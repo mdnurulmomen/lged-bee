@@ -19,7 +19,7 @@ class XStrategicPlanOutcome extends Model
 
     public function plan_duration()
     {
-        return $this->belongsTo(XstrategicPlanDuration::class, 'duration_id', 'id');
+        return $this->belongsTo(XStrategicPlanDuration::class, 'duration_id', 'id');
     }
 
     public function plan_output()
