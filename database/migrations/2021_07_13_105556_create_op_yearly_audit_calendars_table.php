@@ -15,12 +15,6 @@ class CreateOpYearlyAuditCalendarsTable extends Migration
     {
         Schema::create('op_yearly_audit_calendars', function (Blueprint $table) {
             $table->id();
-            echo 'Duration_id,
-fy_id,
-calendar_initiator,
-Current_desk
-Status
-';
             $table->integer('duration_id');
             $table->integer('fiscal_year_id');
             $table->integer('employee_record_id');
@@ -32,6 +26,7 @@ Status
             $table->string('cdesk_name_bn');
             $table->string('cdesk_unit_name_en');
             $table->string('cdesk_unit_name_bn');
+            $table->string('status', 24);
             $table->timestamps();
         });
     }
