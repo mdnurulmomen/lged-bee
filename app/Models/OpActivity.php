@@ -41,4 +41,9 @@ class OpActivity extends Model
         return $this->hasMany(OpActivityMilestone::class, 'activity_id', 'id');
     }
 
+    public function responsibles()
+    {
+        return $this->hasMany(OpYearlyAuditCalendarResponsible::class, 'activity_id', 'id');
+    }
+
 }

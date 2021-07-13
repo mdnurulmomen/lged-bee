@@ -57,7 +57,12 @@ class XFiscalYearController extends Controller
     public function show(ShowOrDeleteRequest $request): \Illuminate\Http\JsonResponse
     {
         $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id);
-        return response()->json($fiscal_year);
+        if ($fiscal_year) {
+            $response = responseFormat('success', $fiscal_year);
+        } else {
+            $response = responseFormat('error', 'Fiscal Year Not Found');
+        }
+        return response()->json($response, 200);
     }
 
     /**

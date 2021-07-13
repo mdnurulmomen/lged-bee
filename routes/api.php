@@ -25,13 +25,13 @@ Route::group(['middleware' => ['header.api.version']], function () {
     Route::group(['prefix' => 'operational-plan/'], function () {
 
         Route::post('activity/find', [OpActivityController::class, 'findActivities']);
-
         Route::customApiResource('activity', OpActivityController::class);
 
         Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
 
         Route::post('audit-calendar/milestones', [OpAuditCalendarController::class, 'activityMilestones']);
-        Route::post('audit-calendar/milestones/date/update', [OpAuditCalendarController::class, 'storeTargetDate']);
+        Route::post('audit-calendar/responsible/create', [OpAuditCalendarController::class, 'storeActivityResponsible']);
+        Route::post('audit-calendar/milestones/date/update', [OpAuditCalendarController::class, 'storeMilestoneTargetDate']);
         Route::customApiResource('audit-calendar', OpAuditCalendarController::class);
 
     });
