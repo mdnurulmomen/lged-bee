@@ -29,9 +29,9 @@ Route::group(['middleware' => ['header.api.version']], function () {
 
         Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
 
-        Route::post('audit-calendar/milestones', [OpAuditCalendarController::class, 'activityMilestones']);
         Route::post('audit-calendar/responsible/create', [OpAuditCalendarController::class, 'storeActivityResponsible']);
         Route::post('audit-calendar/milestones/date/update', [OpAuditCalendarController::class, 'storeMilestoneTargetDate']);
+        Route::post('audit-calendar/comment/update', [OpAuditCalendarController::class, 'updateActivityComment']);
         Route::customApiResource('audit-calendar', OpAuditCalendarController::class);
 
     });
