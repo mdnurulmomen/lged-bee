@@ -15,6 +15,7 @@ class CreateOpYearlyAuditCalendarActivitiesTable extends Migration
     {
         Schema::create('op_yearly_audit_calendar_activities', function (Blueprint $table) {
             $table->id();
+            $table->integer('op_yearly_audit_calendar_id');
             $table->integer('duration_id');
             $table->integer('fiscal_year_id');
             $table->integer('outcome_id');

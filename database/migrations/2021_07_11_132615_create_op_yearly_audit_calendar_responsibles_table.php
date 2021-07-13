@@ -20,9 +20,10 @@ class CreateOpYearlyAuditCalendarResponsiblesTable extends Migration
             $table->integer('outcome_id');
             $table->integer('output_id');
             $table->integer('activity_id');
+            $table->integer('op_yearly_audit_calendar_activity_id');
             $table->integer('op_yearly_audit_calendar_id');
             $table->integer('office_id');
-            $table->integer('office_layer ');
+            $table->integer('office_layer');
             $table->string('short_name_en');
             $table->string('short_name_bn');
             $table->string('office_name_en');
