@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OpActivity;
 use App\Models\OpActivityComment;
-use App\Models\OpYearlyAuditCalendar;
+use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XResponsibleOffice;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class OpAuditCalendarController extends Controller
         ])->validate();
 
         try {
-            $calendar = OpYearlyAuditCalendar::find($request->yearly_audit_calendar_id);
+            $calendar = OpYearlyAuditCalendarActivity::find($request->yearly_audit_calendar_id);
             $calendar->target_date = $request->target_date;
             $calendar->save();
             $response = responseFormat('success', 'Updated Successfully');
@@ -64,7 +64,7 @@ class OpAuditCalendarController extends Controller
         ])->validate();
 
         try {
-            $auditCalendar = OpYearlyAuditCalendar::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id',)->where('activity_id', $data['activity_id'])->first()->toArray();
+            $auditCalendar = OpYearlyAuditCalendarActivity::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id',)->where('activity_id', $data['activity_id'])->first()->toArray();
             $auditCalendar['op_yearly_audit_calendar_id'] = $auditCalendar['id'];
             unset($auditCalendar['id']);
 

@@ -27,7 +27,7 @@ class OpActivityMilestone extends Model
 
     public function milestone_calendar()
     {
-        return $this->hasOne(OpYearlyAuditCalendar::class, 'milestone_id', 'id');
+        return $this->hasOne(OpYearlyAuditCalendarActivity::class, 'milestone_id', 'id');
     }
 
     public function saveMilestone(array $data)
