@@ -20,7 +20,7 @@ class XStrategicPlanOutput extends Model
 
     public function plan_outcome()
     {
-        return $this->belongsTo(XstrategicPlanOutcome::class, 'outcome_id', 'id');
+        return $this->belongsTo(XStrategicPlanOutcome::class, 'outcome_id', 'id');
     }
 
     public function activities()

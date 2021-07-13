@@ -17,6 +17,6 @@ class XStrategicPlanDuration extends Model
 
     public function plan_outcome()
     {
-        return $this->hasMany(XstrategicPlanOutcome::class, 'duration_id', 'id');
+        return $this->hasMany(XStrategicPlanOutcome::class, 'duration_id', 'id');
     }
 }
