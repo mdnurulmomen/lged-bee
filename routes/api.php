@@ -34,6 +34,6 @@ Route::group(['middleware' => ['header.api.version']], function () {
         Route::post('audit-calendar/comment/update', [OpAuditCalendarController::class, 'updateActivityComment']);
         Route::customApiResource('audit-calendar', OpAuditCalendarController::class);
 
+        Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
     });
 });
-

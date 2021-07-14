@@ -41,6 +41,11 @@ class OpActivity extends Model
         return $this->hasMany(OpActivityMilestone::class, 'activity_id', 'id');
     }
 
+    public function calendar_activity()
+    {
+        return $this->hasMany(OpYearlyAuditCalendarActivity::class, 'activity_id', 'id');
+    }
+
     public function responsibles()
     {
         return $this->hasMany(OpYearlyAuditCalendarResponsible::class, 'activity_id', 'id');
@@ -50,5 +55,4 @@ class OpActivity extends Model
     {
         return $this->hasOne(OpActivityComment::class, 'activity_id', 'id');
     }
-
 }
