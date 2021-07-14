@@ -7,14 +7,20 @@ use Illuminate\Http\Request;
 
 class OpYearlyAuditCalendarController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        //
+        if ($request->per_page && $request->page && !$request->all) {
+            $yearly_audit_calendars = OpYearlyAuditCalendar::with('fiscal_year')->paginate($request->per_page);
+        } else {
+            $yearly_audit_calendars = OpYearlyAuditCalendar::with('fiscal_year')->get();
+        }
+
+        if ($yearly_audit_calendars) {
+            $response = responseFormat('success', $yearly_audit_calendars);
+        } else {
+            $response = responseFormat('error', 'Yearly Audit Calendars Not Found!');
+        }
+        return response()->json($response, 200);
     }
 
     /**
@@ -30,7 +36,7 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -41,7 +47,7 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\OpYearlyAuditCalendar  $opYearlyAuditCalendar
+     * @param \App\Models\OpYearlyAuditCalendar $opYearlyAuditCalendar
      * @return \Illuminate\Http\Response
      */
     public function show(OpYearlyAuditCalendar $opYearlyAuditCalendar)
@@ -52,7 +58,7 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\OpYearlyAuditCalendar  $opYearlyAuditCalendar
+     * @param \App\Models\OpYearlyAuditCalendar $opYearlyAuditCalendar
      * @return \Illuminate\Http\Response
      */
     public function edit(OpYearlyAuditCalendar $opYearlyAuditCalendar)
@@ -63,8 +69,8 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\OpYearlyAuditCalendar  $opYearlyAuditCalendar
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\OpYearlyAuditCalendar $opYearlyAuditCalendar
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, OpYearlyAuditCalendar $opYearlyAuditCalendar)
@@ -75,7 +81,7 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\OpYearlyAuditCalendar  $opYearlyAuditCalendar
+     * @param \App\Models\OpYearlyAuditCalendar $opYearlyAuditCalendar
      * @return \Illuminate\Http\Response
      */
     public function destroy(OpYearlyAuditCalendar $opYearlyAuditCalendar)

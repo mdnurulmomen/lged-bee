@@ -23,4 +23,9 @@ class OpYearlyAuditCalendar extends Model
         'cdesk_unit_name_bn',
         'status',
     ];
+
+    public function fiscal_year()
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
 }

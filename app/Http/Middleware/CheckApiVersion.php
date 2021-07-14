@@ -16,7 +16,6 @@ class CheckApiVersion
      */
     public function handle(Request $request, Closure $next)
     {
-//        dd($request->headers->has('api-version') === false);
         if ($request->headers->has('api-version') === false) {
             return setAPIVersionError();
         }
