@@ -35,5 +35,6 @@ Route::group(['middleware' => ['header.api.version']], function () {
         Route::customApiResource('audit-calendar', OpAuditCalendarController::class);
 
         Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
+        Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
     });
 });

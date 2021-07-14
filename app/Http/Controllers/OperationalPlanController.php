@@ -18,4 +18,16 @@ class OperationalPlanController extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+    public function OperationalDetail(
+        Operational $request,
+        OperationalPlan $op
+    ): \Illuminate\Http\JsonResponse {
+        try {
+            $response = responseFormat('success', $op->OperationalDetail($request));
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
 }

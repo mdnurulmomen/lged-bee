@@ -48,4 +48,17 @@ class OperationalPlan implements OperationalPlanInterface
         }
         return $data;
     }
+
+    public function OperationalDetail(Request $request)
+    {
+        $tree = $this->op->with(['children'])->get();
+        $directorates = $this->op
+            ->with(['responsibles'])
+            ->where('fiscal_year_id', $request->fiscal_year_id)
+            ->get();
+        return [
+            'tree' => $tree,
+            'directorates' => $directorates
+        ];
+    }
 }
