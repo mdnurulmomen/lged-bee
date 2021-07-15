@@ -7,6 +7,7 @@ use App\Http\Requests\OpActivity\SearchActivities;
 use App\Http\Requests\OpActivity\ShowOrDeleteRequest;
 use App\Http\Requests\OpActivity\UpdateRequest;
 use App\Models\OpActivity;
+use App\Models\XStrategicPlanOutcome;
 use App\Models\XStrategicPlanOutput;
 use Illuminate\Http\Request;
 
@@ -61,6 +62,48 @@ class OpActivityController extends Controller
         return response()->json($response);
     }
 
+    public function findActivitiesV2(SearchActivities $request): \Illuminate\Http\JsonResponse
+    {
+
+        $output_id = $request->output_id;
+        $outcome_id = $request->outcome_id;
+        $fiscal_year_id = $request->fiscal_year_id;
+
+        $data = [];
+        $outcomes = $outcome_id ? XStrategicPlanOutcome::where('id', $outcome_id)->with('plan_output')->get() : XStrategicPlanOutcome::with('plan_output')->get();
+        foreach ($outcomes as $outcome) {
+            $outputData = [];
+            foreach ($outcome->plan_output as $output) {
+                $query = OpActivity::query();
+                $query->when($output_id, function ($q, $output_id) {
+                    return $q->where('output_id', $output_id);
+                });
+                $query->when($outcome_id, function ($q, $outcome_id) {
+                    return $q->where('outcome_id', $outcome_id);
+                });
+                $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                    return $q->where('fiscal_year_id', $fiscal_year_id);
+                });
+
+                $activities = $query->get();
+                if (count($activities)) {
+                    if ($output_id == $output->id) $outputData[] = ['output_id' => $output->id, 'output_no' => $output->output_no, 'output_title_en' => $output->output_title_en, 'output_title_bn' => $output->output_title_bn, 'output_remarks' => $output->remarks, 'activities' => $activities];
+                }
+            }
+            if (count($outputData)) {
+                $data[] = ['outcome_id' => $outcome->id, 'outcome_no' => $outcome->outcome_no, 'outcome_title_en' => $outcome->outcome_title_en, 'outcome_title_bn' => $outcome->outcome_title_bn, 'outcome_remarks' => $outcome->remarks, 'output' => $outputData];
+            }
+        }
+
+        if (!empty($data)) {
+            $response = responseFormat('success', $data);
+        } else {
+            $response = responseFormat('error', 'Not Found');
+        }
+
+        return response()->json($response);
+    }
+
     public function store(SaveRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -80,8 +123,7 @@ class OpActivityController extends Controller
 
     public function show(ShowOrDeleteRequest $request): \Illuminate\Http\JsonResponse
     {
-        $opActivity = OpActivity::with('plan_output.plan_outcome.plan_duration')->where('id', $request->activity_id)
-            ->first();
+        $opActivity = OpActivity::with('plan_output.plan_outcome.plan_duration')->where('id', $request->activity_id)->first();
 
         if (!empty($opActivity)) {
             $response = responseFormat('success', $opActivity);
