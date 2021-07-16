@@ -9,24 +9,19 @@ use App\Http\Requests\OpActivity\UpdateRequest;
 use App\Models\OpActivity;
 use App\Models\XStrategicPlanOutcome;
 use App\Models\XStrategicPlanOutput;
+use App\Repository\OpActivityRepository;
 use Illuminate\Http\Request;
 
 class OpActivityController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
     {
-        if ($request->per_page && $request->page && !$request->all) {
-            $opActivities = OpActivity::with('plan_output.plan_outcome.plan_duration')->paginate($request->per_page);
-        } else {
-            $opActivities = OpActivity::with('plan_output.plan_outcome.plan_duration')->get();
+        try {
+            $response = responseFormat('success', $opActivity->allActivities($request));
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        if ($opActivities) {
-            $response = responseFormat('success', $opActivities);
-        } else {
-            $response = responseFormat('error', 'Operational Plan Activity Not Found');
-        }
-        return response()->json($response, 200);
     }
 
     public function findActivities(SearchActivities $request): \Illuminate\Http\JsonResponse

@@ -9,21 +9,21 @@ class OpActivity extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'duration_id',
-        'fiscal_year_id',
-        'outcome_id',
-        'output_id',
-        'activity_no',
-        'title_en',
-        'title_bn',
-        'activity_parent_id',
-        'is_parent',
-    ];
+    protected $fillable = ['duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_no', 'title_en', 'title_bn', 'activity_parent_id', 'is_parent',];
 
     public function activity_output()
     {
         return $this->belongsTo(XstrategicPlanOutput::class, 'output_id', 'id');
+    }
+
+    public function activity_outcome()
+    {
+        return $this->belongsTo(XstrategicPlanOutcome::class, 'outcome_id', 'id');
+    }
+
+    public function activity_fiscal_year()
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 
     public function children(): \Illuminate\Database\Eloquent\Relations\HasMany
