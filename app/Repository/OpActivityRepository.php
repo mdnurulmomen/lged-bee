@@ -44,7 +44,7 @@ class OpActivityRepository implements OpActivityInterface
                 $milestone_count += $out[$milestone] * substr($milestone, strpos($milestone, "-") + 1);
             }
             $fiscal_year = XFiscalYear::select('description')->where('id', $fiscal_year_id)->first()->description;
-            $data = [
+            $data[] = [
                 'fiscal_year_id' => $fiscal_year_id,
                 'fiscal_year' => $fiscal_year,
                 'outcome_count' => $outcome_count,
@@ -53,6 +53,7 @@ class OpActivityRepository implements OpActivityInterface
                 'milestone_count' => $milestone_count,
             ];
         }
+
         return $data;
     }
 }
