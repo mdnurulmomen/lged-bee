@@ -29,4 +29,9 @@ class OpYearlyAuditCalendarMovement extends Model
         'created_by',
         'modified_by',
     ];
+
+    public function audit_calendar()
+    {
+        return $this->belongsTo(OpYearlyAuditCalendarMovement::class, 'id', 'op_yearly_calendar_id');
+    }
 }

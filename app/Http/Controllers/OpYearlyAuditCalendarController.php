@@ -3,24 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\OpYearlyAuditCalendar;
+use App\Repository\OpYearlyAuditCalendarRepository;
 use Illuminate\Http\Request;
 
 class OpYearlyAuditCalendarController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendar): \Illuminate\Http\JsonResponse
     {
-        if ($request->per_page && $request->page && !$request->all) {
-            $yearly_audit_calendars = OpYearlyAuditCalendar::with('fiscal_year')->paginate($request->per_page);
-        } else {
-            $yearly_audit_calendars = OpYearlyAuditCalendar::with('fiscal_year')->get();
+        try {
+            $response = responseFormat('success', $opYearlyAuditCalendar->allCalendarLists($request));
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
         }
-
-        if ($yearly_audit_calendars) {
-            $response = responseFormat('success', $yearly_audit_calendars);
-        } else {
-            $response = responseFormat('error', 'Yearly Audit Calendars Not Found!');
-        }
-        return response()->json($response, 200);
     }
 
     /**

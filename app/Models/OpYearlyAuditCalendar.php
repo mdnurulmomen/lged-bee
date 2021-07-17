@@ -28,4 +28,9 @@ class OpYearlyAuditCalendar extends Model
     {
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
+
+    public function calendar_movements()
+    {
+        return $this->hasMany(OpYearlyAuditCalendarMovement::class, 'op_yearly_calendar_id', 'id');
+    }
 }
