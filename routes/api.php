@@ -36,6 +36,8 @@ Route::group(['middleware' => ['header.api.version']], function () {
 
         Route::customApiResource('yearly-audit-calendar', OpYearlyAuditCalendarController::class);
 
+        Route::customApiResource('yearly-audit-calendar-movement', OpYearlyAuditCalendarMovementController::class);
+
         Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
         Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
     });
