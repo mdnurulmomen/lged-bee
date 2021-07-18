@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Models\OpActivity;
 use App\Models\XFiscalYear;
+use App\Models\XStrategicPlanOutcome;
 use App\Repository\Contracts\OpActivityInterface;
 use Illuminate\Http\Request;
 
@@ -55,5 +56,44 @@ class OpActivityRepository implements OpActivityInterface
         }
 
         return $data;
+    }
+
+    public function findActivities(Request $request)
+    {
+        $output_id = $request->output_id;
+        $outcome_id = $request->outcome_id;
+        $fiscal_year_id = $request->fiscal_year_id;
+
+        $outcomes = XStrategicPlanOutcome::query();
+
+        if (!empty($outcome_id)) {
+            $outcomes->where('id', $outcome_id);
+        }
+
+        if (!empty($output_id)) {
+            $outcomes->with(['plan_output' => function ($q) use ($output_id, $fiscal_year_id) {
+                $q->where('id', $output_id);
+                if (!empty($fiscal_year_id)) {
+                    $q->with(['activities' => function ($q) use ($fiscal_year_id) {
+                        $q->where('fiscal_year_id', $fiscal_year_id);
+                    }]);
+                } else {
+                    $q->with('activities');
+                }
+            }]);
+        } else {
+            $outcomes->with('plan_output.activities');
+        }
+
+        $activities['data'] = $outcomes->get();
+        $activities['fiscal_year_id'] = $fiscal_year_id;
+
+        if (!empty($activities)) {
+            $response = responseFormat('success', $activities);
+        } else {
+            $response = responseFormat('error', 'Not Found');
+        }
+
+        return $response;
     }
 }

@@ -24,37 +24,14 @@ class OpActivityController extends Controller
         }
     }
 
-    public function findActivities(SearchActivities $request): \Illuminate\Http\JsonResponse
+    public function findActivities(SearchActivities $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
     {
-
-        $output_id = $request->output_id;
-        $outcome_id = $request->outcome_id;
-        $fiscal_year_id = $request->fiscal_year_id;
-
-//        $query = OpActivity::query();
-        $query = XStrategicPlanOutput::query();
-
-        $query->when($output_id, function ($q, $output_id) {
-            return $q->where('id', $output_id);
-        });
-        $query->when($outcome_id, function ($q, $outcome_id) {
-            return $q->where('outcome_id', $outcome_id);
-        });
-        $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
-            return $q->where('fiscal_year_id', $fiscal_year_id);
-        });
-
-        $activities = $query->with('activities.children')->get();
-
-//        $activities = OpActivity::where('output_id', $request->output_id)->with('children')->get();
-
-        if (!empty($activities)) {
-            $response = responseFormat('success', $activities);
-        } else {
-            $response = responseFormat('error', 'Not Found');
+        try {
+            $data = $opActivity->findActivities($request);
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        return response()->json($response);
     }
 
     public function findActivitiesV2(SearchActivities $request): \Illuminate\Http\JsonResponse
