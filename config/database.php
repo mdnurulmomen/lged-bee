@@ -63,7 +63,7 @@ return [
             ]) : [],
         ],
 
-        'doptor_db' => [
+        'DoptorDB' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DOPTOR_DB_HOST', '127.0.0.1'),
@@ -84,7 +84,7 @@ return [
         ],
 
 
-        'office_db' => [
+        'OfficeDB' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('OFFICE_DB_HOST', '127.0.0.1'),
