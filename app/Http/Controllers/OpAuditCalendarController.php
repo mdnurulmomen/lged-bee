@@ -64,8 +64,8 @@ class OpAuditCalendarController extends Controller
         ])->validate();
 
         try {
-            $auditCalendar = OpYearlyAuditCalendarActivity::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id',)->where('activity_id', $data['activity_id'])->first()->toArray();
-            $auditCalendar['op_yearly_audit_calendar_id'] = $auditCalendar['id'];
+            $auditCalendar = OpYearlyAuditCalendarActivity::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id', 'op_yearly_audit_calendar_id')->where('activity_id', $data['activity_id'])->first()->toArray();
+            $auditCalendar['op_yearly_audit_calendar_activity_id'] = $auditCalendar['id'];
             unset($auditCalendar['id']);
 
             foreach ($data['selected_office_ids'] as $responsible_id) {
