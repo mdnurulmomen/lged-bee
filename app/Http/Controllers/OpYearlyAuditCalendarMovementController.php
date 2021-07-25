@@ -11,10 +11,6 @@ use Illuminate\Support\Facades\Validator;
 class OpYearlyAuditCalendarMovementController extends Controller
 {
 
-    public function index(Request $request)
-    {
-    }
-
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -68,19 +64,5 @@ class OpYearlyAuditCalendarMovementController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
-    }
-
-    public function show(Request $request)
-    {
-        //
-    }
-
-    public function update(Request $request)
-    {
-    }
-
-    public function destroy(OpYearlyAuditCalendarMovement $opYearlyAuditCalendarApprovalMovement)
-    {
-        //
     }
 }
