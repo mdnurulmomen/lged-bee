@@ -34,6 +34,9 @@ class OpYearlyAuditCalendarMovementController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function movementHistory(Request $request, OpYearlyAuditCalendarMovementRepository $opYearlyAuditCalendarMovementRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -49,6 +52,9 @@ class OpYearlyAuditCalendarMovementController extends Controller
         }
     }
 
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function changeStatus(Request $request, OpYearlyAuditCalendarRepository $opYearlycalendar): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
