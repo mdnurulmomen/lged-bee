@@ -53,4 +53,10 @@ class OpYearlyAuditCalendarMovementRepository implements OpYearlyAuditCalendarMo
 
         return $data;
     }
+
+    public function movementHistory(Request $request)
+    {
+        return $this->opYearlyAuditCalendarMovement
+            ->where('op_yearly_calendar_id', $request->op_yearly_calendar_id)->get();
+    }
 }

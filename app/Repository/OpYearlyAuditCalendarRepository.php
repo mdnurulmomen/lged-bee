@@ -60,4 +60,15 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 
         return $data;
     }
+
+    public function changeStatus(Request $request)
+    {
+        $status = $request->status == 'approved' ? 'approved' : ($request->status == 'published' ? 'published' : 'draft');
+        try {
+            $this->opYearlyAuditCalendar->where('id', $request->id)->update(['status' => $status]);
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
 }
