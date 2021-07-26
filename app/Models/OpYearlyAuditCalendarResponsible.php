@@ -34,6 +34,6 @@ class OpYearlyAuditCalendarResponsible extends Model
 
     public function activities()
     {
-        return $this->hasMany(OpActivity::class, 'id', 'activity_id');
+        return $this->hasOne(OpActivity::class, 'id', 'activity_id');
     }
 }

@@ -81,8 +81,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         $data = [];
         $milestones = [];
         $ac_array = [];
-
-
+        $i = 0;
         $responsibles = OpYearlyAuditCalendarResponsible::where('op_yearly_audit_calendar_id', 1)->with('activities.milestones')->with('activities.comment')->orderBy('office_id')->orderBy('activity_id')->get()->toArray();
 
         foreach ($responsibles as $responsible) {
@@ -94,33 +93,37 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                 'op_yearly_audit_calendar_id' => $responsible['op_yearly_audit_calendar_id'],
             ];
 
-            foreach ($responsible['activities'] as $activities) {
 
-                foreach ($activities['milestones'] as $milestone) {
-                    $milestones[] = [
-                        'milestone_id' => $milestone['id'],
-                        'milestone_title_en' => $milestone['title_en'],
-                        'milestone_title_bn' => $milestone['title_bn'],
-                        'target_date' => $this->milestoneTargetDate($milestone['id']),
-                    ];
-                }
-
-                $ac_array[] = [
-//                    'activity_responsible_id' => $responsible['office_id'],
-//                    'output_id' => $activities['output_id'],
-//                    'outcome_id' => $activities['outcome_id'],
-//                    'op_yearly_audit_calendar_activity_id' => $responsible['op_yearly_audit_calendar_activity_id'],
-                    'activity_id' => $activities['id'],
-//                    'activity_title_en' => $activities['title_en'],
-//                    'activity_title_bn' => $activities['title_bn'],
-//                    'comment' => $activities['comment'],
-//                    'milestones' => $milestones,
+            foreach ($responsible['activities']['milestones'] as $milestone) {
+                $milestones[] = [
+                    'milestone_id' => $milestone['id'],
+                    'milestone_title_en' => $milestone['title_en'],
+                    'milestone_title_bn' => $milestone['title_bn'],
+                    'target_date' => $this->milestoneTargetDate($milestone['id']),
                 ];
-
-                $activity_data['activities'] = $ac_array;
             }
-            $data[$responsible['office_id']] = $activity_data;
-//            $data[$responsible['office_id']] = $common_data + $activity_data;
+
+            $ac_array[] = [
+                'activity_responsible_id' => $responsible['office_id'],
+                'output_id' => $responsible['activities']['output_id'],
+                'outcome_id' => $responsible['activities']['outcome_id'],
+                'op_yearly_audit_calendar_activity_id' => $responsible['op_yearly_audit_calendar_activity_id'],
+                'activity_id' => $responsible['activities']['id'],
+                'activity_title_en' => $responsible['activities']['title_en'],
+                'activity_title_bn' => $responsible['activities']['title_bn'],
+                'comment' => $responsible['activities']['comment'],
+                'milestones' => $milestones,
+            ];
+            $activity_data['activities'] = $ac_array;
+            $data[$responsible['office_id']] = $common_data + $activity_data;
+        }
+
+        foreach ($data as $key => $datum) {
+            foreach ($datum['activities'] as $item) {
+                if ($item['activity_responsible_id'] == $key) {
+                    $datax[$key][] = $item;
+                }
+            }
         }
 
 //        foreach ($data as $directory) {
@@ -138,6 +141,6 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 //            }
 //        }
 
-        return $data;
+        return $datax;
     }
 }
