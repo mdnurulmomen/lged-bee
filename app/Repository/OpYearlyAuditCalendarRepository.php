@@ -2,13 +2,16 @@
 
 namespace App\Repository;
 
-use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpYearlyAuditCalendar;
+use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Repository\Contracts\OpYearlyAuditCalendarInterface;
+use App\Traits\GenericData;
 use Illuminate\Http\Request;
 
 class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 {
+    use GenericData;
+
     public function __construct(OpYearlyAuditCalendar $opYearlyAuditCalendar)
     {
         $this->opYearlyAuditCalendar = $opYearlyAuditCalendar;
@@ -75,7 +78,66 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 
     public function saveEventsBeforePublishing(Request $request)
     {
+        $data = [];
+        $milestones = [];
+        $ac_array = [];
 
 
+        $responsibles = OpYearlyAuditCalendarResponsible::where('op_yearly_audit_calendar_id', 1)->with('activities.milestones')->with('activities.comment')->orderBy('office_id')->orderBy('activity_id')->get()->toArray();
+
+        foreach ($responsibles as $responsible) {
+
+            $common_data = [
+                'office_id' => $responsible['office_id'],
+                'duration_id' => $responsible['duration_id'],
+                'fiscal_year_id' => $responsible['fiscal_year_id'],
+                'op_yearly_audit_calendar_id' => $responsible['op_yearly_audit_calendar_id'],
+            ];
+
+            foreach ($responsible['activities'] as $activities) {
+
+                foreach ($activities['milestones'] as $milestone) {
+                    $milestones[] = [
+                        'milestone_id' => $milestone['id'],
+                        'milestone_title_en' => $milestone['title_en'],
+                        'milestone_title_bn' => $milestone['title_bn'],
+                        'target_date' => $this->milestoneTargetDate($milestone['id']),
+                    ];
+                }
+
+                $ac_array[] = [
+//                    'activity_responsible_id' => $responsible['office_id'],
+//                    'output_id' => $activities['output_id'],
+//                    'outcome_id' => $activities['outcome_id'],
+//                    'op_yearly_audit_calendar_activity_id' => $responsible['op_yearly_audit_calendar_activity_id'],
+                    'activity_id' => $activities['id'],
+//                    'activity_title_en' => $activities['title_en'],
+//                    'activity_title_bn' => $activities['title_bn'],
+//                    'comment' => $activities['comment'],
+//                    'milestones' => $milestones,
+                ];
+
+                $activity_data['activities'] = $ac_array;
+            }
+            $data[$responsible['office_id']] = $activity_data;
+//            $data[$responsible['office_id']] = $common_data + $activity_data;
+        }
+
+//        foreach ($data as $directory) {
+//            try {
+//                $event_data = [
+//                    'office_id' => $directory['office_id'],
+//                    'op_yearly_audit_calendar_id' => $directory['op_yearly_audit_calendar_id'],
+//                    'audit_calendar_data' => json_encode($directory['activities']),
+//                    'status' => 0,
+//                ];
+//                OpOrganizationYearlyAuditCalendarEvent::create($event_data);
+//
+//            } catch (\Exception $exception) {
+//                return ['status' => 'error', 'data' => $exception];
+//            }
+//        }
+
+        return $data;
     }
 }

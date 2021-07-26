@@ -43,7 +43,7 @@ class OpYearlyAuditCalendarMovementRepository implements OpYearlyAuditCalendarMo
                     'sent_by' => $sent_by,
                     'created_by' => $designation['officer_id'],
                     'modified_by' => $designation['officer_id'],
-                ];;
+                ];
                 OpYearlyAuditCalendarMovement::create($movement_data);
                 $data = ['status' => 'success', 'data' => 'Successfully Created'];
             } catch (\Exception $e) {

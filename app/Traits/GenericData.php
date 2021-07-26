@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\OfficeDomain;
+use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\XFiscalYear;
 use Illuminate\Support\Facades\Config;
 
@@ -11,6 +12,11 @@ trait GenericData
     public function durationIdFromFiscalYear($fiscal_year_id)
     {
         return XFiscalYear::select('duration_id')->where('id', $fiscal_year_id)->first()->duration_id;
+    }
+
+    public function milestoneTargetDate($milestone_id)
+    {
+        return OpYearlyAuditCalendarActivity::select('target_date')->where('milestone_id', $milestone_id)->first()->target_date;
     }
 
     function switchOffice($office_id, $status = -1, $returnErrorMsg = true): array

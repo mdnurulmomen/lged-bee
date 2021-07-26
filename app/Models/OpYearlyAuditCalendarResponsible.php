@@ -31,4 +31,9 @@ class OpYearlyAuditCalendarResponsible extends Model
     {
         return $this->hasOne(XResponsibleOffice::class, 'office_id', 'office_id');
     }
+
+    public function activities()
+    {
+        return $this->hasMany(OpActivity::class, 'id', 'activity_id');
+    }
 }

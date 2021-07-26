@@ -141,4 +141,11 @@ class OpYearlyAuditCalendarController extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+    public function saveEventsBeforePublishing(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
+    {
+        $res = $opYearlyAuditCalendarRepository->saveEventsBeforePublishing($request);
+
+        return response()->json(responseFormat('success', $res));
+    }
 }
