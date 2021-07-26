@@ -13,7 +13,7 @@ class CreateOpYearlyAuditCalendarSchedulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('op_yearly_audit_calendar_schedules', function (Blueprint $table) {
+        Schema::create('op_organization_yearly_audit_calendar_event_schedules', function (Blueprint $table) {
             $table->id();
             $table->integer('duration_id');
             $table->integer('fiscal_year_id');
@@ -40,6 +40,6 @@ class CreateOpYearlyAuditCalendarSchedulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('op_yearly_audit_calendar_schedules');
+        Schema::dropIfExists('op_organization_yearly_audit_calendar_event_schedules');
     }
 }

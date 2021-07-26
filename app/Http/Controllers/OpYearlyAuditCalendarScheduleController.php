@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OpYearlyAuditCalendarSchedule;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use Illuminate\Http\Request;
 
 class OpYearlyAuditCalendarScheduleController extends Controller
@@ -41,10 +41,10 @@ class OpYearlyAuditCalendarScheduleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\OpYearlyAuditCalendarSchedule  $opYearlyAuditCalendarSchedule
+     * @param  \App\Models\OpOrganizationYearlyAuditCalendarEventSchedule  $opYearlyAuditCalendarSchedule
      * @return \Illuminate\Http\Response
      */
-    public function show(OpYearlyAuditCalendarSchedule $opYearlyAuditCalendarSchedule)
+    public function show(OpOrganizationYearlyAuditCalendarEventSchedule $opYearlyAuditCalendarSchedule)
     {
         //
     }
@@ -52,10 +52,10 @@ class OpYearlyAuditCalendarScheduleController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\OpYearlyAuditCalendarSchedule  $opYearlyAuditCalendarSchedule
+     * @param  \App\Models\OpOrganizationYearlyAuditCalendarEventSchedule  $opYearlyAuditCalendarSchedule
      * @return \Illuminate\Http\Response
      */
-    public function edit(OpYearlyAuditCalendarSchedule $opYearlyAuditCalendarSchedule)
+    public function edit(OpOrganizationYearlyAuditCalendarEventSchedule $opYearlyAuditCalendarSchedule)
     {
         //
     }
@@ -64,10 +64,10 @@ class OpYearlyAuditCalendarScheduleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\OpYearlyAuditCalendarSchedule  $opYearlyAuditCalendarSchedule
+     * @param  \App\Models\OpOrganizationYearlyAuditCalendarEventSchedule  $opYearlyAuditCalendarSchedule
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, OpYearlyAuditCalendarSchedule $opYearlyAuditCalendarSchedule)
+    public function update(Request $request, OpOrganizationYearlyAuditCalendarEventSchedule $opYearlyAuditCalendarSchedule)
     {
         //
     }
@@ -75,10 +75,10 @@ class OpYearlyAuditCalendarScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\OpYearlyAuditCalendarSchedule  $opYearlyAuditCalendarSchedule
+     * @param  \App\Models\OpOrganizationYearlyAuditCalendarEventSchedule  $opYearlyAuditCalendarSchedule
      * @return \Illuminate\Http\Response
      */
-    public function destroy(OpYearlyAuditCalendarSchedule $opYearlyAuditCalendarSchedule)
+    public function destroy(OpOrganizationYearlyAuditCalendarEventSchedule $opYearlyAuditCalendarSchedule)
     {
         //
     }

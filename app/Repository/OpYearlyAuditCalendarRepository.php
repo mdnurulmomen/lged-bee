@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpYearlyAuditCalendar;
 use App\Repository\Contracts\OpYearlyAuditCalendarInterface;
 use Illuminate\Http\Request;
@@ -70,5 +71,11 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    public function saveEventsBeforePublishing(Request $request)
+    {
+
+
     }
 }
