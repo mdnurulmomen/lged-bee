@@ -13,7 +13,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         $this->opYearlyAuditCalendar = $opYearlyAuditCalendar;
     }
 
-    public function allCalendarLists(Request $request)
+    public function allCalendarLists(Request $request): array
     {
         if ($request->per_page && $request->page && !$request->all) {
             $yearly_audit_calendars = $this->opYearlyAuditCalendar->with(['calendar_movements', 'fiscal_year'])->paginate($request->per_page)->toArray();
