@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\OpActivity;
 use App\Models\OpActivityComment;
 use App\Models\OpYearlyAuditCalendarActivity;
-use App\Models\OpYearlyAuditCalendarResponsible;
-use App\Models\XResponsibleOffice;
 use App\Repository\OpYearlyAuditCalendarRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -70,7 +68,7 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function storeActivityResponsible(Request $request): \Illuminate\Http\JsonResponse
+    public function storeActivityResponsible(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendar): \Illuminate\Http\JsonResponse
     {
         $data = Validator::make($request->all(), [
             'activity_id' => 'required|integer',
@@ -78,18 +76,8 @@ class OpYearlyAuditCalendarController extends Controller
         ])->validate();
 
         try {
-            $auditCalendar = OpYearlyAuditCalendarActivity::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id', 'op_yearly_audit_calendar_id')->where('activity_id', $data['activity_id'])->first()->toArray();
-            $auditCalendar['op_yearly_audit_calendar_activity_id'] = $auditCalendar['id'];
-            unset($auditCalendar['id']);
-
-            foreach ($data['selected_office_ids'] as $responsible_id) {
-                if ($responsible_id) {
-                    $office = XResponsibleOffice::select("office_id", "office_layer", "office_name_en", "office_name_bn", "short_name_en", "short_name_bn")->where('id', $responsible_id)->first()->toArray();
-                    $creatingData = array_merge($office, $auditCalendar);
-                    $createAuditResponsible = OpYearlyAuditCalendarResponsible::create($creatingData);
-                    $response = responseFormat('success', 'Successfully created');
-                }
-            }
+            $opYearlyAuditCalendar->storeActivityResponsible($data);
+            $response = responseFormat('success', 'Successfully created');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
         }
