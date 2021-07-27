@@ -200,7 +200,7 @@ if (!function_exists('getBrowser')) {
             'name' => $bname,
             'version' => $version,
             'platform' => $platform,
-            'pattern' => $pattern
+            'pattern' => $pattern,
         );
     }
 }
@@ -213,12 +213,12 @@ if (!function_exists('responseFormat')) {
             if ($status == 'success') {
                 $response = [
                     'status' => $status,
-                    'data' => $data
+                    'data' => $data,
                 ];
             } elseif ($status == 'error') {
                 $response = [
                     'status' => $status,
-                    'message' => $data
+                    'message' => $data,
                 ];
                 if (!empty($options) && !empty($options['details'])) {
                     $response['details'] = $options['details'];
@@ -232,6 +232,20 @@ if (!function_exists('responseFormat')) {
             }
         }
         return $response;
+    }
+}
+
+if (!function_exists('isSuccessResponse')) {
+    function isSuccessResponse($response)
+    {
+        if (!empty($response)) {
+            if (isset($response['status']) && $response['status'] == 'success') {
+                return true;
+            } elseif (isset($response['status']) && $response['status'] == 'error') {
+                return false;
+            }
+        }
+        return false;
     }
 }
 
@@ -341,5 +355,49 @@ function base64_url_encode($val): string
 function base64_url_decode($val): string
 {
     return base64_decode(strtr($val, '-_,', '+/='));
+}
+
+if (!function_exists('makeEncryptedData')) {
+    function makeEncryptedData($string = '', $options = []): string
+    {
+        if (is_object($string)) {
+            print_r($string);
+            die;
+        }
+        try {
+            $cipher = !empty($options['method']) ? $options['method'] : 'AES-128-CBC';
+            $key = !empty($options['key']) ? $options['key'] : config('bee_config.secret_key');
+            $ivlen = openssl_cipher_iv_length($cipher);
+            $iv = openssl_random_pseudo_bytes($ivlen);
+            $ciphertext_raw = openssl_encrypt($string, $cipher, $key, $options = OPENSSL_RAW_DATA, $iv);
+            $hmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary = true);
+            $ciphertext = base64_encode($iv . $hmac . $ciphertext_raw);
+            return $ciphertext;
+        } catch (\Exception $ex) {
+        }
+        return '';
+    }
+}
+if (!function_exists('getDecryptedData')) {
+    function getDecryptedData($encrypt_string = '', $options = [])
+    {
+        try {
+            $cipher = !empty($options['method']) ? $options['method'] : 'AES-128-CBC';
+            $key = !empty($options['key']) ? $options['key'] : config('bee_config.secret_key');
+            $c = base64_decode($encrypt_string);
+            $ivlen = openssl_cipher_iv_length($cipher);
+            $iv = substr($c, 0, $ivlen);
+            $hmac = substr($c, $ivlen, $sha2len = 32);
+            $ciphertext_raw = substr($c, $ivlen + $sha2len);
+            $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $key, OPENSSL_RAW_DATA, $iv);
+            $calcmac = hash_hmac('sha256', $ciphertext_raw, $key, true);
+            if (hash_equals($hmac, $calcmac)) {
+                return $original_plaintext;
+            }
+        } catch (\Exception $ex) {
+        }
+
+        return '';
+    }
 }
 

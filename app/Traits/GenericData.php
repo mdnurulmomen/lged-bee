@@ -19,7 +19,7 @@ trait GenericData
         return OpYearlyAuditCalendarActivity::select('target_date')->where('milestone_id', $milestone_id)->first()->target_date;
     }
 
-    function switchOffice($office_id, $status = -1, $returnErrorMsg = true): array
+    public function switchOffice($office_id, $status = -1, $returnErrorMsg = true): array
     {
         $officeDomain = OfficeDomain::where('office_id', $office_id)->first();
 

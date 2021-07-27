@@ -6,8 +6,128 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function loginInAmms(Request $request)
+
+    public function loginInAmms(Request $request): \Illuminate\Http\JsonResponse
     {
-        return true;
+        try {
+            if (empty($request->hasHeader('device-id')) || empty($request->hasHeader('device-type')) || empty($request->user_data)) {
+                $response = responseFormat('error', __('Missing required information'), ['code' => MISSING_DEVICE_INFO_CODE]);
+                return response()->json($response, UNAUTHORIZED_CODE);
+            }
+            $data['device_id'] = $request->header('device-id');
+            $data['device_type'] = $request->header('device-type');
+
+            $user_data = json_decode(gzuncompress(base64_decode($request->user_data)), true);
+            $data['user_data'] = $user_data['user_info'];
+
+            $response = $this->setOfficeDomains($data['user_data']);
+            if (!isSuccessResponse($response)) {
+                throw new \Exception($response['message']);
+            }
+            $token_response = $this->makeCagToken($response['data'] + [
+                    'device_id' => $data['device_id'],
+                    'device_type' => $data['device_type'],
+                ]);
+            if (!isSuccessResponse($token_response)) {
+                throw new \Exception('Token Generation Error');
+            }
+            $response['data']['token'] = $token_response['data'];
+
+            //get user signature
+//            $gd = new GenericData();
+//            $emp_signature = $gd->getEmployeeSignature($response['data']['user']['employee_record_id']);
+//            $response['data']['signature'] = $emp_signature;
+//
+//            $ta_dds = $gd->getModel('DoptorDataSettings');
+//            $dds = $ta_dds->getAll(['office_sync'], ['id' => 1])->enableHydration(false)->first();
+//            if (!empty($dds)) {
+//                $response['data']['office_sync'] = $dds['office_sync'];
+//            } else {
+//                $response['data']['office_sync'] = 0;
+//            }
+
+            return response()->json($response);
+
+        } catch (\Exception $ex) {
+            return response()->json(responseFormat('error', __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), INTERNAL_SERVER_ERROR_CODE);
+        }
+
+    }
+
+    protected function setOfficeDomains($data): array
+    {
+        try {
+            $office_infos = $data['office_info'];
+            $office_ids = [];
+            foreach ($office_infos as $office_info) {
+                $office_ids[] = $office_info['office_id'];
+            }
+            if (count($office_ids) > 0) {
+                $domains_information = (new \App\Models\OfficeDomain)->getOfficeDomains($office_ids);
+                foreach ($office_infos as $key => &$office_info) {
+                    foreach ($domains_information as $domain_information) {
+                        if ($domain_information['office_id'] == $office_info['office_id']) {
+                            $office_info['office_domain_url'] = $domain_information['domain_url'];
+                        }
+                    }
+                    $data['office_info'] = $office_infos;
+                }
+                return responseFormat('success', $data);
+            } else {
+                $msg = __("অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন।");
+                throw new \Exception($msg);
+            }
+        } catch (\Exception $ex) {
+            return responseFormat('error', __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
+        }
+    }
+
+    protected function makeCagToken($data): array
+    {
+        try {
+            $designations = [];
+            if (!isset($data['office_info'])) {
+                $data['office_info'] = [];
+            }
+            foreach ($data['office_info'] as $office_info) {
+                $designations[$office_info['office_unit_organogram_id']]['office_id'] = $office_info['office_id'];
+                $designations[$office_info['office_unit_organogram_id']]['office_unit_id'] = $office_info['office_unit_id'];
+                $designations[$office_info['office_unit_organogram_id']]['office_head'] = $office_info['office_head'];
+            }
+            $token_data = $this->setLoginTokenData([
+                'device_id' => $data['device_id'],
+                'device_type' => $data['device_type'],
+                'username' => $data['user']['username'],
+                'employee_record_id' => $data['user']['employee_record_id'],
+                'user_id' => $data['user']['id'],
+                'designations' => $designations,
+            ]);
+            $token_response = $this->generateToken($token_data);
+            return ['status' => 'success', 'data' => $token_response];
+        } catch (\Exception $ex) {
+            return responseFormat(
+                'error',
+                __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
+        }
+    }
+
+    protected function setLoginTokenData($data)
+    {
+        if (!empty($data)) {
+            $data_2_unset = [];
+            $data_2_change = $this->getLoginTokenParams();
+            foreach ($data as $data_key => $data_val) {
+                if (isset($data_2_change[$data_key])) {
+                    $data[$data_2_change[$data_key]] = is_array($data_val) ? makeEncryptedData(json_encode($data_val)) : makeEncryptedData($data_val);
+                    $data_2_unset[] = $data_key;
+                }
+            }
+            if (!empty($data_2_unset)) {
+                foreach ($data_2_unset as $unset) {
+                    unset($data[$unset]);
+                }
+            }
+        }
+        return $data;
     }
 }
