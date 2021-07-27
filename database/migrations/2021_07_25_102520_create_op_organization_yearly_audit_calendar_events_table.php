@@ -18,6 +18,8 @@ class CreateOpOrganizationYearlyAuditCalendarEventsTable extends Migration
             $table->integer('office_id');
             $table->integer('op_yearly_audit_calendar_id');
             $table->json('audit_calendar_data');
+            $table->integer('activity_count');
+            $table->integer('milestone_count');
             $table->string('status', 10);
             $table->timestamps();
         });

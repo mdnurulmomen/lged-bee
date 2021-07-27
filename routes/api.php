@@ -36,7 +36,7 @@ Route::group(['middleware' => ['header.api.version']], function () {
         Route::post('audit-calendar/milestones/date/update', [OpYearlyAuditCalendarController::class, 'storeMilestoneTargetDate']);
         Route::post('audit-calendar/comment/update', [OpYearlyAuditCalendarController::class, 'updateActivityComment']);
         Route::post('audit-calendar/change-status', [OpYearlyAuditCalendarController::class, 'changeStatus']);
-        Route::post('audit-calendar/save-events-before-publish', [OpYearlyAuditCalendarController::class, 'saveEventsBeforePublishing']);
+        Route::post('audit-calendar/pending-events-for-publish', [OpYearlyAuditCalendarController::class, 'pendingEventsForPublishing']);
 
         Route::post('audit-calendar/movement/create', [OpYearlyAuditCalendarMovementController::class, 'store']);
         Route::post('audit-calendar/movement/history', [OpYearlyAuditCalendarMovementController::class, 'movementHistory']);

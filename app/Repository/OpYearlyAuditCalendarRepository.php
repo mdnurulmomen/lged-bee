@@ -77,18 +77,31 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         }
     }
 
+    public function pendingEventsForPublishing(Request $request)
+    {
+        $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id')->where('op_yearly_audit_calendar_id', $request->calendar_id)->get()->toArray();
+
+        if (count($calendar_events) == 0) {
+            $is_saved = $this->saveEventsBeforePublishing($request);
+        }
+        $calendar_pending_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status', 'activity_count', 'milestone_count')->where('op_yearly_audit_calendar_id', $request->calendar_id)->where('status', 0)->with('office')->get()->toArray();
+        return $calendar_pending_events;
+    }
+
     public function saveEventsBeforePublishing(Request $request)
     {
         $data = [];
         $milestones = [];
         $ac_array = [];
-        $i = 0;
         $responsibles = OpYearlyAuditCalendarResponsible::where('op_yearly_audit_calendar_id', $request->calendar_id)->with('activities.milestones')->with('activities.comment')->orderBy('office_id')->orderBy('activity_id')->get()->groupBy('office_id')->toArray();
 
         if ($responsibles) {
             foreach ($responsibles as $office_id => $resp) {
                 unset($ac_array);
+                $activity_count = 0;
+                $milestone_count = 0;
                 foreach ($resp as $responsible) {
+                    $activity_count += 1;
                     unset($milestones);
                     $common_data = [
                         'office_id' => $responsible['office_id'],
@@ -98,6 +111,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                     ];
 
                     foreach ($responsible['activities']['milestones'] as $milestone) {
+                        $milestone_count += 1;
                         $milestones[] = [
                             'milestone_id' => $milestone['id'],
                             'milestone_title_en' => $milestone['title_en'],
@@ -118,9 +132,9 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                         'milestones' => $milestones,
                     ];
                     $activity_data['activities'] = $ac_array;
-
                 }
-                $data[$office_id] = $common_data + $activity_data;
+                $count = ['activity_count' => $activity_count, 'milestone_count' => $milestone_count];
+                $data[$office_id] = $common_data + $activity_data + $count;
             }
 
             foreach ($data as $directory) {
@@ -128,16 +142,18 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                     $event_data = [
                         'office_id' => $directory['office_id'],
                         'op_yearly_audit_calendar_id' => $directory['op_yearly_audit_calendar_id'],
+                        'activity_count' => $directory['activity_count'],
+                        'milestone_count' => $directory['milestone_count'],
                         'audit_calendar_data' => json_encode($directory['activities']),
-                        'status' => 0,
+                        'status' => 'pending',
                     ];
                     OpOrganizationYearlyAuditCalendarEvent::create($event_data);
                 } catch (\Exception $exception) {
-                    return responseFormat('error', $exception);
+                    return ['status' => 'error', 'data' => $exception];
                 }
             }
         }
-//        return $data;
-        return responseFormat('success', 'Successfully Added in Events.');
+        return $data;
+//        return ['status' => 'success'];
     }
 }

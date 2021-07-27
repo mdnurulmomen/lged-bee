@@ -145,13 +145,13 @@ class OpYearlyAuditCalendarController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function saveEventsBeforePublishing(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
+    public function pendingEventsForPublishing(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'calendar_id' => 'required|integer',
         ])->validate();
 
-        $res = $opYearlyAuditCalendarRepository->saveEventsBeforePublishing($request);
+        $res = $opYearlyAuditCalendarRepository->pendingEventsForPublishing($request);
 
         return response()->json($res);
     }
