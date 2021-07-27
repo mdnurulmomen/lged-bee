@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpYearlyAuditCalendar;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Repository\Contracts\OpYearlyAuditCalendarInterface;
@@ -82,65 +83,61 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         $milestones = [];
         $ac_array = [];
         $i = 0;
-        $responsibles = OpYearlyAuditCalendarResponsible::where('op_yearly_audit_calendar_id', 1)->with('activities.milestones')->with('activities.comment')->orderBy('office_id')->orderBy('activity_id')->get()->toArray();
+        $responsibles = OpYearlyAuditCalendarResponsible::where('op_yearly_audit_calendar_id', $request->calendar_id)->with('activities.milestones')->with('activities.comment')->orderBy('office_id')->orderBy('activity_id')->get()->groupBy('office_id')->toArray();
 
-        foreach ($responsibles as $responsible) {
+        if ($responsibles) {
+            foreach ($responsibles as $office_id => $resp) {
+                unset($ac_array);
+                foreach ($resp as $responsible) {
+                    unset($milestones);
+                    $common_data = [
+                        'office_id' => $responsible['office_id'],
+                        'duration_id' => $responsible['duration_id'],
+                        'fiscal_year_id' => $responsible['fiscal_year_id'],
+                        'op_yearly_audit_calendar_id' => $responsible['op_yearly_audit_calendar_id'],
+                    ];
 
-            $common_data = [
-                'office_id' => $responsible['office_id'],
-                'duration_id' => $responsible['duration_id'],
-                'fiscal_year_id' => $responsible['fiscal_year_id'],
-                'op_yearly_audit_calendar_id' => $responsible['op_yearly_audit_calendar_id'],
-            ];
+                    foreach ($responsible['activities']['milestones'] as $milestone) {
+                        $milestones[] = [
+                            'milestone_id' => $milestone['id'],
+                            'milestone_title_en' => $milestone['title_en'],
+                            'milestone_title_bn' => $milestone['title_bn'],
+                            'target_date' => $this->milestoneTargetDate($milestone['id']),
+                        ];
+                    }
 
+                    $ac_array[] = [
+                        'activity_responsible_id' => $office_id,
+                        'output_id' => $responsible['activities']['output_id'],
+                        'outcome_id' => $responsible['activities']['outcome_id'],
+                        'op_yearly_audit_calendar_activity_id' => $responsible['op_yearly_audit_calendar_activity_id'],
+                        'activity_id' => $responsible['activities']['id'],
+                        'activity_title_en' => $responsible['activities']['title_en'],
+                        'activity_title_bn' => $responsible['activities']['title_bn'],
+                        'comment' => $responsible['activities']['comment'],
+                        'milestones' => $milestones,
+                    ];
+                    $activity_data['activities'] = $ac_array;
 
-            foreach ($responsible['activities']['milestones'] as $milestone) {
-                $milestones[] = [
-                    'milestone_id' => $milestone['id'],
-                    'milestone_title_en' => $milestone['title_en'],
-                    'milestone_title_bn' => $milestone['title_bn'],
-                    'target_date' => $this->milestoneTargetDate($milestone['id']),
-                ];
+                }
+                $data[$office_id] = $common_data + $activity_data;
             }
 
-            $ac_array[] = [
-                'activity_responsible_id' => $responsible['office_id'],
-                'output_id' => $responsible['activities']['output_id'],
-                'outcome_id' => $responsible['activities']['outcome_id'],
-                'op_yearly_audit_calendar_activity_id' => $responsible['op_yearly_audit_calendar_activity_id'],
-                'activity_id' => $responsible['activities']['id'],
-                'activity_title_en' => $responsible['activities']['title_en'],
-                'activity_title_bn' => $responsible['activities']['title_bn'],
-                'comment' => $responsible['activities']['comment'],
-                'milestones' => $milestones,
-            ];
-            $activity_data['activities'] = $ac_array;
-            $data[$responsible['office_id']] = $common_data + $activity_data;
-        }
-
-        foreach ($data as $key => $datum) {
-            foreach ($datum['activities'] as $item) {
-                if ($item['activity_responsible_id'] == $key) {
-                    $datax[$key][] = $item;
+            foreach ($data as $directory) {
+                try {
+                    $event_data = [
+                        'office_id' => $directory['office_id'],
+                        'op_yearly_audit_calendar_id' => $directory['op_yearly_audit_calendar_id'],
+                        'audit_calendar_data' => json_encode($directory['activities']),
+                        'status' => 0,
+                    ];
+                    OpOrganizationYearlyAuditCalendarEvent::create($event_data);
+                } catch (\Exception $exception) {
+                    return responseFormat('error', $exception);
                 }
             }
         }
-
-//        foreach ($data as $directory) {
-//            try {
-//                $event_data = [
-//                    'office_id' => $directory['office_id'],
-//                    'op_yearly_audit_calendar_id' => $directory['op_yearly_audit_calendar_id'],
-//                    'audit_calendar_data' => json_encode($directory['activities']),
-//                    'status' => 0,
-//                ];
-//                OpOrganizationYearlyAuditCalendarEvent::create($event_data);
-//
-//            } catch (\Exception $exception) {
-//                return ['status' => 'error', 'data' => $exception];
-//            }
-//        }
-
-        return $datax;
+//        return $data;
+        return responseFormat('success', 'Successfully Added in Events.');
     }
 }
