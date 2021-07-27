@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\OpActivityComment;
+use App\Models\OpYearlyAuditCalendarActivity;
+use App\Models\OpYearlyAuditCalendarResponsible;
+use App\Observers\OpActivityCommentObserver;
+use App\Observers\OpYearlyAuditCalendarActivityObserver;
+use App\Observers\OpYearlyAuditCalendarResponsibleObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
-use App\Observers\CalendarObserver;
-use App\Models\OpYearlyAuditCalendarActivity;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,6 +32,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        OpYearlyAuditCalendarActivity::observe(CalendarObserver::class);
+        OpYearlyAuditCalendarActivity::observe(OpYearlyAuditCalendarActivityObserver::class);
+        OpYearlyAuditCalendarResponsible::observe(OpYearlyAuditCalendarResponsibleObserver::class);
+        OpActivityComment::observe(OpActivityCommentObserver::class);
     }
 }

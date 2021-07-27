@@ -27,7 +27,7 @@ class CreateOpYearlyAuditCalendarMovementsTable extends Migration
             $table->integer('employee_designation_id');
             $table->string('employee_designation_en');
             $table->string('employee_designation_bn');
-            $table->integer('user_id');
+            $table->bigInteger('user_id');
             $table->string('calendar_status');
             $table->integer('received_by')->nullable();
             $table->integer('sent_by')->nullable();
