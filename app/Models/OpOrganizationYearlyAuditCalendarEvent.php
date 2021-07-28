@@ -9,7 +9,7 @@ class OpOrganizationYearlyAuditCalendarEvent extends Model
 {
     use HasFactory;
 
-    protected $connection = 'mysql';
+    protected $connection = 'BeeCoreDB';
 
     protected $fillable = [
         'office_id',
