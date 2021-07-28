@@ -164,7 +164,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
     /**
      * @throws \Exception
      */
-    public function publishPendingEvents(Request $request)
+    public function publishPendingEvents(Request $request): array
     {
         $office_ids = $request->office_ids;
         $calendar_id = $request->calendar_id;
