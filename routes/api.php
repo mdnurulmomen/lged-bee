@@ -37,6 +37,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-calendar/comment/update', [OpYearlyAuditCalendarController::class, 'updateActivityComment']);
         Route::post('audit-calendar/change-status', [OpYearlyAuditCalendarController::class, 'changeStatus']);
         Route::post('audit-calendar/pending-events-for-publish', [OpYearlyAuditCalendarController::class, 'pendingEventsForPublishing']);
+        Route::post('audit-calendar/publish', [OpYearlyAuditCalendarController::class, 'publishCalendar']);
 
         Route::post('audit-calendar/movement/create', [OpYearlyAuditCalendarMovementController::class, 'store']);
         Route::post('audit-calendar/movement/history', [OpYearlyAuditCalendarMovementController::class, 'movementHistory']);

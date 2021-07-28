@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\OpActivityComment;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Observers\OpActivityCommentObserver;
+use App\Observers\OpOrganizationAuditCalendarEventScheduleObserver;
 use App\Observers\OpYearlyAuditCalendarActivityObserver;
 use App\Observers\OpYearlyAuditCalendarResponsibleObserver;
 use Illuminate\Auth\Events\Registered;
@@ -35,5 +37,7 @@ class EventServiceProvider extends ServiceProvider
         OpYearlyAuditCalendarActivity::observe(OpYearlyAuditCalendarActivityObserver::class);
         OpYearlyAuditCalendarResponsible::observe(OpYearlyAuditCalendarResponsibleObserver::class);
         OpActivityComment::observe(OpActivityCommentObserver::class);
+
+        OpOrganizationYearlyAuditCalendarEventSchedule::observe(OpOrganizationAuditCalendarEventScheduleObserver::class);
     }
 }

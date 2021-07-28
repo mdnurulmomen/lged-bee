@@ -10,5 +10,12 @@ interface OpYearlyAuditCalendarInterface
 
     public function changeStatus(Request $request);
 
+    public function pendingEventsForPublishing(Request $request);
+
     public function saveEventsBeforePublishing(Request $request);
+
+    public function publishPendingEvents(Request $request);
+
+    public function storeActivityResponsible($data);
+
 }

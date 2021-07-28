@@ -3,13 +3,15 @@
 namespace App\Repository;
 
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendar;
-use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\OpYearlyAuditCalendarActivity;
+use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XResponsibleOffice;
 use App\Repository\Contracts\OpYearlyAuditCalendarInterface;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 {
@@ -90,7 +92,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         return $calendar_pending_events;
     }
 
-    public function saveEventsBeforePublishing(Request $request)
+    public function saveEventsBeforePublishing(Request $request): array
     {
         $data = [];
         $milestones = [];
@@ -146,7 +148,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                         'op_yearly_audit_calendar_id' => $directory['op_yearly_audit_calendar_id'],
                         'activity_count' => $directory['activity_count'],
                         'milestone_count' => $directory['milestone_count'],
-                        'audit_calendar_data' => json_encode($directory['activities']),
+                        'audit_calendar_data' => json_encode($directory),
                         'status' => 'pending',
                     ];
                     OpOrganizationYearlyAuditCalendarEvent::create($event_data);
@@ -159,7 +161,75 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         //        return ['status' => 'success'];
     }
 
-    public function storeActivityResponsible($data)
+    /**
+     * @throws \Exception
+     */
+    public function publishPendingEvents(Request $request)
+    {
+        $office_ids = $request->office_ids;
+        $calendar_id = $request->calendar_id;
+
+        $data = [];
+        $error = [];
+        $success = [];
+
+        foreach ($office_ids as $office_id) {
+            $pending_events = OpOrganizationYearlyAuditCalendarEvent::select('audit_calendar_data')->where('office_id', $office_id)->where('op_yearly_audit_calendar_id', $calendar_id)->latest()->first();
+            if ($pending_events) {
+                $pending_events = $pending_events->audit_calendar_data;
+                $arr_pending_event = json_decode($pending_events, true);
+                $arr_pending_event_activities = $arr_pending_event['activities'];
+                if ($office_id == $arr_pending_event['office_id']) {
+                    $common_data = [
+                        'activity_responsible_id' => $arr_pending_event['office_id'],
+                        'duration_id' => $arr_pending_event['duration_id'],
+                        'fiscal_year_id' => $arr_pending_event['fiscal_year_id'],
+                        'op_yearly_audit_calendar_id' => $arr_pending_event['op_yearly_audit_calendar_id'],
+                    ];
+                    try {
+                        $connection = $this->switchOffice($office_id);
+                        if (isSuccessResponse($connection)) {
+                            DB::beginTransaction();
+                            foreach ($arr_pending_event_activities as $arr_pending_event_activity) {
+                                foreach ($arr_pending_event_activity['milestones'] as $milestone) {
+                                    $schedule_activity_data = [
+                                        'outcome_id' => $arr_pending_event_activity['outcome_id'],
+                                        'output_id' => $arr_pending_event_activity['output_id'],
+                                        'activity_id' => $arr_pending_event_activity['activity_id'],
+                                        'activity_title_en' => $arr_pending_event_activity['activity_title_en'],
+                                        'activity_title_bn' => $arr_pending_event_activity['activity_title_bn'],
+                                        'op_yearly_audit_calendar_activity_id' => $arr_pending_event_activity['op_yearly_audit_calendar_activity_id'],
+                                        'activity_milestone_id' => $milestone['milestone_id'],
+                                        'milestone_title_en' => $milestone['milestone_title_en'],
+                                        'milestone_title_bn' => $milestone['milestone_title_bn'],
+                                        'milestone_target' => $milestone['target_date'],
+                                    ];
+                                    $schedule_data = $common_data + $schedule_activity_data;
+                                    $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
+                                }
+                                $success[$office_id] = ['office_id' => $office_id, 'data' => 'Successfully Published to Office'];
+                            }
+                            DB::commit();
+                        } else {
+                            $error[$office_id] = ['db_error' => 'অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন।'];
+                        }
+                    } catch (\Exception $exception) {
+                        DB::rollBack();
+                        $error[$office_id] = ['exception' => $exception->getMessage(), ['code' => $exception->getCode()]];
+                    }
+                }
+            } else {
+                $error[$office_id] = ['office_id' => $office_id, 'event_error' => 'Calendar For Office Not Found'];
+            }
+        }
+
+        return [
+            'success' => $success,
+            'error' => $error,
+        ];
+    }
+
+    public function storeActivityResponsible($data): bool
     {
         $auditCalendar = OpYearlyAuditCalendarActivity::select('id', 'duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_id', 'op_yearly_audit_calendar_id')
             ->where('activity_id', $data['activity_id'])->first()->toArray();

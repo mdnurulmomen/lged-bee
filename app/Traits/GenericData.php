@@ -6,6 +6,7 @@ use App\Models\OfficeDomain;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\XFiscalYear;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 trait GenericData
 {
@@ -27,12 +28,14 @@ trait GenericData
             $officeDomain = OfficeDomain::where('status', $status)->first();
         }
         if (empty($officeDomain)) {
-            $msg = __("অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন। অফিস আইডিঃ {0}", $office_id);
+            $msg = sprintf("অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন। অফিস আইডিঃ %s.", $office_id);
             if (!$returnErrorMsg) {
                 $msg = "";
             }
             return ['status' => 'error', 'message' => $msg];
         }
+
+        $this->emptyOfficeDBConnection();
 
         Config::set("database.connections.OfficeDB", [
             'driver' => 'mysql',
@@ -43,7 +46,23 @@ trait GenericData
             "port" => 3306,
         ]);
 
+        DB::purge('OfficeDB');
+        DB::reconnect('OfficeDB');
+
         return ['status' => 'success', 'message' => __("Successfully Connected"), 'office_id' => $office_id, 'office_domain' => $officeDomain];
+    }
+
+    public function emptyOfficeDBConnection()
+    {
+        Config::set("database.connections.OfficeDB", [
+            'driver' => 'mysql',
+            "host" => '',
+            "database" => '',
+            "username" => '',
+            "password" => '',
+            "port" => '',
+        ]);
+        DB::purge('OfficeDB');
     }
 }
 

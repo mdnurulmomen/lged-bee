@@ -9,6 +9,8 @@ class OpOrganizationYearlyAuditCalendarEvent extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'office_id',
         'op_yearly_audit_calendar_id',

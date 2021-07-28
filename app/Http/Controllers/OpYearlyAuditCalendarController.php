@@ -143,4 +143,36 @@ class OpYearlyAuditCalendarController extends Controller
 
         return response()->json($res);
     }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function publishCalendar(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'calendar_id' => 'required|integer',
+            'office_ids' => 'required',
+        ])->validate();
+
+        $cdesk = [];
+
+        $res = $opYearlyAuditCalendarRepository->publishPendingEvents($request);
+
+        $success = $res['success'];
+        $error = $res['error'];
+
+        if (count($success) > 0) {
+            $response = [
+                'status' => 'success',
+                'data' => $success + $error,
+            ];
+        } else {
+            $response = [
+                'status' => 'error',
+                'data' => $error,
+            ];
+        }
+
+        return response()->json($res);
+    }
 }
