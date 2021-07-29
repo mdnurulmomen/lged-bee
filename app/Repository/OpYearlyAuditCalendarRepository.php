@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendar;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\OpYearlyAuditCalendarResponsible;
@@ -208,7 +209,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                                         'milestone_target' => $milestone['target_date'],
                                     ];
                                     $schedule_data = $common_data + $schedule_activity_data;
-//                                    $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
+                                    $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
                                 }
                                 $success[$office_id] = ['office_id' => $office_id, 'data' => 'Successfully Published to Office'];
                             }
