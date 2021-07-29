@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
-use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendar;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\OpYearlyAuditCalendarResponsible;
@@ -89,7 +88,11 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
             $is_saved = $this->saveEventsBeforePublishing($request);
         }
         $calendar_pending_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status', 'activity_count', 'milestone_count')->where('op_yearly_audit_calendar_id', $request->calendar_id)->where('status', 0)->with('office')->get()->toArray();
-        return $calendar_pending_events;
+        if ($calendar_pending_events) {
+            return responseFormat('success', $calendar_pending_events);
+        } else {
+            return responseFormat('error', $calendar_pending_events);
+        }
     }
 
     public function saveEventsBeforePublishing(Request $request): array
@@ -205,7 +208,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                                         'milestone_target' => $milestone['target_date'],
                                     ];
                                     $schedule_data = $common_data + $schedule_activity_data;
-                                    $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
+//                                    $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
                                 }
                                 $success[$office_id] = ['office_id' => $office_id, 'data' => 'Successfully Published to Office'];
                             }

@@ -152,7 +152,7 @@ class OpYearlyAuditCalendarController extends Controller
     {
         Validator::make($request->all(), [
             'calendar_id' => 'required|integer',
-            'office_ids' => 'required',
+            'office_ids' => 'array|required',
         ])->validate();
 
         $res = $opYearlyAuditCalendarRepository->publishPendingEvents($request);
@@ -163,7 +163,7 @@ class OpYearlyAuditCalendarController extends Controller
         if (count($success) > 0) {
             $response = [
                 'status' => 'success',
-                'data' => $success + $error,
+                'data' => ['published' => $success, 'failed' => $error],
             ];
         } else {
             $response = [

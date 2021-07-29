@@ -29,9 +29,6 @@ trait GenericData
         }
         if (empty($officeDomain)) {
             $msg = sprintf("অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন। অফিস আইডিঃ %s.", $office_id);
-            if (!$returnErrorMsg) {
-                $msg = "";
-            }
             return ['status' => 'error', 'message' => $msg];
         }
 
