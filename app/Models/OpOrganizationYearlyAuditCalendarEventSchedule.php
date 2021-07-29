@@ -27,4 +27,19 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
         'milestone_title_bn',
         'milestone_target',
     ];
+
+    public function assigned_staffs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApOrganizationYearlyPlanStaff::class, 'milestone_id', 'activity_milestone_id');
+    }
+
+    public function assigned_budget(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApOrganizationYearlyPlanBudget::class, 'milestone_id', 'activity_milestone_id');
+    }
+
+    public function assigned_rp(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApOrganizationYearlyPlanResponsibleParty::class, 'milestone_id', 'activity_milestone_id');
+    }
 }

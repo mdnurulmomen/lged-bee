@@ -9,7 +9,7 @@ Route::post('login-in-amms', [UserController::class, 'loginInAmms'])->middleware
 Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::customApiResource('fiscal-year', XFiscalYearController::class);
-
+    Route::customApiResource('responsible-offices', XResponsibleOfficeController::class);
     Route::group(['prefix' => 'x-strategic-plan/'], function () {
         Route::customApiResource('duration', XStrategicPlanDurationController::class);
 
@@ -22,29 +22,33 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::customApiResource('required-capacity', XStrategicPlanRequiredCapacityController::class);
     });
 
-    Route::customApiResource('responsible-offices', XResponsibleOfficeController::class);
+    Route::group(['prefix' => 'audit-plan/'], function () {
+        Route::group(['prefix' => 'operational-plan/'], function () {
 
-    Route::group(['prefix' => 'operational-plan/'], function () {
+            Route::post('activity/find', [OpActivityController::class, 'findActivities']);
+            Route::customApiResource('activity', OpActivityController::class);
 
-        Route::post('activity/find', [OpActivityController::class, 'findActivities']);
-        Route::customApiResource('activity', OpActivityController::class);
+            Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
 
-        Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
+            Route::post('audit-calendar/calendar-activities', [OpYearlyAuditCalendarController::class, 'showCalendarActivities']);
+            Route::post('audit-calendar/responsible/create', [OpYearlyAuditCalendarController::class, 'storeActivityResponsible']);
+            Route::post('audit-calendar/milestones/date/update', [OpYearlyAuditCalendarController::class, 'storeMilestoneTargetDate']);
+            Route::post('audit-calendar/comment/update', [OpYearlyAuditCalendarController::class, 'updateActivityComment']);
+            Route::post('audit-calendar/change-status', [OpYearlyAuditCalendarController::class, 'changeStatus']);
+            Route::post('audit-calendar/pending-events-for-publish', [OpYearlyAuditCalendarController::class, 'pendingEventsForPublishing']);
+            Route::post('audit-calendar/publish-event-as-calendar', [OpYearlyAuditCalendarController::class, 'publishCalendar']);
 
-        Route::post('audit-calendar/calendar-activities', [OpYearlyAuditCalendarController::class, 'showCalendarActivities']);
-        Route::post('audit-calendar/responsible/create', [OpYearlyAuditCalendarController::class, 'storeActivityResponsible']);
-        Route::post('audit-calendar/milestones/date/update', [OpYearlyAuditCalendarController::class, 'storeMilestoneTargetDate']);
-        Route::post('audit-calendar/comment/update', [OpYearlyAuditCalendarController::class, 'updateActivityComment']);
-        Route::post('audit-calendar/change-status', [OpYearlyAuditCalendarController::class, 'changeStatus']);
-        Route::post('audit-calendar/pending-events-for-publish', [OpYearlyAuditCalendarController::class, 'pendingEventsForPublishing']);
-        Route::post('audit-calendar/publish-event-as-calendar', [OpYearlyAuditCalendarController::class, 'publishCalendar']);
+            Route::post('audit-calendar/movement/create', [OpYearlyAuditCalendarMovementController::class, 'store']);
+            Route::post('audit-calendar/movement/history', [OpYearlyAuditCalendarMovementController::class, 'movementHistory']);
 
-        Route::post('audit-calendar/movement/create', [OpYearlyAuditCalendarMovementController::class, 'store']);
-        Route::post('audit-calendar/movement/history', [OpYearlyAuditCalendarMovementController::class, 'movementHistory']);
+            Route::customApiResource('yearly-audit-calendar', OpYearlyAuditCalendarController::class);
 
-        Route::customApiResource('yearly-audit-calendar', OpYearlyAuditCalendarController::class);
+            Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
+            Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
+        });
 
-        Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
-        Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
+        Route::group(['prefix' => 'annual-plan/'], function () {
+            Route::post('all', [ApOrganizationYearlyPlanController::class, 'allAnnualPlan']);
+        });
     });
 });

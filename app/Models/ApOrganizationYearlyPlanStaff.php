@@ -9,7 +9,9 @@ class ApOrganizationYearlyPlanStaff extends Model
 {
     use HasFactory;
 
+
     protected $connection = 'OfficeDB';
+    protected $table = 'ap_organization_yearly_plan_staffs';
 
     protected $fillable = [
         'schedule_id',
