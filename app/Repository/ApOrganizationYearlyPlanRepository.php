@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Models\ApOrganizationYearlyPlanBudget;
+use App\Models\ApOrganizationYearlyPlanStaff;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Repository\Contracts\ApOrganizationYearlyPlanInterface;
 use App\Traits\GenericData;
@@ -34,4 +36,52 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         return $data;
 
     }
+
+    public function storeAnnualPlanDetails(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $designations = json_decode($request->designations, true) ?? [];
+        $data = [];
+        $this->switchOffice($cdesk->office_id);
+        foreach ($designations as $designation) {
+            try {
+                $staff_data = [
+                    'schedule_id' => $request->schedule_id,
+                    'activity_id' => $request->activity_id,
+                    'milestone_id' => $request->milestone_id,
+                    'office_id' => $designation['office_id'],
+                    'unit_id' => $designation['unit_id'],
+                    'unit_name_en' => $designation['unit_name_en'],
+                    'unit_name_bn' => $designation['unit_name_bn'],
+                    'employee_name_en' => $designation['officer_name_en'],
+                    'employee_name_bn' => $designation['officer_name_bn'],
+                    'employee_category' => $designation['officer_category'],
+                    'employee_grade' => $designation['officer_grade'],
+                    'employee_id' => $designation['officer_id'],
+                    'designation_id' => $designation['designation_id'],
+                    'employee_designation_en' => $designation['designation_en'],
+                    'employee_designation_bn' => $designation['designation_bn'],
+                    'task_start_date_plan' => $request->start_date,
+                    'task_end_date_plan' => $request->end_date,
+                ];
+                ApOrganizationYearlyPlanStaff::create($staff_data);
+                $data = ['status' => 'success', 'data' => 'Successfully Created'];
+            } catch (\Exception $e) {
+                $data = ['status' => 'error', 'data' => $e->getMessage()];
+            }
+        }
+
+        $budget_data = [
+            'schedule_id' => $request->schedule_id,
+            'activity_id' => $request->activity_id,
+            'milestone_id' => $request->milestone_id,
+            'budget' => $request->budget,
+        ];
+        ApOrganizationYearlyPlanBudget::updateOrCreate(['milestone_id' => $request->milestone_id], $budget_data);
+
+        $this->emptyOfficeDBConnection();
+
+        return $data;
+    }
+
 }

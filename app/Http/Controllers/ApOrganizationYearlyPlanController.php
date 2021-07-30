@@ -28,4 +28,31 @@ class ApOrganizationYearlyPlanController extends Controller
 
         return response()->json($response);
     }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storePlanAssignedDetails(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository)
+    {
+        Validator::make($request->all(), [
+            'schedule_id' => 'required|integer',
+            'activity_id' => 'required|integer',
+            'milestone_id' => 'required|integer',
+            'budget' => 'required|integer',
+            'designations' => 'required|json',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ])->validate();
+
+        $ap_plan_submit = $apOrganizationYearlyPlanRepository->storeAnnualPlanDetails($request);
+
+        if (isSuccessResponse($ap_plan_submit)) {
+            $response = responseFormat('success', $ap_plan_submit['data']);
+        } else {
+            $response = responseFormat('error', $ap_plan_submit['data']);
+        }
+
+        return response()->json($response);
+
+    }
 }
