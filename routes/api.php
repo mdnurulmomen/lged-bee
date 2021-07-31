@@ -22,7 +22,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::customApiResource('required-capacity', XStrategicPlanRequiredCapacityController::class);
     });
 
-    Route::group(['prefix' => 'audit-plan/'], function () {
+    Route::group(['prefix' => 'planning/'], function () {
         Route::group(['prefix' => 'operational-plan/'], function () {
 
             Route::post('activity/find', [OpActivityController::class, 'findActivities']);
@@ -50,10 +50,14 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::group(['prefix' => 'annual-plan/'], function () {
             Route::post('all', [ApOrganizationYearlyPlanController::class, 'allAnnualPlan']);
 
-            Route::post('rp-entities/show', [ApOrganizationYearlyPlanController::class, 'allSelectedRPEntities']);
+            Route::post('rp-entities/all-added', [ApOrganizationYearlyPlanController::class, 'allSelectedRPEntities']);
             Route::post('rp-entities/store', [ApOrganizationYearlyPlanController::class, 'storeSelectedRPEntities']);
 
             Route::post('plan-submission/create', [ApOrganizationYearlyPlanController::class, 'storePlanAssignedDetails']);
+        });
+
+        Route::group(['prefix' => 'audit-plan'], function () {
+            Route::customApiResource('entity-audit-plan', ApEntityAuditPlanController::class);
         });
     });
 });
