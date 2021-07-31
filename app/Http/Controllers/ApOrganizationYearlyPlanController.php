@@ -66,14 +66,15 @@ class ApOrganizationYearlyPlanController extends Controller
             'activity_id' => 'required|integer',
             'milestone_id' => 'required|integer',
             'cdesk' => 'required|json',
+            'selected_entities' => 'required|json',
         ])->validate();
 
-        $selected_rp_entites = $apOrganizationYearlyPlanRepository->storeSelectedRPEntities($request);
+        $add_rp_entites = $apOrganizationYearlyPlanRepository->storeSelectedRPEntities($request);
 
-        if (isSuccessResponse($selected_rp_entites)) {
-            $response = responseFormat('success', $selected_rp_entites['data']);
+        if (isSuccessResponse($add_rp_entites)) {
+            $response = responseFormat('success', $add_rp_entites['data']);
         } else {
-            $response = responseFormat('error', $selected_rp_entites['data']);
+            $response = responseFormat('error', $add_rp_entites['data']);
         }
 
         return response()->json($response);

@@ -13,8 +13,14 @@ class CreateApOrganizationYearlyPlanResponsiblePartiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('ap_organization_yearly_plan_responsible_parties', function (Blueprint $table) {
+        Schema::connection('OfficeDB')->create('ap_organization_yearly_plan_responsible_parties', function (Blueprint $table) {
             $table->id();
+            $table->integer('duration_id');
+            $table->integer('fiscal_year_id');
+            $table->integer('outcome_id');
+            $table->integer('output_id');
+            $table->integer('op_yearly_audit_calendar_id');
+            $table->integer('op_yearly_audit_calendar_activity_id');
             $table->integer('schedule_id');
             $table->integer('activity_id');
             $table->integer('milestone_id');

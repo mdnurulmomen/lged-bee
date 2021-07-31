@@ -9,6 +9,7 @@ use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Repository\Contracts\ApOrganizationYearlyPlanInterface;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInterface
 {
@@ -43,10 +44,25 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $cdesk = json_decode($request->cdesk, false);
         $designations = json_decode($request->designations, true) ?? [];
         $data = [];
-        $this->switchOffice($cdesk->office_id);
-        foreach ($designations as $designation) {
-            try {
+        try {
+            $schedule_data = OpOrganizationYearlyAuditCalendarEventSchedule::find($request->schedule_id);
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        DB::beginTransaction();
+        try {
+            foreach ($designations as $designation) {
                 $staff_data = [
+                    'duration_id' => $schedule_data->duration_id,
+                    'fiscal_year_id' => $schedule_data->fiscal_year_id,
+                    'outcome_id' => $schedule_data->outcome_id,
+                    'output_id' => $schedule_data->output_id,
+                    'op_yearly_audit_calendar_id' => $schedule_data->op_yearly_audit_calendar_id,
+                    'op_yearly_audit_calendar_activity_id' => $schedule_data->op_yearly_audit_calendar_activity_id,
                     'schedule_id' => $request->schedule_id,
                     'activity_id' => $request->activity_id,
                     'milestone_id' => $request->milestone_id,
@@ -66,20 +82,29 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                     'task_end_date_plan' => $request->end_date,
                 ];
                 ApOrganizationYearlyPlanStaff::create($staff_data);
-                $data = ['status' => 'success', 'data' => 'Successfully Created'];
-            } catch (\Exception $e) {
-                $data = ['status' => 'error', 'data' => $e->getMessage()];
             }
+
+            $budget_data = [
+                'duration_id' => $schedule_data->duration_id,
+                'fiscal_year_id' => $schedule_data->fiscal_year_id,
+                'outcome_id' => $schedule_data->outcome_id,
+                'output_id' => $schedule_data->output_id,
+                'op_yearly_audit_calendar_id' => $schedule_data->op_yearly_audit_calendar_id,
+                'op_yearly_audit_calendar_activity_id' => $schedule_data->op_yearly_audit_calendar_activity_id,
+                'schedule_id' => $request->schedule_id,
+                'activity_id' => $request->activity_id,
+                'milestone_id' => $request->milestone_id,
+                'budget' => $request->budget,
+            ];
+            ApOrganizationYearlyPlanBudget::updateOrCreate(['milestone_id' => $request->milestone_id], $budget_data);
+
+            ApOrganizationYearlyPlanResponsibleParty::where('milestone_id')->update(['task_start_date_plan' => $request->start_date, 'task_end_date_plan' => $request->end_date,]);
+            $data = ['status' => 'success', 'data' => 'Successfully Created'];
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
-
-        $budget_data = [
-            'schedule_id' => $request->schedule_id,
-            'activity_id' => $request->activity_id,
-            'milestone_id' => $request->milestone_id,
-            'budget' => $request->budget,
-        ];
-        ApOrganizationYearlyPlanBudget::updateOrCreate(['milestone_id' => $request->milestone_id], $budget_data);
-
         $this->emptyOfficeDBConnection();
 
         return $data;
@@ -88,6 +113,47 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
     public function storeSelectedRPEntities(Request $request)
     {
         $cdesk = json_decode($request->cdesk, false);
+        $selected_entities = json_decode($request->selected_entities, true);
+        try {
+            $schedule_data = OpOrganizationYearlyAuditCalendarEventSchedule::find($request->schedule_id);
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        foreach ($selected_entities as $designation) {
+            try {
+                $entity_data = [
+                    'duration_id' => $schedule_data->duration_id,
+                    'fiscal_year_id' => $schedule_data->fiscal_year_id,
+                    'outcome_id' => $schedule_data->outcome_id,
+                    'output_id' => $schedule_data->output_id,
+                    'op_yearly_audit_calendar_id' => $schedule_data->op_yearly_audit_calendar_id,
+                    'op_yearly_audit_calendar_activity_id' => $schedule_data->op_yearly_audit_calendar_activity_id,
+                    'schedule_id' => $request->schedule_id,
+                    'activity_id' => $request->activity_id,
+                    'milestone_id' => $request->milestone_id,
+                    'party_id' => $designation['party_id'],
+                    'party_name_en' => $designation['party_name_en'],
+                    'party_name_bn' => $designation['party_name_bn'],
+                    'ministry_id' => $designation['ministry_id'],
+                    'ministry_name_en' => $designation['ministry_name_en'],
+                    'ministry_name_bn' => $designation['ministry_name_bn'],
+                    'task_start_date_plan' => now(),
+                    'task_end_date_plan' => now(),
+                ];
+                ApOrganizationYearlyPlanResponsibleParty::create($entity_data);
+                $data = ['status' => 'success', 'data' => 'Successfully Created'];
+            } catch (\Exception $e) {
+                $data = ['status' => 'error', 'data' => $e->getMessage()];
+            }
+        }
+
+        return $data;
+
     }
 
     public function allSelectedRPEntities(Request $request): array
@@ -95,10 +161,10 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $cdesk = json_decode($request->cdesk, false);
 
         $this->switchOffice($cdesk->office_id);
+        $all_rp_data = [];
 
         try {
             $all_rp = ApOrganizationYearlyPlanResponsibleParty::where('schedule_id', $request->schedule_id)->where('activity_id', $request->activity_id)->where('milestone_id', $request->milestone_id)->with(['staffs', 'budget'])->get();
-
             foreach ($all_rp as $rp) {
                 $all_rp_data[] = [
                     'id' => $rp->id,
@@ -112,7 +178,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                     'task_start_date_plan' => $rp->task_start_date_plan,
                     'task_end_date_plan' => $rp->task_end_date_plan,
                     'staff_count' => $rp->staffs->count(),
-                    'budget' => $rp->budget->budget,
+                    'budget' => $rp->budget ? $rp->budget->budget : 0,
                 ];
             }
 

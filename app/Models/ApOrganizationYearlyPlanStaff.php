@@ -14,6 +14,12 @@ class ApOrganizationYearlyPlanStaff extends Model
     protected $table = 'ap_organization_yearly_plan_staffs';
 
     protected $fillable = [
+        'duration_id',
+        'fiscal_year_id',
+        'outcome_id',
+        'output_id',
+        'op_yearly_audit_calendar_id',
+        'op_yearly_audit_calendar_activity_id',
         'schedule_id',
         'activity_id',
         'milestone_id',
