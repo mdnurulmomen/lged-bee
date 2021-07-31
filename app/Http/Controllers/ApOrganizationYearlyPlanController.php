@@ -32,7 +32,7 @@ class ApOrganizationYearlyPlanController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function storePlanAssignedDetails(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository)
+    public function storePlanAssignedDetails(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'schedule_id' => 'required|integer',
@@ -54,5 +54,51 @@ class ApOrganizationYearlyPlanController extends Controller
 
         return response()->json($response);
 
+    }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storeSelectedRPEntities(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository)
+    {
+        Validator::make($request->all(), [
+            'schedule_id' => 'required|integer',
+            'activity_id' => 'required|integer',
+            'milestone_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $selected_rp_entites = $apOrganizationYearlyPlanRepository->storeSelectedRPEntities($request);
+
+        if (isSuccessResponse($selected_rp_entites)) {
+            $response = responseFormat('success', $selected_rp_entites['data']);
+        } else {
+            $response = responseFormat('error', $selected_rp_entites['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function allSelectedRPEntities(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'schedule_id' => 'required|integer',
+            'activity_id' => 'required|integer',
+            'milestone_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $selected_rp_entities = $apOrganizationYearlyPlanRepository->allSelectedRPEntities($request);
+
+        if (isSuccessResponse($selected_rp_entities)) {
+            $response = responseFormat('success', $selected_rp_entities['data']);
+        } else {
+            $response = responseFormat('error', $selected_rp_entities['data']);
+        }
+
+        return response()->json($response);
     }
 }

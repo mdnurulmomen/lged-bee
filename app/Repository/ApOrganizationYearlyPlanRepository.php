@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\ApOrganizationYearlyPlanBudget;
+use App\Models\ApOrganizationYearlyPlanResponsibleParty;
 use App\Models\ApOrganizationYearlyPlanStaff;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Repository\Contracts\ApOrganizationYearlyPlanInterface;
@@ -13,7 +14,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
 {
     use GenericData;
 
-    public function allAnnualPlans(Request $request)
+    public function allAnnualPlans(Request $request): array
     {
         $fiscal_year_id = $request->fiscal_year_id;
         $cdesk = json_decode($request->cdesk, false);
@@ -37,7 +38,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
 
     }
 
-    public function storeAnnualPlanDetails(Request $request)
+    public function storeAnnualPlanDetails(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
         $designations = json_decode($request->designations, true) ?? [];
@@ -79,6 +80,46 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         ];
         ApOrganizationYearlyPlanBudget::updateOrCreate(['milestone_id' => $request->milestone_id], $budget_data);
 
+        $this->emptyOfficeDBConnection();
+
+        return $data;
+    }
+
+    public function storeSelectedRPEntities(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+    }
+
+    public function allSelectedRPEntities(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        $this->switchOffice($cdesk->office_id);
+
+        try {
+            $all_rp = ApOrganizationYearlyPlanResponsibleParty::where('schedule_id', $request->schedule_id)->where('activity_id', $request->activity_id)->where('milestone_id', $request->milestone_id)->with(['staffs', 'budget'])->get();
+
+            foreach ($all_rp as $rp) {
+                $all_rp_data[] = [
+                    'id' => $rp->id,
+                    'schedule_id' => $rp->schedule_id,
+                    'milestone_id' => $rp->milestone_id,
+                    'activity_id' => $rp->activity_id,
+                    'party_id' => $rp->party_id,
+                    'party_name_en' => $rp->party_name_en,
+                    'party_name_bn' => $rp->party_name_bn,
+                    'party_type' => $rp->party_type,
+                    'task_start_date_plan' => $rp->task_start_date_plan,
+                    'task_end_date_plan' => $rp->task_end_date_plan,
+                    'staff_count' => $rp->staffs->count(),
+                    'budget' => $rp->budget->budget,
+                ];
+            }
+
+            $data = ['status' => 'success', 'data' => $all_rp_data];
+        } catch (\Exception $e) {
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
+        }
         $this->emptyOfficeDBConnection();
 
         return $data;

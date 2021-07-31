@@ -50,6 +50,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::group(['prefix' => 'annual-plan/'], function () {
             Route::post('all', [ApOrganizationYearlyPlanController::class, 'allAnnualPlan']);
 
+            Route::post('rp-entities/show', [ApOrganizationYearlyPlanController::class, 'allSelectedRPEntities']);
+            Route::post('rp-entities/store', [ApOrganizationYearlyPlanController::class, 'storeSelectedRPEntities']);
+
             Route::post('plan-submission/create', [ApOrganizationYearlyPlanController::class, 'storePlanAssignedDetails']);
         });
     });

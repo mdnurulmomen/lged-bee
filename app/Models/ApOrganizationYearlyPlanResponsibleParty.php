@@ -25,4 +25,14 @@ class ApOrganizationYearlyPlanResponsibleParty extends Model
         'task_start_date_plan',
         'task_end_date_plan',
     ];
+
+    public function staffs()
+    {
+        return $this->hasMany(ApOrganizationYearlyPlanStaff::class, 'milestone_id', 'milestone_id');
+    }
+
+    public function budget()
+    {
+        return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'milestone_id', 'milestone_id');
+    }
 }

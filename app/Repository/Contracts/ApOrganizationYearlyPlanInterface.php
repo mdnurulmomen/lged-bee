@@ -9,4 +9,8 @@ interface ApOrganizationYearlyPlanInterface
     public function allAnnualPlans(Request $request);
 
     public function storeAnnualPlanDetails(Request $request);
+
+    public function storeSelectedRPEntities(Request $request);
+
+    public function allSelectedRPEntities(Request $request);
 }
