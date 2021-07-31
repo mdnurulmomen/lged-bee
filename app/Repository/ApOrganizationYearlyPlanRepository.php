@@ -112,16 +112,20 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
 
     public function storeSelectedRPEntities(Request $request)
     {
+
         $cdesk = json_decode($request->cdesk, false);
+
         $selected_entities = json_decode($request->selected_entities, true);
+
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
         try {
             $schedule_data = OpOrganizationYearlyAuditCalendarEventSchedule::find($request->schedule_id);
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
-        }
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
-        if (!isSuccessResponse($office_db_con_response)) {
-            return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
         foreach ($selected_entities as $designation) {
