@@ -44,15 +44,18 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $cdesk = json_decode($request->cdesk, false);
         $designations = json_decode($request->designations, true) ?? [];
         $data = [];
+
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
         try {
             $schedule_data = OpOrganizationYearlyAuditCalendarEventSchedule::find($request->schedule_id);
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
-        if (!isSuccessResponse($office_db_con_response)) {
-            return ['status' => 'error', 'data' => $office_db_con_response];
-        }
+
         DB::beginTransaction();
         try {
             foreach ($designations as $designation) {
