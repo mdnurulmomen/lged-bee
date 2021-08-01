@@ -24,6 +24,7 @@ class CreateApOrganizationYearlyPlanStaffsTable extends Migration
             $table->integer('schedule_id');
             $table->integer('activity_id');
             $table->integer('milestone_id');
+            $table->integer('ap_organization_yearly_plan_rp_id');
             $table->integer('employee_id');
             $table->integer('office_id');
             $table->integer('unit_id');

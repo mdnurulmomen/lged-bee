@@ -21,6 +21,7 @@ class ApOrganizationYearlyPlanBudget extends Model
         'schedule_id',
         'activity_id',
         'milestone_id',
+        'ap_organization_yearly_plan_rp_id',
         'budget',
     ];
 }

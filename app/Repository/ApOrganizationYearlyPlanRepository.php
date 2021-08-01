@@ -31,6 +31,16 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                 ->groupBy('activity_id')
                 ->toArray();
 
+            foreach ($schedules as $key => &$milestone) {
+                foreach ($milestone as &$ms) {
+                    $assigned_budget = 0;
+                    foreach ($ms['assigned_budget'] as $budget) {
+                        $assigned_budget = $assigned_budget + $budget['budget'];
+                    }
+                    $ms['assigned_budget'] = $assigned_budget;
+                    $ms['assigned_staffs'] = count($ms['assigned_staffs']);
+                }
+            }
             $data = ['status' => 'success', 'data' => $schedules];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
@@ -69,6 +79,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                     'schedule_id' => $request->schedule_id,
                     'activity_id' => $request->activity_id,
                     'milestone_id' => $request->milestone_id,
+                    'ap_organization_yearly_plan_rp_id' => $request->plan_responsible_party_id,
                     'office_id' => $designation['office_id'],
                     'unit_id' => $designation['unit_id'],
                     'unit_name_en' => $designation['unit_name_en'],
@@ -97,9 +108,10 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                 'schedule_id' => $request->schedule_id,
                 'activity_id' => $request->activity_id,
                 'milestone_id' => $request->milestone_id,
+                'ap_organization_yearly_plan_rp_id' => $request->plan_responsible_party_id,
                 'budget' => $request->budget,
             ];
-            ApOrganizationYearlyPlanBudget::updateOrCreate(['milestone_id' => $request->milestone_id], $budget_data);
+            ApOrganizationYearlyPlanBudget::updateOrCreate(['ap_organization_yearly_plan_rp_id' => $request->plan_responsible_party_id,], $budget_data);
 
             ApOrganizationYearlyPlanResponsibleParty::where('milestone_id')->update(['task_start_date_plan' => $request->start_date, 'task_end_date_plan' => $request->end_date,]);
             $data = ['status' => 'success', 'data' => 'Successfully Created'];
@@ -173,7 +185,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         try {
             $all_rp = ApOrganizationYearlyPlanResponsibleParty::where('schedule_id', $request->schedule_id)->where('activity_id', $request->activity_id)->where('milestone_id', $request->milestone_id)->with(['staffs', 'budget'])->get();
             foreach ($all_rp as $rp) {
-                $all_rp_data[] = [
+                $rp_data[] = [
                     'id' => $rp->id,
                     'schedule_id' => $rp->schedule_id,
                     'milestone_id' => $rp->milestone_id,
@@ -188,8 +200,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
                     'budget' => $rp->budget ? $rp->budget->budget : 0,
                 ];
             }
-
-            $data = ['status' => 'success', 'data' => $all_rp_data];
+            $data = ['status' => 'success', 'data' => $rp_data];
         } catch (\Exception $e) {
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }

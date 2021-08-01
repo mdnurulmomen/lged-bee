@@ -34,11 +34,11 @@ class ApOrganizationYearlyPlanResponsibleParty extends Model
 
     public function staffs()
     {
-        return $this->hasMany(ApOrganizationYearlyPlanStaff::class, 'milestone_id', 'milestone_id');
+        return $this->hasMany(ApOrganizationYearlyPlanStaff::class, 'ap_organization_yearly_plan_rp_id', 'id');
     }
 
     public function budget()
     {
-        return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'milestone_id', 'milestone_id');
+        return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'ap_organization_yearly_plan_rp_id', 'id');
     }
 }

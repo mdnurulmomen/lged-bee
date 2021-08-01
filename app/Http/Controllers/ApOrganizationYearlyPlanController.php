@@ -38,6 +38,7 @@ class ApOrganizationYearlyPlanController extends Controller
             'schedule_id' => 'required|integer',
             'activity_id' => 'required|integer',
             'milestone_id' => 'required|integer',
+            'plan_responsible_party_id' => 'required|integer',
             'budget' => 'required|integer',
             'designations' => 'required|json',
             'start_date' => 'required|date',
