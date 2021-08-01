@@ -28,8 +28,8 @@ class CreateOpYearlyAuditCalendarResponsiblesTable extends Migration
             $table->string('short_name_bn');
             $table->string('office_name_en');
             $table->string('office_name_bn');
-            $table->mediumInteger('assigned_staffs');
-            $table->integer('assigned_budget');
+            $table->mediumInteger('assigned_staffs')->default(0);
+            $table->integer('assigned_budget')->default(0);
             $table->timestamps();
         });
     }
