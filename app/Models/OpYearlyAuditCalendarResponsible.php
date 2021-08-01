@@ -24,6 +24,8 @@ class OpYearlyAuditCalendarResponsible extends Model
         "activity_id",
         "op_yearly_audit_calendar_id",
         "op_yearly_audit_calendar_activity_id",
+        'assigned_staffs',
+        'assigned_budget',
         "remarks",
     ];
 
