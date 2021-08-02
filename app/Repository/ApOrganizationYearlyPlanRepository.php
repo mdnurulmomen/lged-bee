@@ -21,6 +21,8 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $fiscal_year_id = $request->fiscal_year_id;
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        dd($office_db_con_response);
+
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
