@@ -7,7 +7,7 @@ use App\Repository\Contracts\OperationalPlanInterface;
 use App\Models\OpActivity;
 use App\Models\XStrategicPlanOutcome;
 
-class OperationalPlan implements OperationalPlanInterface
+class OperationalPlanRepository implements OperationalPlanInterface
 {
     public function __construct(OpActivity $op)
     {

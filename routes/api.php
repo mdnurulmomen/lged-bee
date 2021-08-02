@@ -54,6 +54,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('rp-entities/store', [ApOrganizationYearlyPlanController::class, 'storeSelectedRPEntities']);
 
             Route::post('plan-submission/create', [ApOrganizationYearlyPlanController::class, 'storePlanAssignedDetails']);
+
+            Route::post('submit-plan-to-ocag', [ApOrganizationYearlyPlanController::class, 'submitToOCAG']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {

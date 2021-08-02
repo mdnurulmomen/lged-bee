@@ -13,4 +13,6 @@ interface ApOrganizationYearlyPlanInterface
     public function storeSelectedRPEntities(Request $request);
 
     public function allSelectedRPEntities(Request $request);
+
+    public function submitPlanToOCAG(Request $request);
 }

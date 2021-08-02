@@ -6,6 +6,7 @@ use App\Models\ApOrganizationYearlyPlanBudget;
 use App\Models\ApOrganizationYearlyPlanResponsibleParty;
 use App\Models\ApOrganizationYearlyPlanStaff;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
+use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Repository\Contracts\ApOrganizationYearlyPlanInterface;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -21,7 +22,10 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $cdesk = json_decode($request->cdesk, false);
 
         try {
-            $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
 
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
@@ -125,7 +129,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         return $data;
     }
 
-    public function storeSelectedRPEntities(Request $request)
+    public function storeSelectedRPEntities(Request $request): array
     {
 
         $cdesk = json_decode($request->cdesk, false);
@@ -180,8 +184,7 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $cdesk = json_decode($request->cdesk, false);
 
         $this->switchOffice($cdesk->office_id);
-        $all_rp_data = [];
-
+        $rp_data = [];
         try {
             $all_rp = ApOrganizationYearlyPlanResponsibleParty::where('schedule_id', $request->schedule_id)->where('activity_id', $request->activity_id)->where('milestone_id', $request->milestone_id)->with(['staffs', 'budget'])->get();
             foreach ($all_rp as $rp) {
@@ -207,6 +210,45 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
         $this->emptyOfficeDBConnection();
 
         return $data;
+    }
+
+    public function submitPlanToOCAG(Request $request)
+    {
+        $fiscal_year_id = $request->fiscal_year_id;
+        $cdesk = json_decode($request->cdesk, false);
+
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        $submission_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
+            ->with(['assigned_staffs', 'assigned_budget'])
+            ->get()
+            ->groupBy('activity_id')
+            ->toArray();
+
+        $s_data = [];
+
+        foreach ($submission_datas as $key => &$milestone) {
+            $assigned_budget = 0;
+            $assigned_staff = 0;
+            foreach ($milestone as &$ms) {
+                foreach ($ms['assigned_budget'] as $budget) {
+                    $assigned_budget = $assigned_budget + $budget['budget'];
+                }
+                $assigned_staff = $assigned_staff + count($ms['assigned_staffs']);
+            }
+            $s_data[$key]['assigned_budget'] = $assigned_budget;
+            $s_data[$key]['assigned_staffs'] = $assigned_staff;
+        }
+
+        foreach ($s_data as $activity_id => $s_datum) {
+            OpYearlyAuditCalendarResponsible::where('activity_id', $activity_id)->where('office_id', $cdesk->office_id)->update($s_datum);
+        }
+
+        return $data = ['status' => 'success', 'data' => $s_data];
+
     }
 
 }

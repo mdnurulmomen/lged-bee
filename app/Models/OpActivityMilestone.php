@@ -18,6 +18,7 @@ class OpActivityMilestone extends Model
         'title_en',
         'title_bn',
         'target_date',
+        'assigned_budget',
     ];
 
     public function activity()

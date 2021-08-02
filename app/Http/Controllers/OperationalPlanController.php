@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OperationalPlan\Operational;
-use App\Repository\OperationalPlan;
+use App\Repository\OperationalPlanRepository;
 
 class OperationalPlanController extends Controller
 {
     public function operationalPlan(
         Operational $request,
-        OperationalPlan $op
+        OperationalPlanRepository $op
     ): \Illuminate\Http\JsonResponse {
         try {
             $response = responseFormat('success', $op->OperationalPlan($request));
@@ -21,7 +21,7 @@ class OperationalPlanController extends Controller
 
     public function OperationalDetail(
         Operational $request,
-        OperationalPlan $op
+        OperationalPlanRepository $op
     ): \Illuminate\Http\JsonResponse {
         try {
             $response = responseFormat('success', $op->OperationalDetail($request));

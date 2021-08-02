@@ -60,7 +60,7 @@ class ApOrganizationYearlyPlanController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function storeSelectedRPEntities(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository)
+    public function storeSelectedRPEntities(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'schedule_id' => 'required|integer',
@@ -99,6 +99,23 @@ class ApOrganizationYearlyPlanController extends Controller
             $response = responseFormat('success', $selected_rp_entities['data']);
         } else {
             $response = responseFormat('error', $selected_rp_entities['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function submitToOCAG(Request $request, ApOrganizationYearlyPlanRepository $apOrganizationYearlyPlanRepository)
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $submit_plans = $apOrganizationYearlyPlanRepository->submitPlanToOCAG($request);
+        if (isSuccessResponse($submit_plans)) {
+            $response = responseFormat('success', $submit_plans['data']);
+        } else {
+            $response = responseFormat('error', $submit_plans['data']);
         }
 
         return response()->json($response);
