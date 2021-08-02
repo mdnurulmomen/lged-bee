@@ -49,7 +49,7 @@ class UserController extends Controller
             return response()->json($response);
 
         } catch (\Exception $ex) {
-            return response()->json(responseFormat('error', __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), INTERNAL_SERVER_ERROR_CODE);
+            return response()->json(responseFormat('error', __('Technical Error Happen. Error: LIA'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), INTERNAL_SERVER_ERROR_CODE);
         }
 
     }
@@ -78,7 +78,7 @@ class UserController extends Controller
                 throw new \Exception($msg);
             }
         } catch (\Exception $ex) {
-            return responseFormat('error', __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
+            return responseFormat('error', __('Technical Error happen. Error: SOD'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
         }
     }
 
@@ -107,7 +107,7 @@ class UserController extends Controller
         } catch (\Exception $ex) {
             return responseFormat(
                 'error',
-                __('Technical Error happen'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
+                __('Technical Error Happen. Error: MCT'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
         }
     }
 
