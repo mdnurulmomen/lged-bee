@@ -64,6 +64,7 @@ class UserController extends Controller
             }
             if (count($office_ids) > 0) {
                 $domains_information = (new \App\Models\OfficeDomain)->getOfficeDomains($office_ids);
+                dd($domains_information);
                 foreach ($office_infos as $key => &$office_info) {
                     foreach ($domains_information as $domain_information) {
                         if ($domain_information['office_id'] == $office_info['office_id']) {
