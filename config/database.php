@@ -67,7 +67,7 @@ return [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DOPTOR_DB_HOST', '127.0.0.1'),
-            'port' => env('DOPTOR_DB_HOST', '3306'),
+            'port' => env('DOPTOR_DB_PORT', '3306'),
             'database' => env('DOPTOR_DB_DATABASE', 'forge'),
             'username' => env('DOPTOR_DB_USERNAME', 'forge'),
             'password' => env('DOPTOR_DB_PASSWORD', ''),

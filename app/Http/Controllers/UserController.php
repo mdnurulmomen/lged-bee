@@ -56,7 +56,7 @@ class UserController extends Controller
 
     protected function setOfficeDomains($data): array
     {
-//        try {
+        try {
             $office_infos = $data['office_info'];
             $office_ids = [];
             foreach ($office_infos as $office_info) {
@@ -64,7 +64,6 @@ class UserController extends Controller
             }
             if (count($office_ids) > 0) {
                 $domains_information = (new \App\Models\OfficeDomain)->getOfficeDomains($office_ids);
-                dd($domains_information);
                 if ($domains_information)
                     foreach ($office_infos as $key => &$office_info) {
                         foreach ($domains_information as $domain_information) {
@@ -77,11 +76,11 @@ class UserController extends Controller
                 return responseFormat('success', $data);
             } else {
                 $msg = __("অফিস ডাটাবেজ পাওয়া যায় নি! সাপোর্ট টিমের সাথে যোগাযোগ করুন।");
-//                throw new \Exception($msg);
+                throw new \Exception($msg);
             }
-//        } catch (\Exception $ex) {
-//            return responseFormat('error', __('Technical Error happen. Error: SOD'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
-//        }
+        } catch (\Exception $ex) {
+            return responseFormat('error', __('Technical Error happen. Error: SOD'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]);
+        }
     }
 
     protected function makeCagToken($data): array
