@@ -20,14 +20,13 @@ class ApOrganizationYearlyPlanRepository implements ApOrganizationYearlyPlanInte
     {
         $fiscal_year_id = $request->fiscal_year_id;
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
-        dd($office_db_con_response);
-
-        if (!isSuccessResponse($office_db_con_response)) {
-            return ['status' => 'error', 'data' => $office_db_con_response];
-        }
 
         try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
