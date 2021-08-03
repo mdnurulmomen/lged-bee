@@ -9,7 +9,7 @@ class OpActivity extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_no', 'title_en', 'title_bn', 'activity_parent_id', 'is_parent',];
+    protected $fillable = ['duration_id', 'fiscal_year_id', 'outcome_id', 'output_id', 'activity_no', 'title_en', 'title_bn', 'activity_parent_id', 'is_parent', 'is_activity',];
 
     public function activity_output()
     {

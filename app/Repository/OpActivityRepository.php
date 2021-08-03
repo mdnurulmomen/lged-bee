@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\OpActivity;
+use App\Models\OpActivityMilestone;
 use App\Models\XFiscalYear;
 use App\Models\XStrategicPlanOutcome;
 use App\Repository\Contracts\OpActivityInterface;
@@ -15,13 +16,13 @@ class OpActivityRepository implements OpActivityInterface
         $this->opActivity = $opActivity;
     }
 
-    public function allActivities(Request $request)
+    public function allActivities(Request $request): array
     {
         $data = [];
         if ($request->per_page && $request->page && !$request->all) {
-            $opActivities = $this->opActivity->withCount('milestones')->paginate($request->per_page);
+            $opActivities = $this->opActivity->withCount('milestones')->where('is_activity', 1)->paginate($request->per_page);
         } else {
-            $opActivities = $this->opActivity->withCount('milestones')->get();
+            $opActivities = $this->opActivity->withCount('milestones')->where('is_activity', 1)->get();
         }
         $opActivitiesByFiscalYear = $opActivities->groupBy('fiscal_year_id')->toArray();
 
@@ -58,7 +59,7 @@ class OpActivityRepository implements OpActivityInterface
         return $data;
     }
 
-    public function findActivities(Request $request)
+    public function findActivities(Request $request): array
     {
         $output_id = $request->output_id;
         $outcome_id = $request->outcome_id;
@@ -103,5 +104,45 @@ class OpActivityRepository implements OpActivityInterface
         }
 
         return $response;
+    }
+
+    public function showActivitiesByFiscalYear(Request $request): array
+    {
+        $fiscal_year_id = $request->fiscal_year_id;
+
+        $outcomes = XStrategicPlanOutcome::query();
+
+        $outcomes->with(['plan_output' => function ($q) use ($fiscal_year_id) {
+            if (!empty($fiscal_year_id)) {
+                $q->with(['activities' => function ($q) use ($fiscal_year_id) {
+                    $q->where('activity_parent_id', 0);
+                    $q->where('fiscal_year_id', $fiscal_year_id);
+                }, 'activities.children.milestones', 'activities.milestones']);
+            } else {
+                $q->with(['activities.children.milestones' => function ($q) {
+                    $q->where('activity_parent_id', 0);
+                }, 'activities.milestones']);
+            }
+        }]);
+
+
+        $activities['data'] = $outcomes->get();
+        $activities['fiscal_year_id'] = $fiscal_year_id;
+
+        if (!empty($activities)) {
+            $response = responseFormat('success', $activities);
+        } else {
+            $response = responseFormat('error', 'Not Found');
+        }
+
+        return $response;
+    }
+
+    public function showActivityMilestones(Request $request)
+    {
+        $activity_id = $request->activity_id;
+        $milestones = OpActivityMilestone::select('title_en', 'title_en')->where('activity_id', $activity_id)->with('milestone_calendar')->get();
+
+        return $milestones;
     }
 }

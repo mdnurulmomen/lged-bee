@@ -7,10 +7,9 @@ use App\Http\Requests\OpActivity\SearchActivities;
 use App\Http\Requests\OpActivity\ShowOrDeleteRequest;
 use App\Http\Requests\OpActivity\UpdateRequest;
 use App\Models\OpActivity;
-use App\Models\XStrategicPlanOutcome;
-use App\Models\XStrategicPlanOutput;
 use App\Repository\OpActivityRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OpActivityController extends Controller
 {
@@ -34,12 +33,36 @@ class OpActivityController extends Controller
         }
     }
 
+    public function showActivitiesByFiscalYear(Request $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), ['fiscal_year_id' => 'integer|required'])->validate();
+        try {
+            $data = $opActivity->showActivitiesByFiscalYear($request);
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function showActivityMilestones(Request $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), ['activity_id' => 'integer|required'])->validate();
+        try {
+            $data = $opActivity->showActivityMilestones($request);
+
+            $response = responseFormat('success', $data);
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
+        }
+    }
+
     public function store(SaveRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
             $validated = $request->validated();
             if ($validated['activity_parent_id'] && $validated['activity_parent_id'] > 0) {
-                $validated['is_parent'] = 1;
+                $validated['is_parent'] = 0;
             }
             $validated['duration_id'] = $this->durationIdFromFiscalYear($validated['fiscal_year_id']);
             OpActivity::create($validated);
@@ -53,7 +76,7 @@ class OpActivityController extends Controller
 
     public function show(ShowOrDeleteRequest $request): \Illuminate\Http\JsonResponse
     {
-        $opActivity = OpActivity::with('plan_output.plan_outcome.plan_duration')->where('id', $request->activity_id)->first();
+        $opActivity = OpActivity::with('activity_output.plan_outcome.plan_duration')->where('id', $request->activity_id)->first();
 
         if (!empty($opActivity)) {
             $response = responseFormat('success', $opActivity);
@@ -70,7 +93,7 @@ class OpActivityController extends Controller
         try {
             $validated = $request->validated();
             if ($validated['activity_parent_id']) {
-                $validated['is_parent'] = $validated['activity_parent_id'] > 0 ? 1 : 0;
+                $validated['is_parent'] = $validated['activity_parent_id'] > 0 ? 0 : 1;
             }
             $opActivity->update($validated);
             $response = responseFormat('success', 'Successfully Updated');
