@@ -61,6 +61,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
+            Route::post('entity-audit-plan-lists', [ApEntityAuditPlanController::class, 'index']);
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanController::class);
         });
     });
