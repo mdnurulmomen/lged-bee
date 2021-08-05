@@ -15,8 +15,12 @@ class OpYearlyAuditCalendarEditHistory extends Model
         'fiscal_year_id',
         'unit_id',
         'employee_id',
+        'employee_name_en',
+        'employee_name_bn',
         'user_id',
         'employee_designation_id',
+        'employee_designation_en',
+        'employee_designation_bn',
         'old_data',
     ];
 }
