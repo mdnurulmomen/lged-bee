@@ -13,4 +13,6 @@ interface OpActivityInterface
     public function showActivitiesByFiscalYear(Request $request);
 
     public function showActivityMilestones(Request $request);
+
+    public function storeActivity($validated_data);
 }

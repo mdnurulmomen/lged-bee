@@ -8,6 +8,10 @@ interface OpYearlyAuditCalendarInterface
 {
     public function allCalendarLists(Request $request);
 
+    public function yearsToCreateCalendar();
+
+    public function storeOpYearlyAuditCalendar(Request $request);
+
     public function changeStatus(Request $request);
 
     public function pendingEventsForPublishing(Request $request);

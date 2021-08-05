@@ -35,4 +35,9 @@ class OpActivityMilestone extends Model
     {
         $this->create($data);
     }
+
+    public function milestone_budget()
+    {
+        return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'milestone_id', 'id');
+    }
 }

@@ -21,6 +21,36 @@ class OpYearlyAuditCalendarController extends Controller
         }
     }
 
+    public function yearsToCreateCalendar(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendar): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $response = responseFormat('success', $opYearlyAuditCalendar->yearsToCreateCalendar());
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function store(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $store_op_calendar = $opYearlyAuditCalendarRepository->storeOpYearlyAuditCalendar($request);
+        if (isSuccessResponse($store_op_calendar)) {
+            $response = responseFormat('success', $store_op_calendar['data']);
+            return response()->json($response, 200);
+        } else {
+            $response = responseFormat('error', $store_op_calendar['data'], $store_op_calendar['code']);
+            return response()->json($response, 500);
+        }
+    }
+
     /**
      * @throws \Illuminate\Validation\ValidationException
      */

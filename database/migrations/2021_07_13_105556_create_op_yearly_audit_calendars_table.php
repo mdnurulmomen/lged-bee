@@ -22,10 +22,6 @@ class CreateOpYearlyAuditCalendarsTable extends Migration
             $table->string('initiator_name_bn');
             $table->string('initiator_unit_name_en');
             $table->string('initiator_unit_name_bn');
-            $table->string('cdesk_name_en');
-            $table->string('cdesk_name_bn');
-            $table->string('cdesk_unit_name_en');
-            $table->string('cdesk_unit_name_bn');
             $table->string('status', 24);
             $table->timestamps();
         });

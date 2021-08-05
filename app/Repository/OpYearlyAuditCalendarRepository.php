@@ -2,11 +2,13 @@
 
 namespace App\Repository;
 
+use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendar;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Models\OpYearlyAuditCalendarResponsible;
+use App\Models\XFiscalYear;
 use App\Models\XResponsibleOffice;
 use App\Repository\Contracts\OpYearlyAuditCalendarInterface;
 use App\Traits\GenericData;
@@ -54,10 +56,6 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                 "initiator_name_bn" => $yearly_audit_calendar['initiator_name_bn'],
                 "initiator_unit_name_en" => $yearly_audit_calendar['initiator_unit_name_en'],
                 "initiator_unit_name_bn" => $yearly_audit_calendar['initiator_unit_name_bn'],
-                "cdesk_name_en" => $yearly_audit_calendar['cdesk_name_en'],
-                "cdesk_name_bn" => $yearly_audit_calendar['cdesk_name_bn'],
-                "cdesk_unit_name_en" => $yearly_audit_calendar['cdesk_unit_name_en'],
-                "cdesk_unit_name_bn" => $yearly_audit_calendar['cdesk_unit_name_bn'],
                 "status" => $yearly_audit_calendar['status'],
                 'fiscal_year' => $yearly_audit_calendar['fiscal_year']['description'],
                 'approvers' => $approvers,
@@ -68,6 +66,67 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 
 
         return $data;
+    }
+
+    public function yearsToCreateCalendar()
+    {
+        try {
+            $created_calendar_years = OpYearlyAuditCalendar::select('fiscal_year_id')->get()->toArray();
+            return XFiscalYear::select('id AS fiscal_year_id', 'description')->whereNotIn('id', $created_calendar_years)->get()->toArray();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function storeOpYearlyAuditCalendar(Request $request): array
+    {
+        $fiscal_year_id = $request->fiscal_year_id;
+        $cdesk = json_decode($request->cdesk, false);
+
+        DB::beginTransaction();
+        try {
+            $is_exist = $this->opYearlyAuditCalendar::select('id')->where('fiscal_year_id', $fiscal_year_id)->get();
+            if (count($is_exist) > 0) {
+                throw new \Exception('Calendar Already Exist.', 409);
+            }
+            $fiscal_year_data = XFiscalYear::select('id', 'duration_id')->where('id', $fiscal_year_id)->first()->toArray();
+
+            $op_yearly_audit_calendar_data = [
+                'duration_id' => $fiscal_year_data['duration_id'],
+                'fiscal_year_id' => $fiscal_year_data['id'],
+                'employee_record_id' => $cdesk->officer_id,
+                'initiator_name_en' => $cdesk->officer_en,
+                'initiator_name_bn' => $cdesk->officer_bn,
+                'initiator_unit_name_en' => $cdesk->office_unit_en,
+                'initiator_unit_name_bn' => $cdesk->office_unit_bn,
+                'status' => 'draft',
+            ];
+
+            $op_yearly_audit_calendar = $this->opYearlyAuditCalendar->create($op_yearly_audit_calendar_data);
+
+            $activity_milestones = OpActivity::where('fiscal_year_id', $fiscal_year_id)->where('is_activity', 1)->with('milestones')->get()->toArray();
+
+            foreach ($activity_milestones as $activity_milestone) {
+                foreach ($activity_milestone['milestones'] as $milestone) {
+                    $op_yearly_audit_calendar_activities_data = [
+                        'op_yearly_audit_calendar_id' => $op_yearly_audit_calendar['id'],
+                        'duration_id' => $activity_milestone['duration_id'],
+                        'fiscal_year_id' => $activity_milestone['fiscal_year_id'],
+                        'outcome_id' => $activity_milestone['outcome_id'],
+                        'output_id' => $activity_milestone['output_id'],
+                        'activity_id' => $activity_milestone['id'],
+                        'milestone_id' => $milestone['id'],
+                    ];
+
+                    OpYearlyAuditCalendarActivity::create($op_yearly_audit_calendar_activities_data);
+                }
+            }
+            DB::commit();
+            return ['status' => 'success', 'data' => 'Successfully Created', 'code' => '204'];
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return ['status' => 'error', 'data' => $exception->getMessage(), 'code' => $exception->getCode()];
+        }
     }
 
     public function changeStatus(Request $request)
@@ -81,7 +140,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         }
     }
 
-    public function pendingEventsForPublishing(Request $request)
+    public function pendingEventsForPublishing(Request $request): array
     {
         $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id')->where('op_yearly_audit_calendar_id', $request->calendar_id)->get()->toArray();
 

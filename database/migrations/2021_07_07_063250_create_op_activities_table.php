@@ -22,6 +22,7 @@ class CreateOpActivitiesTable extends Migration
             $table->string('activity_no', 16);
             $table->string('title_en');
             $table->string('title_bn');
+            $table->string('activity_type', 64)->nullable();
             $table->integer('activity_parent_id')->default(0);
             $table->boolean('is_parent')->default(0)->comment('parent/child');
             $table->boolean('is_activity')->default(0);

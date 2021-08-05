@@ -17,10 +17,6 @@ class OpYearlyAuditCalendar extends Model
         'initiator_name_bn',
         'initiator_unit_name_en',
         'initiator_unit_name_bn',
-        'cdesk_name_en',
-        'cdesk_name_bn',
-        'cdesk_unit_name_en',
-        'cdesk_unit_name_bn',
         'status',
     ];
 

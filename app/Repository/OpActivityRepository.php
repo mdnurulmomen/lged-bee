@@ -7,10 +7,13 @@ use App\Models\OpActivityMilestone;
 use App\Models\XFiscalYear;
 use App\Models\XStrategicPlanOutcome;
 use App\Repository\Contracts\OpActivityInterface;
+use App\Traits\GenericData;
 use Illuminate\Http\Request;
 
 class OpActivityRepository implements OpActivityInterface
 {
+    use GenericData;
+
     public function __construct(OpActivity $opActivity)
     {
         $this->opActivity = $opActivity;
@@ -144,5 +147,20 @@ class OpActivityRepository implements OpActivityInterface
         $milestones = OpActivityMilestone::select('title_en', 'title_en')->where('activity_id', $activity_id)->with('milestone_calendar')->get();
 
         return $milestones;
+    }
+
+    public function storeActivity($validated_data): array
+    {
+        try {
+            if ($validated_data['activity_parent_id'] && $validated_data['activity_parent_id'] > 0) {
+                $validated_data['is_parent'] = 0;
+            }
+            $validated_data['duration_id'] = $this->durationIdFromFiscalYear($validated_data['fiscal_year_id']);
+            OpActivity::create($validated_data);
+            $response = responseFormat('success', 'Successfully Created!', ['code' => 200]);
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage(), ['code' => $exception->getCode()]);
+        }
+        return $response;
     }
 }

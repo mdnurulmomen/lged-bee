@@ -57,15 +57,11 @@ class OpActivityController extends Controller
         }
     }
 
-    public function store(SaveRequest $request): \Illuminate\Http\JsonResponse
+    public function store(SaveRequest $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
     {
         try {
             $validated = $request->validated();
-            if ($validated['activity_parent_id'] && $validated['activity_parent_id'] > 0) {
-                $validated['is_parent'] = 0;
-            }
-            $validated['duration_id'] = $this->durationIdFromFiscalYear($validated['fiscal_year_id']);
-            OpActivity::create($validated);
+            $creating_activity = $opActivity->storeActivity($validated);
             $response = responseFormat('success', 'Operational Plan Activity Created Successfully');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage(), ['code' => $exception->getCode()]);
