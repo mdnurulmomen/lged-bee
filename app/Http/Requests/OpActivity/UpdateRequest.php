@@ -31,6 +31,7 @@ class UpdateRequest extends FormRequest
             'activity_no' => 'string|required',
             'title_en' => 'string|required',
             'title_bn' => 'string|required',
+            'activity_type' => 'required',
             'activity_parent_id' => 'integer|nullable',
         ];
     }
@@ -52,6 +53,7 @@ class UpdateRequest extends FormRequest
             'title_en.string' => 'Activity Title (English) Should Be Text',
             'title_bn.required' => 'Activity Title (Bangla) Required',
             'title_bn.string' => 'Activity Title (Bangla) Should Be Text',
+            'activity_type.required' => 'Activity Type is required',
             'activity_parent_id.integer' => 'Activity Parent ID Should Be Number',
         ];
     }
