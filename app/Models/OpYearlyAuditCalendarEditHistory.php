@@ -11,6 +11,7 @@ class OpYearlyAuditCalendarEditHistory extends Model
 
     protected $fillable = [
         'op_yearly_calendar_id',
+        'activity_id',
         'duration_id',
         'fiscal_year_id',
         'unit_id',
