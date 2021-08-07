@@ -20,10 +20,16 @@ class UserController extends Controller
             $user_data = json_decode(gzuncompress(base64_decode($request->user_data)), true);
             $data['user_data'] = $user_data['user_info'];
 
-            $response = $this->setOfficeDomains($data['user_data']);
-            if (!isSuccessResponse($response)) {
-                throw new \Exception($response['message']);
+            if ($user_data['user_info']['user']['user_role_id'] == 1) {
+                $response['status'] = 'success';
+                $response['data'] = $data['user_data'];
+            } else {
+                $response = $this->setOfficeDomains($data['user_data']);
+                if (!isSuccessResponse($response)) {
+                    throw new \Exception($response['message']);
+                }
             }
+
             $token_response = $this->makeCagToken($response['data'] + [
                     'device_id' => $data['device_id'],
                     'device_type' => $data['device_type'],
