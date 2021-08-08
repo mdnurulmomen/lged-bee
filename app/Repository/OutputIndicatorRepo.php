@@ -22,7 +22,7 @@ class OutputIndicatorRepo implements IndicatorInterface
 
     public function show(Request $request)
     {
-        return $this->indecator->with('details')->findOrFail($request->id);
+        return $this->indecator->with(['output', 'year', 'details.year'])->findOrFail($request->id);
     }
 
     public function store(Request $request)
@@ -38,7 +38,7 @@ class OutputIndicatorRepo implements IndicatorInterface
         $indecator->datasource_bn = $request->datasource_bn;
         $indecator->base_fiscal_year_id = $request->base_fiscal_year_id;
         $indecator->base_value = $request->base_value;
-        $indecator->status = $request->status;
+        $indecator->status = $request->status ? 1 : 0;
 
         $details = [];
         if ($indecator->save()) {
@@ -47,7 +47,7 @@ class OutputIndicatorRepo implements IndicatorInterface
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'output_id' => $request->output_id,
-                    'unit_type' => $request->unit_type[$key],
+                    'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);
             }
@@ -63,7 +63,7 @@ class OutputIndicatorRepo implements IndicatorInterface
         $indecator = $this->indecator->find($request->id);
 
         $indecator->duration_id = $request->duration_id;
-        $indecator->outcome_id = $request->outcome_id;
+        $indecator->output_id = $request->output_id;
         $indecator->name_en = $request->name_en;
         $indecator->name_bn = $request->name_bn;
         $indecator->frequency_en = $request->frequency_en;
@@ -72,17 +72,17 @@ class OutputIndicatorRepo implements IndicatorInterface
         $indecator->datasource_bn = $request->datasource_bn;
         $indecator->base_fiscal_year_id = $request->base_fiscal_year_id;
         $indecator->base_value = $request->base_value;
-        $indecator->status = $request->status;
+        $indecator->status = $request->status ? 1 : 0;
 
         $details = [];
         if ($indecator->save()) {
-            OutputIndicatorDetail::where('outcome_indicator_id', $request->id)->delete();
+            OutputIndicatorDetail::where('output_indicator_id', $request->id)->delete();
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
                 $details[] = new OutputIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'output_id' => $request->output_id,
-                    'unit_type' => $request->unit_type[$key],
+                    'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);
             }

@@ -32,10 +32,10 @@ class UpdateOutcomeIndicatorRequest extends FormRequest
             'frequency_bn' => 'required',
             'datasource_en' => 'required',
             'datasource_bn' => 'required',
+            'unit_type' => 'required',
             'base_fiscal_year_id' => 'required|numeric',
             'base_value' => 'required',
-            'fiscal_year_id.*' => 'required',
-            'unit_type.*' => 'required',
+            'fiscal_year_id.*' => 'required'
         ];
     }
 }

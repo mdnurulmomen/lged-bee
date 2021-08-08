@@ -15,4 +15,9 @@ class OutcomeIndicatorDetail extends Model
     {
         return $this->belongsTo(OutcomeIndicator::class, 'outcome_indicator_id', 'id');
     }
+
+    public function year()
+    {
+        return $this->hasOne(XFiscalYear::class, 'id', 'fiscal_year_id');
+    }
 }

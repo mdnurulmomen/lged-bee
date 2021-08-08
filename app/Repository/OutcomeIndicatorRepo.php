@@ -22,7 +22,7 @@ class OutcomeIndicatorRepo implements IndicatorInterface
 
     public function show(Request $request)
     {
-        return $this->indecator->with('details')->findOrFail($request->id);
+        return $this->indecator->with(['outcome', 'year', 'details.year'])->findOrFail($request->id);
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class OutcomeIndicatorRepo implements IndicatorInterface
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'outcome_id' => $request->outcome_id,
-                    'unit_type' => $request->unit_type[$key],
+                    'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);
             }
@@ -82,7 +82,7 @@ class OutcomeIndicatorRepo implements IndicatorInterface
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'outcome_id' => $request->outcome_id,
-                    'unit_type' => $request->unit_type[$key],
+                    'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);
             }

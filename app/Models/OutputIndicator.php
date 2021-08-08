@@ -13,4 +13,14 @@ class OutputIndicator extends Model
     {
         return $this->hasMany(OutputIndicatorDetail::class, 'output_indicator_id', 'id');
     }
+
+    public function output()
+    {
+        return $this->hasMany(XStrategicPlanOutput::class, 'id', 'output_id');
+    }
+
+    public function year()
+    {
+        return $this->hasOne(XFiscalYear::class, 'id', 'base_fiscal_year_id');
+    }
 }

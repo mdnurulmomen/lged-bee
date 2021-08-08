@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\OutcomeIndicator;
+namespace App\Http\Requests\OutputIndicator;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateOutcomeIndicatorRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,17 +25,17 @@ class CreateOutcomeIndicatorRequest extends FormRequest
     {
         return [
             'duration_id' => 'required|numeric',
-            'outcome_id' => 'required|numeric',
+            'output_id' => 'required|numeric',
             'name_en' => 'required',
             'name_bn' => 'required',
             'frequency_en' => 'required',
             'frequency_bn' => 'required',
             'datasource_en' => 'required',
             'datasource_bn' => 'required',
-            'unit_type' => 'required',
             'base_fiscal_year_id' => 'required|numeric',
             'base_value' => 'required',
             'fiscal_year_id.*' => 'required',
+            'unit_type' => 'required',
         ];
     }
 }
