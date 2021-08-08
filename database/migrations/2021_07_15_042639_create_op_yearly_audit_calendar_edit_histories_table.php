@@ -18,10 +18,15 @@ class CreateOpYearlyAuditCalendarEditHistoriesTable extends Migration
             $table->integer('op_yearly_calendar_id');
             $table->integer('duration_id');
             $table->integer('fiscal_year_id');
-            $table->integer('unit_id');
+            $table->integer('activity_id');
             $table->integer('employee_id');
+            $table->string('employee_name_en');
+            $table->string('employee_name_bn');
+            $table->integer('unit_id');
             $table->bigInteger('user_id');
             $table->integer('employee_designation_id');
+            $table->string('employee_designation_en');
+            $table->string('employee_designation_bn');
             $table->json('old_data');
             $table->timestamps();
         });

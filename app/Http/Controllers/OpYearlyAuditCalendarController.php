@@ -124,16 +124,10 @@ class OpYearlyAuditCalendarController extends Controller
             'activity_id' => 'required|integer',
             'comment_en' => 'required|string',
             'comment_bn' => 'required|string',
-            'created_by' => 'nullable|integer',
-            'modified_by' => 'nullable|integer',
+            'cdesk' => 'json|required',
         ])->validate();
         try {
-            $activityComment = OpActivityComment::where('activity_id', $request->activity_id)->first();
-            if ($activityComment) {
-                $activityComment->update($data);
-            } else {
-                OpActivityComment::create($data);
-            }
+            $opActivityComment = OpActivityComment::updateOrCreate(['activity_id' => $request->activity_id], $data);
             $response = responseFormat('success', 'Successfully Updated');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

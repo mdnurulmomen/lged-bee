@@ -16,4 +16,9 @@ class OpActivityComment extends Model
         'created_by',
         'modified_by',
     ];
+
+    public function activity()
+    {
+        return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
+    }
 }
