@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OutputIndicatorDetail extends Model
+class SpOutputIndicatorDetail extends Model
 {
     use HasFactory;
 
@@ -13,7 +13,7 @@ class OutputIndicatorDetail extends Model
 
     public function indecator()
     {
-        return $this->belongsTo(OutputIndicator::class, 'output_indicator_id', 'id');
+        return $this->belongsTo(SpOutputIndicator::class, 'output_indicator_id', 'id');
     }
 
     public function year()

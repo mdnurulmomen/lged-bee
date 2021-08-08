@@ -3,14 +3,14 @@
 namespace App\Repository;
 
 use App\Repository\Contracts\IndicatorInterface;
-use App\Models\OutputIndicator;
-use App\Models\OutputIndicatorDetail;
+use App\Models\SpOutputIndicator;
+use App\Models\SpOutputIndicatorDetail;
 use Illuminate\Http\Request;
 
 class OutputIndicatorRepo implements IndicatorInterface
 {
 
-    public function __construct(OutputIndicator $indecator)
+    public function __construct(SpOutputIndicator $indecator)
     {
         $this->indecator = $indecator;
     }
@@ -27,7 +27,7 @@ class OutputIndicatorRepo implements IndicatorInterface
 
     public function store(Request $request)
     {
-        $indecator = new OutputIndicator();
+        $indecator = new SpOutputIndicator();
         $indecator->duration_id = $request->duration_id;
         $indecator->output_id = $request->output_id;
         $indecator->name_en = $request->name_en;
@@ -43,7 +43,7 @@ class OutputIndicatorRepo implements IndicatorInterface
         $details = [];
         if ($indecator->save()) {
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new OutputIndicatorDetail([
+                $details[] = new SpOutputIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'output_id' => $request->output_id,
@@ -76,9 +76,9 @@ class OutputIndicatorRepo implements IndicatorInterface
 
         $details = [];
         if ($indecator->save()) {
-            OutputIndicatorDetail::where('output_indicator_id', $request->id)->delete();
+            SpOutputIndicatorDetail::where('output_indicator_id', $request->id)->delete();
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new OutputIndicatorDetail([
+                $details[] = new SpOutputIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'output_id' => $request->output_id,

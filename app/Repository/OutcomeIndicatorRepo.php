@@ -3,14 +3,14 @@
 namespace App\Repository;
 
 use App\Repository\Contracts\IndicatorInterface;
-use App\Models\OutcomeIndicator;
-use App\Models\OutcomeIndicatorDetail;
+use App\Models\SpOutcomeIndicator;
+use App\Models\SpOutcomeIndicatorDetail;
 use Illuminate\Http\Request;
 
 class OutcomeIndicatorRepo implements IndicatorInterface
 {
 
-    public function __construct(OutcomeIndicator $indecator)
+    public function __construct(SpOutcomeIndicator $indecator)
     {
         $this->indecator = $indecator;
     }
@@ -27,7 +27,7 @@ class OutcomeIndicatorRepo implements IndicatorInterface
 
     public function store(Request $request)
     {
-        $indecator = new OutcomeIndicator();
+        $indecator = new SpOutcomeIndicator();
         $indecator->duration_id = $request->duration_id;
         $indecator->outcome_id = $request->outcome_id;
         $indecator->name_en = $request->name_en;
@@ -43,7 +43,7 @@ class OutcomeIndicatorRepo implements IndicatorInterface
         $details = [];
         if ($indecator->save()) {
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new OutcomeIndicatorDetail([
+                $details[] = new SpOutcomeIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'outcome_id' => $request->outcome_id,
@@ -76,9 +76,9 @@ class OutcomeIndicatorRepo implements IndicatorInterface
 
         $details = [];
         if ($indecator->save()) {
-            OutcomeIndicatorDetail::where('outcome_indicator_id', $request->id)->delete();
+            SpOutcomeIndicatorDetail::where('outcome_indicator_id', $request->id)->delete();
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new OutcomeIndicatorDetail([
+                $details[] = new SpOutcomeIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
                     'outcome_id' => $request->outcome_id,

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOutputIndicatorsTable extends Migration
+class CreateSpOutputIndicatorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateOutputIndicatorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('output_indicators', function (Blueprint $table) {
+        Schema::create('sp_output_indicators', function (Blueprint $table) {
             $table->id();
             $table->integer('duration_id');
             $table->integer('output_id');
