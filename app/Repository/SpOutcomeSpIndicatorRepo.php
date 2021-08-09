@@ -2,23 +2,23 @@
 
 namespace App\Repository;
 
-use App\Repository\Contracts\IndicatorInterface;
-use App\Models\SpOutputIndicator;
-use App\Models\SpOutputIndicatorDetail;
-use App\Models\XStrategicPlanOutput;
+use App\Repository\Contracts\SpIndicatorInterface;
+use App\Models\SpOutcomeIndicator;
+use App\Models\SpOutcomeIndicatorDetail;
+use App\Models\XStrategicPlanOutcome;
 use Illuminate\Http\Request;
 
-class OutputIndicatorRepo implements IndicatorInterface
+class SpOutcomeSpIndicatorRepo implements SpIndicatorInterface
 {
 
-    public function __construct(SpOutputIndicator $indecator)
+    public function __construct(SpOutcomeIndicator $indecator)
     {
         $this->indecator = $indecator;
     }
 
-    public function outputs()
+    public function outcomes()
     {
-        return XStrategicPlanOutput::with('indicators.details')
+        return XStrategicPlanOutcome::with('indicators.details')
             ->whereHas('indicators')
             ->get();
     }
@@ -30,14 +30,14 @@ class OutputIndicatorRepo implements IndicatorInterface
 
     public function show(Request $request)
     {
-        return $this->indecator->with(['output', 'year', 'details.year'])->findOrFail($request->id);
+        return $this->indecator->with(['outcome', 'year', 'details.year'])->findOrFail($request->id);
     }
 
     public function store(Request $request)
     {
-        $indecator = new SpOutputIndicator();
+        $indecator = new SpOutcomeIndicator();
         $indecator->duration_id = $request->duration_id;
-        $indecator->output_id = $request->output_id;
+        $indecator->outcome_id = $request->outcome_id;
         $indecator->name_en = $request->name_en;
         $indecator->name_bn = $request->name_bn;
         $indecator->frequency_en = $request->frequency_en;
@@ -51,10 +51,10 @@ class OutputIndicatorRepo implements IndicatorInterface
         $details = [];
         if ($indecator->save()) {
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new SpOutputIndicatorDetail([
+                $details[] = new SpOutcomeIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
-                    'output_id' => $request->output_id,
+                    'outcome_id' => $request->outcome_id,
                     'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);
@@ -71,7 +71,7 @@ class OutputIndicatorRepo implements IndicatorInterface
         $indecator = $this->indecator->find($request->id);
 
         $indecator->duration_id = $request->duration_id;
-        $indecator->output_id = $request->output_id;
+        $indecator->outcome_id = $request->outcome_id;
         $indecator->name_en = $request->name_en;
         $indecator->name_bn = $request->name_bn;
         $indecator->frequency_en = $request->frequency_en;
@@ -84,12 +84,12 @@ class OutputIndicatorRepo implements IndicatorInterface
 
         $details = [];
         if ($indecator->save()) {
-            SpOutputIndicatorDetail::where('output_indicator_id', $request->id)->delete();
+            SpOutcomeIndicatorDetail::where('outcome_indicator_id', $request->id)->delete();
             foreach ($request->fiscal_year_id as $key => $fiscal_year) {
-                $details[] = new SpOutputIndicatorDetail([
+                $details[] = new SpOutcomeIndicatorDetail([
                     'duration_id' => $request->duration_id,
                     'fiscal_year_id' => $fiscal_year,
-                    'output_id' => $request->output_id,
+                    'outcome_id' => $request->outcome_id,
                     'unit_type' => $request->unit_type,
                     'target_value' => $request->target_value[$key],
                 ]);

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Repository\OutcomeIndicatorRepo;
+use App\Repository\SpOutcomeSpIndicatorRepo;
 use App\Http\Requests\OutcomeIndicator\CreateOutcomeIndicatorRequest;
 use App\Http\Requests\OutcomeIndicator\UpdateOutcomeIndicatorRequest;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class OutcomeIndicatorController extends Controller
 {
 
-    public function outcomes(OutcomeIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    public function outcomes(SpOutcomeSpIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
     {
         try {
             $response = responseFormat('success', $indecator->outcomes());
@@ -26,7 +26,7 @@ class OutcomeIndicatorController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function index(OutcomeIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    public function index(SpOutcomeSpIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
     {
         try {
             $response = responseFormat('success', $indecator->index());
@@ -42,7 +42,7 @@ class OutcomeIndicatorController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateOutcomeIndicatorRequest $request, OutcomeIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    public function store(CreateOutcomeIndicatorRequest $request, SpOutcomeSpIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
     {
         try {
             $indecator->store($request);
@@ -59,7 +59,7 @@ class OutcomeIndicatorController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function show(Request $request, OutcomeIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    public function show(Request $request, SpOutcomeSpIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
     {
         try {
             $data = responseFormat('success', $indecator->show($request));
@@ -76,7 +76,7 @@ class OutcomeIndicatorController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(UpdateOutcomeIndicatorRequest $request, OutcomeIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    public function update(UpdateOutcomeIndicatorRequest $request, SpOutcomeSpIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
     {
         try {
             $indecator->update($request);
@@ -93,7 +93,7 @@ class OutcomeIndicatorController extends Controller
      * @param \App\Models\ApEntityAuditPlan $apEntityAuditPlan
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, OutcomeIndicatorRepo $indecator)
+    public function destroy(Request $request, SpOutcomeSpIndicatorRepo $indecator)
     {
         try {
             $indecator->destroy($request);
