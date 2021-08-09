@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Repository\Contracts\IndicatorInterface;
 use App\Models\SpOutcomeIndicator;
 use App\Models\SpOutcomeIndicatorDetail;
+use App\Models\XStrategicPlanOutcome;
 use Illuminate\Http\Request;
 
 class OutcomeIndicatorRepo implements IndicatorInterface
@@ -13,6 +14,13 @@ class OutcomeIndicatorRepo implements IndicatorInterface
     public function __construct(SpOutcomeIndicator $indecator)
     {
         $this->indecator = $indecator;
+    }
+
+    public function outcomes()
+    {
+        return XStrategicPlanOutcome::with('indicators.details')
+            ->whereHas('indicators')
+            ->get();
     }
 
     public function index()

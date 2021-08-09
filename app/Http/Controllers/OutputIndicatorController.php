@@ -9,6 +9,19 @@ use Illuminate\Http\Request;
 
 class OutputIndicatorController extends Controller
 {
+
+
+    public function outputs(OutputIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    {
+
+        try {
+            $response = responseFormat('success', $indecator->outputs());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -81,7 +94,7 @@ class OutputIndicatorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param \App\Models\ApEntityAuditPlan $apEntityAuditPlan
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, OutputIndicatorRepo $indecator)
     {
