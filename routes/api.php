@@ -68,6 +68,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::group(['prefix' => 'strategic-plan'], function () {
             Route::customApiResource('outcome-indicators', OutcomeIndicatorController::class);
             Route::customApiResource('output-indicators', OutputIndicatorController::class);
+            Route::post('all/outcome-indicators', [OutcomeIndicatorController::class, 'outcomes']);
+            Route::post('all/output-indicators', [OutputIndicatorController::class, 'outputs']);
         });
     });
 });

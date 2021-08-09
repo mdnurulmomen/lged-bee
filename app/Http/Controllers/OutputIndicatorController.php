@@ -9,6 +9,19 @@ use Illuminate\Http\Request;
 
 class OutputIndicatorController extends Controller
 {
+
+
+    public function outputs(OutputIndicatorRepo $indecator): \Illuminate\Http\JsonResponse
+    {
+
+        try {
+            $response = responseFormat('success', $indecator->outputs());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *

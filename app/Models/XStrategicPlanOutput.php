@@ -27,4 +27,9 @@ class XStrategicPlanOutput extends Model
     {
         return $this->hasMany(OpActivity::class, 'output_id', 'id');
     }
+
+    public function indicators()
+    {
+        return $this->hasMany(OutputIndicator::class, 'output_id', 'id');
+    }
 }

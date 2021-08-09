@@ -26,4 +26,9 @@ class XStrategicPlanOutcome extends Model
     {
         return $this->hasMany(XStrategicPlanOutput::class, 'outcome_id', 'id');
     }
+
+    public function indicators()
+    {
+        return $this->hasMany(OutcomeIndicator::class, 'outcome_id', 'id');
+    }
 }
