@@ -1,14 +1,13 @@
 <?php
 
-
-namespace App\Services;
-
+namespace App\Repository;
 
 use App\Models\OpYearlyAuditCalendarEditHistory;
+use App\Repository\Contracts\EditHistoryInterface;
 
-class OpYearlyAuditCalendarServices
+class OpYearlyAuditCalendarEditHistoryRepository implements EditHistoryInterface
 {
-    public function editHistoryCreateService($cdesk, $changed_data)
+    public function addOpYearlyAuditCalendarEditHistory($cdesk, $changed_data)
     {
         $cdesk = json_decode($cdesk, false);
         $updater_data = [
