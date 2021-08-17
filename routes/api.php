@@ -72,4 +72,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('output-indicators/all', [OutputIndicatorController::class, 'outputs']);
         });
     });
+
+    Route::group(['prefix' => 'follow-up/'], function () {
+        Route::customApiResource('audit-observations', AuditObservationController::class);
+        Route::group(['prefix' => 'audit-observation/'], function () {
+            Route::post('search', [AuditObservationController::class, 'search']);
+            Route::post('remove_attachment', [AuditObservationController::class, 'removeAttachment']);
+        });
+    });
 });
