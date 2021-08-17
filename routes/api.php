@@ -78,6 +78,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::group(['prefix' => 'audit-observation/'], function () {
             Route::post('search', [AuditObservationController::class, 'search']);
             Route::post('remove_attachment', [AuditObservationController::class, 'removeAttachment']);
+            Route::post('get_audit_plan', [AuditObservationController::class, 'getAuditPlan']);
+            Route::post('observation_communication', [AuditObservationController::class, 'observationCommunication']);
+            Route::post('observation_communication_lists', [AuditObservationController::class, 'observationCommunicationLists']);
         });
     });
 });

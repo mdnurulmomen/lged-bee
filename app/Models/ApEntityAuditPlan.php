@@ -29,4 +29,13 @@ class ApEntityAuditPlan extends Model
         'device_type',
         'device_id',
     ];
+
+    public function party()
+    {
+        return $this->belongsTo(
+            ApOrganizationYearlyPlanResponsibleParty::class,
+            'ap_organization_yearly_plan_rp_id',
+            'id'
+        );
+    }
 }

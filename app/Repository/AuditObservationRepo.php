@@ -5,16 +5,24 @@ namespace App\Repository;
 use App\Repository\Contracts\AuditObservationInterface;
 use App\Models\AuditObservation;
 use App\Models\AuditObservationAttachment;
+use App\Models\AuditObservationCommunication;
+use App\Models\AuditObservationCommunicationAttachment;
+use App\Models\AuditObservationCommunicationCC;
+use App\Models\ApEntityAuditPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use App\Traits\GenericData;
 
 class AuditObservationRepo implements AuditObservationInterface
 {
 
-    public function __construct(AuditObservation $observation)
+    use GenericData;
+
+    public function __construct(AuditObservation $observation, AuditObservationCommunication $communication)
     {
         $this->observation = $observation;
+        $this->communication = $communication;
     }
 
     public function index()
@@ -72,6 +80,7 @@ class AuditObservationRepo implements AuditObservationInterface
     {
         $observation = new AuditObservation();
         $observation->observation_no = $this->generateObservationNumber();
+        $observation->audit_id = $request->audit_id;
         $observation->ministry_id = $request->ministry_id;
         $observation->division_id = $request->division_id;
         $observation->parent_office_id = $request->parent_office_id;
@@ -165,6 +174,7 @@ class AuditObservationRepo implements AuditObservationInterface
         $observation = $this->observation->where('id', $request->id)->first();
         //$observation->observation_no = $this->generateObservationNumber();
         $observation->ministry_id = $request->ministry_id;
+        $observation->audit_id = $request->audit_id;
         $observation->division_id = $request->division_id;
         $observation->parent_office_id = $request->parent_office_id;
         $observation->rp_office_id = $request->rp_office_id;
@@ -263,6 +273,18 @@ class AuditObservationRepo implements AuditObservationInterface
         return $this->observation->findOrFail($request->id)->delete();
     }
 
+    public function getAuditPlan(Request $request)
+    {
+        $this->switchOffice($request->office_id);
+
+        $party = ApEntityAuditPlan::whereHas('party', function ($query) use ($request) {
+            $query->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('party_id', $request->rp_office_id);
+        })->select('id', 'plan_description')->get();
+        $this->emptyOfficeDBConnection();
+        return $party;
+    }
+
     public function generateObservationNumber()
     {
         $number = mt_rand(1000000000, 9999999999);
@@ -270,6 +292,55 @@ class AuditObservationRepo implements AuditObservationInterface
             return $this->generateObservationNumber();
         }
         return $number;
+    }
+
+    public function observationCommunication(Request $request)
+    {
+        $communication = new AuditObservationCommunication();
+        $communication->observation_id = $request->observation_id;
+        $communication->parent_office_id = $request->parent_office_id;
+        $communication->rp_office_id = $request->rp_office_id;
+        $communication->directorate_id = $request->directorate_id;
+        $communication->message_title = $request->message_title;
+        $communication->message_body = $request->message_body;
+        $communication->sent_to = $request->sent_to;
+        $communication->sent_by = $request->authorization['payload']['user_id'];
+        $communication->status = 1;
+
+        $ccIds = [];
+        $attachments = [];
+        if ($communication->save()) {
+            if ($request->hasfile('attachments')) {
+                foreach ($request->file('attachments') as $key => $attachment) {
+                    $fileName = "comm_" . uniqid() . $key . '.' . $attachment->extension();
+                    Storage::disk('public')->put($fileName,  File::get($attachment));
+                    $attachments[] = new AuditObservationCommunicationAttachment([
+                        'file_name' => $attachment->getClientOriginalName(),
+                        'file_location' => 'storage/app/public/' . $fileName,
+                        'file_url' => url('storage/' . $fileName),
+                        'file_type' => $attachment->extension()
+                    ]);
+                }
+            }
+            if (!empty($request->cc)) {
+                foreach ($request->cc as $cc) {
+                    $ccIds[] = new AuditObservationCommunicationCC([
+                        'communication_cc' => $cc
+                    ]);
+                }
+            }
+
+            $communication->attachments()->saveMany($attachments);
+            $communication->cc()->saveMany($ccIds);
+        }
+
+        return $communication;
+    }
+
+    public function observationCommunicationLists(Request $request)
+    {
+        $user = $request->authorization['payload']['user_id'];
+        return $this->communication->with(['observation'])->where('sent_by', $user)->latest()->get();
     }
 
     public function NumberExists($number)

@@ -25,6 +25,7 @@ class Update extends FormRequest
     {
         return [
             'id' => 'numeric|required',
+            'audit_id' => 'required|numeric',
             'ministry_id' => 'required|numeric',
             'division_id' => 'required|numeric',
             'parent_office_id' => 'required|numeric',

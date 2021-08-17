@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Repository\AuditObservationRepo;
 use App\Http\Requests\AuditObservation\Create;
 use App\Http\Requests\AuditObservation\Update;
+use App\Http\Requests\AuditObservation\getAuditPlanRequest;
+use App\Http\Requests\AuditObservation\CommunicationRequest;
 
 class AuditObservationController extends Controller
 {
@@ -31,12 +33,37 @@ class AuditObservationController extends Controller
         }
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    public function getAuditPlan(getAuditPlanRequest $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $response = responseFormat('success', $observation->getAuditPlan($request));
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function observationCommunication(CommunicationRequest $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $observation->observationCommunication($request);
+            $response = responseFormat('success', 'Follow Up Saved.');
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function observationCommunicationLists(Request $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $response = responseFormat('success', $observation->observationCommunicationLists($request));
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     public function index(AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
     {
         try {
@@ -47,12 +74,6 @@ class AuditObservationController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Create $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
     {
         try {
@@ -64,12 +85,6 @@ class AuditObservationController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-
     public function show(Request $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
     {
         try {
@@ -80,13 +95,6 @@ class AuditObservationController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function update(Update $request, AuditObservationRepo $observation): \Illuminate\Http\JsonResponse
     {
         try {
@@ -98,12 +106,6 @@ class AuditObservationController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Models\ApEntityAuditPlan $apEntityAuditPlan
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy(Request $request, AuditObservationRepo $observation)
     {
         try {

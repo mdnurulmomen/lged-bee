@@ -16,6 +16,7 @@ class CreateAuditObservationsTable extends Migration
         Schema::create('audit_observations', function (Blueprint $table) {
             $table->id();
             $table->string('observation_no');
+            $table->integer('audit_id');
             $table->integer('ministry_id');
             $table->integer('division_id');
             $table->integer('parent_office_id');

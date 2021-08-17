@@ -24,6 +24,7 @@ class Create extends FormRequest
     public function rules()
     {
         return [
+            'audit_id' => 'required|numeric',
             'ministry_id' => 'required|numeric',
             'division_id' => 'required|numeric',
             'parent_office_id' => 'required|numeric',
