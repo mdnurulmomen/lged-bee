@@ -9,6 +9,8 @@ class AuditObservation extends Model
 {
     use HasFactory;
 
+    protected $connection = 'OfficeDB';
+
     public function attachments()
     {
         return $this->hasMany(AuditObservationAttachment::class, 'observation_id', 'id');

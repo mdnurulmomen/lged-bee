@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AuditObservationCommunication extends Model
 {
     use HasFactory;
-
+    protected $connection = 'OfficeDB';
     public function observation()
     {
         return $this->belongsTo(AuditObservation::class, 'observation_id', 'id');

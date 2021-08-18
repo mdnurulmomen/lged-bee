@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AuditObservationAttachment extends Model
 {
     use HasFactory;
-
+    protected $connection = 'OfficeDB';
     protected $fillable = ['file_name', 'file_location', 'file_type', 'file_url', 'tag', 'file_category'];
 
     public function observation()

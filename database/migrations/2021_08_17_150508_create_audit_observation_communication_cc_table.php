@@ -13,7 +13,7 @@ class CreateAuditObservationCommunicationCcTable extends Migration
      */
     public function up()
     {
-        Schema::create('audit_observation_communication_cc', function (Blueprint $table) {
+        Schema::connection('OfficeDB')->create('audit_observation_communication_cc', function (Blueprint $table) {
             $table->id();
             $table->integer('communication_id');
             $table->string('communication_cc');

@@ -9,6 +9,7 @@ class AuditObservationCommunicationCC extends Model
 {
     use HasFactory;
 
+    protected $connection = 'OfficeDB';
     protected $table = 'audit_observation_communication_cc';
 
     protected $fillable = ['communication_cc'];

@@ -13,7 +13,7 @@ class CreateAuditObservationAttachmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('audit_observation_attachments', function (Blueprint $table) {
+        Schema::connection('OfficeDB')->create('audit_observation_attachments', function (Blueprint $table) {
             $table->id();
             $table->integer('observation_id');
             $table->string('file_category');

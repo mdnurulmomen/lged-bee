@@ -13,7 +13,7 @@ class CreateAuditObservationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('audit_observations', function (Blueprint $table) {
+        Schema::connection('OfficeDB')->create('audit_observations', function (Blueprint $table) {
             $table->id();
             $table->string('observation_no');
             $table->integer('audit_id');
