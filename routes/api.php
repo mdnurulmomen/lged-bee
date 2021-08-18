@@ -61,7 +61,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
-            Route::get('entity-audit-plan-lists', [ApEntityAuditPlanController::class, 'index']);
+            Route::post('entity-audit-plan-lists', [ApEntityAuditPlanController::class, 'index']);
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanController::class);
         });
 
@@ -83,4 +83,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('observation_communication_lists', [AuditObservationController::class, 'observationCommunicationLists']);
         });
     });
+
+    Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
+
 });

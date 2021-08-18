@@ -8,7 +8,7 @@ interface ApEntityAuditPlanInterface
 {
     public function allEntityAuditPlanLists(Request $request);
 
-    public function storeDraftAuditPlan(Request $request);
+    public function draftAuditPlan(Request $request);
 
     public function showEntityAuditPlan(Request $request);
 }

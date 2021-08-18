@@ -41,4 +41,9 @@ class ApOrganizationYearlyPlanResponsibleParty extends Model
     {
         return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'ap_organization_yearly_plan_rp_id', 'id');
     }
+
+    public function activity()
+    {
+        return $this->hasOne(OpActivity::class, 'id', 'activity_id');
+    }
 }

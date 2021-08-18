@@ -11,7 +11,9 @@ class AuditTemplate extends Model
 
     protected $fillable = [
         'template_name',
+        'template_type',
         'content',
+        'lang',
         'version',
         'status',
         'created_by',

@@ -12,6 +12,8 @@ class ApEntityAuditPlanController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
+     * @param ApEntityAuditPlanRepository $apEntityAuditPlanRepository
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -37,6 +39,7 @@ class ApEntityAuditPlanController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param ApEntityAuditPlanRepository $apEntityAuditPlanRepository
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request, ApEntityAuditPlanRepository $apEntityAuditPlanRepository): \Illuminate\Http\JsonResponse
@@ -48,19 +51,21 @@ class ApEntityAuditPlanController extends Controller
      * Display the specified resource.
      *
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function show(Request $request, ApEntityAuditPlanRepository $apEntityAuditPlanRepository)
+    public function show(Request $request, ApEntityAuditPlanRepository $apEntityAuditPlanRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'entity_id' => 'required|integer',
+            'party_id' => 'required|integer',
             'yearly_plan_rp_id' => 'required|integer',
             'cdesk' => 'required|json',
+            'lang' => 'string',
         ])->validate();
 
         $show_plan = $apEntityAuditPlanRepository->showEntityAuditPlan($request);
 
         if (isSuccessResponse($show_plan)) {
-            $response = responseFormat('success', 'Successfully Saved Plan');
+            $response = responseFormat('success', $show_plan['data']);
         } else {
             $response = responseFormat('error', $show_plan['data']);
         }
@@ -81,7 +86,7 @@ class ApEntityAuditPlanController extends Controller
             'cdesk' => 'required|json',
         ])->validate();
 
-        $add_plan = $apEntityAuditPlanRepository->storeDraftAuditPlan($request);
+        $add_plan = $apEntityAuditPlanRepository->draftAuditPlan($request);
 
         if (isSuccessResponse($add_plan)) {
             $response = responseFormat('success', 'Successfully Saved Plan');
@@ -95,10 +100,10 @@ class ApEntityAuditPlanController extends Controller
      * Remove the specified resource from storage.
      *
      * @param \App\Models\ApEntityAuditPlan $apEntityAuditPlan
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(ApEntityAuditPlan $apEntityAuditPlan)
     {
-        //
+        return response()->json('');
     }
 }

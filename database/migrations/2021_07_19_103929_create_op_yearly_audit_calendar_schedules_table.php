@@ -24,6 +24,7 @@ class CreateOpYearlyAuditCalendarSchedulesTable extends Migration
             $table->integer('activity_id');
             $table->string('activity_title_en');
             $table->string('activity_title_bn');
+            $table->string('activity_type', 64)->nullable();
             $table->integer('activity_responsible_id');
             $table->integer('activity_milestone_id');
             $table->string('milestone_title_en');

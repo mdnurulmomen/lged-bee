@@ -12,7 +12,8 @@ class ApEntityAuditPlan extends Model
     protected $connection = 'OfficeDB';
 
     protected $fillable = [
-        'entity_id',
+        'party_id',
+        'ap_organization_yearly_plan_rp_id',
         'plan_description',
         'draft_office_id',
         'draft_unit_id',

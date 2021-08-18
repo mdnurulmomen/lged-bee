@@ -17,6 +17,7 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
         'outcome_id',
         'output_id',
         'activity_id',
+        'activity_type',
         'activity_title_en',
         'activity_title_bn',
         'activity_responsible_id',

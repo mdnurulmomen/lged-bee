@@ -16,8 +16,10 @@ class CreateAuditTemplatesTable extends Migration
         Schema::create('audit_templates', function (Blueprint $table) {
             $table->id();
             $table->string('template_name', 128);
+            $table->string('template_type', 32);
             $table->longText('content');
-            $table->string('version', 3)->default('bn')->comment('language');
+            $table->string('lang', 3)->default('bn')->comment('language');
+            $table->tinyInteger('version')->nullable()->comment('template version');
             $table->boolean('status')->default(1);
             $table->integer('created_by')->nullable();
             $table->integer('modified_by')->nullable();

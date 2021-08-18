@@ -9,6 +9,8 @@ class OpActivity extends Model
 {
     use HasFactory;
 
+    protected $connection = 'BeeCoreDB';
+
     protected $fillable = [
         'duration_id',
         'fiscal_year_id',
