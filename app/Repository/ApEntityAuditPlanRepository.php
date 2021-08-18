@@ -79,13 +79,24 @@ class ApEntityAuditPlanRepository implements ApEntityAuditPlanInterface
         try {
             $plan = ApEntityAuditPlan::where('party_id', $request->party_id)->where('ap_organization_yearly_plan_rp_id', $request->yearly_plan_rp_id)->first();
             if ($plan) {
+                $content = $plan['plan_description'];
+                unset($plan['plan_description']);
+                $plan = ['content' => $content, 'plan_details' => $plan, 'is_draft' => true];
                 $data = ['status' => 'success', 'data' => $plan];
             } else {
                 $yearly_plan_rp = ApOrganizationYearlyPlanResponsibleParty::where('id', $request->yearly_plan_rp_id)->with('activity')->first();
+                if (!$yearly_plan_rp) {
+                    throw new \Exception('Yearly Plan Of RP Unit Not Found!');
+                }
                 $activity_type = $yearly_plan_rp->activity->activity_type;
-
-                $data = ['status' => 'success', 'data' => $activity_type];
-
+                if ($activity_type) {
+                    $template = AuditTemplate::select('content')->where('lang', $request->lang)->where('template_type', $activity_type)->where('status', 1)->first()->toArray();
+                    $template['is_draft'] = false;
+                    $template['plan_details'] = new \stdClass();
+                    $data = ['status' => 'success', 'data' => $template];
+                } else {
+                    throw new \Exception('No template found');
+                }
             }
         } catch (\Exception $e) {
             $data = ['status' => 'error', 'data' => $e->getMessage()];
