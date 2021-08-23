@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Route;
 
-Route::post('login-in-amms', [UserController::class, 'loginInAmms'])->middleware('header.api.version');
+Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
 
-Route::post('client-login', [UserController::class, 'clientLogin']);
+Route::post('client-login', [LoginController::class, 'clientLogin']);
 
 Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
