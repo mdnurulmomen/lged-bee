@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -55,9 +56,8 @@ class UserController extends Controller
             return response()->json($response);
 
         } catch (\Exception $ex) {
-            return response()->json(responseFormat('error', __('Technical Error Happen. Error: LIA'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), INTERNAL_SERVER_ERROR_CODE);
+            return response()->json(responseFormat('error', __('Technical Error Happen. Error: LIA'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), 500);
         }
-
     }
 
     protected function setOfficeDomains($data): array
@@ -136,5 +136,31 @@ class UserController extends Controller
             }
         }
         return $data;
+    }
+
+    public function clientLogin(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            Validator::make($request->all(), [
+                'client_id' => 'required',
+                'password' => 'required',
+            ])->validate();
+
+            if (!($request->client_id == config('bee_config.client_id') && $request->password == config('bee_config.client_pass'))) {
+                throw new \Exception('Client ID or Client Password is not matching. Please provide valid credentials.');
+            }
+
+            $token_data = [
+                'client_id' => $request->client_id,
+                'client_password' => $request->password,
+            ];
+
+            $token_response = $this->generateToken($token_data);
+            $response = ['status' => 'success'];
+            $response['data']['token'] = $token_response;
+            return response()->json($response);
+        } catch (\Exception $ex) {
+            return response()->json(responseFormat('error', __('Technical Error Happen. Error: LIA'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), 500);
+        }
     }
 }

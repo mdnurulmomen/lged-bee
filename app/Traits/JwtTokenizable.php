@@ -22,7 +22,7 @@ trait JwtTokenizable
             $expire = $notBefore + 3600 * 24 * 1; // Adding 1 day expiration
         }
 
-        $serverName = url('/');; /// set domain name
+        $serverName = url('/'); /// set domain name
 
         /*
          * Create the token as an array
