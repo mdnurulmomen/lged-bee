@@ -111,7 +111,7 @@ trait JwtTokenizable
         return $data;
     }
 
-    public function getLoginTokenParams()
+    public function getLoginTokenParams(): array
     {
         return [
             'device_id' => 'did',

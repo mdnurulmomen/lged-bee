@@ -160,7 +160,7 @@ class LoginController extends Controller
             $response['data']['token'] = $token_response;
             return response()->json($response);
         } catch (\Exception $ex) {
-            return response()->json(responseFormat('error', __('Technical Error Happen. Error: LIA'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), 500);
+            return response()->json(responseFormat('error', __('Technical Error Happen. Error.'), ['details' => $ex->getMessage(), 'code' => $ex->getCode()]), 500);
         }
     }
 }
