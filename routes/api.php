@@ -91,5 +91,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     //oboidoo
     Route::post('sp-file-upload', [StrategicPlanController::class, 'store']);
     Route::post('sp-file-show', [StrategicPlanController::class, 'show']);
+    Route::post('sp-file-list', [StrategicPlanController::class, 'list']);
 
 });

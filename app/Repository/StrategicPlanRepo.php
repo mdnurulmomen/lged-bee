@@ -34,4 +34,9 @@ class StrategicPlanRepo
     {
         return SPFile::find($request->id);
     }
+
+    public function list(Request $request)
+    {
+        return SPFile::all();
+    }
 }

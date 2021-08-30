@@ -29,4 +29,14 @@ class StrategicPlanController extends Controller
         }
     }
 
+    public function list(Request $request, StrategicPlanRepo $strategicPlanRepo): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $data = responseFormat('success', $strategicPlanRepo->list($request));
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
 }
