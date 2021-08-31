@@ -39,4 +39,24 @@ class StrategicPlanController extends Controller
         }
     }
 
+    public function settingStore(Request $request, StrategicPlanRepo $strategicPlanRepo): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $data = responseFormat('success', $strategicPlanRepo->settingStore($request));
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function settingList(Request $request, StrategicPlanRepo $strategicPlanRepo): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $data = responseFormat('success', $strategicPlanRepo->settingList($request));
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
 }

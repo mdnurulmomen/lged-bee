@@ -88,9 +88,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
-    //oboidoo
+    //todo
     Route::post('sp-file-upload', [StrategicPlanController::class, 'store']);
     Route::post('sp-file-show', [StrategicPlanController::class, 'show']);
     Route::post('sp-file-list', [StrategicPlanController::class, 'list']);
+    Route::post('sp-setting-store', [StrategicPlanController::class, 'settingStore']);
+    Route::post('sp-setting-list', [StrategicPlanController::class, 'settingList']);
 
 });
