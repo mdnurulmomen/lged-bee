@@ -89,10 +89,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
     //todo
-    Route::post('sp-file-upload', [StrategicPlanController::class, 'store']);
-    Route::post('sp-file-show', [StrategicPlanController::class, 'show']);
-    Route::post('sp-file-list', [StrategicPlanController::class, 'list']);
-    Route::post('sp-setting-store', [StrategicPlanController::class, 'settingStore']);
-    Route::post('sp-setting-list', [StrategicPlanController::class, 'settingList']);
+    Route::post('final-plan-file-upload', [FinalPlanController::class, 'store']);
+    Route::post('final-plan-file-edit', [FinalPlanController::class, 'edit']);
+    Route::post('final-plan-file-update', [FinalPlanController::class, 'update']);
+    Route::post('final-plan-file-list', [FinalPlanController::class, 'list']);
+    Route::post('final-plan-document-is-exist', [FinalPlanController::class, 'documentIsExist']);
+
+    Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
+    Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
 
 });

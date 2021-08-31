@@ -42,10 +42,10 @@ return [
             'visibility' => 'public',
         ],
 
-        'sp' => [
+        'final_documents' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/sp'),
-            'url' => env('APP_URL').'/storage/sp',
+            'root' => storage_path('app/public/final_documents'),
+            'url' => env('APP_URL').'/storage/final_documents',
             'visibility' => 'public',
         ],
 
