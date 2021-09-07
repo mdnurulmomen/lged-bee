@@ -70,6 +70,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('book', [AnnualPlanRevisedController::class, 'exportAnnualPlan']);
 
             Route::post('submit-plan-to-ocag', [AnnualPlanRevisedController::class, 'submitToOCAG']);
+
+            Route::post('show', [AnnualPlanRevisedController::class, 'showAnnualPlan']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {

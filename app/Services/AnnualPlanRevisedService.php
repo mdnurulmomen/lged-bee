@@ -49,6 +49,20 @@ class AnnualPlanRevisedService
 
     }
 
+    public function showAnnualPlans(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $annualPlanList = AnnualPlan::get();
+            $data = ['status' => 'success', 'data' => $annualPlanList];
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $data;
+
+    }
+
     public function storeAnnualPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
