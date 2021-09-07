@@ -68,9 +68,22 @@ class AnnualPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function exportAnnualPlan(Request $request)
+    public function exportAnnualPlan(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
     {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
 
+        $exportPlanBook = $annualPlanRevisedService->exportAnnualPlanBook($request);
+
+        if (isSuccessResponse($exportPlanBook)) {
+            $response = responseFormat('success', $exportPlanBook['data']);
+        } else {
+            $response = responseFormat('error', $exportPlanBook['data']);
+        }
+
+        return response()->json($response);
     }
 
     public function submitToOCAG(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse

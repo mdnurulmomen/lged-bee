@@ -32,4 +32,19 @@ class AnnualPlan extends Model
         'comment',
     ];
 
+    public function activity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
+    }
+
+    public function milestone(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(OpActivityMilestone::class, 'milestone_id', 'id');
+    }
+
+    public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
 }

@@ -40,4 +40,9 @@ class OpActivityMilestone extends Model
     {
         return $this->hasOne(ApOrganizationYearlyPlanBudget::class, 'milestone_id', 'id');
     }
+
+    public function annual_plans()
+    {
+        return $this->hasMany(AnnualPlan::class, 'milestone_id', 'id');
+    }
 }

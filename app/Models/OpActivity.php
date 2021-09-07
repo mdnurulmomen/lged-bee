@@ -69,4 +69,9 @@ class OpActivity extends Model
     {
         return $this->hasOne(OpActivityComment::class, 'activity_id', 'id');
     }
+
+    public function annual_plans()
+    {
+        return $this->hasMany(AnnualPlan::class, 'activity_id', 'id');
+    }
 }
