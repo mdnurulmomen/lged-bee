@@ -51,15 +51,25 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
         });
 
+//        Route::group(['prefix' => 'annual-plan/'], function () {
+//            Route::post('all', [ApOrganizationYearlyPlanController::class, 'allAnnualPlan']);
+//
+//            Route::post('rp-entities/all-added', [ApOrganizationYearlyPlanController::class, 'allSelectedRPEntities']);
+//            Route::post('rp-entities/store', [ApOrganizationYearlyPlanController::class, 'storeSelectedRPEntities']);
+//
+//            Route::post('plan-submission/create', [ApOrganizationYearlyPlanController::class, 'storePlanAssignedDetails']);
+//
+//            Route::post('submit-plan-to-ocag', [ApOrganizationYearlyPlanController::class, 'submitToOCAG']);
+//        });
+
         Route::group(['prefix' => 'annual-plan/'], function () {
-            Route::post('all', [ApOrganizationYearlyPlanController::class, 'allAnnualPlan']);
+            Route::post('all', [AnnualPlanRevisedController::class, 'allAnnualPlan']);
 
-            Route::post('rp-entities/all-added', [ApOrganizationYearlyPlanController::class, 'allSelectedRPEntities']);
-            Route::post('rp-entities/store', [ApOrganizationYearlyPlanController::class, 'storeSelectedRPEntities']);
+            Route::post('create', [AnnualPlanRevisedController::class, 'storeAnnualPlan']);
 
-            Route::post('plan-submission/create', [ApOrganizationYearlyPlanController::class, 'storePlanAssignedDetails']);
+            Route::post('book', [AnnualPlanRevisedController::class, 'exportAnnualPlan']);
 
-            Route::post('submit-plan-to-ocag', [ApOrganizationYearlyPlanController::class, 'submitToOCAG']);
+            Route::post('submit-plan-to-ocag', [AnnualPlanRevisedController::class, 'submitToOCAG']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
