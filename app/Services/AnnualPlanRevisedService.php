@@ -29,11 +29,12 @@ class AnnualPlanRevisedService
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-                ->with(['assigned_staffs', 'assigned_budget', 'assigned_rp'])
+                ->with(['annual_plan'])
                 ->get()
                 ->groupBy('activity_id')
                 ->toArray();
-            foreach ($schedules as $key => &$milestone) {
+
+            /*foreach ($schedules as $key => $milestone) {
                 foreach ($milestone as &$ms) {
                     $assigned_budget = 0;
                     foreach ($ms['assigned_budget'] as $budget) {
@@ -42,7 +43,7 @@ class AnnualPlanRevisedService
                     $ms['assigned_budget'] = $assigned_budget;
                     $ms['assigned_staffs'] = count($ms['assigned_staffs']);
                 }
-            }
+            }*/
             $data = ['status' => 'success', 'data' => $schedules];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
