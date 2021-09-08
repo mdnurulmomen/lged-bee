@@ -49,4 +49,9 @@ class AnnualPlan extends Model
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 
+    public function audit_plans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApEntityIndividualAuditPlan::class, 'annual_plan_id', 'id');
+    }
+
 }

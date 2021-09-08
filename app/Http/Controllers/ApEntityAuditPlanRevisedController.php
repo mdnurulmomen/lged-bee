@@ -42,9 +42,55 @@ class ApEntityAuditPlanRevisedController extends Controller
      * @param ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService
      * @return \Illuminate\Http\JsonResponse
      */
+    public function createNewAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'activity_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $add_plan = $apEntityAuditPlanRevisedService->createNewAuditPlan($request);
+
+        if (isSuccessResponse($add_plan)) {
+            $response = responseFormat('success', $add_plan['data']);
+        } else {
+            $response = responseFormat('error', $add_plan['data']);
+        }
+        return response()->json($response);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'activity_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'audit_plan_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $edit_plan = $apEntityAuditPlanRevisedService->editAuditPlan($request);
+
+        if (isSuccessResponse($edit_plan)) {
+            $response = responseFormat('success', $edit_plan['data']);
+        } else {
+            $response = responseFormat('error', $edit_plan['data']);
+        }
+        return response()->json($response);
+    }
+
     public function store(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
-        return response()->json(responseFormat('success', []));
+        return response()->json([]);
     }
 
     /**
@@ -82,11 +128,14 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function update(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'plan' => 'required|json',
+            'activity_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'audit_plan_id' => 'sometimes|integer',
+            'plan_description' => 'required',
             'cdesk' => 'required|json',
         ])->validate();
 
-        $add_plan = $apEntityAuditPlanRevisedService->draftAuditPlan($request);
+        $add_plan = $apEntityAuditPlanRevisedService->update($request);
 
         if (isSuccessResponse($add_plan)) {
             $response = responseFormat('success', 'Successfully Saved Plan');

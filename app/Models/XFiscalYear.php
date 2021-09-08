@@ -9,11 +9,13 @@ class XFiscalYear extends Model
 {
     use HasFactory;
 
+    protected $connection = 'BeeCoreDB';
+
     protected $fillable = [
         'duration_id',
         'start',
         'end',
-        'description'
+        'description',
     ];
 
 }
