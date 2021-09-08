@@ -23,6 +23,7 @@ class AnnualPlan extends Model
         'controlling_office_en',
         'controlling_office_bn',
         'office_type',
+        'budget',
         'total_unit_no',
         'nominated_offices',
         'nominated_office_counts',
@@ -30,6 +31,7 @@ class AnnualPlan extends Model
         'nominated_man_powers',
         'nominated_man_power_counts',
         'comment',
+        'status',
     ];
 
     public function activity(): \Illuminate\Database\Eloquent\Relations\BelongsTo

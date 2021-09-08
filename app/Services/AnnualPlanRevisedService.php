@@ -106,6 +106,7 @@ class AnnualPlanRevisedService
                                 'controlling_office_bn' => $controller['controlling_office_name_bn'],
                                 'controlling_office_id' => $controller['controlling_office_id'],
                                 'office_type' => $controller['office_type'],
+                                'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                                 'total_unit_no' => $request->total_unit_no,
                                 'nominated_offices' => $request->nominated_offices,
                                 'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
