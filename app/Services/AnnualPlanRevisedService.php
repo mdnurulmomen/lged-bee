@@ -79,10 +79,6 @@ class AnnualPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
-            if (!isSuccessResponse($office_db_con_response)) {
-                return ['status' => 'error', 'data' => $office_db_con_response];
-            }
 
             $nominated_offices = $request->nominated_offices;
             $ministry_info = json_decode($request->ministry_info, true);
