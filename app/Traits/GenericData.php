@@ -41,6 +41,8 @@ trait GenericData
             "username" => $officeDomain->domain_username,
             "password" => $officeDomain->domain_password,
             "port" => 3306,
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
         ]);
 
         DB::purge('OfficeDB');
