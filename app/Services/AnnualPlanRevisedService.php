@@ -193,25 +193,26 @@ class AnnualPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $submission_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
-            ->with(['assigned_staffs', 'assigned_budget'])
+        $submission_datas = $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
+            ->where('activity_responsible_id', $cdesk->office_id)
+            ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
+            ->with(['annual_plan'])
             ->get()
             ->groupBy('activity_id')
             ->toArray();
 
         $s_data = [];
-
         foreach ($submission_datas as $key => &$milestone) {
             $assigned_budget = 0;
             $assigned_staff = 0;
             foreach ($milestone as &$ms) {
-                foreach ($ms['assigned_budget'] as $budget) {
-                    $assigned_budget = $assigned_budget + $budget['budget'];
+                foreach ($ms['annual_plan'] as $annual_plan) {
+                    $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
+                    $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
                 }
-                $assigned_staff = $assigned_staff + count($ms['assigned_staffs']);
+                $s_data[$key]['assigned_budget'] = $assigned_budget;
+                $s_data[$key]['assigned_staffs'] = $assigned_staff;
             }
-            $s_data[$key]['assigned_budget'] = $assigned_budget;
-            $s_data[$key]['assigned_staffs'] = $assigned_staff;
         }
 
         foreach ($s_data as $activity_id => $s_datum) {
