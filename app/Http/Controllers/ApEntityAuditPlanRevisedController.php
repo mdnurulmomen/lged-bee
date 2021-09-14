@@ -71,8 +71,6 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function editAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'activity_id' => 'required|integer',
-            'annual_plan_id' => 'required|integer',
             'audit_plan_id' => 'required|integer',
             'fiscal_year_id' => 'required|integer',
             'cdesk' => 'required|json',

@@ -66,14 +66,8 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-
-            $annual_plan = AnnualPlan::where('id', $request->annual_plan_id)->with('fiscal_year')->first()->toArray();
-            $activity = OpActivity::where('id', $request->activity_id)->first()->toArray();
-            $audit_template = AuditTemplate::where('template_type', $activity['activity_type'])->first()->toArray();
-
-            $data['annual_plan'] = $annual_plan;
-            $data['plan_description'] = $audit_template['content'];
-            return ['status' => 'success', 'data' => $data];
+            $audit_template = ApEntityIndividualAuditPlan::where('id', $request->audit_plan_id)->where('fiscal_year_id', $request->fiscal_year_id)->first()->toArray();
+            return ['status' => 'success', 'data' => $audit_template];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
