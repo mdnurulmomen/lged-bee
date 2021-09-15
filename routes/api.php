@@ -87,6 +87,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('outcome-indicators/all', [OutcomeIndicatorController::class, 'outcomes']);
             Route::post('output-indicators/all', [OutputIndicatorController::class, 'outputs']);
         });
+
+        Route::group(['prefix' => 'calendar'], function () {
+            Route::post('individual', [AuditVisitCalenderPlanController::class, 'getIndividualPlanCalendar']);
+            Route::post('individual/create', [AuditVisitCalenderPlanController::class, 'storeIndividualPlanCalendar']);
+        });
     });
 
     Route::group(['prefix' => 'follow-up/'], function () {

@@ -3,83 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditVisitCalenderPlan;
+use App\Services\AuditVisitCalendarPlanService;
 use Illuminate\Http\Request;
 
 class AuditVisitCalenderPlanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function getIndividualPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        //
+        $calendar_data = $auditVisitCalendarPlanService->getIndividualPlanCalendar($request);
+
+        if (isSuccessResponse($calendar_data)) {
+            $response = responseFormat('success', $calendar_data['data']);
+        } else {
+            $response = responseFormat('error', $calendar_data['data']);
+        }
+
+        return response()->json($response);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function storeIndividualPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        //
-    }
+        $storeIndividualCalendar = $auditVisitCalendarPlanService->storeIndividualPlanCalendar($request);
+        if (isSuccessResponse($storeIndividualCalendar)) {
+            $response = responseFormat('success', $storeIndividualCalendar['data']);
+        } else {
+            $response = responseFormat('error', $storeIndividualCalendar['data']);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param \App\Models\AuditVisitCalenderPlan $auditVisitCalenderPlan
-     * @return \Illuminate\Http\Response
-     */
-    public function show(AuditVisitCalenderPlan $auditVisitCalenderPlan)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\AuditVisitCalenderPlan $auditVisitCalenderPlan
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(AuditVisitCalenderPlan $auditVisitCalenderPlan)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\AuditVisitCalenderPlan $auditVisitCalenderPlan
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, AuditVisitCalenderPlan $auditVisitCalenderPlan)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Models\AuditVisitCalenderPlan $auditVisitCalenderPlan
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(AuditVisitCalenderPlan $auditVisitCalenderPlan)
-    {
-        //
+        return response()->json($response);
     }
 }
