@@ -27,6 +27,9 @@ class CreateAuditVisitCalendarPlanTeamsTable extends Migration
             $table->bigInteger('entity_id');
             $table->string('entity_name_en');
             $table->string('entity_name_bn');
+            $table->bigInteger('controlling_office_id');
+            $table->string('controlling_office_name_en');
+            $table->string('controlling_office_name_bn');
             $table->string('team_name');
             $table->date('team_start_date');
             $table->date('team_end_date');
