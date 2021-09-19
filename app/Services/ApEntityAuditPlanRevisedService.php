@@ -160,20 +160,50 @@ class ApEntityAuditPlanRevisedService
 
     }
 
-    public function storeAuditTeamSchedule(Request $request)
+    public function storeAuditTeam(Request $request)
     {
+        $cdesk = json_decode($request->cdesk, false);
+        $this->switchOffice($cdesk->office_id);
+
         try {
-            $storeSchedule = (new AuditVisitCalendarPlanService)->storeAuditTeamCalendar($request);
-            if (!isSuccessResponse($storeSchedule)) {
-                $msg = $storeSchedule['data'] + 'SATS';
-                throw new \Exception($msg);
-            }
+            $audit_team_data = [
+                'fiscal_year_id' => $request->fiscal_year_id,
+                'duration_id' => $request->duration_id,
+                'outcome_id' => $request->outcome_id,
+                'output_id' => $request->output_id,
+                'activity_id' => $request->activity_id,
+                'milestone_id' => $request->milestone_id,
+                'annual_plan_id' => $request->annual_plan_id,
+                'audit_plan_id' => $request->audit_plan_id,
+                'ministry_id' => $request->ministry_id,
+                'entity_id' => $request->entity_id,
+                'entity_name_en' => $request->entity_name_en,
+                'entity_name_bn' => $request->entity_name_bn,
+                'team_name' => $request->team_name,
+                'team_start_date' => $request->team_start_date,
+                'team_end_date' => $request->team_end_date,
+                'team_members' => $request->team_members,
+                'leader_name_en' => $request->leader_name_en,
+                'leader_name_bn' => $request->leader_name_bn,
+                'leader_designation_id' => $request->leader_designation_id,
+                'leader_designation_name_en' => $request->leader_designation_name_en,
+                'leader_designation_name_bn' => $request->leader_designation_name_bn,
+                'team_parent_id' => $request->team_parent_id,
+                'activity_man_days' => $request->activity_man_days,
+                'audit_year_start' => $request->audit_year_start,
+                'audit_year_end' => $request->audit_year_end,
+                'approve_status' => $request->approve_status,
+            ];
 
-            $data = ['status' => 'success', 'data' => ''];
+            $audit_team_insert = AuditVisitCalendarPlanTeam::create($audit_team_data);
 
-        } catch (\Exception $exception) {
-            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+            $data = ['status' => 'success', 'data' => $audit_team_insert];
+        } catch (\Exception $e) {
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
+        $this->emptyOfficeDBConnection();
+
+        return $data;
     }
 
     public function getSubTeam(Request $request)

@@ -170,4 +170,45 @@ class ApEntityAuditPlanRevisedController extends Controller
     {
         return response()->json('');
     }
+
+    public function storeAuditTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'duration_id' => 'required|integer',
+            'outcome_id' => 'required|integer',
+            'output_id' => 'required|integer',
+            'activity_id' => 'required|integer',
+            'milestone_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'audit_plan_id' => 'required|integer',
+            'ministry_id' => 'required|integer',
+            'entity_id' => 'required|integer',
+            'entity_name_en' => 'required|string',
+            'entity_name_bn' => 'required|string',
+            'team_name' => 'required|string',
+            'team_start_date' => 'required',
+            'team_end_date' => 'required',
+            'team_members' => 'required|string',
+            'leader_name_en' => 'required|string',
+            'leader_name_bn' => 'required|string',
+            'leader_designation_id' => 'required|integer',
+            'leader_designation_name_en' => 'required|string',
+            'leader_designation_name_bn' => 'required|string',
+            'team_parent_id' => 'required|integer',
+            'activity_man_days' => 'required|integer',
+            'audit_year_start' => 'required',
+            'audit_year_end' => 'required|integer',
+            'approve_status' => 'required|string',
+        ])->validate();
+
+        $add_audit_team = $apEntityAuditPlanRevisedService->storeAuditTeam($request);
+
+        if (isSuccessResponse($add_audit_team)) {
+            $response = responseFormat('success', 'Successfully Saved Team');
+        } else {
+            $response = responseFormat('error', $add_audit_team['data']);
+        }
+        return response()->json($response);
+    }
 }
