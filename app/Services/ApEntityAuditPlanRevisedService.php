@@ -165,21 +165,23 @@ class ApEntityAuditPlanRevisedService
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
 
+        $apEntityIndividualAuditPlan = ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->first();
+
         try {
             $audit_team_data = [
-                'fiscal_year_id' => $request->fiscal_year_id,
-                'duration_id' => $request->duration_id,
-                'outcome_id' => $request->outcome_id,
-                'output_id' => $request->output_id,
+                'fiscal_year_id' => $apEntityIndividualAuditPlan->fiscal_year_id,
+                'duration_id' => '1',
+                'outcome_id' => '1',
+                'output_id' => '1',
                 'activity_id' => $request->activity_id,
-                'milestone_id' => $request->milestone_id,
+                'milestone_id' => $apEntityIndividualAuditPlan->milestone_id,
                 'annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id,
-                'ministry_id' => $request->ministry_id,
+                'ministry_id' =>'0',
                 'entity_id' => $request->entity_id,
                 'entity_name_en' => $request->entity_name_en,
                 'entity_name_bn' => $request->entity_name_bn,
-                'team_name' => $request->team_name,
+                'team_name' => 'Team Name',
                 'team_start_date' => $request->team_start_date,
                 'team_end_date' => $request->team_end_date,
                 'team_members' => $request->team_members,
@@ -188,16 +190,16 @@ class ApEntityAuditPlanRevisedService
                 'leader_designation_id' => $request->leader_designation_id,
                 'leader_designation_name_en' => $request->leader_designation_name_en,
                 'leader_designation_name_bn' => $request->leader_designation_name_bn,
-                'team_parent_id' => $request->team_parent_id,
-                'activity_man_days' => $request->activity_man_days,
+                'team_parent_id' => '1',
+                'activity_man_days' => '0',
                 'audit_year_start' => $request->audit_year_start,
                 'audit_year_end' => $request->audit_year_end,
                 'approve_status' => $request->approve_status,
             ];
 
-            $audit_team_insert = AuditVisitCalendarPlanTeam::create($audit_team_data);
+            $auditTeamSave = AuditVisitCalendarPlanTeam::create($audit_team_data);
 
-            $data = ['status' => 'success', 'data' => $audit_team_insert];
+            $data = ['status' => 'success', 'data' => $auditTeamSave];
         } catch (\Exception $e) {
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }

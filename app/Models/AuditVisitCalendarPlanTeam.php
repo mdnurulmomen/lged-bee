@@ -38,6 +38,9 @@ class AuditVisitCalendarPlanTeam extends Model
         'audit_year_start',
         'audit_year_end',
         'approve_status',
+        'controlling_office_id',
+        'controlling_office_name_bn',
+        'controlling_office_name_en',
     ];
 
     public function plan_member()
