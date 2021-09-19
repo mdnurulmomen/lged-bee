@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditVisitCalenderPlan;
 use App\Services\AuditVisitCalendarPlanService;
 use Illuminate\Http\Request;
 
@@ -23,7 +22,7 @@ class AuditVisitCalenderPlanController extends Controller
 
     public function storeIndividualPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        $storeIndividualCalendar = $auditVisitCalendarPlanService->storeIndividualPlanCalendar($request);
+        $storeIndividualCalendar = $auditVisitCalendarPlanService->storeAuditTeamCalendar($request);
         if (isSuccessResponse($storeIndividualCalendar)) {
             $response = responseFormat('success', $storeIndividualCalendar['data']);
         } else {

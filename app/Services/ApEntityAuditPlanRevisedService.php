@@ -10,6 +10,7 @@ use App\Models\AuditTemplate;
 use App\Models\OpActivity;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApEntityAuditPlanRevisedService
 {
@@ -57,7 +58,6 @@ class ApEntityAuditPlanRevisedService
         }
     }
 
-
     public function editAuditPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -79,6 +79,7 @@ class ApEntityAuditPlanRevisedService
 
         $this->switchOffice($cdesk->office_id);
 
+        DB::beginTransaction();
         try {
             $annual_plan_data = AnnualPlan::where('id', $request->annual_plan_id)->select('schedule_id', 'milestone_id', 'fiscal_year_id')->first();
             $draft_plan_data = [
@@ -113,10 +114,19 @@ class ApEntityAuditPlanRevisedService
             } else {
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);
             }
+
+            $storeSchedule = (new AuditVisitCalendarPlanService)->storeAuditTeamCalendar($draft_plan['id'], $request->cdesk);
+            if (!isSuccessResponse($storeSchedule)) {
+                $msg = $storeSchedule['data'] . ' Error Code:SATS';
+                throw new \Exception($msg);
+            }
+
             $data = ['status' => 'success', 'data' => $draft_plan];
         } catch (\Exception $e) {
+            DB::rollBack();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
+        DB::commit();
         $this->emptyOfficeDBConnection();
 
         return $data;
@@ -157,4 +167,19 @@ class ApEntityAuditPlanRevisedService
 
     }
 
+    public function storeAuditTeamSchedule(Request $request)
+    {
+        try {
+            $storeSchedule = (new AuditVisitCalendarPlanService)->storeAuditTeamCalendar($request);
+            if (!isSuccessResponse($storeSchedule)) {
+                $msg = $storeSchedule['data'] + 'SATS';
+                throw new \Exception($msg);
+            }
+
+            $data = ['status' => 'success', 'data' => ''];
+
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
 }
