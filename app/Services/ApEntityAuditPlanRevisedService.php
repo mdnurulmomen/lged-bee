@@ -52,6 +52,7 @@ class ApEntityAuditPlanRevisedService
 
             $data['annual_plan'] = $annual_plan;
             $data['plan_description'] = $audit_template['content'];
+            $data['audit_type'] = $activity['activity_type'];
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -79,7 +80,6 @@ class ApEntityAuditPlanRevisedService
 
         $this->switchOffice($cdesk->office_id);
 
-        DB::beginTransaction();
         try {
             $annual_plan_data = AnnualPlan::where('id', $request->annual_plan_id)->select('schedule_id', 'milestone_id', 'fiscal_year_id')->first();
             $draft_plan_data = [
@@ -115,18 +115,10 @@ class ApEntityAuditPlanRevisedService
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);
             }
 
-            $storeSchedule = (new AuditVisitCalendarPlanService)->storeAuditTeamCalendar($draft_plan['id'], $request->cdesk);
-            if (!isSuccessResponse($storeSchedule)) {
-                $msg = $storeSchedule['data'] . ' Error Code:SATS';
-                throw new \Exception($msg);
-            }
-
             $data = ['status' => 'success', 'data' => $draft_plan];
         } catch (\Exception $e) {
-            DB::rollBack();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
-        DB::commit();
         $this->emptyOfficeDBConnection();
 
         return $data;
