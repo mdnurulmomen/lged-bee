@@ -7,6 +7,7 @@ use App\Models\ApEntityAuditPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOrganizationYearlyPlanResponsibleParty;
 use App\Models\AuditTemplate;
+use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\OpActivity;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -170,6 +171,21 @@ class ApEntityAuditPlanRevisedService
 
             $data = ['status' => 'success', 'data' => ''];
 
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getSubTeam(Request $request)
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $data = AuditVisitCalendarPlanTeam::where('team_parent_id',$request->team_id)->get()->toArray();
+            return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
