@@ -86,7 +86,10 @@ class AnnualPlanRevisedService
             $nominated_offices = $request->nominated_offices;
             $ministry_info = json_decode($request->ministry_info, true);
             $controlling_office = json_decode($request->controlling_office, true);
+            $parent_office = json_decode($request->parent_office, true);
             $entity_ids = (array_keys(json_decode($nominated_offices, true)));
+
+            //dd($parent_office);
 
             foreach ($ministry_info as $ministry) {
                 $is_entity_ministry = !empty(array_intersect($entity_ids, $ministry['entity_ids']));
@@ -94,27 +97,39 @@ class AnnualPlanRevisedService
                     foreach ($controlling_office as $controller) {
                         $is_entity_controller = !empty(array_intersect($entity_ids, $controller['entity_ids']));
                         if ($is_entity_controller) {
-                            $plan_data = [
-                                'schedule_id' => $request->schedule_id,
-                                'milestone_id' => $request->milestone_id,
-                                'activity_id' => $request->activity_id,
-                                'fiscal_year_id' => $request->fiscal_year_id,
-                                'ministry_name_en' => $ministry['ministry_name_en'],
-                                'ministry_name_bn' => $ministry['ministry_name_bn'],
-                                'ministry_id' => $ministry['ministry_id'],
-                                'controlling_office_en' => $controller['controlling_office_name_en'],
-                                'controlling_office_bn' => $controller['controlling_office_name_bn'],
-                                'controlling_office_id' => $controller['controlling_office_id'],
-                                'office_type' => $controller['office_type'],
-                                'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
-                                'total_unit_no' => $request->total_unit_no,
-                                'nominated_offices' => $request->nominated_offices,
-                                'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
-                                'subject_matter' => $request->subject_matter,
-                                'nominated_man_powers' => $request->nominated_man_powers,
-                                'nominated_man_power_counts' => $request->nominated_man_power_counts,
-                                'comment' => $request->comment,
-                            ];
+
+                            foreach ($parent_office as $parent) {
+                                $is_entity_parent_controller = !empty(array_intersect($entity_ids, $parent['entity_ids']));
+                                if ($is_entity_parent_controller) {
+                                    $plan_data = [
+                                        'schedule_id' => $request->schedule_id,
+                                        'milestone_id' => $request->milestone_id,
+                                        'activity_id' => $request->activity_id,
+                                        'fiscal_year_id' => $request->fiscal_year_id,
+                                        'ministry_name_en' => $ministry['ministry_name_en'],
+                                        'ministry_name_bn' => $ministry['ministry_name_bn'],
+                                        'ministry_id' => $ministry['ministry_id'],
+                                        'controlling_office_en' => $controller['controlling_office_name_en'],
+                                        'controlling_office_bn' => $controller['controlling_office_name_bn'],
+                                        'controlling_office_id' => $controller['controlling_office_id'],
+
+                                        'parent_office_name_en' => $parent['parent_office_name_en'],
+                                        'parent_office_name_bn' => $parent['parent_office_name_bn'],
+                                        'parent_office_id' => $parent['parent_office_id'],
+
+                                        'office_type' => $controller['office_type'],
+                                        'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
+                                        'total_unit_no' => $request->total_unit_no,
+                                        'nominated_offices' => $request->nominated_offices,
+                                        'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
+                                        'subject_matter' => $request->subject_matter,
+                                        'nominated_man_powers' => $request->nominated_man_powers,
+                                        'nominated_man_power_counts' => $request->nominated_man_power_counts,
+                                        'comment' => $request->comment,
+                                    ];
+                                }
+                            }
+
 
                             $plan = AnnualPlan::updateOrcreate([
                                 'ministry_id' => $ministry['ministry_id'],
