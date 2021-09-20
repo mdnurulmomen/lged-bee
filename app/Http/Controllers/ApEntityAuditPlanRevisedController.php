@@ -154,7 +154,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         $sub_team_list = $apEntityAuditPlanRevisedService->getSubTeam($request);
 
         if (isSuccessResponse($sub_team_list)) {
-            $response = responseFormat('success', 'Successfully Saved Plan');
+            $response = responseFormat('success', $sub_team_list['data']);
         } else {
             $response = responseFormat('error', $sub_team_list['data']);
         }
