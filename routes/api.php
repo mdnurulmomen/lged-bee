@@ -82,6 +82,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanRevisedController::class);
 
             Route::post('entity-audit-plan/audit-team/store', [ApEntityAuditPlanRevisedController::class, 'storeAuditTeam']);
+            Route::post('entity-audit-plan/audit-team/store-team-schedule', [ApEntityAuditPlanRevisedController::class, 'storeTeamSchedule']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {

@@ -8,6 +8,7 @@ use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOrganizationYearlyPlanResponsibleParty;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -214,6 +215,89 @@ class ApEntityAuditPlanRevisedService
                 }
             }
 
+            $data = ['status' => 'success', 'data' => 'save data successfull'];
+        } catch (\Exception $e) {
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+
+        return $data;
+    }
+
+    public function storeTeamSchedule(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $this->switchOffice($cdesk->office_id);
+        $team_schedules = json_decode($request->team_schedules,true);
+        try {
+            foreach ($team_schedules['schedule'] as $schedule){
+
+                $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)->where('leader_designation_id',$schedule['team_member_designation_id'])->first();
+                $team_mebmer = json_decode($team_data->team_members,true);
+
+                //dd($team_mebmer);
+
+                foreach ($team_mebmer as $member){
+                    if(count($member) > 1 ){
+                        foreach($team_mebmer as $mem){
+                            $teamSchedule = new AuditVisitCalenderPlanMember;
+                            $teamSchedule->fiscal_year_id = $team_data->fiscal_year_id;
+                            $teamSchedule->duration_id = $team_data->duration_id;
+                            $teamSchedule->outcome_id = $team_data->outcome_id;
+                            $teamSchedule->output_id = $team_data->output_id;
+                            $teamSchedule->activity_id = $team_data->activity_id;
+                            $teamSchedule->milestone_id = $team_data->milestone_id;
+                            $teamSchedule->annual_plan_id = $team_data->annual_plan_id;
+                            $teamSchedule->audit_plan_id = $team_data->audit_plan_id;
+                            $teamSchedule->entity_id  = $team_data->entity_id;
+                            $teamSchedule->cost_center_id = $schedule['cost_center_id'];
+                            $teamSchedule->cost_center_name_en = $schedule['cost_center_name_en'];
+                            $teamSchedule->cost_center_name_bn  = $schedule['cost_center_name_bn'];
+                            $teamSchedule->team_member_name_en  = $mem['team_member_name_en'];
+                            $teamSchedule->team_member_name_bn  = $mem['team_member_name_bn'];
+                            $teamSchedule->team_member_designation_id = $mem['designation_id'];
+                            $teamSchedule->team_member_designation_en = $mem['designation_name_en'];
+                            $teamSchedule->team_member_designation_bn = $mem['designation_name_bn'];
+                            $teamSchedule->team_member_role_en = $mem['team_member_role_en'];
+                            $teamSchedule->team_member_role_bn = $mem['team_member_role_bn'];
+                            $teamSchedule->team_member_start_date = $mem['team_member_start_date'];
+                            $teamSchedule->team_member_end_date = $mem['team_member_end_date'];
+                            $teamSchedule->comment = $mem['comment'] ?: '';
+                            $teamSchedule->mobile_no = $mem['mobile_no'] ?: '';
+                            $teamSchedule->approve_status = 'approved';
+                            $teamSchedule->save();
+                        }
+                    }
+
+                        $teamSchedule = new AuditVisitCalenderPlanMember;
+
+                        $teamSchedule->fiscal_year_id = $team_data->fiscal_year_id;
+                        $teamSchedule->duration_id = $team_data->duration_id;
+                        $teamSchedule->outcome_id = $team_data->outcome_id;
+                        $teamSchedule->output_id = $team_data->output_id;
+                        $teamSchedule->activity_id = $team_data->activity_id;
+                        $teamSchedule->milestone_id = $team_data->milestone_id;
+                        $teamSchedule->annual_plan_id = $team_data->annual_plan_id;
+                        $teamSchedule->audit_plan_id = $team_data->audit_plan_id;
+                        $teamSchedule->entity_id  = $team_data->entity_id;
+                        $teamSchedule->cost_center_id = $schedule['cost_center_id'];
+                        $teamSchedule->cost_center_name_en = $schedule['cost_center_name_en'];
+                        $teamSchedule->cost_center_name_bn  = $schedule['cost_center_name_bn'];
+                        $teamSchedule->team_member_name_en  = $member['team_member_name_en'];
+                        $teamSchedule->team_member_name_bn  = $member['team_member_name_bn'];
+                        $teamSchedule->team_member_designation_id = $member['designation_id'];
+                        $teamSchedule->team_member_designation_en = $member['designation_name_en'];
+                        $teamSchedule->team_member_designation_bn = $member['designation_name_bn'];
+                        $teamSchedule->team_member_role_en = $member['team_member_role_en'];
+                        $teamSchedule->team_member_role_bn = $member['team_member_role_bn'];
+                        $teamSchedule->team_member_start_date = $member['team_member_start_date'];
+                        $teamSchedule->team_member_end_date = $member['team_member_end_date'];
+                        $teamSchedule->comment = $member['comment'] ?: '';
+                        $teamSchedule->mobile_no = $member['mobile_no'] ?: '';
+                        $teamSchedule->approve_status = 'approved';
+                        $teamSchedule->save();
+                }
+             }
             $data = ['status' => 'success', 'data' => 'save data successfull'];
         } catch (\Exception $e) {
             dd($e);
