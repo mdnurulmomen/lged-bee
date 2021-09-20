@@ -174,25 +174,13 @@ class ApEntityAuditPlanRevisedController extends Controller
 
     public function storeAuditTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
+
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
             'activity_id' => 'required|integer',
             'annual_plan_id' => 'required|integer',
             'audit_plan_id' => 'required|integer',
-            'entity_id' => 'required|integer',
-            'entity_name_en' => 'required|string',
-            'entity_name_bn' => 'required|string',
-            'team_start_date' => 'required',
-            'team_end_date' => 'required',
-            'team_members' => 'required|string',
-            'leader_name_en' => 'required|string',
-            'leader_name_bn' => 'required|string',
-            'leader_designation_id' => 'required|integer',
-            'leader_designation_name_en' => 'required|string',
-            'leader_designation_name_bn' => 'required|string',
-            'audit_year_start' => 'required',
-            'audit_year_end' => 'required|integer',
-            'approve_status' => 'required|string',
+            'teams' => 'required'
         ])->validate();
 
         $add_audit_team = $apEntityAuditPlanRevisedService->storeAuditTeam($request);

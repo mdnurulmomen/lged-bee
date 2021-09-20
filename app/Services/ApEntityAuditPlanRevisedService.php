@@ -165,42 +165,58 @@ class ApEntityAuditPlanRevisedService
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
 
-        $apEntityIndividualAuditPlan = ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->first();
+        $annualPlan = AnnualPlan::find($request->annual_plan_id);
+        //dd($annualPlan);
+
+        $teams = json_decode($request->teams,true);
+        //dd($teams['teams']);
 
         try {
-            $audit_team_data = [
-                'fiscal_year_id' => $apEntityIndividualAuditPlan->fiscal_year_id,
-                'duration_id' => '1',
-                'outcome_id' => '1',
-                'output_id' => '1',
-                'activity_id' => $request->activity_id,
-                'milestone_id' => $apEntityIndividualAuditPlan->milestone_id,
-                'annual_plan_id' => $request->annual_plan_id,
-                'audit_plan_id' => $request->audit_plan_id,
-                'ministry_id' =>'0',
-                'entity_id' => $request->entity_id,
-                'entity_name_en' => $request->entity_name_en,
-                'entity_name_bn' => $request->entity_name_bn,
-                'team_name' => 'Team Name',
-                'team_start_date' => $request->team_start_date,
-                'team_end_date' => $request->team_end_date,
-                'team_members' => $request->team_members,
-                'leader_name_en' => $request->leader_name_en,
-                'leader_name_bn' => $request->leader_name_bn,
-                'leader_designation_id' => $request->leader_designation_id,
-                'leader_designation_name_en' => $request->leader_designation_name_en,
-                'leader_designation_name_bn' => $request->leader_designation_name_bn,
-                'team_parent_id' => '1',
-                'activity_man_days' => '0',
-                'audit_year_start' => $request->audit_year_start,
-                'audit_year_end' => $request->audit_year_end,
-                'approve_status' => $request->approve_status,
-            ];
+            $parent_id = 0;
+            foreach ($teams['teams'] as $team){
+                $auditVisitCalendarPlanTeam = new AuditVisitCalendarPlanTeam;
+                $auditVisitCalendarPlanTeam->fiscal_year_id = $annualPlan->fiscal_year_id;
+                $auditVisitCalendarPlanTeam->duration_id = $annualPlan->activity->duration_id;
+                $auditVisitCalendarPlanTeam->outcome_id = $annualPlan->activity->outcome_id;
+                $auditVisitCalendarPlanTeam->output_id = $annualPlan->activity->output_id;
+                $auditVisitCalendarPlanTeam->activity_id = $annualPlan->activity_id;
+                $auditVisitCalendarPlanTeam->milestone_id = $annualPlan->milestone_id;
+                $auditVisitCalendarPlanTeam->annual_plan_id = $request->annual_plan_id;
+                $auditVisitCalendarPlanTeam->audit_plan_id = $request->audit_plan_id;
+                $auditVisitCalendarPlanTeam->ministry_id = $annualPlan->ministry_id;
+                $auditVisitCalendarPlanTeam->entity_id = $annualPlan->parent_office_id;
+                $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
+                $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
+                $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
+                $auditVisitCalendarPlanTeam->team_start_date = $team['team_start_date'];
+                $auditVisitCalendarPlanTeam->team_end_date = $team['team_end_date'];
+                $auditVisitCalendarPlanTeam->team_members = json_encode($team['team_members']);
+                $auditVisitCalendarPlanTeam->leader_name_en = $team['leader_name_en'];
+                $auditVisitCalendarPlanTeam->leader_name_bn= $team['leader_name_bn'];
+                $auditVisitCalendarPlanTeam->leader_designation_id = $team['leader_designation_id'];
+                $auditVisitCalendarPlanTeam->leader_designation_name_en = $team['leader_designation_name_en'];
+                $auditVisitCalendarPlanTeam->leader_designation_name_bn = $team['leader_designation_name_bn'];
 
-            $auditTeamSave = AuditVisitCalendarPlanTeam::create($audit_team_data);
+                if($team['team_type'] == 'parent'){
+                    $auditVisitCalendarPlanTeam->team_parent_id = 0;
+                }else{
+                    $auditVisitCalendarPlanTeam->team_parent_id = $parent_id;
+                }
 
-            $data = ['status' => 'success', 'data' => $auditTeamSave];
+                $auditVisitCalendarPlanTeam->activity_man_days = $request->activity_man_days;
+                $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
+                $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
+                $auditVisitCalendarPlanTeam->approve_status = 1;
+                $auditVisitCalendarPlanTeam->save();
+
+                if($team['team_type'] == 'parent'){
+                    $parent_id = $auditVisitCalendarPlanTeam->id;
+                }
+            }
+
+            $data = ['status' => 'success', 'data' => 'save data successfull'];
         } catch (\Exception $e) {
+            dd($e);
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
         $this->emptyOfficeDBConnection();
