@@ -163,6 +163,7 @@ class ApEntityAuditPlanRevisedService
 
     public function storeAuditTeam(Request $request)
     {
+        dd($request->all());
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
 
@@ -170,7 +171,7 @@ class ApEntityAuditPlanRevisedService
         //dd($annualPlan);
 
         $teams = json_decode($request->teams, true);
-        //dd($teams['teams']);
+//        dd($teams);
 
         try {
             $parent_id = 0;
