@@ -204,7 +204,7 @@ class ApEntityAuditPlanRevisedService
                     $auditVisitCalendarPlanTeam->team_parent_id = $parent_id;
                 }
 
-                $auditVisitCalendarPlanTeam->activity_man_days = $request->activity_man_days;
+                $auditVisitCalendarPlanTeam->activity_man_days = 0;
                 $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
                 $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
                 $auditVisitCalendarPlanTeam->approve_status = 1;
@@ -233,13 +233,11 @@ class ApEntityAuditPlanRevisedService
             foreach ($team_schedules['schedule'] as $schedule){
 
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)->where('leader_designation_id',$schedule['team_member_designation_id'])->first();
-                $team_mebmer = json_decode($team_data->team_members,true);
+                $team_member = json_decode($team_data->team_members,true);
 
-                //dd($team_mebmer);
-
-                foreach ($team_mebmer as $member){
+                foreach ($team_member as $member){
                     if(count($member) > 1 ){
-                        foreach($team_mebmer as $mem){
+                        foreach($team_member as $mem){
                             $teamSchedule = new AuditVisitCalenderPlanMember;
                             $teamSchedule->fiscal_year_id = $team_data->fiscal_year_id;
                             $teamSchedule->duration_id = $team_data->duration_id;

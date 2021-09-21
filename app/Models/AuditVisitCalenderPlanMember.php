@@ -36,6 +36,7 @@ class AuditVisitCalenderPlanMember extends Model
         'team_member_start_date',
         'team_member_end_date',
         'team_member_activity',
+        'activity_man_days',
         'team_member_activity_description',
         'activity_location',
         'comment',
