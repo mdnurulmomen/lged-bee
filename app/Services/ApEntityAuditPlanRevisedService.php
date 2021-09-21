@@ -169,12 +169,12 @@ class ApEntityAuditPlanRevisedService
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
         //dd($annualPlan);
 
-        $teams = json_decode($request->teams,true);
+        $teams = json_decode($request->teams, true);
         //dd($teams['teams']);
 
         try {
             $parent_id = 0;
-            foreach ($teams['teams'] as $team){
+            foreach ($teams['teams'] as $team) {
                 $auditVisitCalendarPlanTeam = new AuditVisitCalendarPlanTeam;
                 $auditVisitCalendarPlanTeam->fiscal_year_id = $annualPlan->fiscal_year_id;
                 $auditVisitCalendarPlanTeam->duration_id = $annualPlan->activity->duration_id;
@@ -193,14 +193,14 @@ class ApEntityAuditPlanRevisedService
                 $auditVisitCalendarPlanTeam->team_end_date = $team['team_end_date'];
                 $auditVisitCalendarPlanTeam->team_members = json_encode($team['team_members']);
                 $auditVisitCalendarPlanTeam->leader_name_en = $team['leader_name_en'];
-                $auditVisitCalendarPlanTeam->leader_name_bn= $team['leader_name_bn'];
+                $auditVisitCalendarPlanTeam->leader_name_bn = $team['leader_name_bn'];
                 $auditVisitCalendarPlanTeam->leader_designation_id = $team['leader_designation_id'];
                 $auditVisitCalendarPlanTeam->leader_designation_name_en = $team['leader_designation_name_en'];
                 $auditVisitCalendarPlanTeam->leader_designation_name_bn = $team['leader_designation_name_bn'];
 
-                if($team['team_type'] == 'parent'){
+                if ($team['team_type'] == 'parent') {
                     $auditVisitCalendarPlanTeam->team_parent_id = 0;
-                }else{
+                } else {
                     $auditVisitCalendarPlanTeam->team_parent_id = $parent_id;
                 }
 
@@ -210,7 +210,7 @@ class ApEntityAuditPlanRevisedService
                 $auditVisitCalendarPlanTeam->approve_status = 1;
                 $auditVisitCalendarPlanTeam->save();
 
-                if($team['team_type'] == 'parent'){
+                if ($team['team_type'] == 'parent') {
                     $parent_id = $auditVisitCalendarPlanTeam->id;
                 }
             }
@@ -228,75 +228,80 @@ class ApEntityAuditPlanRevisedService
     {
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
-        $team_schedules = json_decode($request->team_schedules,true);
+        $team_schedules = json_decode($request->team_schedules, true);
         try {
-            foreach ($team_schedules['schedule'] as $schedule){
+            foreach ($team_schedules['schedule'] as $schedule_data) {
+                foreach ($schedule_data as $designation_id => $schedule_datum) {
+                    $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->where('leader_designation_id', $designation_id)->first();
+                    $team_member = json_decode($team_data->team_members, true);
+                    foreach ($team_member as $member) {
+                        foreach ($schedule_datum as $cost_center_id => $datum) {
+                            if (!(array_keys($member) !== range(0, count($member) - 1))) {
+                                foreach ($member as $mem) {
+                                    $team_schedule = [
+                                        'fiscal_year_id' => $team_data->fiscal_year_id,
+                                        'duration_id' => $team_data->duration_id,
+                                        'outcome_id' => $team_data->outcome_id,
+                                        'output_id' => $team_data->output_id,
+                                        'activity_id' => $team_data->activity_id,
+                                        'milestone_id' => $team_data->milestone_id,
+                                        'annual_plan_id' => $team_data->annual_plan_id,
+                                        'audit_plan_id' => $team_data->audit_plan_id,
+                                        'entity_id' => $team_data->entity_id,
+                                        'cost_center_id' => $datum['cost_center_id'],
+                                        'cost_center_name_en' => $datum['cost_center_name_en'],
+                                        'cost_center_name_bn' => $datum['cost_center_name_bn'],
+                                        'team_member_name_en' => $mem['team_member_name_en'],
+                                        'team_member_name_bn' => $mem['team_member_name_bn'],
+                                        'team_member_designation_id' => $mem['designation_id'],
+                                        'team_member_designation_en' => $mem['designation_name_en'],
+                                        'team_member_designation_bn' => $mem['designation_name_bn'],
+                                        'team_member_role_en' => $mem['team_member_role_en'],
+                                        'team_member_role_bn' => $mem['team_member_role_bn'],
+                                        'team_member_start_date' => $mem['team_member_start_date'],
+                                        'team_member_end_date' => $mem['team_member_end_date'],
+                                        'comment' => $mem['comment'] ?: '',
+                                        'mobile_no' => $mem['mobile_no'] ?: '',
+                                        'approve_status' => 'approved',
+                                    ];
+                                    AuditVisitCalenderPlanMember::create($team_schedule);
+                                }
+                            } else {
+                                $team_schedule = [
+                                    'fiscal_year_id' => $team_data->fiscal_year_id,
+                                    'duration_id' => $team_data->duration_id,
+                                    'outcome_id' => $team_data->outcome_id,
+                                    'output_id' => $team_data->output_id,
+                                    'activity_id' => $team_data->activity_id,
+                                    'milestone_id' => $team_data->milestone_id,
+                                    'annual_plan_id' => $team_data->annual_plan_id,
+                                    'audit_plan_id' => $team_data->audit_plan_id,
+                                    'entity_id' => $team_data->entity_id,
+                                    'cost_center_id' => $datum['cost_center_id'],
+                                    'cost_center_name_en' => $datum['cost_center_name_en'],
+                                    'cost_center_name_bn' => $datum['cost_center_name_bn'],
+                                    'team_member_name_en' => $member['team_member_name_en'],
+                                    'team_member_name_bn' => $member['team_member_name_bn'],
+                                    'team_member_designation_id' => $member['designation_id'],
+                                    'team_member_designation_en' => $member['designation_name_en'],
+                                    'team_member_designation_bn' => $member['designation_name_bn'],
+                                    'team_member_role_en' => $member['team_member_role_en'],
+                                    'team_member_role_bn' => $member['team_member_role_bn'],
+                                    'team_member_start_date' => $member['team_member_start_date'],
+                                    'team_member_end_date' => $member['team_member_end_date'],
+                                    'comment' => $member['comment'] ?: '',
+                                    'mobile_no' => $member['mobile_no'] ?: '',
+                                    'approve_status' => 'approved',
+                                ];
+                                AuditVisitCalenderPlanMember::create($team_schedule);
+                            }
 
-                $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)->where('leader_designation_id',$schedule['team_member_designation_id'])->first();
-                $team_member = json_decode($team_data->team_members,true);
 
-                foreach ($team_member as $member){
-                    if(count($member) > 1 ){
-                        foreach($team_member as $mem){
-                            $teamSchedule = new AuditVisitCalenderPlanMember;
-                            $teamSchedule->fiscal_year_id = $team_data->fiscal_year_id;
-                            $teamSchedule->duration_id = $team_data->duration_id;
-                            $teamSchedule->outcome_id = $team_data->outcome_id;
-                            $teamSchedule->output_id = $team_data->output_id;
-                            $teamSchedule->activity_id = $team_data->activity_id;
-                            $teamSchedule->milestone_id = $team_data->milestone_id;
-                            $teamSchedule->annual_plan_id = $team_data->annual_plan_id;
-                            $teamSchedule->audit_plan_id = $team_data->audit_plan_id;
-                            $teamSchedule->entity_id  = $team_data->entity_id;
-                            $teamSchedule->cost_center_id = $schedule['cost_center_id'];
-                            $teamSchedule->cost_center_name_en = $schedule['cost_center_name_en'];
-                            $teamSchedule->cost_center_name_bn  = $schedule['cost_center_name_bn'];
-                            $teamSchedule->team_member_name_en  = $mem['team_member_name_en'];
-                            $teamSchedule->team_member_name_bn  = $mem['team_member_name_bn'];
-                            $teamSchedule->team_member_designation_id = $mem['designation_id'];
-                            $teamSchedule->team_member_designation_en = $mem['designation_name_en'];
-                            $teamSchedule->team_member_designation_bn = $mem['designation_name_bn'];
-                            $teamSchedule->team_member_role_en = $mem['team_member_role_en'];
-                            $teamSchedule->team_member_role_bn = $mem['team_member_role_bn'];
-                            $teamSchedule->team_member_start_date = $mem['team_member_start_date'];
-                            $teamSchedule->team_member_end_date = $mem['team_member_end_date'];
-                            $teamSchedule->comment = $mem['comment'] ?: '';
-                            $teamSchedule->mobile_no = $mem['mobile_no'] ?: '';
-                            $teamSchedule->approve_status = 'approved';
-                            $teamSchedule->save();
                         }
                     }
-
-                        $teamSchedule = new AuditVisitCalenderPlanMember;
-
-                        $teamSchedule->fiscal_year_id = $team_data->fiscal_year_id;
-                        $teamSchedule->duration_id = $team_data->duration_id;
-                        $teamSchedule->outcome_id = $team_data->outcome_id;
-                        $teamSchedule->output_id = $team_data->output_id;
-                        $teamSchedule->activity_id = $team_data->activity_id;
-                        $teamSchedule->milestone_id = $team_data->milestone_id;
-                        $teamSchedule->annual_plan_id = $team_data->annual_plan_id;
-                        $teamSchedule->audit_plan_id = $team_data->audit_plan_id;
-                        $teamSchedule->entity_id  = $team_data->entity_id;
-                        $teamSchedule->cost_center_id = $schedule['cost_center_id'];
-                        $teamSchedule->cost_center_name_en = $schedule['cost_center_name_en'];
-                        $teamSchedule->cost_center_name_bn  = $schedule['cost_center_name_bn'];
-                        $teamSchedule->team_member_name_en  = $member['team_member_name_en'];
-                        $teamSchedule->team_member_name_bn  = $member['team_member_name_bn'];
-                        $teamSchedule->team_member_designation_id = $member['designation_id'];
-                        $teamSchedule->team_member_designation_en = $member['designation_name_en'];
-                        $teamSchedule->team_member_designation_bn = $member['designation_name_bn'];
-                        $teamSchedule->team_member_role_en = $member['team_member_role_en'];
-                        $teamSchedule->team_member_role_bn = $member['team_member_role_bn'];
-                        $teamSchedule->team_member_start_date = $member['team_member_start_date'];
-                        $teamSchedule->team_member_end_date = $member['team_member_end_date'];
-                        $teamSchedule->comment = $member['comment'] ?: '';
-                        $teamSchedule->mobile_no = $member['mobile_no'] ?: '';
-                        $teamSchedule->approve_status = 'approved';
-                        $teamSchedule->save();
                 }
-             }
-            $data = ['status' => 'success', 'data' => 'save data successfull'];
+                $data = ['status' => 'success', 'data' => 'save data successful'];
+            }
         } catch (\Exception $e) {
             dd($e);
             $data = ['status' => 'error', 'data' => $e->getMessage()];
@@ -314,7 +319,7 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $data = AuditVisitCalendarPlanTeam::where('team_parent_id',$request->team_id)->get()->toArray();
+            $data = AuditVisitCalendarPlanTeam::where('team_parent_id', $request->team_id)->get()->toArray();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
