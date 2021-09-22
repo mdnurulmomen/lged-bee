@@ -242,6 +242,7 @@ class ApEntityAuditPlanRevisedService
                                 foreach ($member as $mem) {
                                     $team_schedule = [
                                         'fiscal_year_id' => $team_data->fiscal_year_id,
+                                        'team_id' => $team_data->id,
                                         'duration_id' => $team_data->duration_id,
                                         'outcome_id' => $team_data->outcome_id,
                                         'output_id' => $team_data->output_id,
@@ -264,6 +265,7 @@ class ApEntityAuditPlanRevisedService
                                         'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                         'comment' => isset($mem['comment']) ?? '',
                                         'mobile_no' => isset($mem['mobile_no']) ?: '',
+                                        'team_member_activity' => $schedule_datum[''],
                                         'approve_status' => 'approved',
                                     ];
                                     AuditVisitCalenderPlanMember::create($team_schedule);
@@ -271,6 +273,7 @@ class ApEntityAuditPlanRevisedService
                             } else {
                                 $team_schedule = [
                                     'fiscal_year_id' => $team_data->fiscal_year_id,
+                                    'team_id' => $team_data->id,
                                     'duration_id' => $team_data->duration_id,
                                     'outcome_id' => $team_data->outcome_id,
                                     'output_id' => $team_data->output_id,
@@ -285,6 +288,7 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_name_en' => $member['team_member_name_en'],
                                     'team_member_name_bn' => $member['team_member_name_bn'],
                                     'team_member_designation_id' => $member['designation_id'],
+                                    'team_member_officer_id' => $member['officer_id'],
                                     'team_member_designation_en' => $member['designation_en'],
                                     'team_member_designation_bn' => $member['designation_bn'],
                                     'team_member_role_en' => $member['team_member_role_en'],
@@ -293,6 +297,9 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                     'comment' => isset($mem['comment']) ?? '',
                                     'mobile_no' => isset($mem['officer_mobile']) ?: '',
+                                    'team_member_activity' => $schedule_datum['team_member_activity'],
+                                    'team_member_activity_description' => $schedule_datum['team_member_activity_description'],
+                                    'activity_location' => $schedule_datum['activity_location'],
                                     'approve_status' => 'approved',
                                 ];
                                 AuditVisitCalenderPlanMember::create($team_schedule);
