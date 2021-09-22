@@ -292,7 +292,7 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                     'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                     'comment' => isset($mem['comment']) ?? '',
-                                    'mobile_no' => isset($mem['mobile_no']) ?: '',
+                                    'mobile_no' => isset($mem['officer_mobile']) ?: '',
                                     'approve_status' => 'approved',
                                 ];
                                 AuditVisitCalenderPlanMember::create($team_schedule);
