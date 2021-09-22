@@ -191,9 +191,9 @@ class ApEntityAuditPlanRevisedService
                 $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
                 $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
                 $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
-                $auditVisitCalendarPlanTeam->team_start_date = date("Y-m-d H:i:s", strtotime($team['team_start_date']));
-                $auditVisitCalendarPlanTeam->team_end_date = date("Y-m-d H:i:s", strtotime($team['team_end_date']));
-                $auditVisitCalendarPlanTeam->team_members = json_encode($team['team_members']);
+                $auditVisitCalendarPlanTeam->team_start_date = $team['team_start_date'];
+                $auditVisitCalendarPlanTeam->team_end_date = $team['team_end_date'];
+                $auditVisitCalendarPlanTeam->team_members = json_encode([$team['leader']] + $team['team_members']);
                 $auditVisitCalendarPlanTeam->leader_name_en = $team['leader_name_en'];
                 $auditVisitCalendarPlanTeam->leader_name_bn = $team['leader_name_bn'];
                 $auditVisitCalendarPlanTeam->leader_designation_id = $team['leader_designation_id'];
@@ -262,14 +262,14 @@ class ApEntityAuditPlanRevisedService
                                         'team_member_designation_bn' => $mem['designation_bn'],
                                         'team_member_role_en' => $mem['team_member_role_en'],
                                         'team_member_role_bn' => $mem['team_member_role_bn'],
-                                        'team_member_start_date' => date("Y-m-d H:i:s", strtotime($schedule_datum['team_member_start_date'])),
-                                        'team_member_end_date' => date("Y-m-d H:i:s", strtotime($schedule_datum['team_member_end_date'])),
+                                        'team_member_start_date' => $schedule_datum['team_member_start_date'],
+                                        'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                         'comment' => isset($mem['comment']) ?? '',
                                         'mobile_no' => isset($mem['officer_mobile']) ?: '',
                                         'team_member_activity' => $schedule_datum[''],
                                         'approve_status' => 'approved',
                                     ];
-                                    AuditVisitCalenderPlanMember::create($team_schedule);
+                                    $create = AuditVisitCalenderPlanMember::create($team_schedule);
                                 }
                             } else {
                                 $team_schedule = [
@@ -295,8 +295,8 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_designation_bn' => $member['designation_bn'],
                                     'team_member_role_en' => $member['team_member_role_en'],
                                     'team_member_role_bn' => $member['team_member_role_bn'],
-                                    'team_member_start_date' => date("Y-m-d H:i:s", strtotime($schedule_datum['team_member_start_date'])),
-                                    'team_member_end_date' => date("Y-m-d H:i:s", strtotime($schedule_datum['team_member_end_date'])),
+                                    'team_member_start_date' => $schedule_datum['team_member_start_date'],
+                                    'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                     'comment' => isset($mem['comment']) ?? '',
                                     'mobile_no' => isset($mem['officer_mobile']) ?: '',
                                     'team_member_activity' => $schedule_datum['team_member_activity'],
@@ -304,15 +304,16 @@ class ApEntityAuditPlanRevisedService
                                     'activity_location' => $schedule_datum['activity_location'],
                                     'approve_status' => 'approved',
                                 ];
-                                AuditVisitCalenderPlanMember::create($team_schedule);
+                                $create = AuditVisitCalenderPlanMember::create($team_schedule);
                             }
                         }
 
                     }
                 }
-                $data = ['status' => 'success', 'data' => 'save data successful'];
             }
+            $data = ['status' => 'success', 'data' => $create];
         } catch (\Exception $e) {
+//            dd($e);
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
         $this->emptyOfficeDBConnection();
