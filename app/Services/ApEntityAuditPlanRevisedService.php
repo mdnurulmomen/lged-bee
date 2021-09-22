@@ -289,6 +289,7 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_name_bn' => $member['team_member_name_bn'],
                                     'team_member_designation_id' => $member['designation_id'],
                                     'team_member_officer_id' => $member['officer_id'],
+                                    'team_member_office_id' => $member['office_id'],
                                     'team_member_designation_en' => $member['designation_en'],
                                     'team_member_designation_bn' => $member['designation_bn'],
                                     'team_member_role_en' => $member['team_member_role_en'],

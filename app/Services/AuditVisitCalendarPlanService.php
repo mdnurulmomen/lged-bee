@@ -13,7 +13,7 @@ class AuditVisitCalendarPlanService
 {
     use GenericData;
 
-    public function getIndividualPlanCalendar(Request $request)
+    public function getIndividualPlanCalendar(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
 

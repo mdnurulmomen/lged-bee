@@ -29,6 +29,8 @@ class AuditVisitCalenderPlanMember extends Model
         'team_member_name_en',
         'team_member_name_bn',
         'team_member_designation_id',
+        'team_member_office_id',
+        'team_member_officer_id',
         'team_member_designation_en',
         'team_member_designation_bn',
         'team_member_role_en',
