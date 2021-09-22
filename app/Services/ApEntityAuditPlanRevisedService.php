@@ -257,6 +257,8 @@ class ApEntityAuditPlanRevisedService
                                         'team_member_name_en' => $mem['team_member_name_en'],
                                         'team_member_name_bn' => $mem['team_member_name_bn'],
                                         'team_member_designation_id' => $mem['designation_id'],
+                                        'team_member_officer_id' => $member['officer_id'],
+                                        'team_member_office_id' => $member['office_id'],
                                         'team_member_designation_en' => $mem['designation_en'],
                                         'team_member_designation_bn' => $mem['designation_bn'],
                                         'team_member_role_en' => $mem['team_member_role_en'],
