@@ -266,7 +266,9 @@ class ApEntityAuditPlanRevisedService
                                         'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                         'comment' => isset($mem['comment']) ?? '',
                                         'mobile_no' => isset($mem['officer_mobile']) ?: '',
-                                        'team_member_activity' => $schedule_datum[''],
+                                        'team_member_activity' => array_key_exists('team_member_activity', $schedule_datum) ? $schedule_datum['team_member_activity'] : '',
+                                        'team_member_activity_description' => array_key_exists('team_member_activity_description', $schedule_datum) ? $schedule_datum['team_member_activity_description'] : '',
+                                        'activity_location' => array_key_exists('activity_location', $schedule_datum) ? $schedule_datum['activity_location'] : '',
                                         'approve_status' => 'approved',
                                     ];
                                     $create = AuditVisitCalenderPlanMember::create($team_schedule);
@@ -299,9 +301,9 @@ class ApEntityAuditPlanRevisedService
                                     'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                     'comment' => isset($mem['comment']) ?? '',
                                     'mobile_no' => isset($mem['officer_mobile']) ?: '',
-                                    'team_member_activity' => $schedule_datum['team_member_activity'],
-                                    'team_member_activity_description' => $schedule_datum['team_member_activity_description'],
-                                    'activity_location' => $schedule_datum['activity_location'],
+                                    'team_member_activity' => array_key_exists('team_member_activity', $schedule_datum) ? $schedule_datum['team_member_activity'] : '',
+                                    'team_member_activity_description' => array_key_exists('team_member_activity_description', $schedule_datum) ? $schedule_datum['team_member_activity_description'] : '',
+                                    'activity_location' => array_key_exists('activity_location', $schedule_datum) ? $schedule_datum['activity_location'] : '',
                                     'approve_status' => 'approved',
                                 ];
                                 $create = AuditVisitCalenderPlanMember::create($team_schedule);
