@@ -65,7 +65,26 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $annualPlanList = AnnualPlan::get();
+            $annualPlanList = AnnualPlan::where('fiscal_year_id',$request->fiscal_year_id)->get();
+            $data = ['status' => 'success', 'data' => $annualPlanList];
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $data;
+    }
+
+    public function showAnnualPlanEntities(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $annualPlanList = AnnualPlan::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('milestone_id',$request->milestone_id)
+                ->get();
             $data = ['status' => 'success', 'data' => $annualPlanList];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];

@@ -47,6 +47,25 @@ class AnnualPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function showAnnualPlanEntities(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'milestone_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $all_annual_plans = $annualPlanRevisedService->showAnnualPlanEntities($request);
+
+        if (isSuccessResponse($all_annual_plans)) {
+            $response = responseFormat('success', $all_annual_plans['data']);
+        } else {
+            $response = responseFormat('error', $all_annual_plans['data']);
+        }
+
+        return response()->json($response);
+    }
+
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
