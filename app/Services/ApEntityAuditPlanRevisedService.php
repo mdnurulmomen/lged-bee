@@ -225,7 +225,7 @@ class ApEntityAuditPlanRevisedService
         return $data;
     }
 
-    public function storeTeamSchedule(Request $request)
+    public function storeTeamSchedule(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
@@ -235,7 +235,7 @@ class ApEntityAuditPlanRevisedService
                 foreach ($schedule_data as $schedule_datum) {
                     $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->where('leader_designation_id', $designation_id)->first();
                     $team_member = json_decode($team_data->team_members, true);
-                    foreach ($team_member as $member) {
+                    foreach ($team_member as $key => $member) {
                         if (isset($member)) {
                             if (!(array_keys($member) !== range(0, count($member) - 1))) {
                                 foreach ($member as $mem) {
@@ -307,18 +307,17 @@ class ApEntityAuditPlanRevisedService
                                 $create = AuditVisitCalenderPlanMember::create($team_schedule);
                             }
                         }
-
                     }
                 }
             }
-            $data = ['status' => 'success', 'data' => $create];
+            $data = ['status' => 'success', 'data' => 'successfully saved'];
+            $this->emptyOfficeDBConnection();
+            return $data;
         } catch (\Exception $e) {
-//            dd($e);
-            $data = ['status' => 'error', 'data' => $e->getMessage()];
+            return ['status' => 'error', 'data' => $e->getMessage()];
+        } catch (\Error $e) {
+            return ['status' => 'error', 'data' => $e->getMessage()];
         }
-        $this->emptyOfficeDBConnection();
-
-        return $data;
     }
 
     public function getSubTeam(Request $request)

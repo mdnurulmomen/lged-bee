@@ -203,7 +203,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         $add_audit_team = $apEntityAuditPlanRevisedService->storeTeamSchedule($request);
 
         if (isSuccessResponse($add_audit_team)) {
-            $response = responseFormat('success', 'Successfully Saved Team');
+            $response = responseFormat('success', 'Successfully Saved Schedule');
         } else {
             $response = responseFormat('error', $add_audit_team['data']);
         }
