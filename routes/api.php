@@ -97,7 +97,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
         Route::group(['prefix' => 'calendar'], function () {
             Route::post('individual', [AuditVisitCalenderPlanController::class, 'getIndividualPlanCalendar']);
-            Route::post('individual/create', [AuditVisitCalenderPlanController::class, 'storeIndividualPlanCalendar']);
+            Route::post('individual/update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
         });
     });
 

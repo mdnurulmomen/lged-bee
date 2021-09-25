@@ -20,13 +20,13 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
-    public function storeIndividualPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
+    public function updateVisitCalenderStatus(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        $storeIndividualCalendar = $auditVisitCalendarPlanService->storeAuditTeamCalendar($request);
-        if (isSuccessResponse($storeIndividualCalendar)) {
-            $response = responseFormat('success', $storeIndividualCalendar['data']);
+        $updateStatus= $auditVisitCalendarPlanService->updateVisitCalenderStatus($request);
+        if (isSuccessResponse($updateStatus)) {
+            $response = responseFormat('success', $updateStatus['data']);
         } else {
-            $response = responseFormat('error', $storeIndividualCalendar['data']);
+            $response = responseFormat('error', $updateStatus['data']);
         }
 
         return response()->json($response);
