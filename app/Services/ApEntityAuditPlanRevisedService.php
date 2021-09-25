@@ -168,10 +168,17 @@ class ApEntityAuditPlanRevisedService
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
 
         $teams = json_decode($request->teams, true);
+        $teams = $teams['teams'];
+//        return ['status' => 'error', 'data' => $teams];
 
         try {
             $parent_id = 0;
-            foreach ($teams['teams'] as $team) {
+            foreach ($teams['all_teams'] as $team) {
+                if (count($teams['all_teams']) == 1) {
+                    $members = json_encode($team['members'], JSON_UNESCAPED_UNICODE);
+                } else {
+                    $members = $parent_id == 0 ? json_encode($team['members'], JSON_UNESCAPED_UNICODE) : json_encode(['leader' => $teams['leader']] + $team['members'], JSON_UNESCAPED_UNICODE);
+                }
                 $auditVisitCalendarPlanTeam = new AuditVisitCalendarPlanTeam;
                 $auditVisitCalendarPlanTeam->fiscal_year_id = $annualPlan->fiscal_year_id;
                 $auditVisitCalendarPlanTeam->duration_id = $annualPlan->activity->duration_id;
@@ -191,14 +198,14 @@ class ApEntityAuditPlanRevisedService
                 $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
                 $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
                 $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
-                $auditVisitCalendarPlanTeam->team_start_date = $team['team_start_date'];
-                $auditVisitCalendarPlanTeam->team_end_date = $team['team_end_date'];
-                $auditVisitCalendarPlanTeam->team_members = json_encode([$team['leader']] + $team['team_members']);
+                $auditVisitCalendarPlanTeam->team_start_date = $teams['team_start_date'];
+                $auditVisitCalendarPlanTeam->team_end_date = $teams['team_end_date'];
+                $auditVisitCalendarPlanTeam->team_members = $members;
                 $auditVisitCalendarPlanTeam->leader_name_en = $team['leader_name_en'];
                 $auditVisitCalendarPlanTeam->leader_name_bn = $team['leader_name_bn'];
                 $auditVisitCalendarPlanTeam->leader_designation_id = $team['leader_designation_id'];
-                $auditVisitCalendarPlanTeam->leader_designation_name_en = $team['leader_designation_name_en'];
-                $auditVisitCalendarPlanTeam->leader_designation_name_bn = $team['leader_designation_name_bn'];
+                $auditVisitCalendarPlanTeam->leader_designation_name_en = $team['leader_designation_en'];
+                $auditVisitCalendarPlanTeam->leader_designation_name_bn = $team['leader_designation_bn'];
                 if ($team['team_type'] == 'parent') {
                     $auditVisitCalendarPlanTeam->team_parent_id = 0;
                 } else {
@@ -216,7 +223,7 @@ class ApEntityAuditPlanRevisedService
                 }
             }
 
-            $data = ['status' => 'success', 'data' => 'save data successfull'];
+            $data = ['status' => 'success', 'data' => 'save data successful'];
         } catch (\Exception $e) {
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
@@ -331,7 +338,7 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $teams = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('activity_id', $request->activity_id)->where('audit_plan_id', $request->audit_plan_id)->where('annual_plan_id',$request->annual_plan_id)->get()->toArray();
+            $teams = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('activity_id', $request->activity_id)->where('audit_plan_id', $request->audit_plan_id)->where('annual_plan_id', $request->annual_plan_id)->get()->toArray();
             $data = ['status' => 'sucess', 'data' => $teams];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
