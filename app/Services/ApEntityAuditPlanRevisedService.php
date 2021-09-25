@@ -249,6 +249,7 @@ class ApEntityAuditPlanRevisedService
                                         'milestone_id' => $team_data->milestone_id,
                                         'annual_plan_id' => $team_data->annual_plan_id,
                                         'audit_plan_id' => $team_data->audit_plan_id,
+                                        'ministry_id' => $team_data->ministry_id,
                                         'entity_id' => $team_data->entity_id,
                                         'cost_center_id' => $schedule_datum['cost_center_id'],
                                         'cost_center_name_en' => $schedule_datum['cost_center_name_en'],
