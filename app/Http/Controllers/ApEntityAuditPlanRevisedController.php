@@ -144,6 +144,25 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function getAuditPlanWiseTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'activity_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'audit_plan_id' => 'required|integer',
+        ])->validate();
+//        dd($request->all());
+        $team_list = $apEntityAuditPlanRevisedService->getAuditPlanWiseTeam($request);
+
+        if (isSuccessResponse($team_list)) {
+            $response = responseFormat('success', $team_list['data']);
+        } else {
+            $response = responseFormat('error', $team_list['data']);
+        }
+        return response()->json($response);
+    }
+
     public function getSubTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
