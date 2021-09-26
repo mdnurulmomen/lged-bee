@@ -74,6 +74,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('show', [AnnualPlanRevisedController::class, 'showAnnualPlan']);
 
             Route::post('show-entities', [AnnualPlanRevisedController::class, 'showAnnualPlanEntities']);
+
+            Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {

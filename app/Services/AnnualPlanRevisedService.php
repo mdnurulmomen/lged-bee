@@ -65,7 +65,7 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $annualPlanList = AnnualPlan::where('fiscal_year_id',$request->fiscal_year_id)->get();
+            $annualPlanList = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->get();
             $data = ['status' => 'success', 'data' => $annualPlanList];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
@@ -82,8 +82,8 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $annualPlanList = AnnualPlan::where('fiscal_year_id',$request->fiscal_year_id)
-                ->where('milestone_id',$request->milestone_id)
+            $annualPlanList = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('milestone_id', $request->milestone_id)
                 ->get();
             $data = ['status' => 'success', 'data' => $annualPlanList];
         } catch (\Exception $exception) {
@@ -217,6 +217,24 @@ class AnnualPlanRevisedService
         return $data;
     }
 
+    public function showNominatedOffices(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        try {
+            $nominated_offices = AnnualPlan::find($request->annual_plan_id, ['nominated_offices', 'nominated_office_counts']);
+            $data = ['status' => 'success', 'data' => $nominated_offices];
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $data;
+    }
+
     public function submitPlanToOCAG(Request $request): array
     {
         $fiscal_year_id = $request->fiscal_year_id;
@@ -227,34 +245,37 @@ class AnnualPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $submission_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
-            ->where('activity_responsible_id', $cdesk->office_id)
-            ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-            ->with(['annual_plan'])
-            ->get()
-            ->groupBy('activity_id')
-            ->toArray();
+        try {
+            $submission_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
+                ->where('activity_responsible_id', $cdesk->office_id)
+                ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
+                ->with(['annual_plan'])
+                ->get()
+                ->groupBy('activity_id')
+                ->toArray();
 
-        $s_data = [];
-        foreach ($submission_datas as $key => &$milestone) {
-            $assigned_budget = 0;
-            $assigned_staff = 0;
-            foreach ($milestone as &$ms) {
-                foreach ($ms['annual_plan'] as $annual_plan) {
-                    $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
-                    $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
+            $s_data = [];
+            foreach ($submission_datas as $key => &$milestone) {
+                $assigned_budget = 0;
+                $assigned_staff = 0;
+                foreach ($milestone as &$ms) {
+                    foreach ($ms['annual_plan'] as $annual_plan) {
+                        $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
+                        $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
+                    }
+                    $s_data[$key]['assigned_budget'] = $assigned_budget;
+                    $s_data[$key]['assigned_staffs'] = $assigned_staff;
                 }
-                $s_data[$key]['assigned_budget'] = $assigned_budget;
-                $s_data[$key]['assigned_staffs'] = $assigned_staff;
             }
+
+            foreach ($s_data as $activity_id => $s_datum) {
+                OpYearlyAuditCalendarResponsible::where('activity_id', $activity_id)->where('office_id', $cdesk->office_id)->update($s_datum);
+            }
+
+            $this->emptyOfficeDBConnection();
+            return ['status' => 'success', 'data' => $s_data];
+        } catch (\Exception $e) {
+            return ['status' => 'error', 'data' => $e->getMessage()];
         }
-
-        foreach ($s_data as $activity_id => $s_datum) {
-            OpYearlyAuditCalendarResponsible::where('activity_id', $activity_id)->where('office_id', $cdesk->office_id)->update($s_datum);
-        }
-
-        $this->emptyOfficeDBConnection();
-        return $data = ['status' => 'success', 'data' => $s_data];
-
     }
 }

@@ -66,6 +66,25 @@ class AnnualPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+
+    public function showNominatedOffices(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'annual_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $all_nominated_offices = $annualPlanRevisedService->showNominatedOffices($request);
+
+        if (isSuccessResponse($all_nominated_offices)) {
+            $response = responseFormat('success', $all_nominated_offices['data']);
+        } else {
+            $response = responseFormat('error', $all_nominated_offices['data']);
+        }
+
+        return response()->json($response);
+    }
+
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
