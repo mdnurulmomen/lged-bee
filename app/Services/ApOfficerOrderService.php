@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOfficeOrder;
+use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
@@ -43,8 +45,29 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $officeOrder = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->first();
-            $responseData = ['status' => 'success', 'data' => $officeOrder];
+            $officeOrder = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->first();
+
+            $auditTeamAllMembers = AuditVisitCalenderPlanMember::distinct()
+                ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
+                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no')
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->get()
+                ->toArray();
+
+            $auditTeamWiseSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->get();
+
+            $officeOrderInfo = [
+                'office_order' => $officeOrder,
+                'audit_team_members' => $auditTeamAllMembers,
+                'audit_team_schedules' => $auditTeamWiseSchedule,
+            ];
+
+            $responseData = ['status' => 'success', 'data' => $officeOrderInfo];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -62,7 +85,11 @@ class ApOfficerOrderService
         }
         try {
             $annualPlan = AnnualPlan::find($request->annual_plan_id);
+
+            //audit plan
             $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+            $auditPlan->has_office_order = 1;
+            $auditPlan->save();
 
             $data = [
                 'annual_plan_id' => $request->annual_plan_id,
@@ -90,7 +117,8 @@ class ApOfficerOrderService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            ApOfficeOrder::updateOrcreate($data);
+            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id,
+                'audit_plan_id' => $request->audit_plan_id],$data);
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
