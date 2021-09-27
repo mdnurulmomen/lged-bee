@@ -30,6 +30,8 @@ class CreateApOfficeOrdersTable extends Migration
             $table->text('advices');
             $table->string('approved_status',16);
             $table->text('order_cc_list');
+            $table->longText('team_members');
+            $table->longText('team_schedules');
             $table->bigInteger('draft_officer_id');
             $table->string('draft_officer_name_en');
             $table->string('draft_officer_name_bn');
