@@ -176,7 +176,7 @@ class ApEntityAuditPlanRevisedService
                 if (count($teams['all_teams']) == 1) {
                     $members = json_encode($team['members'], JSON_UNESCAPED_UNICODE);
                 } else {
-                    $members = $parent_id == 0 ? json_encode($team['members'], JSON_UNESCAPED_UNICODE) : json_encode(['leader' => [$teams['leader']['officer_id'] => $teams['leader']]] + $team['members'], JSON_UNESCAPED_UNICODE);
+                    $members = $parent_id == 0 ? json_encode($team['members'], JSON_UNESCAPED_UNICODE) : json_encode(['teamLeader' => [$teams['leader']['officer_id'] => $teams['leader']]] + $team['members'], JSON_UNESCAPED_UNICODE);
                 }
                 $auditVisitCalendarPlanTeam = new AuditVisitCalendarPlanTeam;
                 $auditVisitCalendarPlanTeam->fiscal_year_id = $annualPlan->fiscal_year_id;
