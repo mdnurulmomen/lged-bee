@@ -101,17 +101,16 @@ class ApEntityAuditPlanRevisedService
                 'draft_officer_id' => $cdesk->officer_id,
                 'draft_officer_name_en' => $cdesk->officer_en,
                 'draft_officer_name_bn' => $cdesk->officer_bn,
+                'status' => $request->status,
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
-                'device_type' => '',
-                'device_id' => '',
+                'device_type' => getBrowser(),
+                'device_id' => getIP(),
             ];
 
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
-                $draft_plan = ApEntityIndividualAuditPlan::where('id', $request->audit_plan_id)
-                    ->where('activity_id', $request->activity_id)
-                    ->where('annual_plan_id', $request->annual_plan_id)
+                $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id)
                     ->update($draft_plan_data);
             } else {
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);

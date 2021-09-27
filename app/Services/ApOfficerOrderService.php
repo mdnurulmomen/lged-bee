@@ -27,7 +27,11 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $auditPlanList = ApEntityIndividualAuditPlan::with(['annual_plan'])->get();
+            $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
+                ->with(['annual_plan','audit_teams'])
+                ->where('status','approved')
+                ->paginate(20);
+
             $responseData = ['status' => 'success', 'data' => $auditPlanList];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
