@@ -2,11 +2,18 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\Http;
+
 trait ApiHeart
 {
-    public function initDoptorHttp(): \Illuminate\Http\Client\PendingRequest
+    public function apiHeaders(): array
     {
-        return Http::withHeaders($this->apiHeaders())->withToken($this->getDoptorToken($this->getUsername()));
+        return ['Accept' => 'application/json', 'Content-Type' => 'application/json; charset=utf-8', 'api-version' => '1'];
+    }
+
+    public function initDoptorHttp($username): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withHeaders($this->apiHeaders())->withToken($this->getDoptorToken($username));
     }
 
     public function getDoptorToken($username)
@@ -20,6 +27,11 @@ trait ApiHeart
             session(['_doptor_token' => $token]);
         }
         return session('_doptor_token');
+    }
+
+    public function initHttp(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withHeaders($this->apiHeaders());
     }
 
     public function getClientToken($url, $client_id, $client_pass, $username = '')

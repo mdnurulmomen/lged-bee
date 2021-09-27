@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 
 class AuditVisitCalenderPlanController extends Controller
 {
-    public function getIndividualPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
+    public function getVisitPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        $calendar_data = $auditVisitCalendarPlanService->getIndividualPlanCalendar($request);
+
+        $calendar_data = $auditVisitCalendarPlanService->getVisitPlanCalendar($request);
 
         if (isSuccessResponse($calendar_data)) {
             $response = responseFormat('success', $calendar_data['data']);
