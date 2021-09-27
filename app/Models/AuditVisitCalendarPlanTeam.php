@@ -28,6 +28,7 @@ class AuditVisitCalendarPlanTeam extends Model
         'team_start_date',
         'team_end_date',
         'team_members',
+        'team_schedules',
         'leader_name_en',
         'leader_name_bn',
         'leader_designation_id',

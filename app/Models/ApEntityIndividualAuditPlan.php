@@ -29,6 +29,7 @@ class ApEntityIndividualAuditPlan extends Model
         'draft_officer_name_en',
         'draft_officer_name_bn',
         'status',
+        'has_office_order',
         'created_by',
         'modified_by',
         'device_type',
