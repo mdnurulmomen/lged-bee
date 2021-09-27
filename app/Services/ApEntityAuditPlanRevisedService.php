@@ -292,8 +292,7 @@ class ApEntityAuditPlanRevisedService
         } catch (\Exception $e) {
             DB::rollBack();
             return ['status' => 'error', 'data' => $e->getMessage()];
-        } catch
-        (\Error $e) {
+        } catch (\Error $e) {
             DB::rollBack();
             return ['status' => 'error', 'data' => $e->getMessage()];
         }
