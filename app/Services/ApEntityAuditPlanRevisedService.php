@@ -307,8 +307,14 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $teams = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('activity_id', $request->activity_id)->where('audit_plan_id', $request->audit_plan_id)->where('annual_plan_id', $request->annual_plan_id)->get()->toArray();
-            $data = ['status' => 'sucess', 'data' => $teams];
+            $teams = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('activity_id', $request->activity_id)
+                ->where('audit_plan_id', $request->audit_plan_id)
+                ->where('annual_plan_id', $request->annual_plan_id)
+                ->get()
+                ->toArray();
+
+            $data = ['status' => 'success', 'data' => $teams];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
