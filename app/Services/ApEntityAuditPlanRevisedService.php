@@ -113,6 +113,7 @@ class ApEntityAuditPlanRevisedService
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
                 $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id)
                     ->update($draft_plan_data);
+                $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
             } else {
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);
             }
