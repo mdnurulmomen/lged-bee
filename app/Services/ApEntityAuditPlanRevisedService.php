@@ -474,4 +474,19 @@ class ApEntityAuditPlanRevisedService
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function getTeamInfo(Request $request)
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $data = AuditVisitCalendarPlanTeam::with('child')->where('id', $request->team_id)->get()->toArray();
+            return ['status' => 'success', 'data' => $data];
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
 }

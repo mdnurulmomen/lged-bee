@@ -180,6 +180,23 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function getTeamInfo(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'team_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+//        dd($request->all());
+        $team_info = $apEntityAuditPlanRevisedService->getTeamInfo($request);
+
+        if (isSuccessResponse($team_info)) {
+            $response = responseFormat('success', $team_info['data']);
+        } else {
+            $response = responseFormat('error', $team_info['data']);
+        }
+        return response()->json($response);
+    }
+
     /**
      * Remove the specified resource from storage.
      *

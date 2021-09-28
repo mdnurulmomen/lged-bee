@@ -48,4 +48,14 @@ class AuditVisitCalendarPlanTeam extends Model
     {
         return $this->hasMany(AuditVisitCalenderPlanMember::class, 'team_id', 'id');
     }
+
+    public function child()
+    {
+        return $this->hasMany(AuditVisitCalendarPlanTeam::class, 'team_parent_id', 'id')->with('child');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'team_parent_id', 'id')->with('parent');
+    }
 }
