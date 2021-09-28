@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOfficeOrder;
+use App\Models\ApOfficeOrderMovement;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
@@ -28,7 +29,7 @@ class ApOfficerOrderService
         }
         try {
             $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                ->with(['annual_plan','audit_teams'])
+                ->with(['annual_plan','audit_teams','office_order'])
                 ->where('status','approved')
                 ->paginate(20);
 
@@ -109,7 +110,7 @@ class ApOfficerOrderService
                 'memorandum_date' => date('Y-m-d',strtotime($request->memorandum_date)),
                 'heading_details' => $request->heading_details,
                 'advices' => $request->advices,
-                'approved_status' => '',
+                'approved_status' => $request->approved_status,
                 'order_cc_list' => $request->order_cc_list,
                 'draft_officer_id' => $cdesk->officer_id,
                 'draft_officer_name_en' => $cdesk->officer_en,
@@ -124,6 +125,50 @@ class ApOfficerOrderService
             ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id],$data);
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $responseData;
+    }
+
+    public function storeOfficeOrderApprovalAuthority(Request $request): array
+    {
+        //return ['status' => 'error', 'data' => $request->all()];
+
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $data = [
+                'ap_office_order_id' => $request->ap_office_order_id,
+                'annual_plan_id' => $request->annual_plan_id,
+                'audit_plan_id' => $request->audit_plan_id,
+                'office_id' => $request->office_id,
+                'unit_id' => $request->unit_id,
+                'unit_name_en' => $request->unit_name_en,
+                'unit_name_bn' => $request->unit_name_bn,
+                'officer_type' => $request->officer_type,
+                'employee_id' => $request->employee_id,
+                'employee_name_en' => $request->employee_name_en,
+                'employee_name_bn' => $request->employee_name_bn,
+                'employee_designation_id' => $request->employee_designation_id,
+                'employee_designation_en' => $request->employee_designation_en,
+                'employee_designation_bn' => $request->employee_designation_bn,
+                'received_by' => $request->received_by,
+                'sent_by' => $cdesk->officer_id,
+                'created_by' => $cdesk->officer_id,
+                'modified_by' => $cdesk->officer_id,
+            ];
+
+            ApOfficeOrderMovement::updateOrcreate(['ap_office_order_id' => $request->ap_office_order_id,
+                'annual_plan_id' => $request->annual_plan_id,
+                'audit_plan_id' => $request->audit_plan_id,
+                'officer_type' => $request->officer_type
+            ],$data);
+            $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }

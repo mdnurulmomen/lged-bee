@@ -49,12 +49,44 @@ class ApOfficeOrderController extends Controller
             'cdesk' => 'required|json',
         ])->validate();
 
-        $storeAnnualPlan = $apOfficerOrderService->generateOfficeOrder($request);
+        $responseData = $apOfficerOrderService->generateOfficeOrder($request);
 
-        if (isSuccessResponse($storeAnnualPlan)) {
-            $response = responseFormat('success', $storeAnnualPlan['data']);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $storeAnnualPlan['data']);
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function storeOfficeOrderApprovalAuthority(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'ap_office_order_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'audit_plan_id' => 'required|integer',
+            'office_id' => 'required|integer',
+            'unit_id' => 'required|integer',
+            'unit_name_en' => 'required',
+            'unit_name_bn' => 'required',
+            'officer_type' => 'required',
+            'employee_id' => 'required|integer',
+            'employee_name_en' => 'required',
+            'employee_name_bn' => 'required',
+            'employee_designation_id' => 'required|integer',
+            'employee_designation_en' => 'required',
+            'employee_designation_bn' => 'required',
+            'received_by' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseData = $apOfficerOrderService->storeOfficeOrderApprovalAuthority($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);

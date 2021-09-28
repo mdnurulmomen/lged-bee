@@ -95,6 +95,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('office-order/audit-plan-list', [ApOfficeOrderController::class, 'auditPlanList']);
             Route::post('office-order/generate', [ApOfficeOrderController::class, 'generateOfficeOrder']);
             Route::post('office-order/show', [ApOfficeOrderController::class, 'showOfficeOrder']);
+            Route::post('office-order/store-approval-authority', [ApOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {
