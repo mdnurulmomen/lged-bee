@@ -147,13 +147,13 @@ class AnnualPlanRevisedService
                                         'comment' => $request->comment,
                                     ];
                                 }
+
+                                $plan = AnnualPlan::updateOrcreate([
+                                    'ministry_id' => $ministry['ministry_id'],
+                                    'parent_office_id' => $parent['parent_office_id'],
+                                ], $plan_data);
                             }
 
-
-                            $plan = AnnualPlan::updateOrcreate([
-                                'ministry_id' => $ministry['ministry_id'],
-                                'controlling_office_id' => $controller['controlling_office_id'],
-                            ], $plan_data);
                         }
                     }
                 }
