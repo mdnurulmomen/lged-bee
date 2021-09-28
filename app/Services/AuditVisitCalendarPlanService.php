@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class AuditVisitCalendarPlanService
 {
-    use GenericData,ApiHeart;
+    use GenericData, ApiHeart;
 
     public function getVisitPlanCalendar(Request $request): array
     {
@@ -28,12 +28,26 @@ class AuditVisitCalendarPlanService
         }
 
         try {
-            if($designation_info['data']['is_office_admin'] || $designation_info['data']['is_office_head']){
+            if ($designation_info['data']['is_office_admin'] || $designation_info['data']['is_office_head']) {
                 $calendar = AuditVisitCalendarPlanTeam::with('plan_member')->paginate(20);
-            }else{
+            } else {
 //               $calendar = AuditVisitCalendarPlanTeam::with('plan_member')->get();
-               $calendar = AuditVisitCalenderPlanMember::with('plan_team')->where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->get();
+                $calendar = AuditVisitCalenderPlanMember::with('plan_team')->where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->get();
             }
+
+            return ['status' => 'success', 'data' => $calendar];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getIndividualVisitPlanCalendar(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $calendar = AuditVisitCalenderPlanMember::with('plan_team')->where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->get();
 
             return ['status' => 'success', 'data' => $calendar];
         } catch (\Exception $exception) {
