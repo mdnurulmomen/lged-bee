@@ -104,10 +104,11 @@ class ApEntityAuditPlanRevisedService
                 'status' => $request->status,
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
-                'device_type' => getBrowser(),
-                'device_id' => getIP(),
+                'device_type' => '',
+                'device_id' => '',
             ];
 
+            \Log::info(json_encode($draft_plan_data));
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
                 $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id)
@@ -240,7 +241,7 @@ class ApEntityAuditPlanRevisedService
         $teams = json_decode($request->teams, true);
         $teams = $teams['teams'];
         try {
-            AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)->delete();
+            AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->delete();
             $parent_id = 0;
             foreach ($teams['all_teams'] as $team) {
                 if (count($teams['all_teams']) == 1) {
@@ -376,7 +377,7 @@ class ApEntityAuditPlanRevisedService
         $team_schedules = $team_schedules['schedule'];
         DB::beginTransaction();
         try {
-            AuditVisitCalenderPlanMember::where('audit_plan_id',$request->audit_plan_id)->delete();
+            AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
             foreach ($team_schedules as $designation_id => $schedule_data) {
                 foreach ($schedule_data as $schedule_datum) {
                     $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->where('leader_designation_id', $designation_id)->first();
