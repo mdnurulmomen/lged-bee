@@ -45,7 +45,7 @@ class AuditVisitCalendarPlanService
     {
         $cdesk = json_decode($request->cdesk, false);
 
-        $office_admin = 1;
+        $office_admin = 0;
 
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -53,9 +53,10 @@ class AuditVisitCalendarPlanService
         }
         try {
             if($office_admin){
-                $calendar = AuditVisitCalendarPlanTeam::with('child')->where('team_parent_id',0)->where('approve_status',1)->get()->toArray();
+                $calendar = AuditVisitCalendarPlanTeam::with('child')->where('approve_status',1)->get()->toArray();
             }else{
-                $calendar = AuditVisitCalenderPlanMember::where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->get();
+                $team_id = AuditVisitCalenderPlanMember::where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->distinct('team_id')->pluck('team_id');
+                $calendar = AuditVisitCalendarPlanTeam::with('child')->whereIn('id',$team_id)->where('approve_status',1)->get()->toArray();
             }
             return ['status' => 'success', 'data' => $calendar];
         } catch (\Exception $exception) {
