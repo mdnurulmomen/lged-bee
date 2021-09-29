@@ -35,7 +35,17 @@ class ApOfficeOrder extends Model
         'draft_designation_id',
         'draft_designation_name_en',
         'draft_designation_name_bn',
+        'draft_office_unit_id',
+        'draft_office_unit_en',
+        'draft_office_unit_bn',
+        'draft_officer_phone',
+        'draft_officer_email',
         'created_by',
         'modified_by'
     ];
+
+    public function office_order_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ApOfficeOrderMovement::class,'ap_office_order_id','id');
+    }
 }

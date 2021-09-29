@@ -26,6 +26,8 @@ class ApOfficeOrderMovement extends Model
         'employee_designation_id',
         'employee_designation_en',
         'employee_designation_bn',
+        'officer_phone',
+        'officer_email',
         'received_by',
         'sent_by',
         'created_by',

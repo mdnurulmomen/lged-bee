@@ -29,7 +29,7 @@ class ApOfficerOrderService
         }
         try {
             $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                ->with(['annual_plan','audit_teams','office_order'])
+                ->with(['annual_plan','audit_teams','office_order.office_order_movement'])
                 ->where('status','approved')
                 ->paginate(20);
 
@@ -50,7 +50,7 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $officeOrder = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)
+            $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
                 ->first();
 
@@ -118,6 +118,11 @@ class ApOfficerOrderService
                 'draft_designation_id' => $cdesk->designation_id,
                 'draft_designation_name_en' => $cdesk->designation_en,
                 'draft_designation_name_bn' => $cdesk->designation_bn,
+                'draft_office_unit_id' => $cdesk->office_unit_id,
+                'draft_office_unit_en' => $cdesk->office_unit_en,
+                'draft_office_unit_bn' => $cdesk->office_unit_bn,
+                'draft_officer_phone' => $cdesk->phone,
+                'draft_officer_email' => $cdesk->email,
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
@@ -134,8 +139,6 @@ class ApOfficerOrderService
 
     public function storeOfficeOrderApprovalAuthority(Request $request): array
     {
-        //return ['status' => 'error', 'data' => $request->all()];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -157,6 +160,8 @@ class ApOfficerOrderService
                 'employee_designation_id' => $request->employee_designation_id,
                 'employee_designation_en' => $request->employee_designation_en,
                 'employee_designation_bn' => $request->employee_designation_bn,
+                'officer_phone' => $request->officer_phone,
+                'officer_email' => $request->officer_email,
                 'received_by' => $request->received_by,
                 'sent_by' => $cdesk->officer_id,
                 'created_by' => $cdesk->officer_id,
@@ -168,6 +173,25 @@ class ApOfficerOrderService
                 'audit_plan_id' => $request->audit_plan_id,
                 'officer_type' => $request->officer_type
             ],$data);
+            $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $responseData;
+    }
+
+    public function approveOfficeOrder(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $apOfficeOrder = ApOfficeOrder::find($request->ap_office_order_id);
+            $apOfficeOrder->approved_status = $request->approved_status;
+            $apOfficeOrder->save();
             $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
