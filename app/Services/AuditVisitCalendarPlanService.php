@@ -44,15 +44,12 @@ class AuditVisitCalendarPlanService
     public function getIndividualVisitPlanCalendar(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-
-        $office_admin = 0;
-
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            if($office_admin){
+            if($cdesk->is_office_admin || $cdesk->is_office_head){
                 $calendar = AuditVisitCalendarPlanTeam::with('child')->where('approve_status',1)->get()->toArray();
             }else{
                 $team_id = AuditVisitCalenderPlanMember::where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->distinct('team_id')->pluck('team_id');
