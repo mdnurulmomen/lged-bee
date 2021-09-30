@@ -23,15 +23,27 @@ class ApOfficerOrderService
     public function auditPlanList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
+
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                ->with(['annual_plan','audit_teams','office_order.office_order_movement'])
-                ->where('status','approved')
-                ->paginate(20);
+            if ($request->per_page && $request->page && !$request->all) {
+                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
+                    ->with(['annual_plan','audit_teams','office_order.office_order_movement'])
+                    ->where('fiscal_year_id', $request->fiscal_year_id)
+                    ->where('status','approved')
+                    ->paginate($request->per_page);
+            }
+            else{
+                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
+                    ->with(['annual_plan','audit_teams','office_order.office_order_movement'])
+                    ->where('fiscal_year_id', $request->fiscal_year_id)
+                    ->where('status','approved')
+                    ->get();
+            }
 
             $responseData = ['status' => 'success', 'data' => $auditPlanList];
         } catch (\Exception $exception) {
