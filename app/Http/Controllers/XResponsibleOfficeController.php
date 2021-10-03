@@ -15,15 +15,31 @@ class XResponsibleOfficeController extends Controller
     public function index(Request $request)
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $offices = XResponsibleOffice::paginate($request->per_page);
+            $offices = XResponsibleOffice::orderBy('office_sequence')->paginate($request->per_page);
         } else {
-            $offices = XResponsibleOffice::orderBy('office_sequence')->get();
+            $offices = XResponsibleOffice::orderBy('office_sequence')->orderBy('office_sequence')->get();
         }
 
         if ($offices) {
             $response = responseFormat('success', $offices);
         } else {
-            $response = responseFormat('error', 'Fiscal Year Not Found');
+            $response = responseFormat('error', 'Directorates Not Found');
+        }
+        return response()->json($response, 200);
+    }
+
+    public function allDirectorates(Request $request): \Illuminate\Http\JsonResponse
+    {
+        if ($request->per_page && $request->page && !$request->all) {
+            $offices = XResponsibleOffice::orderBy('office_sequence')->where('office_layer', 2)->paginate($request->per_page);
+        } else {
+            $offices = XResponsibleOffice::orderBy('office_sequence')->where('office_layer', 2)->get();
+        }
+
+        if ($offices) {
+            $response = responseFormat('success', $offices);
+        } else {
+            $response = responseFormat('error', 'Directorates Not Found');
         }
         return response()->json($response, 200);
     }

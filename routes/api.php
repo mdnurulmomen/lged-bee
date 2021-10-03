@@ -11,6 +11,7 @@ Route::post('client-login', [LoginController::class, 'clientLogin']);
 Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::customApiResource('fiscal-year', XFiscalYearController::class);
+    Route::post('directorates/all', [XResponsibleOfficeController::class, 'allDirectorates']);
     Route::customApiResource('responsible-offices', XResponsibleOfficeController::class);
     Route::group(['prefix' => 'x-strategic-plan/'], function () {
         Route::customApiResource('duration', XStrategicPlanDurationController::class);

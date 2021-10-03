@@ -14,6 +14,7 @@ class MISAndDashboardService
 
     public function allTeams(Request $request): array
     {
+        $cdesk = json_decode($request->cdesk, false);
         try {
             $team_lists = [];
             $directorates = XResponsibleOffice::select('office_id', 'office_name_bn', 'office_name_en')->where('office_layer', 2)->get();
