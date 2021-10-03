@@ -108,12 +108,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
         Route::group(['prefix' => 'calendar'], function () {
 //            Route::post('individual', [AuditVisitCalenderPlanController::class, 'getVisitPlanCalendar']);
-            Route::post('individual', [AuditVisitCalenderPlanController::class, 'getIndividualVisitPlanCalendar']);
-            Route::post('individual/update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
+            Route::post('individual', [MISAndDashboardController::class, 'getIndividualVisitPlanCalendar']);
+            Route::post('individual/update-visit-calender-status', [MISAndDashboardController::class, 'updateVisitCalenderStatus']);
         });
     });
 
-    Route::group(['prefix' => 'follow-up/'], function () {
+    Route::group(['prefix' => 'follow-up'], function () {
         Route::customApiResource('audit-observations', AuditObservationController::class);
         Route::group(['prefix' => 'audit-observation/'], function () {
             Route::post('search', [AuditObservationController::class, 'search']);
@@ -122,6 +122,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('observation_communication', [AuditObservationController::class, 'observationCommunication']);
             Route::post('observation_communication_lists', [AuditObservationController::class, 'observationCommunicationLists']);
         });
+    });
+
+    Route::group(['prefix' => 'mis-and-dashboard'], function () {
+        Route::post('load-all-team-lists', [MISAndDashboardController::class, 'allTeams']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
