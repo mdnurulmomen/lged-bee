@@ -16,16 +16,14 @@ class AuditVisitCalendarPlanService
     public function getVisitPlanCalendar(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $designation['designation_id'] = $cdesk->designation_id;
 
-        $designation_info = $this->initDoptorHttp($cdesk->user_id)->post(config('cag_doptor_api.designation_role'), $designation)->json();
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
         try {
-            if ($designation_info['data']['is_office_admin'] || $designation_info['data']['is_office_head']) {
+            if ($cdesk->is_office_admin || $cdesk->is_office_head) {
                 $calendar = AuditVisitCalendarPlanTeam::with('plan_member')->paginate(20);
             } else {
                 $calendar = AuditVisitCalenderPlanMember::with('plan_team')->where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->get();
