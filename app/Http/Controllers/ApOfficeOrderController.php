@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ApOfficerOrderService;
+use App\Services\MISAndDashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -92,7 +93,7 @@ class ApOfficeOrderController extends Controller
         return response()->json($response);
     }
 
-    public function approveOfficeOrder(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    public function approveOfficeOrder(Request $request,ApOfficerOrderService $apOfficerOrderService,MISAndDashboardService $misAndDashboardService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'ap_office_order_id' => 'required|integer',
@@ -102,6 +103,7 @@ class ApOfficeOrderController extends Controller
             'cdesk' => 'required|json',
         ])->validate();
 
+        $misAndDashboardService->storeAuditPlanTeamInfo($request);
         $responseData = $apOfficerOrderService->approveOfficeOrder($request);
 
         if (isSuccessResponse($responseData)) {
