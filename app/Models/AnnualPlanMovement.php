@@ -9,7 +9,7 @@ class AnnualPlanMovement extends Model
 {
     use HasFactory;
 
-    protected $connection = "OfficeDB";
+    protected $connection = "BeeCoreDB";
     protected $fillable = [
         'fiscal_year_id',
         'op_audit_calendar_event_id',
