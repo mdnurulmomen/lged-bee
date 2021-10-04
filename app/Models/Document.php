@@ -9,7 +9,7 @@ class Document extends Model
 {
     use HasFactory;
 
-    protected $connection = 'OfficeDB';
+    protected $connection = 'BeeCoreDB';
     protected $fillable = [
         'document_type',
         'relational_id',
