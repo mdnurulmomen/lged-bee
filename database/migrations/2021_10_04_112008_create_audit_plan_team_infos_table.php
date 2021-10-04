@@ -19,7 +19,9 @@ class CreateAuditPlanTeamInfosTable extends Migration
             $table->bigInteger('duration_id');
             $table->bigInteger('outcome_id');
             $table->bigInteger('output_id');
-            $table->bigInteger('directorate_id');
+            $table->bigInteger('office_id');
+            $table->string('office_name_bn');
+            $table->string('office_name_en');
             $table->tinyInteger('total_teams');
             $table->tinyInteger('total_team_members');
             $table->tinyInteger('total_employees');
