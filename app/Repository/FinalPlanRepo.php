@@ -20,7 +20,8 @@ class FinalPlanRepo
             $attachment = $request->file;
             $fileSize = $attachment->getSize();
             $fileName = uniqid() . '.' . $attachment->extension();
-            Storage::disk('final_documents')->put($fileName,  File::get($attachment));
+            //Storage::disk('final_documents')->put($fileName,  File::get($attachment));
+            Storage::disk('public')->put($fileName,  File::get($attachment));
 
             $document = new Document();
             $document->document_type = $request->document_type;
@@ -29,8 +30,8 @@ class FinalPlanRepo
             $document->attachment_type = $attachment->extension();
             $document->user_file_name = $attachment->getClientOriginalName();
             $document->file_custom_name = $fileName;
-            $document->file_location = 'storage/app/public/final_documents/' . $fileName;
-            $document->file_url = url('storage/final_documents/' . $fileName);
+            $document->file_location = 'storage/app/public/' . $fileName;
+            $document->file_url = url('storage/' . $fileName);
             $document->file_size_in_kb = $fileSize;
             $document->created_by = 1;
             $document->save();
@@ -48,7 +49,7 @@ class FinalPlanRepo
             $attachment = $request->file;
             $fileSize = $attachment->getSize();
             $fileName = uniqid() . '.' . $attachment->extension();
-            Storage::disk('final_documents')->put($fileName,  File::get($attachment));
+            Storage::disk('public')->put($fileName,  File::get($attachment));
 
             $document = Document::find($request->id);
             $document->document_type =  $request->document_type;
@@ -57,8 +58,8 @@ class FinalPlanRepo
             $document->attachment_type = $attachment->extension();
             $document->user_file_name = $attachment->getClientOriginalName();
             $document->file_custom_name = $fileName;
-            $document->file_location = 'storage/app/public/final_documents/' . $fileName;
-            $document->file_url = url('storage/final_documents/' . $fileName);
+            $document->file_location = 'storage/app/public/' . $fileName;
+            $document->file_url = url('storage/' . $fileName);
             $document->file_size_in_kb = $fileSize;
             $document->modified_by = 1;
             $document->save();
