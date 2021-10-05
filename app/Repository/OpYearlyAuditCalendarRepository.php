@@ -238,13 +238,14 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         $success = [];
 
         foreach ($office_ids as $office_id) {
-            $pending_events = OpOrganizationYearlyAuditCalendarEvent::select('audit_calendar_data')->where('office_id', $office_id)->where('op_yearly_audit_calendar_id', $calendar_id)->latest()->first();
+            $pending_events = OpOrganizationYearlyAuditCalendarEvent::select('id', 'audit_calendar_data')->where('office_id', $office_id)->where('op_yearly_audit_calendar_id', $calendar_id)->latest()->first();
             if ($pending_events) {
-                $pending_events = $pending_events->audit_calendar_data;
-                $arr_pending_event = json_decode($pending_events, true);
+                $pending_events_calendar_data = $pending_events->audit_calendar_data;
+                $arr_pending_event = json_decode($pending_events_calendar_data, true);
                 $arr_pending_event_activities = $arr_pending_event['activities'];
                 if ($office_id == $arr_pending_event['office_id']) {
                     $common_data = [
+                        'op_audit_calendar_event_id' => $pending_events->id,
                         'activity_responsible_id' => $arr_pending_event['office_id'],
                         'duration_id' => $arr_pending_event['duration_id'],
                         'fiscal_year_id' => $arr_pending_event['fiscal_year_id'],

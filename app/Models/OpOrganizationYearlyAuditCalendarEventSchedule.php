@@ -23,6 +23,7 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
         'activity_responsible_id',
         'activity_milestone_id',
         'op_yearly_audit_calendar_activity_id',
+        'op_audit_calendar_event_id',
         'op_yearly_audit_calendar_id',
         'milestone_title_en',
         'milestone_title_bn',

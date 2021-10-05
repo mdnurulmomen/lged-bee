@@ -15,6 +15,7 @@ class CreateAnnualPlansTable extends Migration
     {
         Schema::connection('OfficeDB')->create('annual_plans', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('op_audit_calendar_event_id');
             $table->bigInteger('schedule_id');
             $table->bigInteger('activity_id');
             $table->bigInteger('milestone_id');

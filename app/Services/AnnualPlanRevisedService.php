@@ -28,7 +28,7 @@ class AnnualPlanRevisedService
 
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
-                ->select('id AS schedule_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
+                ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
                 ->with(['annual_plan'])
                 ->get()
                 ->groupBy('activity_id')
@@ -125,6 +125,7 @@ class AnnualPlanRevisedService
                                         'milestone_id' => $request->milestone_id,
                                         'activity_id' => $request->activity_id,
                                         'fiscal_year_id' => $request->fiscal_year_id,
+                                        'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
                                         'ministry_name_en' => $ministry['ministry_name_en'],
                                         'ministry_name_bn' => $ministry['ministry_name_bn'],
                                         'ministry_id' => $ministry['ministry_id'],
