@@ -16,7 +16,6 @@ class AnnualPlanMovement extends Model
         'duration_id',
         'outcome_id',
         'output_id',
-        'annual_plan_id',
         'sender_office_id',
         'sender_office_name_en',
         'sender_office_name_bn',

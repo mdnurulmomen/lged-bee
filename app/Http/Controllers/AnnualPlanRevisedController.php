@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AnnualPlanMovementRevisedService;
 use App\Services\AnnualPlanRevisedService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -136,6 +137,46 @@ class AnnualPlanRevisedController extends Controller
             $response = responseFormat('success', $submit_plans['data']);
         } else {
             $response = responseFormat('error', $submit_plans['data']);
+        }
+
+        return response()->json($response);
+    }
+
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function storeApprovalAuthority(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'op_audit_calendar_event_id' => 'required|integer',
+            'duration_id' => 'required|integer',
+            'outcome_id' => 'required|integer',
+            'output_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'receiver_type' => 'required',
+            'receiver_office_id' => 'required',
+            'receiver_office_name_en' => 'required',
+            'receiver_office_name_bn' => 'required',
+            'receiver_unit_id' => 'required',
+            'receiver_unit_name_en' => 'required',
+            'receiver_unit_name_bn' => 'required',
+            'receiver_officer_id' => 'required',
+            'receiver_name_en' => 'required',
+            'receiver_name_bn' => 'required',
+            'receiver_designation_id' => 'required',
+            'receiver_designation_en' => 'required',
+            'receiver_designation_bn' => 'required',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseStore = $annualPlanMovementRevisedService->storeApprovalAuthority($request);
+
+        if (isSuccessResponse($responseStore)) {
+            $response = responseFormat('success', $responseStore['data']);
+        } else {
+            $response = responseFormat('error', $responseStore['data']);
         }
 
         return response()->json($response);

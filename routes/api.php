@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AnnualPlanMovementRevisedService;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -77,6 +78,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('show-entities', [AnnualPlanRevisedController::class, 'showAnnualPlanEntities']);
 
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
+
+            Route::post('store-approval-authority', [AnnualPlanRevisedController::class, 'storeApprovalAuthority']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
