@@ -18,6 +18,7 @@ class OpOrganizationYearlyAuditCalendarEvent extends Model
         'activity_count',
         'milestone_count',
         'status',
+        'approval_status',
     ];
 
     public function office()

@@ -80,6 +80,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
 
             Route::post('store-approval-authority', [AnnualPlanRevisedController::class, 'storeApprovalAuthority']);
+            Route::post('get-movement-histories', [AnnualPlanRevisedController::class, 'getMovementHistories']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
