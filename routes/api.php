@@ -130,6 +130,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'mis-and-dashboard'], function () {
         Route::post('load-all-team-lists', [MISAndDashboardController::class, 'allTeams']);
+        Route::post('load-fiscal-year-wise-team', [MISAndDashboardController::class, 'fiscalYearWiseTeams']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
