@@ -19,6 +19,7 @@ class CreateOpYearlyAuditCalendarSchedulesTable extends Migration
             $table->integer('fiscal_year_id');
             $table->integer('outcome_id');
             $table->integer('output_id');
+            $table->bigInteger('op_audit_calendar_event_id');
             $table->integer('op_yearly_audit_calendar_id');
             $table->integer('op_yearly_audit_calendar_activity_id');
             $table->integer('activity_id');
