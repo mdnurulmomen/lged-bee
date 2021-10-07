@@ -30,8 +30,8 @@ class AnnualPlanMovementRevisedService
                     'duration_id' => $xFiscalYear->duration_id,
 
                     'sender_office_id' => $cdesk->office_id,
-                    'sender_office_name_en' => $cdesk->office,
-                    'sender_office_name_bn' => $cdesk->office,
+                    'sender_office_name_en' => $cdesk->office_name_en,
+                    'sender_office_name_bn' => $cdesk->office_name_bn,
                     'sender_unit_id' => $cdesk->office_unit_id,
                     'sender_unit_name_en' => $cdesk->office_unit_en,
                     'sender_unit_name_bn' => $cdesk->office_unit_bn,

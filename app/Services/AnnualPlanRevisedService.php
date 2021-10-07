@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\OpActivity;
+use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
@@ -29,7 +30,7 @@ class AnnualPlanRevisedService
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-                ->with(['annual_plan'])
+                ->with(['annual_plan','op_organization_yearly_audit_calendar_event'])
                 ->get()
                 ->groupBy('activity_id')
                 ->toArray();
