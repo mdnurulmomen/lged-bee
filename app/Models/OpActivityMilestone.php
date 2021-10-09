@@ -9,6 +9,8 @@ class OpActivityMilestone extends Model
 {
     use HasFactory;
 
+    protected $connection = 'BeeCoreDB';
+
     protected $fillable = [
         'fiscal_year_id',
         'duration_id',

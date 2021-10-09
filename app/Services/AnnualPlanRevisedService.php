@@ -179,32 +179,50 @@ class AnnualPlanRevisedService
 
             $directorate = XResponsibleOffice::where('office_id', $cdesk->office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
-            $plan_datas = OpActivity::where('fiscal_year_id', $request->fiscal_year_id)->with('milestones.annual_plans')->get()->toArray();
-            $fiscal_year = XFiscalYear::where('id', $request->fiscal_year_id)->select('start', 'end', 'description')->first()->toArray();
+//            $plan_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $request->fiscal_year_id)->with('milestones.annual_plans')->get()->toArray();
+//            $plan_datas = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->with('yearly_audit_calendar_event_schedule.activity.milestones.milestone_calendar')->get()->toArray();
+
+            $plan_datas = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->with('activity.milestones.milestone_calendar')->get()->toArray();
+            $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
             $ministries = [];
             $all_ministries = [];
-            $annual_plans = [];
+            $activity = [];
 
             foreach ($plan_datas as $plan_data) {
-                foreach ($plan_data['milestones'] as $plan_datum) {
-                    if (!empty($plan_datum['annual_plans'])) {
-                        foreach ($plan_datum['annual_plans'] as $plan) {
-                            $ministries[$plan['ministry_id']] = [
-                                'ministry_name_en' => $plan['ministry_name_en'],
-                                'ministry_name_bn' => $plan['ministry_name_bn'],
-                            ];
-                            $annual_plans[] = $plan;
-                        }
-                        $all_ministries = $ministries;
-                        $plan_data_final[] = $plan_data + ['ministries' => $ministries] + ['annual_plans' => $annual_plans];
-                    }
-                }
+                $ministries[$plan_data['ministry_id']] = [
+                    'ministry_name_en' => $plan_data['ministry_name_en'],
+                    'ministry_name_bn' => $plan_data['ministry_name_bn'],
+                ];
+
+                $activity = $plan_data['activity'];
+                unset($plan_data['activity']);
+
+                $all_ministries = $ministries;
+                $plan_data_final[$plan_data['id']] = $activity + ['ministries' => $ministries] + ['annual_plans' => $plan_data];
             }
+
+//            foreach ($plan_datas as $plan_data) {
+//                foreach ($plan_data['milestones'] as $plan_datum) {
+//                    if (!empty($plan_datum['annual_plans'])) {
+//                        foreach ($plan_datum['annual_plans'] as $plan) {
+//                            $ministries[$plan['ministry_id']] = [
+//                                'ministry_name_en' => $plan['ministry_name_en'],
+//                                'ministry_name_bn' => $plan['ministry_name_bn'],
+//                            ];
+//                            if ($plan['milestone_id'] == $plan_datum['id']) {
+//                                $annual_plans[$plan['id']] = $plan;
+//                            }
+//                        }
+//                        $all_ministries = $ministries;
+//                        $plan_data_final[$plan_datum['id']] = $plan_data + ['ministries' => $ministries] + ['annual_plans' => $annual_plans];
+//                    }
+//                }
+//            }
 
             $pdf_data = [
                 'office_info' => $directorate,
-                'plan' => $plan_data_final,
+                'plans' => $plan_data_final,
                 'all_ministries' => $all_ministries,
                 'fiscal_year' => $fiscal_year,
             ];

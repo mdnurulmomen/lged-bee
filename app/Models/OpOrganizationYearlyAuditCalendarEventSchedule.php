@@ -30,6 +30,16 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
         'milestone_target',
     ];
 
+    public function milestones()
+    {
+        return $this->belongsTo(OpActivityMilestone::class, 'activity_milestone_id', 'id');
+    }
+
+    public function activity()
+    {
+        return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
+    }
+
     public function assigned_staffs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ApOrganizationYearlyPlanStaff::class, 'milestone_id', 'activity_milestone_id');

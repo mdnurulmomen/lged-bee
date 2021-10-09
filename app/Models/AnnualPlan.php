@@ -38,6 +38,11 @@ class AnnualPlan extends Model
         'status',
     ];
 
+    public function yearly_audit_calendar_event_schedule(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(OpOrganizationYearlyAuditCalendarEventSchedule::class, 'milestone_id', 'activity_milestone_id');
+    }
+
     public function activity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OpActivity::class, 'activity_id', 'id');

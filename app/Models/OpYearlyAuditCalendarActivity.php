@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,5 +24,15 @@ class OpYearlyAuditCalendarActivity extends Model
     public function milestones(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OpActivityMilestone::class, 'milestone_id', 'id');
+    }
+
+    public function getTargetDateAttribute($value): string
+    {
+        return Carbon::parse($value)->format('d-m-Y');
+    }
+
+    public function setTargetDateAttribute($value)
+    {
+        $this->attributes['target_date'] = Carbon::parse($value)->format('Y-m-d');
     }
 }
