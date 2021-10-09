@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\AnnualPlan;
-use App\Models\OpActivity;
-use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
@@ -30,7 +28,7 @@ class AnnualPlanRevisedService
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-                ->with(['annual_plan','op_organization_yearly_audit_calendar_event'])
+                ->with(['annual_plan', 'op_organization_yearly_audit_calendar_event'])
                 ->get()
                 ->groupBy('activity_id')
                 ->toArray();
@@ -170,57 +168,40 @@ class AnnualPlanRevisedService
 
     public function exportAnnualPlanBook(Request $request): array
     {
-        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id;
 
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $directorate = XResponsibleOffice::where('office_id', $cdesk->office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
-
-//            $plan_datas = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $request->fiscal_year_id)->with('milestones.annual_plans')->get()->toArray();
-//            $plan_datas = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->with('yearly_audit_calendar_event_schedule.activity.milestones.milestone_calendar')->get()->toArray();
+            $directorate = XResponsibleOffice::where('office_id', $office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
             $plan_datas = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->with('activity.milestones.milestone_calendar')->get()->toArray();
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
-            $ministries = [];
             $all_ministries = [];
-            $activity = [];
-
+            $annual_plan = [];
             foreach ($plan_datas as $plan_data) {
-                $ministries[$plan_data['ministry_id']] = [
+                $activity = $plan_data['activity'];
+                unset($plan_data['activity']);
+                $annual_plan[$plan_data['id']] = $plan_data;
+                foreach ($annual_plan as $plan) {
+                    if ($activity['id'] == $plan['activity_id']) {
+                        $annual_plan[$plan_data['id']] = $plan_data;
+                    } else {
+                        $annual_plan = [];
+                    }
+                }
+                $ministries = [
                     'ministry_name_en' => $plan_data['ministry_name_en'],
                     'ministry_name_bn' => $plan_data['ministry_name_bn'],
                 ];
 
-                $activity = $plan_data['activity'];
-                unset($plan_data['activity']);
-
-                $all_ministries = $ministries;
-                $plan_data_final[$plan_data['id']] = $activity + ['ministries' => $ministries] + ['annual_plans' => $plan_data];
+                $all_ministries[$plan_data['ministry_id']] = $ministries;
+                $plan_data_final[$activity['id']] = $activity + ['ministries' => $ministries] + ['annual_plans' => $annual_plan];
             }
-
-//            foreach ($plan_datas as $plan_data) {
-//                foreach ($plan_data['milestones'] as $plan_datum) {
-//                    if (!empty($plan_datum['annual_plans'])) {
-//                        foreach ($plan_datum['annual_plans'] as $plan) {
-//                            $ministries[$plan['ministry_id']] = [
-//                                'ministry_name_en' => $plan['ministry_name_en'],
-//                                'ministry_name_bn' => $plan['ministry_name_bn'],
-//                            ];
-//                            if ($plan['milestone_id'] == $plan_datum['id']) {
-//                                $annual_plans[$plan['id']] = $plan;
-//                            }
-//                        }
-//                        $all_ministries = $ministries;
-//                        $plan_data_final[$plan_datum['id']] = $plan_data + ['ministries' => $ministries] + ['annual_plans' => $annual_plans];
-//                    }
-//                }
-//            }
-
             $pdf_data = [
                 'office_info' => $directorate,
                 'plans' => $plan_data_final,

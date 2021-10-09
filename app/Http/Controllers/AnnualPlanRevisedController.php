@@ -111,6 +111,7 @@ class AnnualPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
+            'office_id' => 'required|integer',
             'cdesk' => 'required|json',
         ])->validate();
 
@@ -182,7 +183,7 @@ class AnnualPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
-            'op_audit_calendar_event_id' => 'required|integer'
+            'op_audit_calendar_event_id' => 'required|integer',
         ])->validate();
 
         $responseData = $annualPlanMovementRevisedService->getMovementHistories($request);
