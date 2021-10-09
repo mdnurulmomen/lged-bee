@@ -151,10 +151,6 @@ class AnnualPlanRevisedController extends Controller
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
             'op_audit_calendar_event_id' => 'required|integer',
-            'duration_id' => 'required|integer',
-            'outcome_id' => 'required|integer',
-            'output_id' => 'required|integer',
-            'annual_plan_id' => 'required|integer',
             'receiver_type' => 'required',
             'receiver_office_id' => 'required',
             'receiver_office_name_en' => 'required',
@@ -179,6 +175,23 @@ class AnnualPlanRevisedController extends Controller
             $response = responseFormat('error', $responseStore['data']);
         }
 
+        return response()->json($response);
+    }
+
+    public function getMovementHistories(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'op_audit_calendar_event_id' => 'required|integer'
+        ])->validate();
+
+        $responseData = $annualPlanMovementRevisedService->getMovementHistories($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
         return response()->json($response);
     }
 }

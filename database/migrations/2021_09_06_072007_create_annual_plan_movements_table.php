@@ -18,8 +18,6 @@ class CreateAnnualPlanMovementsTable extends Migration
             $table->bigInteger('fiscal_year_id');
             $table->bigInteger('op_audit_calendar_event_id');
             $table->bigInteger('duration_id');
-            $table->bigInteger('outcome_id');
-            $table->bigInteger('output_id');
             $table->bigInteger('sender_office_id');
             $table->string('sender_office_name_en');
             $table->string('sender_office_name_bn');

@@ -80,6 +80,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
 
             Route::post('store-approval-authority', [AnnualPlanRevisedController::class, 'storeApprovalAuthority']);
+            Route::post('get-movement-histories', [AnnualPlanRevisedController::class, 'getMovementHistories']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
@@ -130,6 +131,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'mis-and-dashboard'], function () {
         Route::post('load-all-team-lists', [MISAndDashboardController::class, 'allTeams']);
+        Route::post('load-fiscal-year-wise-team', [MISAndDashboardController::class, 'fiscalYearWiseTeams']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

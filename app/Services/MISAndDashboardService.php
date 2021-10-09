@@ -25,7 +25,23 @@ class MISAndDashboardService
         }
     }
 
-    public function storeAuditPlanTeamInfo(Request $request)
+    public function fiscalYearWiseTeams(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+           $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('team_parent_id',0)->get();
+            return ['status' => 'success', 'data' => $auditPlanTeamList];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+
+        }
+    }
+
+        public function storeAuditPlanTeamInfo(Request $request)
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
@@ -33,8 +49,8 @@ class MISAndDashboardService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $team = AuditVisitCalendarPlanTeam::selectRaw('count(id) as total_team, SUM(activity_man_days) AS total_working_days,duration_id,outcome_id,output_id')->where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->first();
-        $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->count();
+        $team = AuditVisitCalendarPlanTeam::selectRaw('count(id) as total_team, SUM(activity_man_days) AS total_working_days,duration_id,outcome_id,output_id')->where('fiscal_year_id', $request->fiscal_year_id)->first();
+        $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)-count();
         $this->emptyOfficeDBConnection();
 
         $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
