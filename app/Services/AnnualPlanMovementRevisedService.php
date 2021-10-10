@@ -12,7 +12,7 @@ class AnnualPlanMovementRevisedService
 {
     use GenericData;
 
-    public function storeApprovalAuthority(Request $request): array
+    public function sendAnnualPlanSenderToReceiver(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
 
@@ -75,6 +75,75 @@ class AnnualPlanMovementRevisedService
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+        return $responseData;
+    }
+
+    public function sendAnnualPlanReceiverToSender(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
+            $annualPlanMovement = AnnualPlanMovement::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('op_audit_calendar_event_id',$request->op_audit_calendar_event_id)
+                ->where('duration_id',$xFiscalYear->duration_id)
+                ->where('receiver_office_id',$cdesk->office_id)
+                ->where('receiver_unit_id',$cdesk->office_unit_id)
+                ->where('receiver_officer_id',$cdesk->officer_id)
+                ->where('status','pending')
+                ->latest()
+                ->first();
+
+            if (!empty($annualPlanMovement)){
+                $data = [
+                    'fiscal_year_id' => $request->fiscal_year_id,
+                    'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,
+                    'duration_id' => $xFiscalYear->duration_id,
+
+                    'sender_office_id' => $cdesk->office_id,
+                    'sender_office_name_en' => $cdesk->office_name_en,
+                    'sender_office_name_bn' => $cdesk->office_name_bn,
+                    'sender_unit_id' => $cdesk->office_unit_id,
+                    'sender_unit_name_en' => $cdesk->office_unit_en,
+                    'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                    'sender_officer_id' => $cdesk->officer_id,
+                    'sender_name_en' => $cdesk->officer_en,
+                    'sender_name_bn' => $cdesk->officer_bn,
+                    'sender_designation_id' => $cdesk->designation_id,
+                    'sender_designation_en' => $cdesk->designation_en,
+                    'sender_designation_bn' => $cdesk->designation_bn,
+
+                    'receiver_type' => $request->receiver_type,
+                    'receiver_office_id' => $annualPlanMovement->sender_office_id,
+                    'receiver_office_name_en' => $annualPlanMovement->sender_office_name_en,
+                    'receiver_office_name_bn' => $annualPlanMovement->sender_office_name_bn,
+                    'receiver_unit_id' => $annualPlanMovement->sender_unit_id,
+                    'receiver_unit_name_en' => $annualPlanMovement->sender_unit_name_en,
+                    'receiver_unit_name_bn' => $annualPlanMovement->sender_unit_name_bn,
+                    'receiver_officer_id' => $annualPlanMovement->sender_officer_id,
+                    'receiver_name_en' => $annualPlanMovement->sender_name_en,
+                    'receiver_name_bn' => $annualPlanMovement->sender_name_bn,
+                    'receiver_designation_id' => $annualPlanMovement->sender_designation_id,
+                    'receiver_designation_en' => $annualPlanMovement->sender_designation_en,
+                    'receiver_designation_bn' => $annualPlanMovement->sender_designation_bn,
+
+                    'status' => $request->status,
+                    'comments' => $request->comments
+                ];
+
+                AnnualPlanMovement::create($data);
+
+                //update op organization yearly audit calendar event
+                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
+                    ->update(["approval_status" => $request->status]);
+
+                $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
+            }
+            else{
+                $responseData = ['status' => 'error', 'data' => 'Invalid receiver'];
+            }
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
         return $responseData;
     }
 

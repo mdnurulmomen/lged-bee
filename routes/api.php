@@ -36,6 +36,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
             Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
 
+            Route::post('audit-calendar/yearly-event-list', [OpYearlyAuditCalendarController::class, 'yearlyAuditCalendarEventList']);
+
             Route::post('audit-calendar/calendar-activities', [OpYearlyAuditCalendarController::class, 'showCalendarActivities']);
             Route::post('audit-calendar/responsible/create', [OpYearlyAuditCalendarController::class, 'storeActivityResponsible']);
             Route::post('audit-calendar/milestones/date/update', [OpYearlyAuditCalendarController::class, 'storeMilestoneTargetDate']);
@@ -51,6 +53,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
             Route::post('list', [OperationalPlanController::class, 'OperationalPlan']);
             Route::post('details', [OperationalPlanController::class, 'OperationalDetail']);
+
+            Route::post('send-annual-plan-receiver-to-sender', [AnnualPlanRevisedController::class, 'sendAnnualPlanReceiverToSender']);
         });
 
 //        Route::group(['prefix' => 'annual-plan/'], function () {
@@ -79,7 +83,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
 
-            Route::post('store-approval-authority', [AnnualPlanRevisedController::class, 'storeApprovalAuthority']);
+            Route::post('send-annual-plan-sender-to-receiver', [AnnualPlanRevisedController::class, 'sendAnnualPlanSenderToReceiver']);
             Route::post('get-movement-histories', [AnnualPlanRevisedController::class, 'getMovementHistories']);
         });
 

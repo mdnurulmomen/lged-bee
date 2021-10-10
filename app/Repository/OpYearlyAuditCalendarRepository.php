@@ -155,6 +155,22 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
         }
     }
 
+    public function yearlyAuditCalendarEventList(Request $request): array
+    {
+        $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status',
+            'approval_status', 'activity_count', 'milestone_count')
+            ->where('op_yearly_audit_calendar_id', $request->calendar_id)
+            ->with('office')
+            ->get()
+            ->toArray();
+
+        if ($calendar_events) {
+            return responseFormat('success', $calendar_events);
+        } else {
+            return responseFormat('error', $calendar_events);
+        }
+    }
+
     public function saveEventsBeforePublishing(Request $request): array
     {
         $data = [];

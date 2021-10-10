@@ -147,7 +147,7 @@ class AnnualPlanRevisedController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function storeApprovalAuthority(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    public function sendAnnualPlanSenderToReceiver(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
@@ -168,7 +168,7 @@ class AnnualPlanRevisedController extends Controller
             'cdesk' => 'required|json',
         ])->validate();
 
-        $responseStore = $annualPlanMovementRevisedService->storeApprovalAuthority($request);
+        $responseStore = $annualPlanMovementRevisedService->sendAnnualPlanSenderToReceiver($request);
 
         if (isSuccessResponse($responseStore)) {
             $response = responseFormat('success', $responseStore['data']);
@@ -176,6 +176,26 @@ class AnnualPlanRevisedController extends Controller
             $response = responseFormat('error', $responseStore['data']);
         }
 
+        return response()->json($response);
+    }
+
+    public function sendAnnualPlanReceiverToSender(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'op_audit_calendar_event_id' => 'required|integer',
+            'receiver_type' => 'required',
+            'status' => 'required',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseStore = $annualPlanMovementRevisedService->sendAnnualPlanReceiverToSender($request);
+
+        if (isSuccessResponse($responseStore)) {
+            $response = responseFormat('success', $responseStore['data']);
+        } else {
+            $response = responseFormat('error', $responseStore['data']);
+        }
         return response()->json($response);
     }
 
