@@ -28,7 +28,7 @@ class MISAndDashboardService
     public function fiscalYearWiseTeams(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($request->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }

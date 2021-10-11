@@ -33,6 +33,18 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
+    public function teamCalenderFilter(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
+    {
+        $individual_plan = $auditVisitCalendarPlanService->teamCalenderFilter($request);
+        if (isSuccessResponse($individual_plan)) {
+            $response = responseFormat('success', $individual_plan['data']);
+        } else {
+            $response = responseFormat('error', $individual_plan['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function updateVisitCalenderStatus(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
         $updateStatus = $auditVisitCalendarPlanService->updateVisitCalenderStatus($request);
