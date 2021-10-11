@@ -9,6 +9,7 @@ use App\Models\ApOfficeOrderMovement;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\GenericData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ApOfficerOrderService
@@ -90,6 +91,9 @@ class ApOfficerOrderService
 
     public function generateOfficeOrder(Request $request): array
     {
+
+       //return ['status' => 'error', 'data' =>date('Y/m/d',strtotime($request->memorandum_date))];
+
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -114,7 +118,7 @@ class ApOfficerOrderService
                 'outcome_id' => $annualPlan->activity->outcome_id,
                 'output_id' => $annualPlan->activity->output_id,
                 'memorandum_no' => $request->memorandum_no,
-                'memorandum_date' => date('Y-m-d',strtotime($request->memorandum_date)),
+                'memorandum_date' => $request->memorandum_date,
                 'heading_details' => $request->heading_details,
                 'advices' => $request->advices,
                 'approved_status' => $request->approved_status,

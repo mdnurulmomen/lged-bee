@@ -215,4 +215,21 @@ class AnnualPlanRevisedController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getCurrentDeskApprovalAuthority(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'op_audit_calendar_event_id' => 'required|integer',
+        ])->validate();
+
+        $responseData = $annualPlanMovementRevisedService->getCurrentDeskApprovalAuthority($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
 }

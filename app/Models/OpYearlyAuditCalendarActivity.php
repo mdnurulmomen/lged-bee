@@ -33,6 +33,10 @@ class OpYearlyAuditCalendarActivity extends Model
 
     public function setTargetDateAttribute($value)
     {
+        if (strstr($value, '/')){
+            $value = str_replace('/','-',$value);
+        }
+
         $this->attributes['target_date'] = Carbon::parse($value)->format('Y-m-d');
     }
 }

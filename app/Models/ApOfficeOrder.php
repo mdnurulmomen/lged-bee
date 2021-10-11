@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -47,5 +48,18 @@ class ApOfficeOrder extends Model
     public function office_order_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ApOfficeOrderMovement::class,'ap_office_order_id','id');
+    }
+
+    public function getMemorandumDateAttribute($value): string
+    {
+        return Carbon::parse($value)->format('d/m/Y');
+    }
+
+    public function setMemorandumDateAttribute($value)
+    {
+        if (strstr($value, '/')){
+            $value = str_replace('/','-',$value);
+        }
+        $this->attributes['memorandum_date'] = Carbon::parse($value)->format('Y-m-d');
     }
 }

@@ -159,4 +159,19 @@ class AnnualPlanMovementRevisedService
         }
         return $responseData;
     }
+
+    public function getCurrentDeskApprovalAuthority(Request $request): array
+    {
+        try{
+            $currentDeskApprovalAuthority = AnnualPlanMovement::where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
+                ->where('receiver_type','approver')
+                ->latest()
+                ->first();
+            $responseData = ['status' => 'success', 'data' => $currentDeskApprovalAuthority];
+        }catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $responseData;
+    }
 }
