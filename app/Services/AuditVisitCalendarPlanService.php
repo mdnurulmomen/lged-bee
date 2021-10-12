@@ -84,12 +84,31 @@ class AuditVisitCalendarPlanService
     public function teamCalenderFilter(Request $request): array
     {
         $office_db_con_response = $this->switchOffice($request->office_id);
+
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $calendar = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('id', $request->team_id)->where('approve_status', 1)->get()->toArray();
-            return ['status' => 'success', 'data' => $calendar];
+
+        $fiscal_year_id = $request->fiscal_year_id;
+        $team_id = $request->team_id;
+
+        $query = AuditVisitCalendarPlanTeam::query();
+
+        $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+            return $q->where('fiscal_year_id', $fiscal_year_id);
+        });
+
+        $query->when($team_id, function ($q, $team_id) {
+            return $q->where('id', $team_id);
+        });
+
+        $query->where('approve_status', 1);
+
+        $calendar = $query->with('child')->get()->toArray();
+
+        return ['status' => 'success', 'data' => $calendar];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
