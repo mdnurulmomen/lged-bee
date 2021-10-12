@@ -41,7 +41,7 @@ class MISAndDashboardService
         }
     }
 
-        public function storeAuditPlanTeamInfo(Request $request)
+    public function storeAuditPlanTeamInfo(Request $request)
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
@@ -49,14 +49,16 @@ class MISAndDashboardService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $team = AuditVisitCalendarPlanTeam::selectRaw('count(id) as total_team, SUM(activity_man_days) AS total_working_days,duration_id,outcome_id,output_id')->where('fiscal_year_id', $request->fiscal_year_id)->first();
-        $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)-count();
+        $team = AuditVisitCalendarPlanTeam::selectRaw('count(id) as total_team, SUM(activity_man_days) AS total_working_days,duration_id,outcome_id,output_id')
+            ->where('fiscal_year_id', $request->fiscal_year_id)
+            ->groupBy('fiscal_year_id')
+            ->first();
+        $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->count();
         $this->emptyOfficeDBConnection();
 
         $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
-        $total_resources = isSuccessResponse($total_resources) ? $total_resources['data']['employees_count'] : 0;
-
-        $auditPlanTeamInfo = AuditPlanTeamInfo::updateOrCreate(
+        $total_resources = isSuccessResponse($total_resources) ? $total_resources['data'][0]['employees_count'] : 0;
+        AuditPlanTeamInfo::updateOrCreate(
             ['fiscal_year_id' => $request->fiscal_year_id],
             [
                 'duration_id' => $team->duration_id,
