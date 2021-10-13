@@ -49,9 +49,9 @@ class MISAndDashboardService
         }
 
         try {
-            $total_team = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->count();
-            $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->sum('activity_man_days');
-            $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->count();
+            $total_team = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->count();
+            $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->sum('activity_man_days');
+            $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->count();
             $this->emptyOfficeDBConnection();
 
             $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
