@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\AuditPlanTeamInfo;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
-use App\Models\XResponsibleOffice;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -33,7 +32,7 @@ class MISAndDashboardService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-           $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('team_parent_id',0)->get();
+            $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('team_parent_id', 0)->get();
             return ['status' => 'success', 'data' => $auditPlanTeamList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -49,30 +48,33 @@ class MISAndDashboardService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-//        $team = AuditVisitCalendarPlanTeam::select('duration_id,outcome_id,output_id')->where('fiscal_year_id', $request->fiscal_year_id)->first();
-        $total_team = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->count();
-        $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->sum('activity_man_days');
-        $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->count();
-        $this->emptyOfficeDBConnection();
+        try {
+            $total_team = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->count();
+            $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->sum('activity_man_days');
+            $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->count();
+            $this->emptyOfficeDBConnection();
 
-        $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
-        $total_resources = isSuccessResponse($total_resources) ? $total_resources['data'][0]['employees_count'] : 0;
-        AuditPlanTeamInfo::updateOrCreate(
-            ['fiscal_year_id' => $request->fiscal_year_id],
-            [
-                'duration_id' => 1,
-                'outcome_id' => 1,
-                'output_id' => 1,
-                'office_id' => $cdesk->office_id,
-                'office_name_bn' => $cdesk->office_name_bn,
-                'office_name_en' => $cdesk->office_name_en,
-                'total_teams' => $total_team,
-                'total_employees' => $total_resources,
-                'total_team_members' => $team_member_count,
-                'total_working_days' => $total_activity_man_days,
-
-            ]
-        );
+            $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
+            $total_resources = isSuccessResponse($total_resources) ? $total_resources['data'][0]['employees_count'] : 0;
+            AuditPlanTeamInfo::updateOrCreate(
+                ['fiscal_year_id' => $request->fiscal_year_id],
+                [
+                    'duration_id' => 1,
+                    'outcome_id' => 1,
+                    'output_id' => 1,
+                    'office_id' => $cdesk->office_id,
+                    'office_name_bn' => $cdesk->office_name_bn,
+                    'office_name_en' => $cdesk->office_name_en,
+                    'total_teams' => $total_team,
+                    'total_employees' => $total_resources,
+                    'total_team_members' => $team_member_count,
+                    'total_working_days' => $total_activity_man_days,
+                ]
+            );
+            return ['status' => 'success', 'data' => 'Successfully Created'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
 
     }
 }

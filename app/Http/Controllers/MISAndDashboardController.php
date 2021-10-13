@@ -25,7 +25,7 @@ class MISAndDashboardController extends Controller
     public function fiscalYearWiseTeams(Request $request, MISAndDashboardService $MISAndDashboardService)
     {
 
-        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required'])->validate();
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required'])->validate();
 
         $all_teams = $MISAndDashboardService->fiscalYearWiseTeams($request);
 

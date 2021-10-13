@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ApOfficeOrderController extends Controller
 {
-    public function auditPlanList(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    public function auditPlanList(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         $auditPlanListResponse = $apOfficerOrderService->auditPlanList($request);
 
@@ -23,7 +23,7 @@ class ApOfficeOrderController extends Controller
 
     }
 
-    public function showOfficeOrder(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    public function showOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         $showOfficeOrderResponse = $apOfficerOrderService->showOfficeOrder($request);
 
@@ -37,7 +37,7 @@ class ApOfficeOrderController extends Controller
 
     }
 
-    public function generateOfficeOrder(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    public function generateOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'audit_plan_id' => 'required',
@@ -61,7 +61,7 @@ class ApOfficeOrderController extends Controller
         return response()->json($response);
     }
 
-    public function storeOfficeOrderApprovalAuthority(Request $request,ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    public function storeOfficeOrderApprovalAuthority(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'ap_office_order_id' => 'required|integer',
@@ -93,7 +93,7 @@ class ApOfficeOrderController extends Controller
         return response()->json($response);
     }
 
-    public function approveOfficeOrder(Request $request,ApOfficerOrderService $apOfficerOrderService,MISAndDashboardService $misAndDashboardService): \Illuminate\Http\JsonResponse
+    public function approveOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService, MISAndDashboardService $misAndDashboardService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'ap_office_order_id' => 'required|integer',
@@ -103,8 +103,8 @@ class ApOfficeOrderController extends Controller
             'cdesk' => 'required|json',
         ])->validate();
 
-        $misAndDashboardService->storeAuditPlanTeamInfo($request);
         $responseData = $apOfficerOrderService->approveOfficeOrder($request);
+        $misAndDashboardService->storeAuditPlanTeamInfo($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
