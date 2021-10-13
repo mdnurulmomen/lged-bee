@@ -15,7 +15,7 @@ class AuditPlanTeamInfo extends Model
         'duration_id',
         'outcome_id',
         'output_id',
-        'directorate_id',
+        'office_id',
         'total_teams',
         'total_team_members',
         'total_employees',
