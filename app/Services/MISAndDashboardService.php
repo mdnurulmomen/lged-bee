@@ -56,8 +56,9 @@ class MISAndDashboardService
 
             $total_resources = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.office_employees'), ['office_id' => $cdesk->office_id, 'type' => 'count'])->json();
             $total_resources = isSuccessResponse($total_resources) ? $total_resources['data'][0]['employees_count'] : 0;
+
             AuditPlanTeamInfo::updateOrCreate(
-                ['fiscal_year_id' => $request->fiscal_year_id],
+                ['fiscal_year_id' => $request->fiscal_year_id,'office_id' => $cdesk->office_id],
                 [
                     'duration_id' => 1,
                     'outcome_id' => 1,
