@@ -141,12 +141,19 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
-    //todo
-    Route::post('final-plan-file-upload', [FinalPlanController::class, 'store']);
-    Route::post('final-plan-file-edit', [FinalPlanController::class, 'edit']);
+    //final plan
+    Route::group(['prefix' => 'final-plan-file'], function () {
+        Route::post('list', [FinalPlanController::class, 'list']);
+        Route::post('store', [FinalPlanController::class, 'store']);
+        Route::post('edit', [FinalPlanController::class, 'edit']);
+        Route::post('update', [FinalPlanController::class, 'update']);
+    });
+    Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
+
+    /*Route::post('final-plan-file-edit', [FinalPlanController::class, 'edit']);
     Route::post('final-plan-file-update', [FinalPlanController::class, 'update']);
     Route::post('final-plan-file-list', [FinalPlanController::class, 'list']);
-    Route::post('final-plan-document-is-exist', [FinalPlanController::class, 'documentIsExist']);
+    Route::post('final-plan-document-is-exist', [FinalPlanController::class, 'documentIsExist']);*/
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
