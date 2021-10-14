@@ -38,14 +38,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
-            'visibility' => 'public',
-        ],
-
-        'final_documents' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public/final_documents'),
-            'url' => env('APP_URL').'/storage/final_documents',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
