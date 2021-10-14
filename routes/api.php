@@ -117,10 +117,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
 
         Route::group(['prefix' => 'calendar'], function () {
-//            Route::post('individual', [AuditVisitCalenderPlanController::class, 'getVisitPlanCalendar']);
-            Route::post('individual', [AuditVisitCalenderPlanController::class, 'getIndividualVisitPlanCalendar']);
-            Route::post('individual/team-filter', [AuditVisitCalenderPlanController::class, 'teamCalenderFilter']);
-            Route::post('individual/update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
+            Route::post('teams', [AuditVisitCalenderPlanController::class, 'getTeamVisitPlanCalendar']);
+            Route::post('team-filter', [AuditVisitCalenderPlanController::class, 'teamCalenderFilter']);
+            Route::post('update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
+            Route::post('load-fiscal-year-wise-team', [AuditVisitCalenderPlanController::class, 'fiscalYearWiseTeams']);
         });
     });
 
@@ -137,7 +137,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'mis-and-dashboard'], function () {
         Route::post('load-all-team-lists', [MISAndDashboardController::class, 'allTeams']);
-        Route::post('load-fiscal-year-wise-team', [MISAndDashboardController::class, 'fiscalYearWiseTeams']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

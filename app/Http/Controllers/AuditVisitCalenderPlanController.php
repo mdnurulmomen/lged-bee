@@ -21,9 +21,9 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
-    public function getIndividualVisitPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
+    public function getTeamVisitPlanCalendar(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
-        $individual_plan = $auditVisitCalendarPlanService->getIndividualVisitPlanCalendar($request);
+        $individual_plan = $auditVisitCalendarPlanService->getTeamVisitPlanCalendar($request);
         if (isSuccessResponse($individual_plan)) {
             $response = responseFormat('success', $individual_plan['data']);
         } else {
@@ -54,6 +54,21 @@ class AuditVisitCalenderPlanController extends Controller
             $response = responseFormat('error', $updateStatus['data']);
         }
 
+        return response()->json($response);
+    }
+
+    public function fiscalYearWiseTeams(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
+    {
+
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required'])->validate();
+
+        $all_teams = $auditVisitCalendarPlanService->fiscalYearWiseTeams($request);
+
+        if (isSuccessResponse($all_teams)) {
+            $response = responseFormat('success', $all_teams['data']);
+        } else {
+            $response = responseFormat('error', $all_teams['data']);
+        }
         return response()->json($response);
     }
 }

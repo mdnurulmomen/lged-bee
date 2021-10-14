@@ -36,7 +36,7 @@ class AuditVisitCalendarPlanService
 
     }
 
-    public function getIndividualVisitPlanCalendar(Request $request): array
+    public function getTeamVisitPlanCalendar(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($request->office_id);
@@ -113,5 +113,21 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+    }
+
+    public function fiscalYearWiseTeams(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('team_parent_id', 0)->get();
+            return ['status' => 'success', 'data' => $auditPlanTeamList];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+
+        }
     }
 }
