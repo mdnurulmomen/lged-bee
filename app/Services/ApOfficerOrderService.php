@@ -67,6 +67,7 @@ class ApOfficerOrderService
                     'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no')
                 ->where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
+                ->orderBy('team_member_role_en','DESC')
                 ->get()
                 ->toArray();
 
