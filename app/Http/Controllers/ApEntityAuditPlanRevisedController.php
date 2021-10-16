@@ -163,23 +163,6 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function getSubTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
-    {
-        Validator::make($request->all(), [
-            'team_id' => 'required|integer',
-            'cdesk' => 'required|json',
-        ])->validate();
-//        dd($request->all());
-        $sub_team_list = $apEntityAuditPlanRevisedService->getSubTeam($request);
-
-        if (isSuccessResponse($sub_team_list)) {
-            $response = responseFormat('success', $sub_team_list['data']);
-        } else {
-            $response = responseFormat('error', $sub_team_list['data']);
-        }
-        return response()->json($response);
-    }
-
     public function getTeamInfo(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [

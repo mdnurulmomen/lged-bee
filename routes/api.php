@@ -93,7 +93,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/new', [ApEntityAuditPlanRevisedController::class, 'createNewAuditPlan']);
             Route::post('entity-audit-plan/edit', [ApEntityAuditPlanRevisedController::class, 'editAuditPlan']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team', [ApEntityAuditPlanRevisedController::class, 'getAuditPlanWiseTeam']);
-            Route::post('entity-audit-plan/get-sub-tam', [ApEntityAuditPlanRevisedController::class, 'getSubTeam']);
             Route::post('entity-audit-plan/get-team-info', [ApEntityAuditPlanRevisedController::class, 'getTeamInfo']);
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanRevisedController::class);
 
@@ -121,6 +120,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('team-filter', [AuditVisitCalenderPlanController::class, 'teamCalenderFilter']);
             Route::post('update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
             Route::post('load-fiscal-year-wise-team', [AuditVisitCalenderPlanController::class, 'fiscalYearWiseTeams']);
+            Route::post('load-cost-center-and-fiscal-year-wise-team', [AuditVisitCalenderPlanController::class, 'costCenterAndFiscalYearWiseTeams']);
+            Route::post('load-cost-center-directorate-fiscal-year-wise', [AuditVisitCalenderPlanController::class, 'getCostCenterDirectorateFiscalYearWise']);
+            Route::post('get-sub-tam', [AuditVisitCalenderPlanController::class, 'getSubTeam']);
+            Route::post('team-calender-schedule-list', [AuditVisitCalenderPlanController::class, 'teamCalenderScheduleList']);
         });
     });
 
