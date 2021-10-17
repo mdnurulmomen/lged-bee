@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQueriesTable extends Migration
+class CreateCostCenterTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateQueriesTable extends Migration
      */
     public function up()
     {
-        Schema::connection('BeeCoreDB')->create('queries', function (Blueprint $table) {
+        Schema::connection('BeeCoreDB')->create('cost_center_types', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('cost_center_type_id');
-            $table->string('query_title_en');
-            $table->string('query_title_bn');
-            $table->mediumText('query_description_en');
-            $table->mediumText('query_description_bn');
+            $table->string('name_en');
+            $table->string('name_bn');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateQueriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('queries');
+        Schema::dropIfExists('cost_center_types');
     }
 }
