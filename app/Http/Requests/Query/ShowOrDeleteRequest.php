@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\XFiscalYear;
+namespace App\Http\Requests\Query;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,18 +21,18 @@ class ShowOrDeleteRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+     public function rules()
     {
         return [
-            'fiscal_year_id' => 'required|integer'
+            'audit_query_id' => 'required|integer'
         ];
     }
 
     public function messages()
     {
         return [
-            'fiscal_year_id.required' => 'Fiscal Year Required.',
-            'fiscal_year_id.integer' => 'Fiscal Year ID should be integer.'
+            'audit_query_id.required' => 'Fiscal Year Required.',
+            'audit_query_id.integer' => 'Fiscal Year ID should be integer.'
         ];
     }
 }

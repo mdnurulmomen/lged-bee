@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\XFiscalYear;
+namespace App\Http\Requests\Query;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,21 +24,16 @@ class SaveRequest extends FormRequest
     public function rules()
     {
         return [
-            'duration_id' => 'integer|required',
-            'start' => 'integer|required',
-            'end' => 'integer|required',
-            'description' => 'string|nullable',
+            'cost_center_type_id' => 'integer|required',
+            'query_title_bn' => 'required',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'duration_id.integer' => 'Duration Span Should Be Year',
-            'start.required' => 'Start Year Required',
-            'start.integer' => 'Start Year Should Be Year',
-            'end.required' => 'End Year Required',
-            'end.integer' => 'End Year Should Be Year',
+            'cost_center_type_id.required' => 'Cost Center Type Required',
+            'query_title_bn.required' => 'Query Title Bangla Required',
         ];
     }
 

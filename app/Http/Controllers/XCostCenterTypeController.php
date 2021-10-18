@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Query\SaveRequest;
-use App\Http\Requests\Query\ShowOrDeleteRequest;
-use App\Http\Requests\Query\UpdateRequest;
-use App\Models\Query;
+use App\Http\Requests\XFiscalYear\SaveRequest;
+use App\Http\Requests\XFiscalYear\ShowOrDeleteRequest;
+use App\Http\Requests\XFiscalYear\UpdateRequest;
+use App\Models\CostCenterType;
 use Illuminate\Http\Request;
 
-class XAuditQueryController extends Controller
+class XCostCenterTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class XAuditQueryController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $audit_query = Query::with('cost_center_type')->paginate($request->per_page);
+            $csot_center_types = CostCenterType::paginate($request->per_page);
         } else {
-            $audit_query = Query::with('cost_center_type')->get();
+            $csot_center_types = CostCenterType::all();
         }
 
-        if ($audit_query) {
-            $response = responseFormat('success', $audit_query);
+        if ($csot_center_types) {
+            $response = responseFormat('success', $csot_center_types);
         } else {
-            $response = responseFormat('error', 'Fiscal Year Not Found');
+            $response = responseFormat('error', 'Cost Center Type Not Found');
         }
         return response()->json($response, 200);
     }
@@ -40,14 +40,7 @@ class XAuditQueryController extends Controller
     public function store(SaveRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $request->validated();
-            foreach ($request->query_title_bn as $key => $query_title_bn){
-                $data['cost_center_type_id'] = $request->cost_center_type_id;
-                $data['query_title_bn'] = $query_title_bn;
-                $data['query_title_en'] = $request->query_title_bn[$key];
-                Query::create($data);
-            }
-
+            XFiscalYear::create($request->validated());
             $response = responseFormat('success', 'Created Successfully');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage(), ['code' => $exception->getCode()]);
@@ -63,7 +56,7 @@ class XAuditQueryController extends Controller
      */
     public function show(ShowOrDeleteRequest $request): \Illuminate\Http\JsonResponse
     {
-        $fiscal_year = Query::findOrFail($request->fiscal_year_id);
+        $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id);
         if ($fiscal_year) {
             $response = responseFormat('success', $fiscal_year);
         } else {
@@ -80,7 +73,7 @@ class XAuditQueryController extends Controller
      */
     public function update(UpdateRequest $request)
     {
-        $fiscal_year = Query::find($request->fiscal_year_id);
+        $fiscal_year = XFiscalYear::find($request->fiscal_year_id);
         try {
             $fiscal_year->update($request->validated());
             $response = responseFormat('success', 'Successfully Updated');
@@ -91,27 +84,16 @@ class XAuditQueryController extends Controller
         return response()->json($response);
     }
 
-    public function costCenterTypeWiseQuery(Request $request)
-    {
-        try {
-            $query_list = Query::where('cost_center_type_id',$request->cost_center_type_id)->get();
-            return ['status' => 'success', 'data' => $query_list];
-        } catch (\Exception $exception) {
-            return ['status' => 'error', 'data' => $exception->getMessage()];
-
-        }
-    }
-
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Query $Query
+     * @param \App\Models\XFiscalYear $xFiscalYear
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(ShowOrDeleteRequest $request)
     {
         try {
-            Query::find($request->audit_query_id)->delete();
+            XFiscalYear::find($request->fiscal_year_id)->delete();
             $response = responseFormat('success', 'Successfully Updated');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

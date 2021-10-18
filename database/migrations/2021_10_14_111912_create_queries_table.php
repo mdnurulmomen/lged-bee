@@ -20,6 +20,10 @@ class CreateQueriesTable extends Migration
             $table->string('query_title_bn');
             $table->mediumText('query_description_en');
             $table->mediumText('query_description_bn');
+            $table->boolean('is_global');
+            $table->bigInteger('office_id');
+            $table->bigInteger('created_by');
+            $table->bigInteger('modified_by');
             $table->timestamps();
         });
     }
