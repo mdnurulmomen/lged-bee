@@ -20,4 +20,9 @@ class Query extends Model
     {
         return $this->belongsTo(CostCenterType::class, 'cost_center_type_id', 'id');
     }
+
+    public function audit_query()
+    {
+        return $this->hasMany(AcQuery::class, 'query_id', 'id');
+    }
 }

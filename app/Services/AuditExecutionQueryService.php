@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\AcQuery;
+use App\Models\Query;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -78,6 +79,47 @@ class AuditExecutionQueryService
             return ['status' => 'success', 'data' => 'Send Successfully'];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function receivedAuditQuery(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+//        return ['status' => 'success', 'data' => $cdesk];
+        try {
+            $ac_query = AcQuery::where('query_id',$request->query_id)->where('cost_center_id',$request->cost_center_id)->where('fiscal_year_id',$request->fiscal_year_id)->first();
+
+            $ac_query->query_received_date  = date('Y-m-d');
+            $ac_query->query_receiver_officer_id  = $cdesk->officer_id;
+            $ac_query->query_receiver_officer_name_bn  = $cdesk->officer_bn;
+            $ac_query->query_receiver_officer_name_en  = $cdesk->officer_en;
+            $ac_query->query_receiver_designation_id  = $cdesk->designation_id;
+            $ac_query->is_query_received  = 1;
+            $ac_query->save();
+
+             return ['status' => 'success', 'data' => 'Received Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function auditQueryCostCenterTypeWise(Request $request){
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $query_list = Query::with('audit_query')->where('cost_center_type_id',$request->cost_center_type_id)->get();
+            return ['status' => 'success', 'data' => $query_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+
         }
     }
 }
