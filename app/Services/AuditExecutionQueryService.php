@@ -2,12 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AuditExecutionQueryService
 {
@@ -34,9 +32,9 @@ class AuditExecutionQueryService
                 return $q->where('cost_center_id', $cost_center_id);
             });
 
-            $query->where('team_member_designation_id',$cdesk->designation_id);
+            $query->where('team_member_designation_id', $cdesk->designation_id);
 
-            $schedule_list = $query->get();
+            $schedule_list = $query->paginate(PER_PAGE_PAGINATION);
 
             return ['status' => 'success', 'data' => $schedule_list];
 
