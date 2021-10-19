@@ -23,19 +23,9 @@ class AuditExecutionQueryService
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
 
-            $query = AuditVisitCalenderPlanMember::query();
-
-            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
-                return $q->where('fiscal_year_id', $fiscal_year_id);
-            });
-
-            $query->when($cost_center_id, function ($q, $cost_center_id) {
-                return $q->where('cost_center_id', $cost_center_id);
-            });
-
-            $query->where('team_member_designation_id', $cdesk->designation_id);
-
-            $schedule_list = $query->paginate(PER_PAGE_PAGINATION);
+            $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id',$request->fiscal_year_id)->whereHas('office_order', function($q){
+                                 $q->where('approve_status','approved');
+                            })->with('office_order:id,audit_plan_id')->where('team_member_designation_id', $cdesk->designation_id)->paginate(PER_PAGE_PAGINATION);
 
             return ['status' => 'success', 'data' => $schedule_list];
 
@@ -54,14 +44,11 @@ class AuditExecutionQueryService
         try {
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
-            $query_ids = $request->query_ids;
+            $queries = $request->queries;
 
             $query_info = AuditVisitCalenderPlanMember::where('fiscal_year_id',$request->fiscal_year_id)->where('team_member_designation_id',$cdesk->designation_id)->first();
 
-            foreach ($query_ids as $key => $query_id){
-
-                $query = explode('-',$query_id);
-
+            foreach ($queries as $key => $query){
                 $ac_query = New AcQuery;
                 $ac_query->fiscal_year_id = $fiscal_year_id;
                 $ac_query->activity_id = $query_info->activity_id;
@@ -77,18 +64,15 @@ class AuditExecutionQueryService
                 $ac_query->entity_office_name_en  = $query_info->annual_plan->parent_office_name_en;
                 $ac_query->entity_office_name_bn  = $query_info->annual_plan->parent_office_name_bn;
                 $ac_query->cost_center_id  = $request->cost_center_id;
-                $ac_query->cost_center_name_en  = $request->cost_center_name_bn;
-                $ac_query->cost_center_name_en  = $request->cost_center_name_bn;
-                $ac_query->query_id  = $query_id[0];
-                $ac_query->query_title_en  = $query_id[1];
-                $ac_query->query_title_bn  = $query_id[2];
-                $ac_query->is_query_sent  = '1';
+                $ac_query->cost_center_name_bn  = $request->cost_center_name_bn;
+                $ac_query->cost_center_name_en  = $request->cost_center_name_en;
+                $ac_query->query_id  = $query['query_id'];
+                $ac_query->query_title_en  = $query['query_title_en'];
+                $ac_query->query_title_bn  = $query['query_title_bn'];
+                $ac_query->is_query_sent  = 1;
                 $ac_query->query_send_date  = date('Y-m-d');
-                $ac_query->is_query_document_received  = '0';
-                $ac_query->query_document_received_date  = '';
                 $ac_query->querier_officer_id  = $cdesk->officer_id;
                 $ac_query->querier_designation_id  = $cdesk->designation_id;
-                return ['status' => 'success', 'data' => $ac_query];
                 $ac_query->save();
             }
             return ['status' => 'success', 'data' => 'Send Successfully'];

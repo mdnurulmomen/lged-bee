@@ -61,6 +61,6 @@ class AuditVisitCalenderPlanMember extends Model
 
     public function office_order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'id');
+        return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'audit_plan_id');
     }
 }
