@@ -45,6 +45,8 @@ class AuditVisitCalenderPlanMember extends Model
         'mobile_no',
         'approve_status',
         'status',
+        'schedule_type',
+        'sequence_level',
     ];
 
     public function plan_team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
