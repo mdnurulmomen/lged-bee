@@ -53,4 +53,14 @@ class AuditVisitCalenderPlanMember extends Model
     {
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'team_id', 'id');
     }
+
+    public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
+    }
+
+    public function office_order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'id');
+    }
 }

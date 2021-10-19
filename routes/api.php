@@ -148,6 +148,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'audit-conduct-query'], function () {
         Route::post('audit-query-schedule-list', [AuditExecutionQueryController::class, 'auditQueryScheduleList']);
+        Route::post('send-audit-query', [AuditExecutionQueryController::class, 'sendAuditQuery']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
