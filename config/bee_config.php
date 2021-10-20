@@ -1,6 +1,6 @@
 <?php
 
-if (!defined("PER_PAGE_PAGINATION")) define("PER_PAGE_PAGINATION", 10);
+if (!defined("PER_PAGE_PAGINATION")) define("PER_PAGE_PAGINATION", 40);
 
 return [
     'secret_key' => env('SECRET_KEY'),
