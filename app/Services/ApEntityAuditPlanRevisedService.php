@@ -305,6 +305,8 @@ class ApEntityAuditPlanRevisedService
 
     public function storeTeamSchedule(Request $request): array
     {
+        //return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
+
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
         $team_schedules = json_decode($request->team_schedules, true);
@@ -333,7 +335,7 @@ class ApEntityAuditPlanRevisedService
                                 'entity_id' => $team_data->entity_id,
                                 'cost_center_id' => $schedule_datum['cost_center_id'],
                                 'cost_center_name_en' => $schedule_datum['cost_center_name_en'],
-                                'cost_center_name_bn' => $schedule_datum['cost_center_name_en'],
+                                'cost_center_name_bn' => $schedule_datum['cost_center_name_bn'],
                                 'team_member_name_en' => $member['officer_name_en'],
                                 'team_member_name_bn' => $member['officer_name_bn'],
                                 'team_member_designation_id' => $member['designation_id'],
@@ -378,6 +380,8 @@ class ApEntityAuditPlanRevisedService
 
     public function updateTeamSchedule(Request $request): array
     {
+        //return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
+
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
         $team_schedules = json_decode($request->team_schedules, true);
@@ -407,7 +411,7 @@ class ApEntityAuditPlanRevisedService
                                 'entity_id' => $team_data->entity_id,
                                 'cost_center_id' => $schedule_datum['cost_center_id'],
                                 'cost_center_name_en' => $schedule_datum['cost_center_name_en'],
-                                'cost_center_name_bn' => $schedule_datum['cost_center_name_en'],
+                                'cost_center_name_bn' => $schedule_datum['cost_center_name_bn'],
                                 'team_member_name_en' => $member['officer_name_en'],
                                 'team_member_name_bn' => $member['officer_name_bn'],
                                 'team_member_designation_id' => $member['designation_id'],
