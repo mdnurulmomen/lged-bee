@@ -41,7 +41,6 @@ class AcQuery extends Model
         'querier_designation_id',
         'query_receiver_officer_id',
         'query_receiver_designation_id',
-        'has_memo',
         'status',
     ];
 
