@@ -23,6 +23,6 @@ class Query extends Model
 
     public function audit_query()
     {
-        return $this->hasMany(AcQuery::class, 'query_id', 'id');
+        return $this->hasOne(AcQuery::class, 'query_id', 'id');
     }
 }
