@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Http;
 
 trait ApiHeart
 {
-    public function apiHeaders(): array
-    {
-        return ['Accept' => 'application/json', 'Content-Type' => 'application/json; charset=utf-8', 'api-version' => '1'];
-    }
-
     public function initDoptorHttp($username): \Illuminate\Http\Client\PendingRequest
     {
         return Http::withHeaders($this->apiHeaders())->withToken($this->getDoptorToken($username));
+    }
+
+    public function apiHeaders(): array
+    {
+        return ['Accept' => 'application/json', 'Content-Type' => 'application/json; charset=utf-8', 'api-version' => '1'];
     }
 
     public function getDoptorToken($username)
@@ -29,11 +29,6 @@ trait ApiHeart
         return session('_doptor_token');
     }
 
-    public function initHttp(): \Illuminate\Http\Client\PendingRequest
-    {
-        return Http::withHeaders($this->apiHeaders());
-    }
-
     public function getClientToken($url, $client_id, $client_pass, $username = '')
     {
         if ($username == '') {
@@ -47,6 +42,28 @@ trait ApiHeart
         } else {
             return '';
         }
+    }
+
+    public function initHttp(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withHeaders($this->apiHeaders());
+    }
+
+    public function initRPUHttp(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withHeaders($this->apiHeaders())->withToken($this->getRPUniverseToken());
+    }
+
+    public function getRPUniverseToken()
+    {
+        $url = config('cag_rpu_api.auth.client_login_url');
+        $client_id = config('cag_rpu_api.auth.client_id');
+        $client_pass = config('cag_rpu_api.auth.client_pass');
+        if (!session()->has('_rpu_token') || session('_rpu_token') == '') {
+            $token = $this->getClientToken($url, $client_id, $client_pass, $this->getUsername());
+            session(['_rpu_token' => $token]);
+        }
+        return session('_rpu_token');
     }
 }
 
