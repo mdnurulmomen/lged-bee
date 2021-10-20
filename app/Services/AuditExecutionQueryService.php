@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\AcQuery;
 use App\Models\AuditVisitCalenderPlanMember;
+use App\Models\AcQuery;
 use App\Models\Query;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
@@ -42,13 +42,15 @@ class AuditExecutionQueryService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
+
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
             $queries = $request->queries;
 
             $query_info = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('team_member_designation_id', $cdesk->designation_id)->first();
-
+            $send_rpu = [];
             foreach ($queries as $key => $query) {
                 $ac_query = new AcQuery;
                 $ac_query->fiscal_year_id = $fiscal_year_id;
@@ -68,18 +70,40 @@ class AuditExecutionQueryService
                 $ac_query->cost_center_name_bn = $request->cost_center_name_bn;
                 $ac_query->cost_center_name_en = $request->cost_center_name_en;
                 $ac_query->query_id = $query['query_id'];
+                $ac_query->potro_no = '1';
                 $ac_query->query_title_en = $query['query_title_en'];
                 $ac_query->query_title_bn = $query['query_title_bn'];
                 $ac_query->is_query_sent = 1;
                 $ac_query->query_send_date = date('Y-m-d');
                 $ac_query->querier_officer_id = $cdesk->officer_id;
+                $ac_query->querier_officer_name_en = $cdesk->officer_en;
+                $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
                 $ac_query->querier_designation_id = $cdesk->designation_id;
+                $rpu_data[] = $ac_query;
+                $send_rpu = $rpu_data;
                 $ac_query->save();
             }
-            return ['status' => 'success', 'data' => 'Send Successfully'];
+
+            $data['query_list'] = $send_rpu;
+
+            $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data);
+
+            dd($send_audit_query_to_rpu);
+
+            if ($send_audit_query_to_rpu['status'] == 'success') {
+                \DB::commit();
+                return ['status' => 'success', 'data' => $send_audit_query_to_rpu];
+            } else {
+                throw new \Exception('Try Again');
+            }
+
+
         } catch (\Exception $exception) {
+            \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
+
         }
+
     }
 
     public function receivedAuditQuery(Request $request): array
@@ -89,34 +113,34 @@ class AuditExecutionQueryService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
 //        return ['status' => 'success', 'data' => $cdesk];
         try {
-            $ac_query = AcQuery::where('query_id', $request->query_id)->where('cost_center_id', $request->cost_center_id)->where('fiscal_year_id', $request->fiscal_year_id)->first();
+            $ac_query = AcQuery::where('query_id',$request->query_id)->where('cost_center_id',$request->cost_center_id)->where('fiscal_year_id',$request->fiscal_year_id)->first();
 
-            $ac_query->query_document_received_date = date('Y-m-d');
-            $ac_query->query_receiver_officer_id = $cdesk->officer_id;
-            $ac_query->query_receiver_officer_name_bn = $cdesk->officer_bn;
-            $ac_query->query_receiver_officer_name_en = $cdesk->officer_en;
-            $ac_query->query_receiver_designation_id = $cdesk->designation_id;
-            $ac_query->is_query_document_received = 1;
+            $ac_query->query_document_received_date  = date('Y-m-d');
+            $ac_query->query_receiver_officer_id  = $cdesk->officer_id;
+            $ac_query->query_receiver_officer_name_bn  = $cdesk->officer_bn;
+            $ac_query->query_receiver_officer_name_en  = $cdesk->officer_en;
+            $ac_query->query_receiver_designation_id  = $cdesk->designation_id;
+            $ac_query->is_query_document_received  = 1;
             $ac_query->save();
 
-            return ['status' => 'success', 'data' => 'Received Successfully'];
+             return ['status' => 'success', 'data' => 'Received Successfully'];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
 
-    public function auditQueryCostCenterTypeWise(Request $request)
-    {
+    public function auditQueryCostCenterTypeWise(Request $request){
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $query_list = Query::with('audit_query')->where('cost_center_type_id', $request->cost_center_type_id)->get();
+            $query_list = Query::with('audit_query')->where('cost_center_type_id',$request->cost_center_type_id)->get();
             return ['status' => 'success', 'data' => $query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

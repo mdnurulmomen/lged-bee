@@ -38,8 +38,12 @@ class AcQuery extends Model
         'is_query_document_received',
         'query_document_received_date',
         'querier_officer_id',
+        'querier_officer_name_en',
+        'querier_officer_name_bn',
         'querier_designation_id',
         'query_receiver_officer_id',
+        'query_receiver_officer_name_bn',
+        'query_receiver_officer_name_en',
         'query_receiver_designation_id',
         'status',
     ];

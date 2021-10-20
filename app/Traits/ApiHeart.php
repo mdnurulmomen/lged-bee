@@ -60,7 +60,7 @@ trait ApiHeart
         $client_id = config('cag_rpu_api.auth.client_id');
         $client_pass = config('cag_rpu_api.auth.client_pass');
         if (!session()->has('_rpu_token') || session('_rpu_token') == '') {
-            $token = $this->getClientToken($url, $client_id, $client_pass, $this->getUsername());
+            $token = $this->getClientToken($url, $client_id, $client_pass);
             session(['_rpu_token' => $token]);
         }
         return session('_rpu_token');

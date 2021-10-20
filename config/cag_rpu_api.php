@@ -6,4 +6,5 @@ return [
         'client_pass' => env('RPU_CLIENT_PASS', ''),
     ],
     'get-office-ministry-list' => env('API_URL_RPU', '') . '/get-office-ministry-list',
+    'send_query_to_rpu' => env('API_URL_RPU', '') . '/send-audit-query',
 ];
