@@ -58,4 +58,9 @@ class AuditVisitCalendarPlanTeam extends Model
     {
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'team_parent_id', 'id')->with('parent');
     }
+
+    public function ac_memos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemo::class, 'team_id', 'id');
+    }
 }

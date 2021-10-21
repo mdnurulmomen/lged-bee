@@ -21,6 +21,8 @@ class CreateAcMemoAttachmentsTable extends Migration
             $table->longText('attachment_name');
             $table->longText('attachment_path');
             $table->smallInteger('sequence');
+            $table->bigInteger('created_by');
+            $table->bigInteger('modified_by');
             $table->bigInteger('deleted_by');
             $table->softDeletes();
             $table->timestamps();

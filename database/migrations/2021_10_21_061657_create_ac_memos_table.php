@@ -35,6 +35,7 @@ class CreateAcMemosTable extends Migration
             $table->year('audit_year_end');
             $table->smallInteger('ac_query_potro_no');
             $table->bigInteger('ap_office_order_id');
+            $table->bigInteger('audit_plan_id');
             $table->string('audit_type');
             $table->bigInteger('team_id');
             $table->text('memo_title_bn');

@@ -66,4 +66,14 @@ class AcMemo extends Model
         'comment',
     ];
 
+    public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'id');
+    }
+
+    public function team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
+    }
+
 }
