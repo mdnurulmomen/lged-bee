@@ -87,7 +87,7 @@ class AcMemoService
 
         try {
             $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)->where('cost_center_id', $request->cost_center_id)->paginate(config('bee_config.per_page_pagination'));
-            return ['status' => 'error', 'data' => $memo_list];
+            return ['status' => 'success', 'data' => $memo_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
