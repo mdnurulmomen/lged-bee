@@ -13,6 +13,8 @@ class AcMemoService
 
     public function auditMemoStore(Request $request): array
     {
+        //return ['status' => 'error', 'data' => $request->all()];
+
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -54,9 +56,9 @@ class AcMemoService
             $audi_memo->audit_conclusion = $request->audit_conclusion;
             $audi_memo->audit_recommendation = $request->audit_recommendation;
             $audi_memo->created_by = $cdesk->officer_id;
-            $audi_memo->approve_status = $request->approve_status;
-            $audi_memo->status = $request->status;
-            $audi_memo->comment = $request->comment;
+            $audi_memo->approve_status = 'draft';
+            $audi_memo->status = 'draft';
+            $audi_memo->comment = '';
             $audi_memo->save();
 
             return ['status' => 'success', 'data' => 'Memo Saved Successfully'];
