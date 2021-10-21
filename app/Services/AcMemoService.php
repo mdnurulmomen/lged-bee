@@ -85,9 +85,12 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $memo_list = AcMemo::where('audit_plan_id',$request->audit_plan_id)->where('cost_center_id',$request->cost_center_id)->paginate(config('bee_config.per_page_pagination'));
-
-        return ['status' => 'error', 'data' => $memo_list];
+        try {
+            $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)->where('cost_center_id', $request->cost_center_id)->paginate(config('bee_config.per_page_pagination'));
+            return ['status' => 'error', 'data' => $memo_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
 
     }
 }
