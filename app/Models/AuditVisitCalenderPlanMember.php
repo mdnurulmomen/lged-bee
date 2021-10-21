@@ -68,4 +68,9 @@ class AuditVisitCalenderPlanMember extends Model
     {
         return $this->hasMany(AcQuery::class, 'cost_center_id', 'cost_center_id');
     }
+
+    public function cost_center_type()
+    {
+        return $this->hasOne(AcQuery::class, 'cost_center_id', 'cost_center_id');
+    }
 }

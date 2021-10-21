@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\AuditVisitCalenderPlanMember;
-use App\Models\AuditVisitCalendarPlanTeam;
-use App\Models\XFiscalYear;
 use App\Models\AcQuery;
+use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\Query;
+use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -23,12 +23,12 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $fiscal_year_id = XFiscalYear::select('id')->where('start',date("Y"))->first();
+            $fiscal_year_id = XFiscalYear::select('id')->where('start', date("Y"))->first();
             $cost_center_id = $request->cost_center_id;
 
             $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)->whereHas('office_order', function ($q) {
                 $q->where('approve_status', 'approved');
-            })->with('office_order:id,audit_plan_id','cost_center_query:id,cost_center_type_id')->where('team_member_designation_id', $cdesk->designation_id)->where('cost_center_id','!=',0)->paginate(config('bee_config.per_page_pagination'));
+            })->with('office_order:id,audit_plan_id')->with('cost_center_type:id,cost_center_id,cost_center_type_id')->where('team_member_designation_id', $cdesk->designation_id)->where('cost_center_id', '!=', 0)->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
 
