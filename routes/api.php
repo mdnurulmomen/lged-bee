@@ -156,6 +156,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'audit-conduct-memo'], function () {
         Route::post('audit-memo-store', [AcMemoController::class, 'auditMemoStore']);
+        Route::post('audit-memo-list', [AcMemoController::class, 'auditMemoList']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

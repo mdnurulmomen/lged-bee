@@ -10,22 +10,37 @@ class AcMemo extends Model
     use HasFactory;
 
     public static $memo_type = [
-        '1' => '১. SFI',
-        '2' => '২. Non-SFI',
-        '3' => '৩. ড্রাফ্ট প্যারা',
-        '4' => '৪. পাণ্ডুলিপি',
+        '1' => 'এসএফআই',
+        '2' => 'নন-এসএফআই',
+        '3' => 'ড্রাফ্ট প্যারা',
+        '4' => 'পাণ্ডুলিপি',
     ];
     public static $memo_irregularity_type = [
-        '1' => '১. জালিয়াতী',
-        '2' => '২. আর্থিক ক্ষতি',
-        '3' => '৩. আর্থিক বিধির ব্যত্যয়',
-        '4' => '৪. নিরিক্ষা কালিন অসহযোগীতা',
-        '5' => '৫. রাজস্ব ক্ষতি',
-        '6' => '৬. অন্যান্য',
+        '1' => 'জালিয়াতী',
+        '2' => 'সরকারের আর্থিক ক্ষতি',
+        '3' => 'বিধি ও পদ্ধতিগত অনিয়ম',
+        '4' => 'নিরিক্ষা কালিন অসহযোগীতা',
+        '5' => 'বিশেষ ধরনের আপত্তি',
+        '6' => 'অন্যান্য',
     ];
     public static $memo_irregularity_sub_type = [
         '1' => 'ভ্যাট-আইটিসহ সরকারি প্রাপ্য আদায় না করা',
+        '2' => 'কম আদায় করাা',
+        '3' => 'আদায় করা সত্ত্বেও কোষাগারে জমা না করা',
+        '4' => 'বাজার দর অপেক্ষা উচ্চমূল্যে ক্রয় কার্য সম্পাদন',
+        '5' => 'রেসপন্সিভ সর্বনিম্ন দরদাতার স্থলে উচ্চ দরদাতার নিকট থেকে কার্য/পণ্য/সেবা ক্রয়',
+        '6' => 'প্রকল্প শেষে অব্যয়িত অর্থ ফেরত না দেওয়া',
+        '7' => 'ভুল বেতন নির্ধারণীর মাধ্যমে অতিরিক্ত বেতন উত্তোলন',
+        '8' => 'প্রাপ্যতাবিহীন ভাতা উত্তোলন',
+        '9' => 'জাতীয় অন্যান্য সরকারী অর্থের ক্ষতি সংক্রান্ত আপত্তি।',
     ];
+
+    public static $memo_status = [
+        '1' => 'নিস্পন্ন',
+        '2' => 'অনিস্পন্ন',
+        '3' => 'আংশিক নিস্পন্ন',
+    ];
+
     protected $connection = 'OfficeDB';
     protected $fillable = [
         'onucched_no',
@@ -44,6 +59,7 @@ class AcMemo extends Model
         'cost_center_name_en',
         'cost_center_name_bn',
         'fiscal_year_id',
+        'audit_plan_id',
         'audit_year_start',
         'audit_year_end',
         'ac_query_potro_no',
@@ -74,6 +90,22 @@ class AcMemo extends Model
     public function team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
+    }
+
+    public function getMemoTypeAttribute($value){
+        return self::$memo_type[$value];
+    }
+
+    public function getMemoStatusAttribute($value){
+        return self::$memo_status[$value];
+    }
+
+    public function getMemoIrregularityTypeAttribute($value){
+        return self::$memo_irregularity_type[$value];
+    }
+
+    public function getMemoIrregularitySubTypeAttribute($value){
+        return self::$memo_irregularity_sub_type[$value];
     }
 
 }

@@ -38,9 +38,10 @@ class AcMemoService
             $audi_memo->parent_office_name_en = $schedule->plan_team->entity_name_en;
             $audi_memo->parent_office_name_bn = $schedule->Plan_team->entity_name_bn;
             $audi_memo->cost_center_id = $schedule->cost_center_id;
-            $audi_memo->cost_center_name_en = $schedule->cost_center_id;
+            $audi_memo->cost_center_name_en = $schedule->cost_center_name_bn;
             $audi_memo->cost_center_name_bn = $schedule->cost_center_name_bn;
             $audi_memo->fiscal_year_id = $schedule->fiscal_year_id;
+            $audi_memo->audit_plan_id = $schedule->audit_plan_id;
             $audi_memo->audit_year_start = $request->audit_year_start;
             $audi_memo->audit_year_end = $request->audit_year_end;
             $audi_memo->ac_query_potro_no = 1; //to do
@@ -71,6 +72,23 @@ class AcMemoService
 //            }
         } catch (\Exception $exception) {
             \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function auditMemoList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        try {
+            $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)->where('cost_center_id', $request->cost_center_id)->paginate(config('bee_config.per_page_pagination'));
+            return ['status' => 'success', 'data' => $memo_list];
+        } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
