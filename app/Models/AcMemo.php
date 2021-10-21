@@ -9,8 +9,24 @@ class AcMemo extends Model
 {
     use HasFactory;
 
+    public static $memo_type = [
+        '1' => '১. SFI',
+        '2' => '২. Non-SFI',
+        '3' => '৩. ড্রাফ্ট প্যারা',
+        '4' => '৪. পাণ্ডুলিপি',
+    ];
+    public static $memo_irregularity_type = [
+        '1' => '১. জালিয়াতী',
+        '2' => '২. আর্থিক ক্ষতি',
+        '3' => '৩. আর্থিক বিধির ব্যত্যয়',
+        '4' => '৪. নিরিক্ষা কালিন অসহযোগীতা',
+        '5' => '৫. রাজস্ব ক্ষতি',
+        '6' => '৬. অন্যান্য',
+    ];
+    public static $memo_irregularity_sub_type = [
+        '1' => 'ভ্যাট-আইটিসহ সরকারি প্রাপ্য আদায় না করা',
+    ];
     protected $connection = 'OfficeDB';
-
     protected $fillable = [
         'onucched_no',
         'memo_irregularity_type',
