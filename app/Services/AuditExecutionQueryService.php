@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\AuditVisitCalenderPlanMember;
+use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\XFiscalYear;
 use App\Models\AcQuery;
 use App\Models\Query;
 use App\Traits\ApiHeart;
@@ -21,12 +23,12 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $fiscal_year_id = $request->fiscal_year_id;
+            $fiscal_year_id = XFiscalYear::select('id')->where('start',date("Y"))->first();
             $cost_center_id = $request->cost_center_id;
 
-            $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->whereHas('office_order', function ($q) {
+            $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)->whereHas('office_order', function ($q) {
                 $q->where('approve_status', 'approved');
-            })->with('office_order:id,audit_plan_id')->where('team_member_designation_id', $cdesk->designation_id)->paginate(config('bee_config.per_page_pagination'));
+            })->with('office_order:id,audit_plan_id','cost_center_query:id,cost_center_type_id')->where('team_member_designation_id', $cdesk->designation_id)->where('cost_center_id','!=',0)->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
 
@@ -50,6 +52,7 @@ class AuditExecutionQueryService
             $queries = $request->queries;
 
             $query_info = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('team_member_designation_id', $cdesk->designation_id)->first();
+            $team_leader_info = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('id', $query_info->team_id)->first();
             $send_rpu = [];
             foreach ($queries as $key => $query) {
                 $ac_query = new AcQuery;
@@ -58,6 +61,8 @@ class AuditExecutionQueryService
                 $ac_query->audit_plan_id = $query_info->audit_plan_id;
                 $ac_query->office_order_id = $query_info->office_order->id;
                 $ac_query->team_id = $query_info->team_id;
+                $ac_query->team_leader_name_en = $team_leader_info->leader_name_en;
+                $ac_query->team_leader_name_bn = $team_leader_info->leader_name_bn;
                 $ac_query->cost_center_type_id = $request->cost_center_type_id;
                 $ac_query->ministry_id = $query_info->annual_plan->ministry_id;
                 $ac_query->controlling_office_id = $query_info->annual_plan->controlling_office_id;
@@ -90,7 +95,7 @@ class AuditExecutionQueryService
 
             if ($send_audit_query_to_rpu['status'] == 'success') {
                 \DB::commit();
-                return ['status' => 'success', 'data' => $send_audit_query_to_rpu];
+                return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
                 throw new \Exception(json_encode($send_audit_query_to_rpu));
             }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcMemo;
 use App\Services\AnnualPlanMovementRevisedService;
 use App\Services\AuditExecutionQueryService;
 use Illuminate\Support\Facades\Route;
@@ -151,6 +152,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('send-audit-query', [AuditExecutionQueryController::class, 'sendAuditQuery']);
         Route::post('received-audit-query', [AuditExecutionQueryController::class, 'receivedAuditQuery']);
         Route::post('audit-query-cost-center-type-wise', [AuditExecutionQueryController::class, 'auditQueryCostCenterTypeWise']);
+    });
+
+    Route::group(['prefix' => 'audit-conduct-memo'], function () {
+        Route::post('audit-memo-store', [AcMemoController::class, 'auditMemoStore']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

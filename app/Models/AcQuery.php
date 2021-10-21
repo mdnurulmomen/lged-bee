@@ -19,6 +19,8 @@ class AcQuery extends Model
         'audit_plan_id',
         'office_order_id',
         'team_id',
+        'team_leader_name_en',
+        'team_leader_name_bn',
         'cost_center_type_id',
         'ministry_id',
         'controlling_office_id',
