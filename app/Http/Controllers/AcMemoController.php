@@ -18,4 +18,16 @@ class AcMemoController extends Controller
 
         return response()->json($response);
     }
+
+    public function auditMemoList(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $query_schedule_list = $acMemoService->auditMemoList($request);
+        if (isSuccessResponse($query_schedule_list)) {
+            $response = responseFormat('success', $query_schedule_list['data']);
+        } else {
+            $response = responseFormat('error', $query_schedule_list['data']);
+        }
+
+        return response()->json($response);
+    }
 }

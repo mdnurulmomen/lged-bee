@@ -44,6 +44,7 @@ class AcMemo extends Model
         'cost_center_name_en',
         'cost_center_name_bn',
         'fiscal_year_id',
+        'audit_plan_id',
         'audit_year_start',
         'audit_year_end',
         'ac_query_potro_no',
