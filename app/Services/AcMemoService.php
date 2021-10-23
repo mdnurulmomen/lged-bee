@@ -51,7 +51,7 @@ class AcMemoService
             $audi_memo->audit_year_start = $request->audit_year_start;
             $audi_memo->audit_year_end = $request->audit_year_end;
             $audi_memo->ac_query_potro_no = 1; //todo
-            $audi_memo->audit_type = '1';
+            $audi_memo->audit_type = $schedule->activity->activity_type;
             $audi_memo->team_id = $schedule->team_id;
             $audi_memo->memo_title_bn = $request->memo_title_bn;
             $audi_memo->memo_description_bn = $request->memo_description_bn;
