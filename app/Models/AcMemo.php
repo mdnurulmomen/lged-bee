@@ -11,13 +11,22 @@ class AcMemo extends Model
 
     protected $connection = 'OfficeDB';
 
-    public static $memo_type = [
+    protected $appends = ['memo_type_name','memo_irregularity_type_name','memo_irregularity_sub_type_name','memo_status_name'];
+
+    public static $memo_types = [
         '1' => 'এসএফআই',
         '2' => 'নন-এসএফআই',
         '3' => 'ড্রাফ্ট প্যারা',
         '4' => 'পাণ্ডুলিপি',
     ];
-    public static $memo_irregularity_type = [
+
+    public static $memo_status_list = [
+        '1' => 'নিস্পন্ন',
+        '2' => 'অনিস্পন্ন',
+        '3' => 'আংশিক নিস্পন্ন',
+    ];
+
+    public static $memo_irregularity_types = [
         '1' => 'জালিয়াতী',
         '2' => 'সরকারের আর্থিক ক্ষতি',
         '3' => 'বিধি ও পদ্ধতিগত অনিয়ম',
@@ -25,7 +34,7 @@ class AcMemo extends Model
         '5' => 'বিশেষ ধরনের আপত্তি',
         '6' => 'অন্যান্য',
     ];
-    public static $memo_irregularity_sub_type = [
+    public static $memo_irregularity_sub_types = [
         '1' => 'ভ্যাট-আইটিসহ সরকারি প্রাপ্য আদায় না করা',
         '2' => 'কম আদায় করাা',
         '3' => 'আদায় করা সত্ত্বেও কোষাগারে জমা না করা',
@@ -37,11 +46,6 @@ class AcMemo extends Model
         '9' => 'জাতীয় অন্যান্য সরকারী অর্থের ক্ষতি সংক্রান্ত আপত্তি।',
     ];
 
-    public static $memo_status = [
-        '1' => 'নিস্পন্ন',
-        '2' => 'অনিস্পন্ন',
-        '3' => 'আংশিক নিস্পন্ন',
-    ];
 
     protected $fillable = [
         'onucched_no',
@@ -94,20 +98,20 @@ class AcMemo extends Model
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
     }
 
-    public function getMemoTypeAttribute($value){
-        return self::$memo_type[$value];
+    public function getMemoTypeNameAttribute(){
+        return self::$memo_types[$this->attributes['memo_type']];
     }
 
-    public function getMemoStatusAttribute($value){
-        return self::$memo_status[$value];
+    public function getMemoStatusNameAttribute(){
+        return self::$memo_status_list[$this->attributes['memo_status']];
     }
 
-    public function getMemoIrregularityTypeAttribute($value){
-        return self::$memo_irregularity_type[$value];
+    public function getMemoIrregularityTypeNameAttribute(){
+        return self::$memo_irregularity_types[$this->attributes['memo_irregularity_type']];
     }
 
-    public function getMemoIrregularitySubTypeAttribute($value){
-        return self::$memo_irregularity_sub_type[$value];
+    public function getMemoIrregularitySubTypeNameAttribute($value){
+        return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
     }
 
 }

@@ -174,31 +174,12 @@ class AcMemoService
         }
         \DB::beginTransaction();
         try {
-
-            $schedule = AuditVisitCalenderPlanMember::where('id',$request->schedule_id)->first();
-
             $audi_memo = AcMemo::find($request->memo_id);
             $audi_memo->onucched_no = '1';
             $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audi_memo->ministry_id = $schedule->plan_team->ministry_id;
-            $audi_memo->ministry_name_en = 'Ministry Name';
-            $audi_memo->controlling_office_id = $schedule->plan_team->controlling_office_id;
-            $audi_memo->controlling_office_name_en = $schedule->plan_team->controlling_office_name_en;
-            $audi_memo->controlling_office_name_bn = $schedule->plan_team->controlling_office_name_bn;
-            $audi_memo->parent_office_id = $schedule->plan_team->entity_id;
-            $audi_memo->parent_office_name_en = $schedule->plan_team->entity_name_en;
-            $audi_memo->parent_office_name_bn = $schedule->Plan_team->entity_name_bn;
-            $audi_memo->cost_center_id = $schedule->cost_center_id;
-            $audi_memo->cost_center_name_en = $schedule->cost_center_name_bn;
-            $audi_memo->cost_center_name_bn = $schedule->cost_center_name_bn;
-            $audi_memo->fiscal_year_id = $schedule->fiscal_year_id;
-            $audi_memo->audit_plan_id = $schedule->audit_plan_id;
             $audi_memo->audit_year_start = $request->audit_year_start;
             $audi_memo->audit_year_end = $request->audit_year_end;
-            $audi_memo->ac_query_potro_no = 1; //to do
-            $audi_memo->audit_type = '1';
-            $audi_memo->team_id = $schedule->team_id;
             $audi_memo->memo_title_bn = $request->memo_title_bn;
             $audi_memo->memo_description_bn = $request->memo_description_bn;
             $audi_memo->memo_type = $request->memo_type;
@@ -208,10 +189,7 @@ class AcMemoService
             $audi_memo->response_of_rpu = $request->response_of_rpu;
             $audi_memo->audit_conclusion = $request->audit_conclusion;
             $audi_memo->audit_recommendation = $request->audit_recommendation;
-            $audi_memo->created_by = $cdesk->officer_id;
-            $audi_memo->approve_status = 'draft';
-            $audi_memo->status = 'draft';
-            $audi_memo->comment = '';
+            $audi_memo->updated_by = $cdesk->officer_id;
             $audi_memo->save();
 
             //for attachments
@@ -223,11 +201,11 @@ class AcMemoService
                 Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
-                        'ac_memo_id' => $audi_memo->id,
+                        'ac_memo_id' => $request->memo_id,
                         'attachment_type' => 'porisishto',
                         'user_define_name'=> $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => 'storage/app/public/memo/'. $fileName,
+                        'attachment_path' => url('storage/memo/'. $fileName),
                         'sequence'=> 1,
                         'created_by'=> $cdesk->officer_id,
                         'modified_by'=> $cdesk->officer_id,
@@ -243,11 +221,11 @@ class AcMemoService
                 Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
-                        'ac_memo_id' => $audi_memo->id,
+                        'ac_memo_id' => $request->memo_id,
                         'attachment_type' => 'pramanok',
                         'user_define_name'=> $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => 'storage/app/public/memo/'. $fileName,
+                        'attachment_path' => url('storage/memo/'. $fileName),
                         'sequence'=> 1,
                         'created_by'=> $cdesk->officer_id,
                         'modified_by'=> $cdesk->officer_id,
@@ -258,13 +236,6 @@ class AcMemoService
             AcMemoAttachment::insert($finalAttachments);
 
             return ['status' => 'success', 'data' => 'Memo Saved Successfully'];
-
-//            if ($send_audit_query_to_rpu['status'] == 'success') {
-//                \DB::commit();
-//                return ['status' => 'success', 'data' => 'Send Successfully'];
-//            } else {
-//                throw new \Exception(json_encode($send_audit_query_to_rpu));
-//            }
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
