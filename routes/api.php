@@ -158,6 +158,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-store', [AcMemoController::class, 'auditMemoStore']);
         Route::post('audit-memo-list', [AcMemoController::class, 'auditMemoList']);
         Route::post('send-audit-memo-to-rpu', [AcMemoController::class, 'sendMemoToRpu']);
+        Route::post('audit-memo-edit', [AcMemoController::class, 'auditMemoEdit']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

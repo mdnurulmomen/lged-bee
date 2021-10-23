@@ -9,6 +9,8 @@ class AcMemo extends Model
 {
     use HasFactory;
 
+    protected $connection = 'OfficeDB';
+
     public static $memo_type = [
         '1' => 'এসএফআই',
         '2' => 'নন-এসএফআই',
@@ -41,7 +43,6 @@ class AcMemo extends Model
         '3' => 'আংশিক নিস্পন্ন',
     ];
 
-    protected $connection = 'OfficeDB';
     protected $fillable = [
         'onucched_no',
         'memo_irregularity_type',
@@ -80,6 +81,7 @@ class AcMemo extends Model
         'approve_status',
         'status',
         'comment',
+        'has_sent_to_rpu',
     ];
 
     public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany

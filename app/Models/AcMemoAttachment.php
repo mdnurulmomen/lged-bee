@@ -9,15 +9,18 @@ class AcMemoAttachment extends Model
 {
     use SoftDeletes;
 
+    protected $connection = 'OfficeDB';
+
     protected $fillable = [
         'ac_memo_id',
         'attachment_type',
         'user_define_name',
         'attachment_name',
         'attachment_path',
-        'deleted_by',
-        'deleted_at',
         'sequence',
+        'created_by',
+        'modified_by',
+        'deleted_by',
     ];
 
     protected $attachmentTypes = [
