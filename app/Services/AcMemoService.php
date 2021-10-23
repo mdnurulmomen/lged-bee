@@ -5,11 +5,12 @@ namespace App\Services;
 use App\Models\AcMemo;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\GenericData;
+use App\Traits\ApiHeart;
 use Illuminate\Http\Request;
 
 class AcMemoService
 {
-    use GenericData;
+    use GenericData, ApiHeart;
 
     public function auditMemoStore(Request $request): array
     {
@@ -84,10 +85,41 @@ class AcMemoService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-
         try {
             $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)->where('cost_center_id', $request->cost_center_id)->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $memo_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function sendMemoToRpu(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $memo = AcMemo::whereIn('id',$request->memos)->get();
+
+            $data['memos'] = $memo;
+            $data['memo_send_date'] = date('Y-m-d');
+            $data['sender_officer_id'] = $cdesk->officer_id;
+            $data['sender_officer_name_bn'] = $cdesk->officer_bn;
+            $data['sender_officer_name_en'] = $cdesk->officer_en;
+
+//            return ['status' => 'success', 'data' => $data];
+
+            $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
+
+            if ($send_audit_memo_to_rpu['status'] == 'success') {
+                return ['status' => 'success', 'data' => 'Send Successfully'];
+            } else {
+                throw new \Exception(json_encode($send_audit_memo_to_rpu));
+            }
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

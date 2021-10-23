@@ -80,9 +80,9 @@ class XAuditQueryController extends Controller
      */
     public function update(UpdateRequest $request)
     {
-        $fiscal_year = Query::find($request->fiscal_year_id);
+        $query_id = Query::find($request->id);
         try {
-            $fiscal_year->update($request->validated());
+            $query_id->update($request->validated());
             $response = responseFormat('success', 'Successfully Updated');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

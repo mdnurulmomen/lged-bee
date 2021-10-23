@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\XFiscalYear;
+namespace App\Http\Requests\Query;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,32 +25,20 @@ class UpdateRequest extends FormRequest
     {
         return [
             'id' => 'integer|required',
-            'duration_id' => 'integer|required',
-            'start' => 'integer|required',
-            'end' => 'integer|required',
-            'description' => 'string|nullable',
+            'cost_center_type_id' => 'integer|required',
+            'query_title_bn' => 'required|string',
+            'query_title_en' => 'required|string',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'id.required' => 'Fiscal Year ID Required',
-            'id.integer' => 'Fiscal Year ID Should Be Integer',
-            'duration_id.integer' => 'Duration Span Should Be Year',
-            'start.required' => 'Start Year Required',
-            'start.integer' => 'Start Year Should Be Year',
-            'end.required' => 'End Year Required',
-            'end.integer' => 'End Year Should Be Year',
+            'id.required' => 'Query ID Required',
+            'id.integer' => 'Query ID Should Be Integer',
+            'cost_center_type_id.integer' => 'Duration Span Should Be Year',
+            'query_title_bn.required' => 'Query Titel Bn Required',
+            'query_title_en.required' => 'Query Titel En Be Year',
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'start' => $this->start_year,
-            'end' => $this->end_year,
-            'id' => $this->fiscal_year_id,
-        ]);
     }
 }
