@@ -263,6 +263,7 @@ class AcMemoService
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
             if ($send_audit_memo_to_rpu['status'] == 'success') {
+                AcMemo::whereIn('id', $request->memos)->update(['has_sent_to_rpu'=>1]);
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
                 throw new \Exception(json_encode($send_audit_memo_to_rpu));
