@@ -26,14 +26,15 @@ class AcMemoService
         try {
 
             $plan_member_schedule = AuditVisitCalenderPlanMember::where('id', $request->team_member_schedule_id)->first();
+            $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no') ? AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no') + 1 : 1;
 
             $audi_memo = new AcMemo();
-            $audi_memo->onucched_no = '1';
+            $audi_memo->onucched_no = $onucched;
             $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audi_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
-            $audi_memo->ministry_name_en = 'Ministry Name';
-            $audi_memo->ministry_name_bn = 'Ministry Name Bn';
+            $audi_memo->ministry_name_en = $plan_member_schedule->annual_plan->ministry_name_en;
+            $audi_memo->ministry_name_bn = $plan_member_schedule->annual_plan->ministry_name_en;
             $audi_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
             $audi_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
             $audi_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
