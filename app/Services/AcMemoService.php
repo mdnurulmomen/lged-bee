@@ -273,4 +273,44 @@ class AcMemoService
         }
 
     }
+
+    public function authorityMemoList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+//            $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)
+//                ->where('cost_center_id', $request->cost_center_id)
+//                ->paginate(config('bee_config.per_page_pagination'));
+
+            $fiscal_year_id = $request->fiscal_year_id;
+            $cost_center_id = $request->cost_center_id;
+            $team_id = $request->team_id;
+
+            $query = AcMemo::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($cost_center_id, function ($q, $cost_center_id) {
+                return $q->where('cost_center_id', $cost_center_id);
+            });
+
+            $query->when($team_id, function ($q, $team_id) {
+                return $q->where('team_id', $team_id);
+            });
+
+            $memo_list = $query->paginate(config('bee_config.per_page_pagination'));
+
+            return ['status' => 'success', 'data' => $memo_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
 }
