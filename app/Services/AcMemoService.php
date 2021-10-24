@@ -7,19 +7,16 @@ use App\Models\AcMemoAttachment;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class AcMemoService
 {
-    use GenericData,ApiHeart;
+    use GenericData, ApiHeart;
 
     public function auditMemoStore(Request $request): array
     {
-        //return ['status' => 'error', 'data' => $request->all()];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -28,31 +25,31 @@ class AcMemoService
         \DB::beginTransaction();
         try {
 
-            $schedule = AuditVisitCalenderPlanMember::where('id',$request->schedule_id)->first();
+            $plan_member_schedule = AuditVisitCalenderPlanMember::where('id', $request->team_member_schedule_id)->first();
 
-            $audi_memo = New AcMemo();
+            $audi_memo = new AcMemo();
             $audi_memo->onucched_no = '1';
             $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audi_memo->ministry_id = $schedule->plan_team->ministry_id;
-            $audi_memo->ministry_name_en = 'Ministry Name';
-            $audi_memo->ministry_name_bn = 'Ministry Name Bn';
-            $audi_memo->controlling_office_id = $schedule->plan_team->controlling_office_id;
-            $audi_memo->controlling_office_name_en = $schedule->plan_team->controlling_office_name_en;
-            $audi_memo->controlling_office_name_bn = $schedule->plan_team->controlling_office_name_bn;
-            $audi_memo->parent_office_id = $schedule->plan_team->entity_id;
-            $audi_memo->parent_office_name_en = $schedule->plan_team->entity_name_en;
-            $audi_memo->parent_office_name_bn = $schedule->Plan_team->entity_name_bn;
-            $audi_memo->cost_center_id = $schedule->cost_center_id;
-            $audi_memo->cost_center_name_en = $schedule->cost_center_name_bn;
-            $audi_memo->cost_center_name_bn = $schedule->cost_center_name_bn;
-            $audi_memo->fiscal_year_id = $schedule->fiscal_year_id;
-            $audi_memo->audit_plan_id = $schedule->audit_plan_id;
+            $audi_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
+            $audi_memo->ministry_name_en = 'Ministry Name'; // TODO
+            $audi_memo->ministry_name_bn = 'Ministry Name Bn'; // TODO
+            $audi_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
+            $audi_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
+            $audi_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
+            $audi_memo->parent_office_id = $plan_member_schedule->plan_team->entity_id;
+            $audi_memo->parent_office_name_en = $plan_member_schedule->plan_team->entity_name_en;
+            $audi_memo->parent_office_name_bn = $plan_member_schedule->Plan_team->entity_name_bn;
+            $audi_memo->cost_center_id = $plan_member_schedule->cost_center_id;
+            $audi_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
+            $audi_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
+            $audi_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
+            $audi_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
             $audi_memo->audit_year_start = $request->audit_year_start;
             $audi_memo->audit_year_end = $request->audit_year_end;
-            $audi_memo->ac_query_potro_no = 1; //todo
-            $audi_memo->audit_type = $schedule->activity->activity_type;
-            $audi_memo->team_id = $schedule->team_id;
+            $audi_memo->ac_query_potro_no = (int)AcMemo::max('ac_query_potro_no') + 1;
+            $audi_memo->audit_type = $plan_member_schedule->activity->activity_type;
+            $audi_memo->team_id = $plan_member_schedule->team_id;
             $audi_memo->memo_title_bn = $request->memo_title_bn;
             $audi_memo->memo_description_bn = $request->memo_description_bn;
             $audi_memo->memo_type = $request->memo_type;
@@ -79,13 +76,13 @@ class AcMemoService
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $audi_memo->id,
                         'attachment_type' => 'porisishto',
-                        'user_define_name'=> $fileName,
+                        'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/'. $fileName),
-                        'sequence'=> 1,
-                        'created_by'=> $cdesk->officer_id,
-                        'modified_by'=> $cdesk->officer_id,
-                        'deleted_by'=> $cdesk->officer_id,
+                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'sequence' => 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
+                        'deleted_by' => $cdesk->officer_id,
                     )
                 );
             }
@@ -99,13 +96,13 @@ class AcMemoService
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $audi_memo->id,
                         'attachment_type' => 'pramanok',
-                        'user_define_name'=> $fileName,
+                        'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/'. $fileName),
-                        'sequence'=> 1,
-                        'created_by'=> $cdesk->officer_id,
-                        'modified_by'=> $cdesk->officer_id,
-                        'deleted_by'=> $cdesk->officer_id,
+                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'sequence' => 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
+                        'deleted_by' => $cdesk->officer_id,
                     )
                 );
             }
@@ -203,13 +200,13 @@ class AcMemoService
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $request->memo_id,
                         'attachment_type' => 'porisishto',
-                        'user_define_name'=> $fileName,
+                        'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/'. $fileName),
-                        'sequence'=> 1,
-                        'created_by'=> $cdesk->officer_id,
-                        'modified_by'=> $cdesk->officer_id,
-                        'deleted_by'=> $cdesk->officer_id,
+                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'sequence' => 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
+                        'deleted_by' => $cdesk->officer_id,
                     )
                 );
             }
@@ -223,13 +220,13 @@ class AcMemoService
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $request->memo_id,
                         'attachment_type' => 'pramanok',
-                        'user_define_name'=> $fileName,
+                        'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/'. $fileName),
-                        'sequence'=> 1,
-                        'created_by'=> $cdesk->officer_id,
-                        'modified_by'=> $cdesk->officer_id,
-                        'deleted_by'=> $cdesk->officer_id,
+                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'sequence' => 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
+                        'deleted_by' => $cdesk->officer_id,
                     )
                 );
             }
@@ -252,7 +249,7 @@ class AcMemoService
         }
         try {
 
-            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')->whereIn('id',$request->memos)->get();
+            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')->whereIn('id', $request->memos)->get();
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
