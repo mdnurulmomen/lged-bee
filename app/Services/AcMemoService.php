@@ -26,7 +26,8 @@ class AcMemoService
         try {
 
             $plan_member_schedule = AuditVisitCalenderPlanMember::where('id', $request->team_member_schedule_id)->first();
-            $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no') ? AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no') + 1 : 1;
+            $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no');
+            $onucched = $onucched ? (int)$onucched + 1 : 1;
 
             $audi_memo = new AcMemo();
             $audi_memo->onucched_no = $onucched;
