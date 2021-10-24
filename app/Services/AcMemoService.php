@@ -25,48 +25,48 @@ class AcMemoService
         \DB::beginTransaction();
         try {
 
-            $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team','annual_plan','activity','office_order'])->where('id', $request->team_member_schedule_id)->first();
+            $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity', 'office_order'])->where('id', $request->team_member_schedule_id)->first();
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no');
             $onucched = $onucched ? (int)$onucched + 1 : 1;
 
-            $audi_memo = new AcMemo();
-            $audi_memo->onucched_no = $onucched;
-            $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
-            $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audi_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
-            $audi_memo->ministry_name_en = $plan_member_schedule->annual_plan->ministry_name_en;
-            $audi_memo->ministry_name_bn = $plan_member_schedule->annual_plan->ministry_name_en;
-            $audi_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
-            $audi_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
-            $audi_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
-            $audi_memo->parent_office_id = $plan_member_schedule->plan_team->entity_id;
-            $audi_memo->parent_office_name_en = $plan_member_schedule->plan_team->entity_name_en;
-            $audi_memo->parent_office_name_bn = $plan_member_schedule->plan_team->entity_name_bn;
-            $audi_memo->cost_center_id = $plan_member_schedule->cost_center_id;
-            $audi_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
-            $audi_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
-            $audi_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
-            $audi_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
-            $audi_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
-            $audi_memo->audit_year_start = $request->audit_year_start;
-            $audi_memo->audit_year_end = $request->audit_year_end;
-            $audi_memo->ac_query_potro_no = 1; //todo
-            $audi_memo->audit_type = $plan_member_schedule->activity->activity_type;
-            $audi_memo->team_id = $plan_member_schedule->team_id;
-            $audi_memo->memo_title_bn = $request->memo_title_bn;
-            $audi_memo->memo_description_bn = $request->memo_description_bn;
-            $audi_memo->memo_type = $request->memo_type;
-            $audi_memo->memo_status = $request->memo_status;
-            $audi_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
-            $audi_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
-            $audi_memo->response_of_rpu = $request->response_of_rpu;
-            $audi_memo->audit_conclusion = $request->audit_conclusion;
-            $audi_memo->audit_recommendation = $request->audit_recommendation;
-            $audi_memo->created_by = $cdesk->officer_id;
-            $audi_memo->approve_status = 'draft';
-            $audi_memo->status = 'draft';
-            $audi_memo->comment = '';
-            $audi_memo->save();
+            $audit_memo = new AcMemo();
+            $audit_memo->onucched_no = $onucched;
+            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
+            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
+            $audit_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
+            $audit_memo->ministry_name_en = $plan_member_schedule->annual_plan->ministry_name_en;
+            $audit_memo->ministry_name_bn = $plan_member_schedule->annual_plan->ministry_name_en;
+            $audit_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
+            $audit_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
+            $audit_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
+            $audit_memo->parent_office_id = $plan_member_schedule->plan_team->entity_id;
+            $audit_memo->parent_office_name_en = $plan_member_schedule->plan_team->entity_name_en;
+            $audit_memo->parent_office_name_bn = $plan_member_schedule->plan_team->entity_name_bn;
+            $audit_memo->cost_center_id = $plan_member_schedule->cost_center_id;
+            $audit_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
+            $audit_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
+            $audit_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
+            $audit_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
+            $audit_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
+            $audit_memo->audit_year_start = $request->audit_year_start;
+            $audit_memo->audit_year_end = $request->audit_year_end;
+            $audit_memo->ac_query_potro_no = 1; //todo
+            $audit_memo->audit_type = $plan_member_schedule->activity->activity_type;
+            $audit_memo->team_id = $plan_member_schedule->team_id;
+            $audit_memo->memo_title_bn = $request->memo_title_bn;
+            $audit_memo->memo_description_bn = $request->memo_description_bn;
+            $audit_memo->memo_type = $request->memo_type;
+            $audit_memo->memo_status = $request->memo_status;
+            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $audit_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
+            $audit_memo->response_of_rpu = $request->response_of_rpu;
+            $audit_memo->audit_conclusion = $request->audit_conclusion;
+            $audit_memo->audit_recommendation = $request->audit_recommendation;
+            $audit_memo->created_by = $cdesk->officer_id;
+            $audit_memo->approve_status = 'draft';
+            $audit_memo->status = 'draft';
+            $audit_memo->comment = '';
+            $audit_memo->save();
 
             //for attachments
             $finalAttachments = [];
@@ -77,7 +77,7 @@ class AcMemoService
                 Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
-                        'ac_memo_id' => $audi_memo->id,
+                        'ac_memo_id' => $audit_memo->id,
                         'attachment_type' => 'porisishto',
                         'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
@@ -97,7 +97,7 @@ class AcMemoService
                 Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
-                        'ac_memo_id' => $audi_memo->id,
+                        'ac_memo_id' => $audit_memo->id,
                         'attachment_type' => 'pramanok',
                         'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
@@ -174,23 +174,23 @@ class AcMemoService
         }
         \DB::beginTransaction();
         try {
-            $audi_memo = AcMemo::find($request->memo_id);
-            $audi_memo->onucched_no = '1';
-            $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
-            $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audi_memo->audit_year_start = $request->audit_year_start;
-            $audi_memo->audit_year_end = $request->audit_year_end;
-            $audi_memo->memo_title_bn = $request->memo_title_bn;
-            $audi_memo->memo_description_bn = $request->memo_description_bn;
-            $audi_memo->memo_type = $request->memo_type;
-            $audi_memo->memo_status = $request->memo_status;
-            $audi_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
-            $audi_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
-            $audi_memo->response_of_rpu = $request->response_of_rpu;
-            $audi_memo->audit_conclusion = $request->audit_conclusion;
-            $audi_memo->audit_recommendation = $request->audit_recommendation;
-            $audi_memo->updated_by = $cdesk->officer_id;
-            $audi_memo->save();
+            $audit_memo = AcMemo::find($request->memo_id);
+            $audit_memo->onucched_no = '1';
+            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
+            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
+            $audit_memo->audit_year_start = $request->audit_year_start;
+            $audit_memo->audit_year_end = $request->audit_year_end;
+            $audit_memo->memo_title_bn = $request->memo_title_bn;
+            $audit_memo->memo_description_bn = $request->memo_description_bn;
+            $audit_memo->memo_type = $request->memo_type;
+            $audit_memo->memo_status = $request->memo_status;
+            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $audit_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
+            $audit_memo->response_of_rpu = $request->response_of_rpu;
+            $audit_memo->audit_conclusion = $request->audit_conclusion;
+            $audit_memo->audit_recommendation = $request->audit_recommendation;
+            $audit_memo->updated_by = $cdesk->officer_id;
+            $audit_memo->save();
 
             //for attachments
             $finalAttachments = [];
