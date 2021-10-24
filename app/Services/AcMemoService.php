@@ -32,8 +32,8 @@ class AcMemoService
             $audi_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audi_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audi_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
-            $audi_memo->ministry_name_en = 'Ministry Name'; // TODO
-            $audi_memo->ministry_name_bn = 'Ministry Name Bn'; // TODO
+            $audi_memo->ministry_name_en = 'Ministry Name';
+            $audi_memo->ministry_name_bn = 'Ministry Name Bn';
             $audi_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
             $audi_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
             $audi_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
@@ -47,7 +47,7 @@ class AcMemoService
             $audi_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
             $audi_memo->audit_year_start = $request->audit_year_start;
             $audi_memo->audit_year_end = $request->audit_year_end;
-            $audi_memo->ac_query_potro_no = (int)AcMemo::max('ac_query_potro_no') + 1;
+            $audi_memo->ac_query_potro_no = 1; //todo
             $audi_memo->audit_type = $plan_member_schedule->activity->activity_type;
             $audi_memo->team_id = $plan_member_schedule->team_id;
             $audi_memo->memo_title_bn = $request->memo_title_bn;
