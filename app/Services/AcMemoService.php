@@ -41,7 +41,7 @@ class AcMemoService
             $audi_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
             $audi_memo->parent_office_id = $plan_member_schedule->plan_team->entity_id;
             $audi_memo->parent_office_name_en = $plan_member_schedule->plan_team->entity_name_en;
-            $audi_memo->parent_office_name_bn = $plan_member_schedule->Plan_team->entity_name_bn;
+            $audi_memo->parent_office_name_bn = $plan_member_schedule->plan_team->entity_name_bn;
             $audi_memo->cost_center_id = $plan_member_schedule->cost_center_id;
             $audi_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
             $audi_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
