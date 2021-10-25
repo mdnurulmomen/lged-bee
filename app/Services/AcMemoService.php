@@ -289,6 +289,13 @@ class AcMemoService
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
             $team_id = $request->team_id;
+            $memo_irregularity_type= $request->memo_irregularity_type;
+            $memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
+            $memo_type = $request->memo_type;
+            $memo_status = $request->memo_status;
+            $jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $audit_year_start = $request->audit_year_start;
+            $audit_year_end = $request->audit_year_end;
 
             $query = AcMemo::query();
 
@@ -302,6 +309,34 @@ class AcMemoService
 
             $query->when($team_id, function ($q, $team_id) {
                 return $q->where('team_id', $team_id);
+            });
+
+            $query->when($memo_irregularity_type, function ($q, $memo_irregularity_type) {
+                return $q->where('memo_irregularity_type', $memo_irregularity_type);
+            });
+
+            $query->when($memo_irregularity_sub_type, function ($q, $memo_irregularity_sub_type) {
+                return $q->where('memo_irregularity_sub_type', $memo_irregularity_sub_type);
+            });
+
+            $query->when($memo_type, function ($q, $memo_type) {
+                return $q->where('memo_type', $memo_type);
+            });
+
+            $query->when($memo_status, function ($q, $memo_status) {
+                return $q->where('memo_status', $memo_status);
+            });
+
+            $query->when($jorito_ortho_poriman, function ($q, $jorito_ortho_poriman) {
+                return $q->where('jorito_ortho_poriman', $jorito_ortho_poriman);
+            });
+
+            $query->when($audit_year_start, function ($q, $audit_year_start) {
+                return $q->where('audit_year_start', $audit_year_start);
+            });
+
+            $query->when($audit_year_end, function ($q, $audit_year_end) {
+                return $q->where('audit_year_end', $audit_year_end);
             });
 
             $memo_list = $query->paginate(config('bee_config.per_page_pagination'));
