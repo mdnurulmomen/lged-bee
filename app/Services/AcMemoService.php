@@ -175,7 +175,6 @@ class AcMemoService
         \DB::beginTransaction();
         try {
             $audit_memo = AcMemo::find($request->memo_id);
-            $audit_memo->onucched_no = '1';
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audit_memo->audit_year_start = $request->audit_year_start;
@@ -191,6 +190,8 @@ class AcMemoService
             $audit_memo->audit_recommendation = $request->audit_recommendation;
             $audit_memo->updated_by = $cdesk->officer_id;
             $audit_memo->save();
+
+//            return ['status' => 'success', 'data' => $audit_memo];
 
             //for attachments
             $finalAttachments = [];
@@ -235,7 +236,15 @@ class AcMemoService
             }
             AcMemoAttachment::insert($finalAttachments);
 
-            return ['status' => 'success', 'data' => 'Memo Saved Successfully'];
+            $memo_info = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')->where('id', $request->memo_id)->first();
+            $data['memo_info'] = $memo_info;
+            $update_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_memo_to_rpu'), $data)->json();
+            if ($update_audit_memo_to_rpu['status'] == 'success') {
+                return ['status' => 'success', 'data' => 'Memo Update Successfully'];
+            } else {
+                throw new \Exception(json_encode($update_audit_memo_to_rpu));
+            }
+
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
