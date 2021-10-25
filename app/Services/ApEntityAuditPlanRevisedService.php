@@ -305,7 +305,7 @@ class ApEntityAuditPlanRevisedService
 
     public function storeTeamSchedule(Request $request): array
     {
-        //return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
+//        return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
 
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
@@ -316,6 +316,9 @@ class ApEntityAuditPlanRevisedService
             foreach ($team_schedules as $designation_id => $schedule_data) {
                 foreach ($schedule_data as $schedule_datum) {
                     $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->where('leader_designation_id', $designation_id)->first();
+                    if (!$team_data) {
+                        throw new \Exception('Team is not formed');
+                    }
                     $team_data->team_schedules = json_encode_unicode($schedule_data);
                     $team_data->save();
                     $team_member = json_decode($team_data->team_members, true);
@@ -347,16 +350,11 @@ class ApEntityAuditPlanRevisedService
                                 'team_member_role_bn' => $member['team_member_role_bn'],
                                 'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                 'team_member_end_date' => $schedule_datum['team_member_end_date'],
-                                'comment' => isset($member['comment'])?$member['comment']:'',
-                                'mobile_no' => isset($member['officer_mobile'])?$member['officer_mobile']: '',
+                                'comment' => $member['comment'] ?? '',
+                                'mobile_no' => $member['officer_mobile'] ?? '',
                                 'activity_location' => $schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
-
-                                //'team_member_activity' => array_key_exists('team_member_activity', $schedule_datum) ? $schedule_datum['team_member_activity'] : '',
-                                //'team_member_activity_description' => array_key_exists('team_member_activity_description', $schedule_datum) ? $schedule_datum['team_member_activity_description'] : '',
-                                //'activity_location' => array_key_exists('activity_location', $schedule_datum) ? $schedule_datum['activity_location'] : '',
-
                                 'status' => 'pending',
                                 'approve_status' => 'approved',
                             ];
@@ -392,6 +390,9 @@ class ApEntityAuditPlanRevisedService
             foreach ($team_schedules as $designation_id => $schedule_data) {
                 foreach ($schedule_data as $schedule_datum) {
                     $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->where('leader_designation_id', $designation_id)->first();
+                    if (!$team_data) {
+                        throw new \Exception('Team is not formed');
+                    }
                     $team_data->team_schedules = json_encode_unicode($schedule_data);
                     $team_data->save();
                     $team_member = json_decode($team_data->team_members, true);
@@ -423,8 +424,8 @@ class ApEntityAuditPlanRevisedService
                                 'team_member_role_bn' => $member['team_member_role_bn'],
                                 'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                 'team_member_end_date' => $schedule_datum['team_member_end_date'],
-                                'comment' => isset($member['comment'])?$member['comment']:'',
-                                'mobile_no' => isset($member['officer_mobile'])?$member['officer_mobile']: '',
+                                'comment' => $member['comment'] ?? '',
+                                'mobile_no' => $member['officer_mobile'] ?? '',
                                 'activity_location' => $schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
