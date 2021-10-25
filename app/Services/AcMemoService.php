@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AcMemo;
 use App\Models\AcMemoAttachment;
+use App\Models\AcMemoRecommendation;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
@@ -291,10 +292,6 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-//            $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)
-//                ->where('cost_center_id', $request->cost_center_id)
-//                ->paginate(config('bee_config.per_page_pagination'));
-
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
             $team_id = $request->team_id;
@@ -351,6 +348,49 @@ class AcMemoService
             $memo_list = $query->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $memo_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function auditMemoRecommendationStore(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        \DB::beginTransaction();
+        try {
+            $audit_memo_recommendaton = new AcMemoRecommendation();
+            $audit_memo_recommendaton->memo_id = $request->memo_id;
+            $audit_memo_recommendaton->audit_recommendation = $request->audit_recommendation;
+            $audit_memo_recommendaton->created_by = $cdesk->officer_id;
+            $audit_memo_recommendaton->created_by_name_en = $cdesk->officer_en;
+            $audit_memo_recommendaton->created_by_name_bn = $cdesk->officer_bn;
+            $audit_memo_recommendaton->save();
+
+            return ['status' => 'success', 'data' => 'Memo Recommendation Successfully'];
+
+        } catch (\Exception $exception) {
+            \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function auditMemoRecommendationList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $audit_memo_recommendaton_list = AcMemoRecommendation::all();
+            return ['status' => 'success', 'data' => $audit_memo_recommendaton_list];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
