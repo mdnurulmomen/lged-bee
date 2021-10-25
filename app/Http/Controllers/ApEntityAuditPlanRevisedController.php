@@ -4,19 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\ApEntityAuditPlan;
 use App\Services\ApEntityAuditPlanRevisedService;
+use App\Services\ApEntityTeamService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ApEntityAuditPlanRevisedController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @param ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function index(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -35,13 +28,6 @@ class ApEntityAuditPlanRevisedController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function createNewAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -61,13 +47,6 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function editAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -91,38 +70,6 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json([]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function show(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
-    {
-        Validator::make($request->all(), [
-            'party_id' => 'required|integer',
-            'yearly_plan_rp_id' => 'required|integer',
-            'cdesk' => 'required|json',
-            'lang' => 'string',
-        ])->validate();
-
-        $show_plan = $apEntityAuditPlanRevisedService->showEntityAuditPlan($request);
-
-        if (isSuccessResponse($show_plan)) {
-            $response = responseFormat('success', $show_plan['data']);
-        } else {
-            $response = responseFormat('error', $show_plan['data']);
-        }
-        return response()->json($response);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function update(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -152,7 +99,6 @@ class ApEntityAuditPlanRevisedController extends Controller
             'fiscal_year_id' => 'required|integer',
             'audit_plan_id' => 'required|integer',
         ])->validate();
-//        dd($request->all());
         $team_list = $apEntityAuditPlanRevisedService->getAuditPlanWiseTeam($request);
 
         if (isSuccessResponse($team_list)) {
@@ -169,9 +115,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'team_id' => 'required|integer',
             'cdesk' => 'required|json',
         ])->validate();
-//        dd($request->all());
         $team_info = $apEntityAuditPlanRevisedService->getTeamInfo($request);
-
         if (isSuccessResponse($team_info)) {
             $response = responseFormat('success', $team_info['data']);
         } else {
@@ -191,7 +135,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json('');
     }
 
-    public function storeAuditTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    public function storeAuditTeam(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
@@ -201,7 +145,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'teams' => 'required',
         ])->validate();
 
-        $add_audit_team = $apEntityAuditPlanRevisedService->storeAuditTeam($request);
+        $add_audit_team = $apEntityTeamService->storeAuditTeam($request);
 
         if (isSuccessResponse($add_audit_team)) {
             $response = responseFormat('success', 'Successfully Saved Team');
@@ -211,7 +155,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function updateAuditTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    public function updateAuditTeam(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
@@ -221,7 +165,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'teams' => 'required',
         ])->validate();
 
-        $add_audit_team = $apEntityAuditPlanRevisedService->updateAuditTeam($request);
+        $add_audit_team = $apEntityTeamService->updateAuditTeam($request);
 
         if (isSuccessResponse($add_audit_team)) {
             $response = responseFormat('success', 'Successfully Saved Team');
@@ -231,7 +175,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function storeTeamSchedule(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    public function storeTeamSchedule(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
 
         Validator::make($request->all(), [
@@ -239,7 +183,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'team_schedules' => 'required|json',
         ])->validate();
 
-        $add_audit_team = $apEntityAuditPlanRevisedService->storeTeamSchedule($request);
+        $add_audit_team = $apEntityTeamService->storeTeamSchedule($request);
 
         if (isSuccessResponse($add_audit_team)) {
             $response = responseFormat('success', 'Successfully Saved Schedule');
@@ -249,7 +193,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function updateTeamSchedule(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    public function updateTeamSchedule(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
 
         Validator::make($request->all(), [
@@ -257,7 +201,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'team_schedules' => 'required|json',
         ])->validate();
 
-        $add_audit_team = $apEntityAuditPlanRevisedService->updateTeamSchedule($request);
+        $add_audit_team = $apEntityTeamService->updateTeamSchedule($request);
 
         if (isSuccessResponse($add_audit_team)) {
             $response = responseFormat('success', 'Successfully Saved Schedule');
