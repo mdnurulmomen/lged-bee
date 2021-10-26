@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AcMemo;
 use App\Models\AcMemoAttachment;
+use App\Models\AcMemoLog;
 use App\Models\AcMemoRecommendation;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\ApiHeart;
@@ -190,9 +191,24 @@ class AcMemoService
             $audit_memo->audit_conclusion = $request->audit_conclusion;
             $audit_memo->audit_recommendation = $request->audit_recommendation;
             $audit_memo->updated_by = $cdesk->officer_id;
-            $audit_memo->save();
 
-//            return ['status' => 'success', 'data' => $audit_memo];
+            $changes = array();
+            foreach ($audit_memo->getDirty() as $key => $value) {
+                $original = $audit_memo->getOriginal($key);
+                $changes[$key] = [
+                    'old' => $original,
+                    'new' => $value,
+                ];
+            }
+
+            $memo_log = new AcMemoLog();
+            $memo_log->memo_content_change = json_encode($changes);
+            $memo_log->memo_id = $request->memo_id;
+            $memo_log->created_by_id = $cdesk->officer_id;
+            $memo_log->created_by_name_bn = $cdesk->officer_bn;
+            $memo_log->save();
+
+            $audit_memo->save();
 
             //for attachments
             $finalAttachments = [];
@@ -372,6 +388,8 @@ class AcMemoService
             $audit_memo_recommendaton->created_by_name_bn = $cdesk->officer_bn;
             $audit_memo_recommendaton->save();
 
+            AcMemo::where('id',$request->memo_id)->update(['audit_recommendation' => $request->audit_recommendation]);
+
             return ['status' => 'success', 'data' => 'Memo Recommendation Successfully'];
 
         } catch (\Exception $exception) {
@@ -391,6 +409,23 @@ class AcMemoService
         try {
             $audit_memo_recommendaton_list = AcMemoRecommendation::all();
             return ['status' => 'success', 'data' => $audit_memo_recommendaton_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function auditMemoLogList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $audit_memo_log_list = AcMemoLog::where('memo_id',$request->memo_id)->paginate(config('bee_config.per_page_pagination'));
+            return ['status' => 'success', 'data' => $audit_memo_log_list];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

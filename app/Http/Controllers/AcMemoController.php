@@ -102,4 +102,15 @@ class AcMemoController extends Controller
 
         return response()->json($response);
     }
+
+    public function auditMemoLogList(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $auditMemoLogList = $acMemoService->auditMemoLogList($request);
+        if (isSuccessResponse($auditMemoLogList)) {
+            $response = responseFormat('success', $auditMemoLogList['data']);
+        } else {
+            $response = responseFormat('error', $auditMemoLogList['data']);
+        }
+        return response()->json($response);
+    }
 }
