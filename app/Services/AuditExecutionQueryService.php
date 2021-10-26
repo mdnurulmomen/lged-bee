@@ -84,6 +84,7 @@ class AuditExecutionQueryService
                 $ac_query->querier_officer_name_en = $cdesk->officer_en;
                 $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
                 $ac_query->querier_designation_id = $cdesk->designation_id;
+                $ac_query->status = 'pending';
                 $send_rpu[] = $ac_query;
                 $ac_query->save();
             }
@@ -123,6 +124,7 @@ class AuditExecutionQueryService
             $ac_query->query_receiver_officer_name_en = $cdesk->officer_en;
             $ac_query->query_receiver_designation_id = $cdesk->designation_id;
             $ac_query->is_query_document_received = 1;
+            $ac_query->status = 'received';
             $ac_query->save();
 
             return ['status' => 'success', 'data' => 'Received Successfully'];
@@ -159,8 +161,12 @@ class AuditExecutionQueryService
         }
         try {
             $ac_query = AcQuery::find($request->ac_query_id);
+            $ac_query->query_rejector_officer_id = $cdesk->officer_id;
+            $ac_query->query_rejector_officer_name_en = $cdesk->officer_en;
+            $ac_query->query_rejector_officer_name_bn = $cdesk->officer_bn;
+            $ac_query->query_rejector_officer_designation_id = $cdesk->designation_id;
             $ac_query->comment = $request->comment;
-            $ac_query->status = 'rejected';
+            $ac_query->status = 'removed';
             $ac_query->save();
 
             /*$data['ac_query_id'] = $request->ac_query_id;
