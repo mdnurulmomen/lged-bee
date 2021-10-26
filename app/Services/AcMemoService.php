@@ -204,8 +204,9 @@ class AcMemoService
             $memo_log = new AcMemoLog();
             $memo_log->memo_content_change = json_encode($changes);
             $memo_log->memo_id = $request->memo_id;
-            $memo_log->created_by_id = $cdesk->officer_id;
-            $memo_log->created_by_name_bn = $cdesk->officer_bn;
+            $memo_log->modified_by_id = $cdesk->officer_id;
+            $memo_log->modified_by_name_bn = $cdesk->officer_bn;
+            $memo_log->modified_by_name_en = $cdesk->officer_en;
             $memo_log->save();
 
             $audit_memo->save();
