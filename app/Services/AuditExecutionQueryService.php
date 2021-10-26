@@ -140,11 +140,43 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $query_list = Query::with('audit_query')->where('cost_center_type_id', $request->cost_center_type_id)->get();
+            $query_list = Query::with('audit_query')
+                ->where('cost_center_type_id', $request->cost_center_type_id)
+                ->get();
             return ['status' => 'success', 'data' => $query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
 
+        }
+    }
+
+    public function rejectedAuditQuery(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_query = AcQuery::find($request->ac_query_id);
+            $ac_query->comment = $request->comment;
+            $ac_query->status = 'rejected';
+            $ac_query->save();
+
+            /*$data['ac_query_id'] = $request->ac_query_id;
+            $data['comment'] = $request->comment;
+            $data['status'] = 'rejected';
+            $update_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_query_to_rpu'), $data)->json();
+
+            if ($update_audit_query_to_rpu['status'] == 'success') {
+                return ['status' => 'success', 'data' => 'Rejected Successfully'];
+            } else {
+                throw new \Exception(json_encode($update_audit_query_to_rpu));
+            }*/
+            return ['status' => 'success', 'data' => 'Rejected Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
 }
