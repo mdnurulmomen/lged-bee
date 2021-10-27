@@ -25,8 +25,8 @@ class SaveRequest extends FormRequest
     {
         return [
             'cost_center_type_id' => 'required',
-            'query_title_bn' => 'required|array',
-            'query_title_en' => 'required',
+            'query_title_bn.*' => 'required',
+            'query_title_en.*' => 'required',
         ];
     }
 
@@ -34,8 +34,8 @@ class SaveRequest extends FormRequest
     {
         return [
             'cost_center_type_id.required' => 'Cost Center Type Required',
-            'query_title_bn.required' => 'Query Title Bangla Required',
-            'query_title_en.required' => 'Query Title English Required',
+            'query_title_bn.*.required' => 'Query Title Bangla Required',
+            'query_title_en.*.required' => 'Query Title English Required',
         ];
     }
 
