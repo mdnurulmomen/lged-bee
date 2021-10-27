@@ -263,6 +263,8 @@ class AcMemoService
                 } else {
                     throw new \Exception(json_encode($update_audit_memo_to_rpu));
                 }
+            }else{
+                return ['status' => 'success', 'data' => 'Memo Update Successfully'];
             }
 
         } catch (\Exception $exception) {
