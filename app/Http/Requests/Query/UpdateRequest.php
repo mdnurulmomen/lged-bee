@@ -25,7 +25,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'id' => 'integer|required',
-            'cost_center_type_id' => 'integer|required',
+            'cost_center_type_id' => 'required',
             'query_title_bn' => 'required|string',
             'query_title_en' => 'required|string',
         ];
@@ -35,10 +35,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'id.required' => 'Query ID Required',
-            'id.integer' => 'Query ID Should Be Integer',
-            'cost_center_type_id.integer' => 'Duration Span Should Be Year',
+            'cost_center_type_id.required' => 'Cost Center Type Required',
             'query_title_bn.required' => 'Query Titel Bn Required',
-            'query_title_en.required' => 'Query Titel En Be Year',
+            'query_title_en.required' => 'Query Titel En Required',
         ];
     }
 }
