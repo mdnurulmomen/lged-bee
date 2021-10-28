@@ -72,18 +72,38 @@ class AcMemoService
 
             //for attachments
             $finalAttachments = [];
+            if ($request->hasfile('memo')) {
+                $attachment = $request->memo;
+                $fileName = uniqid() . '.' . $attachment->extension();
+
+                Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($attachment));
+
+                array_push($finalAttachments, array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'attachment_type' => 'memo',
+                        'user_define_name' => $fileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => url('storage/memo/dicfia/' . $fileName),
+                        'sequence' => 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
+                        'deleted_by' => $cdesk->officer_id,
+                    )
+                );
+            }
+
             if ($request->hasfile('porisishto')) {
                 $attachment = $request->porisishto;
                 $fileName = uniqid() . '.' . $attachment->extension();
 
-                Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
+                Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $audit_memo->id,
                         'attachment_type' => 'porisishto',
                         'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'attachment_path' => url('storage/memo/dicfia/' . $fileName),
                         'sequence' => 1,
                         'created_by' => $cdesk->officer_id,
                         'modified_by' => $cdesk->officer_id,
@@ -96,14 +116,14 @@ class AcMemoService
                 $attachment = $request->pramanok;
                 $fileName = uniqid() . '.' . $attachment->extension();
 
-                Storage::disk('public')->put('memo/' . $fileName, File::get($attachment));
+                Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($attachment));
 
                 array_push($finalAttachments, array(
                         'ac_memo_id' => $audit_memo->id,
                         'attachment_type' => 'pramanok',
                         'user_define_name' => $fileName,
                         'attachment_name' => $fileName,
-                        'attachment_path' => url('storage/memo/' . $fileName),
+                        'attachment_path' => url('storage/memo/dicfia/' . $fileName),
                         'sequence' => 1,
                         'created_by' => $cdesk->officer_id,
                         'modified_by' => $cdesk->officer_id,
