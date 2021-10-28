@@ -141,6 +141,9 @@ class ApEntityTeamService
     public function saveTeamSchedule($team_schedules, $audit_plan_id)
     {
         try {
+            $team_schedules = json_decode($team_schedules, true);
+            $team_schedules = $team_schedules['schedule'];
+
             foreach ($team_schedules as $designation_id => $schedule_data) {
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)->where('leader_designation_id', $designation_id)->first();
                 dump($schedule_data);
@@ -203,12 +206,12 @@ class ApEntityTeamService
 
         $cdesk = json_decode($request->cdesk, false);
         $this->switchOffice($cdesk->office_id);
-        $team_schedules = json_decode($request->team_schedules, true);
-        $team_schedules = $team_schedules['schedule'];
+//        $team_schedules = json_decode($request->team_schedules, true);
+/*        $team_schedules = $team_schedules['schedule'];*/
         DB::beginTransaction();
         try {
             AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
-            $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
+            $this->saveTeamSchedule($request->team_schedules, $request->audit_plan_id);
             $data = ['status' => 'success', 'data' => 'successfully saved'];
             DB::commit();
             $this->emptyOfficeDBConnection();
