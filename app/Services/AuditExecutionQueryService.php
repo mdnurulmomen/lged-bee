@@ -142,10 +142,36 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $query_list = Query::with('audit_query')
-                ->where('cost_center_type_id', $request->cost_center_type_id)
+            $query_list = Query::where('cost_center_type_id', $request->cost_center_type_id)->get();
+
+            $ac_query_list = AcQuery::where('cost_center_type_id',$request->cost_center_type_id)
+                ->where('cost_center_id',$request->cost_center_id)
+                ->where('status','!=','removed')
                 ->get();
-            return ['status' => 'success', 'data' => $query_list];
+
+            $cost_center_wise_query_temp = [];
+            $cost_center_wise_query = [];
+
+            foreach ($query_list as $query){
+                $cost_center_wise_query_temp['id'] = $query['id'];
+                $cost_center_wise_query_temp['query_title_bn'] = $query['query_title_bn'];
+                $cost_center_wise_query_temp['query_title_en'] = $query['query_title_en'];
+                $cost_center_wise_query_temp['audit_query'] = '';
+                foreach ($ac_query_list as $ac_query){
+                    if($query['id'] == $ac_query['query_id']){
+                        $cost_center_wise_query_temp['audit_query'] = [
+                            'id' => $ac_query['id'],
+                            'query_id' => $ac_query['query_id'],
+                            'status' => $ac_query['status'],
+                            'is_query_document_received' => $ac_query['is_query_document_received'],
+                        ];
+                    }
+                }
+
+                $cost_center_wise_query[] = $cost_center_wise_query_temp;
+            }
+
+            return ['status' => 'success', 'data' => $cost_center_wise_query];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
 
