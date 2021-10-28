@@ -114,7 +114,7 @@ class MigrationController extends Controller
             return ['status' => 'success', 'data' => 'successfully saved'];
         } catch (\Exception $e) {
             DB::rollBack();
-            return $e->getMessage();
+            return $e;
         }
     }
 }
