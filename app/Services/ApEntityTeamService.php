@@ -142,7 +142,6 @@ class ApEntityTeamService
     {
         try {
             foreach ($team_schedules as $designation_id => $schedule_data) {
-                dump($designation_id);
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
                     ->where('leader_designation_id', $designation_id)->first();
                 if (!$team_data) {
@@ -181,7 +180,7 @@ class ApEntityTeamService
                                 'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                 'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                 //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
-                                'mobile_no' => $member['officer_mobile'],
+                                'mobile_no' => empty($member['officer_mobile'])?null:$member['officer_mobile'],
                                 'activity_location' => empty($schedule_datum['activity_details'])?null:$schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
