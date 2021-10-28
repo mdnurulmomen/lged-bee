@@ -106,7 +106,7 @@ class MigrationController extends Controller
                                 'approve_status' => 'approved',
                             ];
                             $created = AuditVisitCalenderPlanMember::create($team_schedule);
-                            dump($created);
+                            dump($created->toArray());
                         }
                     }
                 }
