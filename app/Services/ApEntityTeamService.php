@@ -141,13 +141,13 @@ class ApEntityTeamService
     public function saveTeamSchedule($team_schedules, $audit_plan_id)
     {
         try {
-            foreach ($team_schedules as $designation_id => $schedule_data) {
-                dump($designation_id);
+            foreach ($team_schedules as $key_d => $schedule_data) {
+                dump($key_d);
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
-                    ->where('leader_designation_id', $designation_id)->first();
-                /*if (!$team_data) {
+                    ->where('leader_designation_id', $key_d)->first();
+                if (!$team_data) {
                     throw new \Exception('Team is not formed');
-                }*/
+                }
                 $team_data->team_schedules = json_encode_unicode($schedule_data);
                 $team_data->save();
                 foreach ($schedule_data as $schedule_datum) {
