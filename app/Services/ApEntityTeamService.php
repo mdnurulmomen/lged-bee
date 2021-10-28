@@ -141,8 +141,8 @@ class ApEntityTeamService
     public function saveTeamSchedule($team_schedules, $audit_plan_id)
     {
         try {
-            dump($team_schedules);
             foreach ($team_schedules as $designation_id => $schedule_data) {
+                dump($designation_id);
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
                     ->where('leader_designation_id', $designation_id)->first();
                 if (!$team_data) {
