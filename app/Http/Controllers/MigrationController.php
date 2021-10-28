@@ -71,7 +71,7 @@ class MigrationController extends Controller
                     $team_member = json_decode($team_data->team_members, true);
                     foreach ($team_member as $key => $member_info) {
                         foreach ($member_info as $member) {
-                            $team_schedule = [
+                            $team_schedule_data = [
                                 'fiscal_year_id' => $team_data->fiscal_year_id,
                                 'team_id' => $team_data->id,
                                 'duration_id' => $team_data->duration_id,
@@ -105,8 +105,9 @@ class MigrationController extends Controller
                                 'status' => 'pending',
                                 'approve_status' => 'approved',
                             ];
-                            $created = AuditVisitCalenderPlanMember::create($team_schedule);
-                            print_r($created->toArray()['team_id']);
+                            if (!AuditVisitCalenderPlanMember::create($team_schedule_data)) {
+                                print_r($team_schedule);
+                            }
                         }
                     }
                 }
