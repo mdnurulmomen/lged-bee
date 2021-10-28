@@ -169,17 +169,24 @@ class AuditExecutionQueryService
             $ac_query->status = 'removed';
             $ac_query->save();
 
-            /*$data['ac_query_id'] = $request->ac_query_id;
-            $data['comment'] = $request->comment;
-            $data['status'] = 'rejected';
-            $update_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_query_to_rpu'), $data)->json();
+            if ($ac_query->is_query_sent) {
+                $data['query_id'] = $request->ac_query_id;
+                $data['query_rejector_officer_id'] = $cdesk->officer_id;
+                $data['query_rejector_officer_name_en'] = $cdesk->officer_en;
+                $data['query_rejector_officer_name_bn'] = $cdesk->officer_bn;
+                $data['query_rejector_officer_designation_id'] = $cdesk->designation_id;
+                $data['comment'] = $request->comment;
+                $data['status'] = 'removed';
 
-            if ($update_audit_query_to_rpu['status'] == 'success') {
-                return ['status' => 'success', 'data' => 'Rejected Successfully'];
-            } else {
-                throw new \Exception(json_encode($update_audit_query_to_rpu));
-            }*/
-            return ['status' => 'success', 'data' => 'Rejected Successfully'];
+                $update_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.remove_query_to_rpu'), $data)->json();
+                if ($update_audit_query_to_rpu['status'] == 'success') {
+                    return ['status' => 'success', 'data' => 'Remove  Successfully'];
+                } else {
+                    throw new \Exception(json_encode($update_audit_query_to_rpu));
+                }
+            }else{
+                return ['status' => 'success', 'data' => 'Remove Successfully'];
+            }
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
