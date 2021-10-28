@@ -39,7 +39,7 @@ class MigrationController extends Controller
                         $sequence++;
                         $schedule_type = 'visit';
                         $new_schedule_arr[$sequence] = [
-                            "cost_center_id" => "",
+                            "cost_center_id" => 0,
                             "cost_center_name_en" => "",
                             "cost_center_name_bn" => "",
                             "team_member_start_date" => $schedule['team_member_start_date'],
@@ -71,7 +71,7 @@ class MigrationController extends Controller
                     $team_member = json_decode($team_data->team_members, true);
                     foreach ($team_member as $key => $member_info) {
                         foreach ($member_info as $member) {
-                            $team_schedule = [
+                            $team_schedule_data = [
                                 'fiscal_year_id' => $team_data->fiscal_year_id,
                                 'team_id' => $team_data->id,
                                 'duration_id' => $team_data->duration_id,
@@ -105,7 +105,9 @@ class MigrationController extends Controller
                                 'status' => 'pending',
                                 'approve_status' => 'approved',
                             ];
-                            AuditVisitCalenderPlanMember::create($team_schedule);
+                            if (!AuditVisitCalenderPlanMember::create($team_schedule_data)) {
+                                print_r($team_schedule);
+                            }
                         }
                     }
                 }
@@ -114,7 +116,7 @@ class MigrationController extends Controller
             return ['status' => 'success', 'data' => 'successfully saved'];
         } catch (\Exception $e) {
             DB::rollBack();
-            return $e->getMessage();
+            return $e;
         }
     }
 }
