@@ -39,7 +39,7 @@ class MigrationController extends Controller
                         $sequence++;
                         $schedule_type = 'visit';
                         $new_schedule_arr[$sequence] = [
-                            "cost_center_id" => "",
+                            "cost_center_id" => 0,
                             "cost_center_name_en" => "",
                             "cost_center_name_bn" => "",
                             "team_member_start_date" => $schedule['team_member_start_date'],
