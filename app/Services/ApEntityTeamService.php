@@ -142,13 +142,14 @@ class ApEntityTeamService
     {
         try {
             foreach ($team_schedules as $designation_id => $schedule_data) {
+                $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
+                    ->where('leader_designation_id', $designation_id)->first();
+                if (!$team_data) {
+                    throw new \Exception('Team is not formed');
+                }
+                $team_data->team_schedules = json_encode_unicode($schedule_data);
+                $team_data->save();
                 foreach ($schedule_data as $schedule_datum) {
-                    $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)->where('leader_designation_id', $designation_id)->first();
-                    if (!$team_data) {
-                        throw new \Exception('Team is not formed');
-                    }
-                    $team_data->team_schedules = json_encode_unicode($schedule_data);
-                    $team_data->save();
                     $team_member = json_decode($team_data->team_members, true);
                     foreach ($team_member as $key => $member_info) {
                         foreach ($member_info as $member) {
@@ -164,9 +165,9 @@ class ApEntityTeamService
                                 'audit_plan_id' => $team_data->audit_plan_id,
                                 'ministry_id' => $team_data->ministry_id,
                                 'entity_id' => $team_data->entity_id,
-                                'cost_center_id' => $schedule_datum['cost_center_id'],
-                                'cost_center_name_en' => $schedule_datum['cost_center_name_en'],
-                                'cost_center_name_bn' => $schedule_datum['cost_center_name_bn'],
+                                'cost_center_id' => empty($schedule_datum['cost_center_id'])?null:$schedule_datum['cost_center_id'],
+                                'cost_center_name_en' => empty($schedule_datum['cost_center_name_en'])?null:$schedule_datum['cost_center_name_en'],
+                                'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn'])?null:$schedule_datum['cost_center_name_bn'],
                                 'team_member_name_en' => $member['officer_name_en'],
                                 'team_member_name_bn' => $member['officer_name_bn'],
                                 'team_member_designation_id' => $member['designation_id'],
@@ -178,9 +179,9 @@ class ApEntityTeamService
                                 'team_member_role_bn' => $member['team_member_role_bn'],
                                 'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                 'team_member_end_date' => $schedule_datum['team_member_end_date'],
-                                'comment' => $member['comment'] ?? '',
-                                'mobile_no' => $member['officer_mobile'] ?? '',
-                                'activity_location' => $schedule_datum['activity_details'],
+                                //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
+                                'mobile_no' => empty($member['officer_mobile'])?null:$member['officer_mobile'],
+                                'activity_location' => empty($schedule_datum['activity_details'])?null:$schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
                                 'status' => 'pending',

@@ -196,7 +196,7 @@ class AuditExecutionQueryService
             $ac_query->save();
 
             if ($ac_query->is_query_sent) {
-                $data['query_id'] = $request->ac_query_id;
+                $data['query_id'] = $ac_query->query_id;
                 $data['query_rejector_officer_id'] = $cdesk->officer_id;
                 $data['query_rejector_officer_name_en'] = $cdesk->officer_en;
                 $data['query_rejector_officer_name_bn'] = $cdesk->officer_bn;
