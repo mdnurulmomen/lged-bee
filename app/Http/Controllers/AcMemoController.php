@@ -67,6 +67,18 @@ class AcMemoController extends Controller
         return response()->json($response);
     }
 
+    public function responseOfRpuMemo(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $auditMemoRecommendationStore = $acMemoService->responseOfRpuMemo($request);
+        if (isSuccessResponse($auditMemoRecommendationStore)) {
+            $response = responseFormat('success', $auditMemoRecommendationStore['data']);
+        } else {
+            $response = responseFormat('error', $auditMemoRecommendationStore['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function authorityMemoList(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
     {
         $query_schedule_list = $acMemoService->authorityMemoList($request);

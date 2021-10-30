@@ -91,6 +91,9 @@ class AuditExecutionQueryService
 
             $data = [];
             $data['query_list'] = $send_rpu;
+            $data['directorate_id'] = $cdesk->office_id;
+            $data['directorate_en'] = $cdesk->office_name_en;
+            $data['directorate_bn'] = $cdesk->office_name_bn;
 
             $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data)->json();
 
@@ -127,7 +130,24 @@ class AuditExecutionQueryService
             $ac_query->status = 'received';
             $ac_query->save();
 
-            return ['status' => 'success', 'data' => 'Received Successfully'];
+             if ($ac_query->is_query_sent) {
+                $data['query_id'] = $ac_query->query_id;
+                $data['query_receiver_officer_id'] = $cdesk->officer_id;
+                $data['querier_receiver_officer_name_en'] = $cdesk->officer_en;
+                $data['querier_receiver_officer_name_bn'] = $cdesk->officer_bn;
+                $data['query_receiver_designation_id'] = $cdesk->designation_id;
+//                $data['comment'] = $request->comment;
+                $data['status'] = 'received';
+
+                $received_query_from_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.received_query_from_rpu'), $data)->json();
+                if ($received_query_from_rpu['status'] == 'success') {
+                    return ['status' => 'success', 'data' => 'Received Successfully'];
+                } else {
+                    throw new \Exception(json_encode($received_query_from_rpu));
+                }
+            }else{
+               return ['status' => 'success', 'data' => 'Received Successfully'];
+            }
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

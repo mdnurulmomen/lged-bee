@@ -10,5 +10,6 @@ return [
     'update_query_to_rpu' => env('API_URL_RPU', '') . '/update-audit-query',
     'send_memo_to_rpu' => env('API_URL_RPU', '') . '/send-audit-memo',
     'update_memo_to_rpu' => env('API_URL_RPU', '') . '/update-audit-memo',
+    'received_query_from_rpu' => env('API_URL_RPU', '') . '/receive-query-from-rpu',
     'remove_query_to_rpu' => env('API_URL_RPU', '') . '/remove-query-from-rpu',
 ];

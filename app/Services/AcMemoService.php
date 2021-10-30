@@ -307,6 +307,10 @@ class AcMemoService
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
+            $data['directorate_id'] = $cdesk->office_id;
+            $data['directorate_en'] = $cdesk->office_name_en;
+            $data['directorate_bn'] = $cdesk->office_name_bn;
+            $data['sender_officer_id'] = $cdesk->officer_id;
             $data['sender_officer_id'] = $cdesk->officer_id;
             $data['sender_officer_name_bn'] = $cdesk->officer_bn;
             $data['sender_officer_name_en'] = $cdesk->officer_en;
@@ -422,6 +426,24 @@ class AcMemoService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+    }
+
+    public function responseOfRpuMemo(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_memo = AcMemo::find($request->memo_id);
+            $ac_memo->response_of_rpu = $request->response_of_rpu;
+            $ac_memo->save();
+
+            return ['status' => 'success', 'data' => 'Response Send Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
     }
 
     public function auditMemoRecommendationList(Request $request): array
