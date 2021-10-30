@@ -131,7 +131,7 @@ class AnnualPlanRevisedService
                 'subject_matter' => $request->subject_matter,
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
-                'comment' => $request->comment,
+                'comment' => empty($request->comment) ? null : $request->comment,
             ];
             $plan = AnnualPlan::updateOrcreate([
                 'ministry_id' => $ministry->ministry_id,
