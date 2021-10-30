@@ -58,7 +58,7 @@ class FinalPlanRepo
             if ($request->document_type == 'strategic') {
                 Storage::disk('public')->put('strategic/' . $fileName, File::get($attachment));
             } elseif ($request->document_type == 'operation') {
-                Storage::disk('public')->put('operation/' . $fileName, File::get($attachment));
+                Storage::disk('public')->put('operational/' . $fileName, File::get($attachment));
             } else {
                 Storage::disk('public')->put($fileName, File::get($attachment));
             }
