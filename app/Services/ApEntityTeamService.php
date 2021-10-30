@@ -186,6 +186,7 @@ class ApEntityTeamService
                                 'schedule_type' => $schedule_datum['schedule_type'],
                                 'status' => 'pending',
                                 'approve_status' => 'approved',
+                                'activity_man_days' => empty($member['activity_man_days'])?null:$member['activity_man_days'],
                             ];
                             AuditVisitCalenderPlanMember::create($team_schedule);
                         }
