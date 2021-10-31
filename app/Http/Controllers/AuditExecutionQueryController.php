@@ -62,4 +62,15 @@ class AuditExecutionQueryController extends Controller
         }
         return response()->json($response);
     }
+
+    public function rpuSendQueryList(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $ac_query_list = $auditExecutionQueryService->rpuSendQueryList($request);
+        if (isSuccessResponse($ac_query_list)) {
+            $response = responseFormat('success', $ac_query_list['data']);
+        } else {
+            $response = responseFormat('error', $ac_query_list['data']);
+        }
+        return response()->json($response);
+    }
 }
