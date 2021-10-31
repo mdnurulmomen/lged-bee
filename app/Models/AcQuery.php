@@ -43,6 +43,8 @@ class AcQuery extends Model
         'querier_officer_name_en',
         'querier_officer_name_bn',
         'querier_designation_id',
+        'querier_designation_bn',
+        'querier_designation_bn',
         'query_receiver_officer_id',
         'query_receiver_officer_name_bn',
         'query_receiver_officer_name_en',

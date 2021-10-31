@@ -84,16 +84,21 @@ class AuditExecutionQueryService
                 $ac_query->querier_officer_name_en = $cdesk->officer_en;
                 $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
                 $ac_query->querier_designation_id = $cdesk->designation_id;
+                $ac_query->querier_designation_bn = $cdesk->designation_bn;
+                $ac_query->querier_designation_en = $cdesk->designation_en;
                 $ac_query->status = 'pending';
                 $send_rpu[] = $ac_query;
                 $ac_query->save();
             }
+
+            $fiscal_year_info =  XFiscalYear::select('start','end')->find($request->fiscal_year_id);
 
             $data = [];
             $data['query_list'] = $send_rpu;
             $data['directorate_id'] = $cdesk->office_id;
             $data['directorate_en'] = $cdesk->office_name_en;
             $data['directorate_bn'] = $cdesk->office_name_bn;
+            $data['fiscal_year'] = $fiscal_year_info->start.'-'.$fiscal_year_info->end;
 
             $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data)->json();
 
