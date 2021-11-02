@@ -181,7 +181,7 @@ class AcMemoService
             $memo_list = AcMemo::with(['ac_memo_attachments'])
                 ->where('id', $request->memo_id)
                 ->first();
-            
+
             /*$data['sender_officer_id'] = $memo_list['sender_officer_id'];
             $employee_signature = $this->initDoptorHttp($cdesk->user_id)
                 ->post(config('cag_doptor_api.employee_signature'), $data)
