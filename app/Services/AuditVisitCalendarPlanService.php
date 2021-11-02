@@ -88,12 +88,14 @@ class AuditVisitCalendarPlanService
                 $team_id = [$request->team_id];
             }
             else if($cost_center_id){
-                $team_id = AuditVisitCalenderPlanMember::where('cost_center_id',$cost_center_id)->distinct('team_id')->pluck('team_id');
+                $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('cost_center_id',$cost_center_id)->distinct('team_id')->pluck('team_id');
             }
+
 
             $query = AuditVisitCalendarPlanTeam::query();
 
             if (!empty($team_id)) {
+//                return ['status' => 'success', 'data' => $team_id];
                 $query->whereIn('id', $team_id);
             }
 
@@ -123,6 +125,20 @@ class AuditVisitCalendarPlanService
         try {
             $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->where('team_parent_id', 0)->get();
             return ['status' => 'success', 'data' => $auditPlanTeamList];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function scheduleEntityFiscalYearWise(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')->get()->unique('entity_id');
+            return ['status' => 'success', 'data' => $entityList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -165,7 +181,7 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $costCenterList = AuditVisitCalenderPlanMember::select('cost_center_id','cost_center_name_en','cost_center_name_bn')->where('fiscal_year_id', $request->fiscal_year_id)->distinct('cost_center_id')->get();
+            $costCenterList = AuditVisitCalenderPlanMember::select('cost_center_id','cost_center_name_en','cost_center_name_bn')->where('entity_id', $request->entity_id)->where('fiscal_year_id', $request->fiscal_year_id)->distinct('cost_center_id')->get();
             return ['status' => 'success', 'data' => $costCenterList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

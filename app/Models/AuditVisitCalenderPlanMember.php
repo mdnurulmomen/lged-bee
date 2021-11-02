@@ -23,6 +23,8 @@ class AuditVisitCalenderPlanMember extends Model
         'audit_plan_id',
         'ministry_id',
         'entity_id',
+        'entity_name_bn',
+        'entity_name_en',
         'cost_center_id',
         'cost_center_name_en',
         'cost_center_name_bn',

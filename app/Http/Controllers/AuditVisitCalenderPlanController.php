@@ -58,6 +58,22 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
+
+    public function scheduleEntityFiscalYearWise(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
+    {
+
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required'])->validate();
+
+        $all_teams = $auditVisitCalendarPlanService->scheduleEntityFiscalYearWise($request);
+
+        if (isSuccessResponse($all_teams)) {
+            $response = responseFormat('success', $all_teams['data']);
+        } else {
+            $response = responseFormat('error', $all_teams['data']);
+        }
+        return response()->json($response);
+    }
+
     public function costCenterAndFiscalYearWiseTeams(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
     {
 
@@ -73,7 +89,7 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
-     public function getSubTeam(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
+    public function getSubTeam(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService): \Illuminate\Http\JsonResponse
     {
         \Validator::make($request->all(), [
             'team_id' => 'required|integer',
@@ -91,8 +107,9 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
-    public function getCostCenterDirectorateFiscalYearWise(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService){
-         \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required'])->validate();
+    public function getCostCenterDirectorateFiscalYearWise(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
+    {
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required'])->validate();
 
         $all_cost_center = $auditVisitCalendarPlanService->getCostCenterDirectorateFiscalYearWise($request);
 
