@@ -26,9 +26,16 @@ class AuditExecutionQueryService
             $fiscal_year_id = XFiscalYear::select('id')->where('start', date("Y"))->first();
             $cost_center_id = $request->cost_center_id;
 
-            $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)->whereHas('office_order', function ($q) {
-                $q->where('approve_status', 'approved');
-            })->with('office_order:id,audit_plan_id')->with('cost_center_type:id,cost_center_id,cost_center_type_id')->where('team_member_designation_id', $cdesk->designation_id)->where('cost_center_id', '!=', 0)->paginate(config('bee_config.per_page_pagination'));
+            $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)
+                ->with('office_order:id,audit_plan_id')
+                ->with('plan_team:id,audit_year_start,audit_year_end')
+                ->with('cost_center_type:id,cost_center_id,cost_center_type_id')
+                ->whereHas('office_order', function ($q) {
+                    $q->where('approve_status', 'approved');
+                })
+                ->where('team_member_designation_id', $cdesk->designation_id)
+                ->where('cost_center_id', '!=', 0)
+                ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
 
@@ -84,16 +91,21 @@ class AuditExecutionQueryService
                 $ac_query->querier_officer_name_en = $cdesk->officer_en;
                 $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
                 $ac_query->querier_designation_id = $cdesk->designation_id;
+                $ac_query->querier_designation_bn = $cdesk->designation_bn;
+                $ac_query->querier_designation_en = $cdesk->designation_en;
                 $ac_query->status = 'pending';
                 $send_rpu[] = $ac_query;
                 $ac_query->save();
             }
+
+            $fiscal_year_info =  XFiscalYear::select('start','end')->find($request->fiscal_year_id);
 
             $data = [];
             $data['query_list'] = $send_rpu;
             $data['directorate_id'] = $cdesk->office_id;
             $data['directorate_en'] = $cdesk->office_name_en;
             $data['directorate_bn'] = $cdesk->office_name_bn;
+            $data['fiscal_year'] = $fiscal_year_info->start.'-'.$fiscal_year_info->end;
 
             $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data)->json();
 
@@ -234,6 +246,26 @@ class AuditExecutionQueryService
                 return ['status' => 'success', 'data' => 'Remove Successfully'];
             }
 
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+
+    public function rpuSendQueryList(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_query_list = AcQuery::where('cost_center_type_id',$request->cost_center_type_id)
+                ->where('cost_center_id',$request->cost_center_id)
+                ->where('is_query_sent',1)
+                ->where('status','!=','removed')
+                ->get();
+            return ['status' => 'success', 'data' => $ac_query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

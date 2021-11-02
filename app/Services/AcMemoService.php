@@ -7,6 +7,7 @@ use App\Models\AcMemoAttachment;
 use App\Models\AcMemoLog;
 use App\Models\AcMemoRecommendation;
 use App\Models\AuditVisitCalenderPlanMember;
+use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class AcMemoService
             $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity', 'office_order'])->where('id', $request->team_member_schedule_id)->first();
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no');
             $onucched = $onucched ? (int)$onucched + 1 : 1;
-
+            $fiscal_year_info = XFiscalYear::select('start','end')->find($plan_member_schedule->fiscal_year_id);
             $audit_memo = new AcMemo();
             $audit_memo->onucched_no = $onucched;
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
@@ -48,6 +49,7 @@ class AcMemoService
             $audit_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
             $audit_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
             $audit_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
+            $audit_memo->fiscal_year = $fiscal_year_info->start.'-'.$fiscal_year_info->end;
             $audit_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
             $audit_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
             $audit_memo->audit_year_start = $request->audit_year_start;
@@ -314,6 +316,9 @@ class AcMemoService
             $data['sender_officer_id'] = $cdesk->officer_id;
             $data['sender_officer_name_bn'] = $cdesk->officer_bn;
             $data['sender_officer_name_en'] = $cdesk->officer_en;
+            $data['sender_designation_id'] = $cdesk->designation_id;
+            $data['sender_designation_en'] = $cdesk->designation_en;
+            $data['sender_designation_bn'] = $cdesk->designation_bn;
 
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
