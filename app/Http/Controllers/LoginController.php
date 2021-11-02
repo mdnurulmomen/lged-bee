@@ -42,8 +42,8 @@ class LoginController extends Controller
             $response['data']['token'] = $token_response['data'];
 
 //            get user signature
-            $emp_signature = (new CagDoptorService())->loadSignatureFromDoptor($user_data['user_info']['user']['username'], $user_data['user_info']['user']['employee_record_id']);
-            $response['data']['signature'] = $emp_signature['data'];
+//            $emp_signature = (new CagDoptorService())->loadSignatureFromDoptor($user_data['user_info']['user']['username'], $user_data['user_info']['user']['employee_record_id']);
+//            $response['data']['signature'] = $emp_signature['data'];
 
 //            $ta_dds = $gd->getModel('DoptorDataSettings');
 //            $dds = $ta_dds->getAll(['office_sync'], ['id' => 1])->enableHydration(false)->first();
