@@ -165,6 +165,8 @@ class ApEntityTeamService
                                 'audit_plan_id' => $team_data->audit_plan_id,
                                 'ministry_id' => $team_data->ministry_id,
                                 'entity_id' => $team_data->entity_id,
+                                'entity_name_en' => $team_data->entity_name_en,
+                                'entity_name_bn' => $team_data->entity_name_bn,
                                 'cost_center_id' => empty($schedule_datum['cost_center_id'])?null:$schedule_datum['cost_center_id'],
                                 'cost_center_name_en' => empty($schedule_datum['cost_center_name_en'])?null:$schedule_datum['cost_center_name_en'],
                                 'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn'])?null:$schedule_datum['cost_center_name_bn'],

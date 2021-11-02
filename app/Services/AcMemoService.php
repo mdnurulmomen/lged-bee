@@ -32,6 +32,7 @@ class AcMemoService
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->max('onucched_no');
             $onucched = $onucched ? (int)$onucched + 1 : 1;
             $fiscal_year_info = XFiscalYear::select('start','end')->find($plan_member_schedule->fiscal_year_id);
+
             $audit_memo = new AcMemo();
             $audit_memo->onucched_no = $onucched;
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
@@ -305,7 +306,9 @@ class AcMemoService
         }
         try {
 
-            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')->whereIn('id', $request->memos)->get();
+            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')
+                ->whereIn('id', $request->memos)
+                ->get();
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
@@ -323,7 +326,19 @@ class AcMemoService
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
             if ($send_audit_memo_to_rpu['status'] == 'success') {
-                AcMemo::whereIn('id', $request->memos)->update(['has_sent_to_rpu'=>1]);
+                AcMemo::whereIn('id', $request->memos)
+                    ->update([
+                        'has_sent_to_rpu'=>1,
+                        'sender_officer_id'=>$cdesk->officer_id,
+                        'sender_officer_name_bn'=>$cdesk->officer_bn,
+                        'sender_officer_name_en'=>$cdesk->officer_en,
+                        'sender_unit_id'=>$cdesk->office_unit_id,
+                        'sender_unit_name_bn'=>$cdesk->office_unit_bn,
+                        'sender_unit_name_en'=>$cdesk->office_unit_en,
+                        'sender_designation_id'=>$cdesk->designation_id,
+                        'sender_designation_bn'=>$cdesk->designation_bn,
+                        'sender_designation_en'=>$cdesk->designation_en
+                    ]);
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
                 throw new \Exception(json_encode($send_audit_memo_to_rpu));
@@ -442,6 +457,31 @@ class AcMemoService
         try {
             $ac_memo = AcMemo::find($request->memo_id);
             $ac_memo->response_of_rpu = $request->response_of_rpu;
+            $ac_memo->save();
+
+            return ['status' => 'success', 'data' => 'Response Send Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function acknowledgmentOfRpuMemo(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_memo = AcMemo::find($request->memo_id);
+            $ac_memo->rpu_acceptor_officer_id = $request->rpu_acceptor_officer_id;
+            $ac_memo->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
+            $ac_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_en;
+            $ac_memo->rpu_acceptor_unit_name_bn = $request->rpu_acceptor_unit_name_bn;
+            $ac_memo->rpu_acceptor_unit_name_en = $request->rpu_acceptor_unit_name_en;
+            $ac_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
+            $ac_memo->rpu_acceptor_designation_name_en = $request->rpu_acceptor_designation_name_en;
+            $ac_memo->rpu_acceptor_signature = $request->rpu_acceptor_signature;
             $ac_memo->save();
 
             return ['status' => 'success', 'data' => 'Response Send Successfully'];

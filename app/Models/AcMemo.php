@@ -86,6 +86,23 @@ class AcMemo extends Model
         'status',
         'comment',
         'has_sent_to_rpu',
+        'sender_officer_id',
+        'sender_officer_name_bn',
+        'sender_officer_name_en',
+        'sender_unit_id',
+        'sender_unit_name_bn',
+        'sender_unit_name_en',
+        'sender_designation_id',
+        'sender_designation_bn',
+        'sender_designation_en',
+        'rpu_acceptor_officer_id',
+        'rpu_acceptor_officer_name_bn',
+        'rpu_acceptor_officer_name_en',
+        'rpu_acceptor_unit_name_bn',
+        'rpu_acceptor_unit_name_en',
+        'rpu_acceptor_designation_name_bn',
+        'rpu_acceptor_designation_name_en',
+        'rpu_acceptor_signature',
     ];
 
     public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
