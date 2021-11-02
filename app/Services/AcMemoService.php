@@ -182,12 +182,12 @@ class AcMemoService
                 ->where('id', $request->memo_id)
                 ->first();
             
-            $data['sender_officer_id'] = $memo_list['sender_officer_id'];
+            /*$data['sender_officer_id'] = $memo_list['sender_officer_id'];
             $employee_signature = $this->initDoptorHttp($cdesk->user_id)
                 ->post(config('cag_doptor_api.employee_signature'), $data)
-                ->json();
+                ->json();*/
 
-            return ['status' => 'success', 'data' => $memo_list+$employee_signature];
+            return ['status' => 'success', 'data' => $memo_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
