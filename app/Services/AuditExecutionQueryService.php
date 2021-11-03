@@ -35,6 +35,7 @@ class AuditExecutionQueryService
                 })
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->where('cost_center_id', '!=', 0)
+                ->orderBy('team_member_start_date','DESC')
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];

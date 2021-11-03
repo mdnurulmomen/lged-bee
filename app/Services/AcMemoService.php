@@ -284,6 +284,7 @@ class AcMemoService
             AcMemoAttachment::insert($finalAttachments);
 
             $memo_info = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')->where('id', $request->memo_id)->first();
+//            return ['status' => 'success', 'data' => $memo_info];
             if($memo_info->has_sent_to_rpu){
                 $data['memo_info'] = $memo_info;
                 $update_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_memo_to_rpu'), $data)->json();
