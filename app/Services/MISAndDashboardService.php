@@ -35,7 +35,9 @@ class MISAndDashboardService
 
         try {
             $total_team = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->count();
-            $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->sum('activity_man_days');
+            $total_activity_man_days = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('audit_plan_id', $request->audit_plan_id)
+                ->sum('activity_man_days');
             $team_member_count = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('audit_plan_id', $request->audit_plan_id)->count();
             $this->emptyOfficeDBConnection();
 

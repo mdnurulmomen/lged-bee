@@ -148,6 +148,7 @@ class ApEntityTeamService
                     throw new \Exception('Team is not formed');
                 }
                 $team_data->team_schedules = json_encode_unicode($schedule_data);
+                $team_data->activity_man_days = array_sum(array_column($schedule_data, 'activity_man_days'));
                 $team_data->save();
                 foreach ($schedule_data as $schedule_datum) {
                     $team_member = json_decode($team_data->team_members, true);
