@@ -97,6 +97,8 @@ class AuditVisitCalendarPlanService
             if (!empty($team_id)) {
 //                return ['status' => 'success', 'data' => $team_id];
                 $query->whereIn('id', $team_id);
+            }else{
+                $query->where('team_schedules','!=', 'null');
             }
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
