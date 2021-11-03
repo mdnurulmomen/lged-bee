@@ -181,7 +181,10 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $costCenterList = AuditVisitCalenderPlanMember::select('cost_center_id','cost_center_name_en','cost_center_name_bn')->where('entity_id', $request->entity_id)->where('fiscal_year_id', $request->fiscal_year_id)->distinct('cost_center_id')->get();
+            $costCenterList = AuditVisitCalenderPlanMember::select('cost_center_id','cost_center_name_en','cost_center_name_bn')
+                ->where('entity_id', $request->entity_id)->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('cost_center_id', '!=',null)
+                ->distinct('cost_center_id')->get();
             return ['status' => 'success', 'data' => $costCenterList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
