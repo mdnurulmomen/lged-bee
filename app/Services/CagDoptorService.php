@@ -13,11 +13,11 @@ class CagDoptorService
     {
     }
 
-    public function loadSignatureFromDoptor($username, $employee_id): array
+    public function loadSignatureFromDoptor($username, $employee_ids): array
     {
-        $response = $this->initDoptorHttp($username)->post(config('cag_doptor_api.employee_signature'), ['username' => $username])->json();
+        $response = $this->initDoptorHttp($username)->post(config('cag_doptor_api.employee_signatures'), ['employee_record_ids' => $employee_ids])->json();
         if (isSuccessResponse($response)) {
-            return ['status' => 'success', 'data' => $response['data']['encode_sign']];
+            return ['status' => 'success', 'data' => $response['data']];
         } else {
             return ['error' => 'error', 'data' => [], 'message' => 'Signature not found.'];
         }
