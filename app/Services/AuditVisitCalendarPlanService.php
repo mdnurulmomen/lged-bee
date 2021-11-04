@@ -132,6 +132,21 @@ class AuditVisitCalendarPlanService
         }
     }
 
+    public function fiscalYearCostCenterWiseTeams(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('cost_center_id', $request->cost_center_id)->get()->unique('team_parent_id')->pluck('team_parent_id');
+            $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->whereIn('id', $team_id)->get();
+            return ['status' => 'success', 'data' => $auditPlanTeamList];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function scheduleEntityFiscalYearWise(Request $request): array
     {
         $office_db_con_response = $this->switchOffice($request->office_id);

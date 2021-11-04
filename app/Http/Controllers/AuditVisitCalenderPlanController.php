@@ -58,6 +58,21 @@ class AuditVisitCalenderPlanController extends Controller
         return response()->json($response);
     }
 
+    public function fiscalYearCostCenterWiseTeams(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
+    {
+
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required','cost_center_id' => 'integer|required'])->validate();
+
+        $all_teams = $auditVisitCalendarPlanService->fiscalYearCostCenterWiseTeams($request);
+
+        if (isSuccessResponse($all_teams)) {
+            $response = responseFormat('success', $all_teams['data']);
+        } else {
+            $response = responseFormat('error', $all_teams['data']);
+        }
+        return response()->json($response);
+    }
+
 
     public function scheduleEntityFiscalYearWise(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
     {

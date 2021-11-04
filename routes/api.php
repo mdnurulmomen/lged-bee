@@ -122,6 +122,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('team-filter', [AuditVisitCalenderPlanController::class, 'teamCalenderFilter']);
             Route::post('update-visit-calender-status', [AuditVisitCalenderPlanController::class, 'updateVisitCalenderStatus']);
             Route::post('load-fiscal-year-wise-team', [AuditVisitCalenderPlanController::class, 'fiscalYearWiseTeams']);
+            Route::post('load-fiscal-year-cost-center-wise-team', [AuditVisitCalenderPlanController::class, 'fiscalYearCostCenterWiseTeams']);
             Route::post('load-cost-center-and-fiscal-year-wise-team', [AuditVisitCalenderPlanController::class, 'costCenterAndFiscalYearWiseTeams']);
             Route::post('load-schedule-entity-fiscal-year-wise', [AuditVisitCalenderPlanController::class, 'scheduleEntityFiscalYearWise']);
             Route::post('load-cost-center-directorate-fiscal-year-wise', [AuditVisitCalenderPlanController::class, 'getCostCenterDirectorateFiscalYearWise']);
