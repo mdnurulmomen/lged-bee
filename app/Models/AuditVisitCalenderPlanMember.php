@@ -80,4 +80,9 @@ class AuditVisitCalenderPlanMember extends Model
     {
         return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
     }
+
+    public function x_fiscal_year()
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
 }
