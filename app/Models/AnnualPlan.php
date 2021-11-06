@@ -28,6 +28,7 @@ class AnnualPlan extends Model
         'parent_office_id',
         'office_type',
         'budget',
+        'cost_center_total_budget',
         'total_unit_no',
         'nominated_offices',
         'nominated_office_counts',
