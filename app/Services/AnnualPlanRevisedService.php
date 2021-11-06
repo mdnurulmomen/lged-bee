@@ -125,6 +125,7 @@ class AnnualPlanRevisedService
                 'office_type' => $parent_office->office_type,
 
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
+                'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
                 'total_unit_no' => $request->total_unit_no,
                 'nominated_offices' => $request->nominated_offices,
                 'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
