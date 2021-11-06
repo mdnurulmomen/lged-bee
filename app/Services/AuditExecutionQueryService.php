@@ -27,14 +27,13 @@ class AuditExecutionQueryService
             $cost_center_id = $request->cost_center_id;
 
             $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)
-                ->with('office_order:id,audit_plan_id')
                 ->with('plan_team:id,audit_year_start,audit_year_end')
                 ->with('cost_center_type:id,cost_center_id,cost_center_type_id')
                 ->whereHas('office_order', function ($q) {
                     $q->where('approve_status', 'approved');
                 })
                 ->where('team_member_designation_id', $cdesk->designation_id)
-                ->where('cost_center_id', '!=', 0)
+                ->whereNotNull('cost_center_id')
                 ->orderBy('team_member_start_date','DESC')
                 ->paginate(config('bee_config.per_page_pagination'));
 
