@@ -265,6 +265,7 @@ class AuditExecutionQueryService
             $ac_query->memorandum_date = $request->memorandum_date;
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
+            $ac_query->cc = $request->cc;
             $ac_query->status = 'pending';
             $ac_query->save();
 
@@ -305,6 +306,7 @@ class AuditExecutionQueryService
             $ac_query->memorandum_date = $request->memorandum_date;
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
+            $ac_query->cc = $request->cc;
             $ac_query->status = 'pending';
             $ac_query->updated_by = $cdesk->officer_id;
             $ac_query->save();
