@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\XRiskAssessment;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -12,6 +13,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::customApiResource('fiscal-year', XFiscalYearController::class);
     Route::customApiResource('audit-query', XAuditQueryController::class);
+    Route::customApiResource('risk-assessment', XRiskAssessmentController::class);
     Route::post('cost-center-type-wise-query', [XAuditQueryController::class, 'costCenterTypeWiseQuery']);
     Route::customApiResource('cost-center-type', XCostCenterTypeController::class);
     Route::post('directorates/all', [XResponsibleOfficeController::class, 'allDirectorates']);
@@ -108,6 +110,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('office-order/show', [ApOfficeOrderController::class, 'showOfficeOrder']);
             Route::post('office-order/store-approval-authority', [ApOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
             Route::post('office-order/approve', [ApOfficeOrderController::class, 'approveOfficeOrder']);
+
+            Route::post('risk-assessment/store', [ApRiskAssessmentController::class, 'store']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {
