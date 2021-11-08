@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\AcQuery;
+use App\Models\AcQueryItem;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\Query;
 use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class AuditExecutionQueryService
@@ -28,7 +30,7 @@ class AuditExecutionQueryService
 
             $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)
                 ->with('plan_team:id,audit_year_start,audit_year_end')
-                ->with('cost_center_type:id,cost_center_id,cost_center_type_id')
+                ->with('office_order:id,audit_plan_id')
                 ->whereHas('office_order', function ($q) {
                     $q->where('approve_status', 'approved');
                 })
@@ -53,55 +55,20 @@ class AuditExecutionQueryService
         }
         \DB::beginTransaction();
         try {
+            //todo
+            $acQuery = AcQuery::where('id',$request->ac_query_id)
+                ->with('plan_team:id,team_name,team_parent_id,leader_name_en,leader_name_bn')
+                ->first();
 
-            $fiscal_year_id = $request->fiscal_year_id;
-            $cost_center_id = $request->cost_center_id;
-            $queries = $request->queries;
+            $fiscal_year_info =  XFiscalYear::select('start','end')->find($acQuery->fiscal_year_id);
 
-            $query_info = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('team_member_designation_id', $cdesk->designation_id)->first();
-            $team_leader_info = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)->where('id', $query_info->team_id)->first();
-            $send_rpu = [];
-            foreach ($queries as $key => $query) {
-                $ac_query = new AcQuery;
-                $ac_query->fiscal_year_id = $fiscal_year_id;
-                $ac_query->activity_id = $query_info->activity_id;
-                $ac_query->audit_plan_id = $query_info->audit_plan_id;
-                $ac_query->office_order_id = $query_info->office_order->id;
-                $ac_query->team_id = $query_info->team_id;
-                $ac_query->team_leader_name_en = $team_leader_info->leader_name_en;
-                $ac_query->team_leader_name_bn = $team_leader_info->leader_name_bn;
-                $ac_query->cost_center_type_id = $request->cost_center_type_id;
-                $ac_query->ministry_id = $query_info->annual_plan->ministry_id;
-                $ac_query->controlling_office_id = $query_info->annual_plan->controlling_office_id;
-                $ac_query->controlling_office_name_en = $query_info->annual_plan->controlling_office_en;
-                $ac_query->controlling_office_name_bn = $query_info->annual_plan->controlling_office_bn;
-                $ac_query->entity_office_id = $query_info->annual_plan->parent_office_id;
-                $ac_query->entity_office_name_en = $query_info->annual_plan->parent_office_name_en;
-                $ac_query->entity_office_name_bn = $query_info->annual_plan->parent_office_name_bn;
-                $ac_query->cost_center_id = $request->cost_center_id;
-                $ac_query->cost_center_name_bn = $request->cost_center_name_bn;
-                $ac_query->cost_center_name_en = $request->cost_center_name_en;
-                $ac_query->query_id = $query['query_id'];
-                $ac_query->potro_no = '1';
-                $ac_query->query_title_en = $query['query_title_en'];
-                $ac_query->query_title_bn = $query['query_title_bn'];
-                $ac_query->is_query_sent = 1;
-                $ac_query->query_send_date = date('Y-m-d');
-                $ac_query->querier_officer_id = $cdesk->officer_id;
-                $ac_query->querier_officer_name_en = $cdesk->officer_en;
-                $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
-                $ac_query->querier_designation_id = $cdesk->designation_id;
-                $ac_query->querier_designation_bn = $cdesk->designation_bn;
-                $ac_query->querier_designation_en = $cdesk->designation_en;
-                $ac_query->status = 'pending';
-                $send_rpu[] = $ac_query;
-                $ac_query->save();
-            }
-
-            $fiscal_year_info =  XFiscalYear::select('start','end')->find($request->fiscal_year_id);
+            $acQueryItems = AcQueryItem::select('ac_query_id','item_title_en','item_title_bn','status')
+                ->where('ac_query_id',$request->ac_query_id)
+                ->get();
 
             $data = [];
-            $data['query_list'] = $send_rpu;
+            $data['ac_query'] = $acQuery;
+            $data['ac_query_items'] = json_encode_unicode($acQueryItems);
             $data['directorate_id'] = $cdesk->office_id;
             $data['directorate_en'] = $cdesk->office_name_en;
             $data['directorate_bn'] = $cdesk->office_name_bn;
@@ -110,6 +77,10 @@ class AuditExecutionQueryService
             $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data)->json();
 
             if ($send_audit_query_to_rpu['status'] == 'success') {
+                $acQuery->has_sent_to_rpu = 1;
+                $acQuery->status = 'send';
+                $acQuery->save();
+
                 \DB::commit();
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
@@ -166,7 +137,7 @@ class AuditExecutionQueryService
         }
     }
 
-    public function auditQueryCostCenterTypeWise(Request $request)
+    public function loadAuditQuery(Request $request)
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
@@ -174,36 +145,19 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $query_list = Query::where('cost_center_type_id', $request->cost_center_type_id)->get();
+            $ac_query_list = AcQuery::where('cost_center_id',$request->cost_center_id)->get();
+            return ['status' => 'success', 'data' => $ac_query_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
 
-            $ac_query_list = AcQuery::where('cost_center_type_id',$request->cost_center_type_id)
-                ->where('cost_center_id',$request->cost_center_id)
-                ->where('status','!=','removed')
-                ->get();
+        }
+    }
 
-            $cost_center_wise_query_temp = [];
-            $cost_center_wise_query = [];
-
-            foreach ($query_list as $query){
-                $cost_center_wise_query_temp['id'] = $query['id'];
-                $cost_center_wise_query_temp['query_title_bn'] = $query['query_title_bn'];
-                $cost_center_wise_query_temp['query_title_en'] = $query['query_title_en'];
-                $cost_center_wise_query_temp['audit_query'] = '';
-                foreach ($ac_query_list as $ac_query){
-                    if($query['id'] == $ac_query['query_id']){
-                        $cost_center_wise_query_temp['audit_query'] = [
-                            'id' => $ac_query['id'],
-                            'query_id' => $ac_query['query_id'],
-                            'status' => $ac_query['status'],
-                            'is_query_document_received' => $ac_query['is_query_document_received'],
-                        ];
-                    }
-                }
-
-                $cost_center_wise_query[] = $cost_center_wise_query_temp;
-            }
-
-            return ['status' => 'success', 'data' => $cost_center_wise_query];
+    public function loadTypeWiseAuditQuery(Request $request)
+    {
+        try {
+            $query_list = Query::where('cost_center_type_id',$request->cost_center_type_id)->get();
+            return ['status' => 'success', 'data' => $query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
 
@@ -251,7 +205,6 @@ class AuditExecutionQueryService
         }
     }
 
-
     public function rpuSendQueryList(Request $request)
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -266,6 +219,134 @@ class AuditExecutionQueryService
                 ->where('status','!=','removed')
                 ->get();
             return ['status' => 'success', 'data' => $ac_query_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function storeAuditQuery(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $schedule = AuditVisitCalenderPlanMember::with('plan_team:id')
+                ->with('office_order:id,audit_plan_id')
+                ->where('id', $request->schedule_id)
+                ->first();
+
+            $ac_query = new AcQuery();
+            $ac_query->fiscal_year_id = $schedule->fiscal_year_id;
+            $ac_query->activity_id = $schedule->activity_id;
+            $ac_query->annual_plan_id = $schedule->annual_plan_id;
+            $ac_query->audit_plan_id = $schedule->audit_plan_id;
+            $ac_query->office_order_id = $schedule->office_order->id;
+            $ac_query->team_id = $schedule->team_id;
+            $ac_query->entity_office_id = $schedule->entity_id;
+            $ac_query->entity_office_name_en = $schedule->entity_name_en;
+            $ac_query->entity_office_name_bn = $schedule->entity_name_bn;
+            $ac_query->cost_center_id = $schedule->cost_center_id;
+            $ac_query->cost_center_name_en = $schedule->cost_center_name_en;
+            $ac_query->cost_center_name_bn = $schedule->cost_center_name_bn;
+
+            $ac_query->querier_officer_id = $cdesk->officer_id;
+            $ac_query->querier_officer_name_en = $cdesk->officer_en;
+            $ac_query->querier_officer_name_bn = $cdesk->officer_bn;
+            $ac_query->querier_unit_name_en = $cdesk->office_unit_en;
+            $ac_query->querier_unit_name_bn = $cdesk->office_unit_bn;
+            $ac_query->querier_designation_id = $cdesk->designation_id;
+            $ac_query->querier_designation_bn = $cdesk->designation_bn;
+            $ac_query->querier_designation_en = $cdesk->designation_en;
+
+            $ac_query->rpu_office_head_details = $request->rpu_office_head_details;
+            $ac_query->memorandum_no = $request->memorandum_no;
+            $ac_query->memorandum_date = $request->memorandum_date;
+            $ac_query->subject = $request->subject;
+            $ac_query->description = $request->description;
+            $ac_query->status = 'pending';
+            $ac_query->save();
+
+
+            //for insert items
+            $acQueryItems = array();
+            foreach ($request->audit_query_items as $value) {
+                if (!empty($value)){
+                    $acQueryItems[] = array(
+                        'ac_query_id'=> $ac_query->id,
+                        'item_title_en'=> $value,
+                        'item_title_bn'=> $value,
+                        'status'=> 'pending'
+                    );
+                }
+            }
+            if (!empty($acQueryItems)) {
+                AcQueryItem::insert($acQueryItems);
+            }
+
+            return ['status' => 'success', 'data' => 'Query Saved Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function updateAuditQuery(Request $request)
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_query = AcQuery::find($request->ac_query_id);
+            $ac_query->rpu_office_head_details = $request->rpu_office_head_details;
+            $ac_query->memorandum_no = $request->memorandum_no;
+            $ac_query->memorandum_date = $request->memorandum_date;
+            $ac_query->subject = $request->subject;
+            $ac_query->description = $request->description;
+            $ac_query->status = 'pending';
+            $ac_query->updated_by = $cdesk->officer_id;
+            $ac_query->save();
+
+
+            //for insert items
+            AcQueryItem::where('ac_query_id', $request->ac_query_id)->delete();
+            $acQueryItems = array();
+            foreach ($request->audit_query_items as $value) {
+                if (!empty($value)){
+                    $acQueryItems[] = array(
+                        'ac_query_id'=> $ac_query->id,
+                        'item_title_en'=> $value,
+                        'item_title_bn'=> $value,
+                        'status'=> 'pending'
+                    );
+                }
+            }
+            if (!empty($acQueryItems)) {
+                AcQueryItem::insert($acQueryItems);
+            }
+
+            return ['status' => 'success', 'data' => 'Query Saved Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function viewAuditQuery(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ac_query = AcQuery::with('query_items')
+                ->with('plan_team:id,team_name,team_parent_id')
+                ->where('id',$request->ac_query_id)
+                ->first();
+            return ['status' => 'success', 'data' => $ac_query];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

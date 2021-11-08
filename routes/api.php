@@ -155,8 +155,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('send-audit-query', [AuditExecutionQueryController::class, 'sendAuditQuery']);
         Route::post('received-audit-query', [AuditExecutionQueryController::class, 'receivedAuditQuery']);
         Route::post('rejected-audit-query', [AuditExecutionQueryController::class, 'rejectedAuditQuery']);
-        Route::post('audit-query-cost-center-type-wise', [AuditExecutionQueryController::class, 'auditQueryCostCenterTypeWise']);
+        Route::post('load-audit-query', [AuditExecutionQueryController::class, 'loadAuditQuery']);
+        Route::post('load-type-wise-audit-query', [AuditExecutionQueryController::class, 'loadTypeWiseAuditQuery']);
         Route::post('rpu-send-query-list', [AuditExecutionQueryController::class, 'rpuSendQueryList']);
+        Route::post('store-audit-query', [AuditExecutionQueryController::class, 'storeAuditQuery']);
+        Route::post('update-audit-query', [AuditExecutionQueryController::class, 'updateAuditQuery']);
+        Route::post('view-audit-query', [AuditExecutionQueryController::class, 'viewAuditQuery']);
     });
 
     Route::group(['prefix' => 'audit-conduct-memo'], function () {

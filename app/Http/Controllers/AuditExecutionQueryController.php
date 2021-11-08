@@ -41,13 +41,24 @@ class AuditExecutionQueryController extends Controller
         return response()->json($response);
     }
 
-    public function auditQueryCostCenterTypeWise(Request $request, AuditExecutionQueryService $auditExecutionQueryService)
+    public function loadAuditQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService)
     {
-        $cost_center_wise_query = $auditExecutionQueryService->auditQueryCostCenterTypeWise($request);
-        if (isSuccessResponse($cost_center_wise_query)) {
-            $response = responseFormat('success', $cost_center_wise_query['data']);
+        $auditQueries = $auditExecutionQueryService->loadAuditQuery($request);
+        if (isSuccessResponse($auditQueries)) {
+            $response = responseFormat('success', $auditQueries['data']);
         } else {
-            $response = responseFormat('error', $cost_center_wise_query['data']);
+            $response = responseFormat('error', $auditQueries['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function loadTypeWiseAuditQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService)
+    {
+        $auditQueries = $auditExecutionQueryService->loadTypeWiseAuditQuery($request);
+        if (isSuccessResponse($auditQueries)) {
+            $response = responseFormat('success', $auditQueries['data']);
+        } else {
+            $response = responseFormat('error', $auditQueries['data']);
         }
         return response()->json($response);
     }
@@ -66,6 +77,39 @@ class AuditExecutionQueryController extends Controller
     public function rpuSendQueryList(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
     {
         $ac_query_list = $auditExecutionQueryService->rpuSendQueryList($request);
+        if (isSuccessResponse($ac_query_list)) {
+            $response = responseFormat('success', $ac_query_list['data']);
+        } else {
+            $response = responseFormat('error', $ac_query_list['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function storeAuditQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $ac_query_list = $auditExecutionQueryService->storeAuditQuery($request);
+        if (isSuccessResponse($ac_query_list)) {
+            $response = responseFormat('success', $ac_query_list['data']);
+        } else {
+            $response = responseFormat('error', $ac_query_list['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function viewAuditQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $ac_query_list = $auditExecutionQueryService->viewAuditQuery($request);
+        if (isSuccessResponse($ac_query_list)) {
+            $response = responseFormat('success', $ac_query_list['data']);
+        } else {
+            $response = responseFormat('error', $ac_query_list['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function updateAuditQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $ac_query_list = $auditExecutionQueryService->updateAuditQuery($request);
         if (isSuccessResponse($ac_query_list)) {
             $response = responseFormat('success', $ac_query_list['data']);
         } else {

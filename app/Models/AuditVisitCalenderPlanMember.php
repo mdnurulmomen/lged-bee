@@ -66,16 +66,6 @@ class AuditVisitCalenderPlanMember extends Model
         return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'audit_plan_id');
     }
 
-    public function cost_center_query()
-    {
-        return $this->hasMany(AcQuery::class, 'cost_center_id', 'cost_center_id');
-    }
-
-    public function cost_center_type()
-    {
-        return $this->hasOne(AcQuery::class, 'cost_center_id', 'cost_center_id');
-    }
-
     public function activity()
     {
         return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
