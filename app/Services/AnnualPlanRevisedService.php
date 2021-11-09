@@ -82,8 +82,15 @@ class AnnualPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $annualPlanList = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)
-                ->where('milestone_id', $request->milestone_id)
+//                ->where('milestone_id', $request->milestone_id)
                 ->get();
+
+//            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')
+//                ->where('fiscal_year_id', $request->fiscal_year_id)
+//                ->first()->op_audit_calendar_event_id;
+//
+//            $annualPlanList['op_audit_calendar_event_id'] = $op_audit_calendar_event_id;
+
             $data = ['status' => 'success', 'data' => $annualPlanList];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];

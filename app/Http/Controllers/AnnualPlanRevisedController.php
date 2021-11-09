@@ -52,7 +52,6 @@ class AnnualPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
-            'milestone_id' => 'required|integer',
             'cdesk' => 'required|json',
         ])->validate();
 
