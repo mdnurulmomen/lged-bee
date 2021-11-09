@@ -9,4 +9,9 @@ class ApRiskAssessment extends Model
 {
     use HasFactory;
     protected $connection = 'OfficeDB';
+
+    public function risk_assessment_items()
+    {
+        return $this->hasMany(ApRiskAssessmentItem::class);
+    }
 }

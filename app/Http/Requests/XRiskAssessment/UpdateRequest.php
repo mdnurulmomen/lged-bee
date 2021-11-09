@@ -24,10 +24,11 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
+            'id' => 'required',
             'risk_assessment_type' => 'required',
             'company_type' => 'nullable',
-            'risk_assessment_title_bn.*' => 'required',
-            'risk_assessment_title_en.*' => 'required',
+            'risk_assessment_title_bn' => 'required',
+            'risk_assessment_title_en' => 'required',
         ];
     }
 
@@ -35,8 +36,8 @@ class UpdateRequest extends FormRequest
     {
         return [
             'risk_assessment_type.required' => 'Risk Assessment Type Required',
-            'risk_assessment_title_en.*.required' => 'Risk Assessment Title Bangla Required',
-            'risk_assessment_title_bn.*.required' => 'Risk Assessment Title English Required',
+            'risk_assessment_title_en.required' => 'Risk Assessment Title Bangla Required',
+            'risk_assessment_title_bn.required' => 'Risk Assessment Title English Required',
         ];
     }
 }
