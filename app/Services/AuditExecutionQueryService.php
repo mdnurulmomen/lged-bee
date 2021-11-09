@@ -78,7 +78,7 @@ class AuditExecutionQueryService
 
             if ($send_audit_query_to_rpu['status'] == 'success') {
                 $acQuery->has_sent_to_rpu = 1;
-                $acQuery->status = 'send';
+                $acQuery->status = 'sent';
                 $acQuery->save();
 
                 \DB::commit();
