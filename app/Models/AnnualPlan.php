@@ -64,9 +64,4 @@ class AnnualPlan extends Model
         return $this->hasMany(ApEntityIndividualAuditPlan::class, 'annual_plan_id', 'id');
     }
 
-    public function op_organization_yearly_audit_calendar_event(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(OpOrganizationYearlyAuditCalendarEvent::class, 'op_audit_calendar_event_id', 'op_audit_calendar_event_id');
-    }
-
 }

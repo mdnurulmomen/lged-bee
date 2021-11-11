@@ -36,6 +36,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('activity/find', [OpActivityController::class, 'findActivities']);
             Route::post('activity/all-by-fiscal-year', [OpActivityController::class, 'showActivitiesByFiscalYear']);
             Route::post('activity/milestones', [OpActivityController::class, 'showActivityMilestones']);
+            Route::post('activity/get-all-activity', [OpActivityController::class, 'getAllActivity']);
             Route::customApiResource('activity', OpActivityController::class);
 
             Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);

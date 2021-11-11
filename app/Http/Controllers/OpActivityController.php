@@ -57,6 +57,19 @@ class OpActivityController extends Controller
         }
     }
 
+    public function getAllActivity(Request $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
+    {
+        $activity_list = $opActivity->getAllActivity($request);
+
+        if (isSuccessResponse($activity_list)) {
+            $response = responseFormat('success', $activity_list['data']);
+        } else {
+            $response = responseFormat('error', $activity_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function store(SaveRequest $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
     {
         try {

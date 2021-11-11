@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AnnualPlan;
+use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
@@ -85,13 +86,15 @@ class AnnualPlanRevisedService
 //                ->where('milestone_id', $request->milestone_id)
                 ->get();
 
-//            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')
-//                ->where('fiscal_year_id', $request->fiscal_year_id)
-//                ->first()->op_audit_calendar_event_id;
-//
-//            $annualPlanList['op_audit_calendar_event_id'] = $op_audit_calendar_event_id;
+            $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
+                ->where('office_id', $cdesk->office_id)
+                ->first()->approval_status;
 
-            $data = ['status' => 'success', 'data' => $annualPlanList];
+            $annualPlan['annual_plan_list'] = $annualPlanList;
+            $annualPlan['approval_status'] = $approval_status;
+
+            $data = ['status' => 'success', 'data' => $annualPlan];
+
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -111,8 +114,10 @@ class AnnualPlanRevisedService
             $controlling_office = json_decode($request->controlling_office);
             $parent_office = json_decode($request->parent_office);
 
+           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
+
             $plan_data = [
-                'schedule_id' => $request->schedule_id,
+                'schedule_id' => $schedule_id,
                 'milestone_id' => $request->milestone_id,
                 'activity_id' => $request->activity_id,
                 'fiscal_year_id' => $request->fiscal_year_id,
@@ -129,7 +134,7 @@ class AnnualPlanRevisedService
                 'parent_office_name_en' => $parent_office->parent_office_name_en,
                 'parent_office_name_bn' => $parent_office->parent_office_name_bn,
                 'parent_office_id' => $parent_office->parent_office_id,
-                'office_type' => $parent_office->office_type,
+                'office_type' => $request->office_type,
 
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),

@@ -144,9 +144,19 @@ class OpActivityRepository implements OpActivityInterface
     public function showActivityMilestones(Request $request)
     {
         $activity_id = $request->activity_id;
-        $milestones = OpActivityMilestone::select('title_en', 'title_en')->where('activity_id', $activity_id)->with('milestone_calendar')->get();
+        $milestones = OpActivityMilestone::select('id', 'title_en', 'title_bn')->where('activity_id', $activity_id)->with('milestone_calendar')->get();
 
         return $milestones;
+    }
+
+    public function getAllActivity(Request $request): array
+    {
+        try {
+            $activity_list = OpActivity::where('fiscal_year_id', $request->fiscal_year_id)->get();
+            return ['status' => 'success', 'data' => $activity_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
     }
 
     public function storeActivity($validated_data): array
