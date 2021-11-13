@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\XRiskAssessment;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -198,6 +197,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
+
+    //Permission
+    Route::post('modules', [PermissionController::class, 'modules']);
+    Route::post('modules/other', [PermissionController::class, 'otherModules']);
+    Route::post('modules/menus', [PermissionController::class, 'menus']);
 
     Route::group(['prefix' => 'migration'], function () {
         Route::post('audit-team-schedules', [MigrationController::class, 'migrateAuditTeamSchedules']);
