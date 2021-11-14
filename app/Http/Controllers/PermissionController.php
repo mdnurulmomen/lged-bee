@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    public function modules(Request $request, PermissionService $permissionService)
+    public function modules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $cdesk = json_decode($request->cdesk, false);
         $modules = $permissionService->permittedModules($cdesk->master_desigation_id);
@@ -22,10 +22,10 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function otherModules(Request $request, PermissionService $permissionService)
+    public function otherModules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $cdesk = json_decode($request->cdesk, false);
-        $modules = $permissionService->permittedModules($cdesk->master_desigation_id);
+        $modules = $permissionService->permittedOtherModules($cdesk->master_desigation_id);
         if (isSuccessResponse($modules)) {
             $response = responseFormat('success', $modules['data']);
         } else {
@@ -35,7 +35,7 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function menus(Request $request, PermissionService $permissionService)
+    public function menus(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $cdesk = json_decode($request->cdesk, false);
         $menus = $permissionService->permittedModuleWiseMenus($cdesk->master_designation_id, $request->module_link);
@@ -48,7 +48,7 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function assignModulesToRole(Request $request)
+    public function assignModulesToRole(Request $request): \Illuminate\Http\JsonResponse
     {
         $assignedMenus = $request->input('modules') ?: [];
         $role_id = $request->input('role_id');
