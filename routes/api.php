@@ -203,10 +203,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::customApiResource('roles', PMenuController::class);
 
     //Permission
-    Route::group(['prefix' => 'role-permission/'], function () {
+    Route::group(['prefix' => 'role-and-permissions/'], function () {
         Route::post('modules', [PermissionController::class, 'modules']);
         Route::post('modules/other', [PermissionController::class, 'otherModules']);
-        Route::post('modules/menus', [PermissionController::class, 'menus']);
+        Route::post('module/menus', [PermissionController::class, 'menus']);
     });
 
     Route::group(['prefix' => 'migration'], function () {

@@ -2,47 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PMenu;
 use App\Models\PMenuModule;
-use App\Models\PMenuModuleRoleMap;
-use App\Models\PMenuRoleMap;
 use App\Models\PRole;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    public function modules(Request $request)
+    public function modules(Request $request, PermissionService $permissionService)
     {
         $cdesk = json_decode($request->cdesk, false);
-        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', $cdesk->master_designation_id)->pluck('module_id');
-        return PMenuModule::whereIn('id', $roleMenuMapIds)->with([
-            'children' => function ($query) use ($roleMenuMapIds) {
-                $query->whereIn('id', $roleMenuMapIds);
-            }])->where('parent_menu_id', '0')->get();
+        $modules = $permissionService->permittedModules($cdesk->master_desigation_id);
+        if (isSuccessResponse($modules)) {
+            $response = responseFormat('success', $modules['data']);
+        } else {
+            $response = responseFormat('error', $modules['data']);
+        }
+
+        return response()->json($response);
     }
 
-    public function otherModules(Request $request)
+    public function otherModules(Request $request, PermissionService $permissionService)
     {
         $cdesk = json_decode($request->cdesk, false);
-        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', $cdesk->master_designation_id)->pluck('module_id');
-        return PMenuModule::whereIn('id', $roleMenuMapIds)->with([
-            'children' => function ($query) use ($roleMenuMapIds) {
-                $query->whereIn('id', $roleMenuMapIds);
-            }])->where('parent_menu_id', '0')->get();
+        $modules = $permissionService->permittedModules($cdesk->master_desigation_id);
+        if (isSuccessResponse($modules)) {
+            $response = responseFormat('success', $modules['data']);
+        } else {
+            $response = responseFormat('error', $modules['data']);
+        }
+
+        return response()->json($response);
     }
 
-    public function menus(Request $request)
+    public function menus(Request $request, PermissionService $permissionService)
     {
-        $roleMenuMapIds = PMenuRoleMap::where('role_id', 1)->pluck('menu_id');
-        return PMenu::whereIn('id', $roleMenuMapIds)->with([
-            'children' => function ($query) use ($roleMenuMapIds) {
-                $query->whereIn('id', $roleMenuMapIds);
-            }])->where('parent_menu_id', '0')->get();
+        $cdesk = json_decode($request->cdesk, false);
+        $menus = $permissionService->permittedModuleWiseMenus($cdesk->master_designation_id, $request->module_link);
+        if (isSuccessResponse($menus)) {
+            $response = responseFormat('success', $menus['data']);
+        } else {
+            $response = responseFormat('error', $menus['data']);
+        }
+
+        return response()->json($response);
     }
 
     public function assignModulesToRole(Request $request)
     {
-
         $assignedMenus = $request->input('modules') ?: [];
         $role_id = $request->input('role_id');
         $menus = PMenuModule::whereIn('id', $assignedMenus)->get();
