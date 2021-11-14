@@ -33,6 +33,11 @@ class PMenuModule extends Model
 
     public function children(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(PMenu::class, 'parent_module_id')->with('children');
+        return $this->hasMany(PMenuModule::class, 'parent_module_id')->with('children');
+    }
+
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenuModule::class, 'parent_module_id');
     }
 }

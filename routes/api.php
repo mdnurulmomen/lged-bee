@@ -200,7 +200,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::customApiResource('module-menus', PMenuModuleController::class);
     Route::customApiResource('menus', PMenuController::class);
-    Route::customApiResource('roles', PMenuController::class);
+    Route::customApiResource('roles', PRoleController::class);
 
     //Permission
     Route::group(['prefix' => 'role-and-permissions/'], function () {

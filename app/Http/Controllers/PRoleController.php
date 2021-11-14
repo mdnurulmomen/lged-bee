@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PRoleController extends Controller
 {
@@ -25,7 +26,15 @@ class PRoleController extends Controller
 
     public function store(Request $request)
     {
-        $data = \Validator::make($request->all(), [])->validate();
+        $data = Validator::make($request->all(), [
+            'role_name_en' => 'required',
+            'role_name_bn' => 'required',
+            'description_en' => 'required',
+            'description_bn' => 'required',
+            'user_level' => 'required|integer',
+            'master_designation_id' => 'nullable|integer',
+        ])->validate();
+
         try {
             PRole::create($data);
             $response = responseFormat('success', 'Created Successfully');

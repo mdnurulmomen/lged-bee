@@ -9,7 +9,7 @@ class PRole extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['role_name_en', 'role_name_bn', 'description_en', 'description_bn', 'user_level'];
+    protected $fillable = ['role_name_en', 'role_name_bn', 'description_en', 'description_bn', 'user_level', 'master_designation_id'];
 
     public function menus(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {

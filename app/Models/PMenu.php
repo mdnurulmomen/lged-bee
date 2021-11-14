@@ -34,4 +34,14 @@ class PMenu extends Model
     {
         return $this->hasMany(PMenu::class, 'parent_menu_id')->with('children');
     }
+
+    public function module_menu(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenuModule::class, 'module_menu_id');
+    }
+
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenu::class, 'parent_menu_id');
+    }
 }

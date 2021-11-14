@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\PMenuModule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PMenuModuleController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $modules = PMenuModule::with('children')->where('parent_module_id', null)->paginate($request->per_page);
+            $modules = PMenuModule::with(['parent'])->paginate($request->per_page);
         } else {
-            $modules = PMenuModule::with('children')->where('parent_module_id', null)->get();
+            $modules = PMenuModule::with(['parent'])->get();
         }
 
         if ($modules) {
@@ -25,7 +26,17 @@ class PMenuModuleController extends Controller
 
     public function store(Request $request)
     {
-        $data = \Validator::make($request->all(), [])->validate();
+        $data = Validator::make($request->all(), [
+            'module_name_en' => 'required',
+            'module_name_bn' => 'required',
+            'is_other_module' => 'required',
+            'parent_module_id' => 'nullable',
+            'module_link' => 'nullable',
+            'module_class' => 'nullable',
+            'module_icon' => 'nullable',
+            'display_order' => 'nullable',
+        ])->validate();
+
         try {
             PMenuModule::create($data);
             $response = responseFormat('success', 'Created Successfully');
