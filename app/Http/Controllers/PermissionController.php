@@ -12,7 +12,7 @@ class PermissionController extends Controller
     public function modules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $cdesk = json_decode($request->cdesk, false);
-        $modules = $permissionService->permittedModules($cdesk->master_desigation_id);
+        $modules = $permissionService->permittedModules($cdesk->master_designation_id);
         if (isSuccessResponse($modules)) {
             $response = responseFormat('success', $modules['data']);
         } else {
@@ -25,7 +25,7 @@ class PermissionController extends Controller
     public function otherModules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $cdesk = json_decode($request->cdesk, false);
-        $modules = $permissionService->permittedOtherModules($cdesk->master_desigation_id);
+        $modules = $permissionService->permittedOtherModules($cdesk->master_designation_id);
         if (isSuccessResponse($modules)) {
             $response = responseFormat('success', $modules['data']);
         } else {

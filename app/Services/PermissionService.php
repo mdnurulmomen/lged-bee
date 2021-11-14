@@ -18,11 +18,12 @@ class PermissionService
     public function permittedModules($master_designation_id): array
     {
         try {
-            $roleMenuMapIds = PMenuModuleRoleMap::where('p_role_id', $master_designation_id)->pluck('p_menu_module_id');
+            $role = PRole::where('master_designation_id', $master_designation_id)->first();
+            $roleMenuMapIds = PMenuModuleRoleMap::where('p_role_id', $role->id)->pluck('p_menu_module_id');
             $modules = PMenuModule::where('is_other_module', 0)->whereIn('id', $roleMenuMapIds)->with([
                 'children' => function ($query) use ($roleMenuMapIds) {
                     $query->whereIn('id', $roleMenuMapIds);
-                }])->where('parent_menu_id', '0')->get();
+                }])->where('parent_module_id', null)->get();
             return ['status' => 'success', 'data' => $modules];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -32,11 +33,11 @@ class PermissionService
     public function permittedOtherModules($master_designation_id): array
     {
         try {
-            $roleMenuMapIds = PMenuModuleRoleMap::where('p_role_id', $master_designation_id)->pluck('p_menu_module_id');
+            $roleMenuMapIds = PMenuModuleRoleMap::where('master_designation_id', $master_designation_id)->pluck('p_menu_module_id');
             $modules = PMenuModule::where('is_other_module', 1)->whereIn('id', $roleMenuMapIds)->with([
                 'children' => function ($query) use ($roleMenuMapIds) {
                     $query->whereIn('id', $roleMenuMapIds);
-                }])->where('parent_menu_id', '0')->get();
+                }])->where('parent_module_id', null)->get();
             return ['status' => 'success', 'data' => $modules];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
