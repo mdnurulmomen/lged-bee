@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PMenu;
+use App\Models\PRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,12 +50,33 @@ class PMenuController extends Controller
 
     public function show(Request $request)
     {
-        //
+        Validator::make($request->all(), [
+            'menu_id' => 'required|integer',
+        ])->validate();
+
+        $menu = PMenu::find($request->menu_id);
+        if ($menu) {
+            $response = responseFormat('success', $menu);
+        } else {
+            $response = responseFormat('error', 'Menu Not Found');
+        }
+        return response()->json($response, 200);
     }
 
     public function update(Request $request)
     {
-        $data = \Validator::make($request->all(), [])->validate();
+        $data = Validator::make($request->all(), [
+            'menu_id' => 'required|integer',
+            'menu_name_en' => 'required',
+            'menu_name_bn' => 'required',
+            'module_menu_id' => 'required',
+            'parent_menu_id' => 'nullable',
+            'menu_class' => 'nullable',
+            'menu_link' => 'nullable',
+            'menu_icon' => 'nullable',
+            'display_order' => 'nullable',
+        ])->validate();
+
         try {
             $menu_module = PMenu::find($request->menu_id);
             $menu_module->update($data);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PMenu;
 use App\Models\PMenuModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -35,6 +36,8 @@ class PMenuModuleController extends Controller
             'module_class' => 'nullable',
             'module_icon' => 'nullable',
             'display_order' => 'nullable',
+            'module_controller' => 'nullable',
+            'module_method' => 'nullable',
         ])->validate();
 
         try {
@@ -49,12 +52,35 @@ class PMenuModuleController extends Controller
 
     public function show(Request $request)
     {
-        //
+        Validator::make($request->all(), [
+            'menu_module_id' => 'required|integer',
+        ])->validate();
+
+        $menu_module = PMenuModule::find($request->menu_module_id);
+        if ($menu_module) {
+            $response = responseFormat('success', $menu_module);
+        } else {
+            $response = responseFormat('error', 'Menu Not Found');
+        }
+        return response()->json($response, 200);
     }
 
     public function update(Request $request)
     {
-        $data = \Validator::make($request->all(), [])->validate();
+        $data = Validator::make($request->all(), [
+            'menu_module_id' => 'required|integer',
+            'module_name_en' => 'required',
+            'module_name_bn' => 'required',
+            'is_other_module' => 'required',
+            'parent_module_id' => 'nullable',
+            'module_link' => 'nullable',
+            'module_class' => 'nullable',
+            'module_icon' => 'nullable',
+            'display_order' => 'nullable',
+            'module_controller' => 'nullable',
+            'module_method' => 'nullable',
+        ])->validate();
+
         try {
             $menu_module = PMenuModule::find($request->menu_module_id);
             $menu_module->update($data);

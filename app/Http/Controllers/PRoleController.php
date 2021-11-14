@@ -19,7 +19,7 @@ class PRoleController extends Controller
         if ($roles) {
             $response = responseFormat('success', $roles);
         } else {
-            $response = responseFormat('error', 'Module Not Found');
+            $response = responseFormat('error', 'Role Not Found');
         }
         return response()->json($response, 200);
     }
@@ -32,7 +32,7 @@ class PRoleController extends Controller
             'description_en' => 'required',
             'description_bn' => 'required',
             'user_level' => 'required|integer',
-            'master_designation_id' => 'nullable|integer',
+            'master_designation_id' => 'required|integer',
         ])->validate();
 
         try {
@@ -47,12 +47,31 @@ class PRoleController extends Controller
 
     public function show(Request $request)
     {
-        //
+        Validator::make($request->all(), [
+            'role_id' => 'required|integer',
+        ])->validate();
+
+        $role = PRole::find($request->role_id);
+        if ($role) {
+            $response = responseFormat('success', $role);
+        } else {
+            $response = responseFormat('error', 'Role Not Found');
+        }
+        return response()->json($response, 200);
     }
 
     public function update(Request $request)
     {
-        $data = \Validator::make($request->all(), [])->validate();
+        $data = Validator::make($request->all(), [
+            'role_id' => 'required',
+            'role_name_en' => 'required',
+            'role_name_bn' => 'required',
+            'description_en' => 'required',
+            'description_bn' => 'required',
+            'user_level' => 'required|integer',
+            'master_designation_id' => 'required|integer',
+        ])->validate();
+
         try {
             $menu_module = PRole::find($request->role_id);
             $menu_module->update($data);
