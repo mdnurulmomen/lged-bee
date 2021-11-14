@@ -48,16 +48,26 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function assignModulesToRole(Request $request): \Illuminate\Http\JsonResponse
+    public function getMenuModuleLists(Request $request, PermissionService $permissionService)
     {
-        $assignedMenus = $request->input('modules') ?: [];
-        $role_id = $request->input('role_id');
-        $menus = PMenuModule::whereIn('id', $assignedMenus)->get();
-        $role = PRole::find($role_id);
+        $cdesk = json_decode($request->cdesk, false);
+        $menus = $permissionService->getMenuModuleLists();
+        if (isSuccessResponse($menus)) {
+            $response = responseFormat('success', $menus['data']);
+        } else {
+            $response = responseFormat('error', $menus['data']);
+        }
+        return response()->json($response);
+    }
 
-        if ($role->modules()->sync($menus))
-            return response()->json(['msg' => 'মেনু প্রদান করা হয়েছে।', 'status' => 'success'], 200);
-        else
-            return response()->json(['msg' => 'Error', 'status' => 'error'], 500);
+    public function assignModulesToRole(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
+    {
+        $assign = $permissionService->assignModulesToRole($request);
+        if (isSuccessResponse($assign)) {
+            $response = responseFormat('success', $assign['data']);
+        } else {
+            $response = responseFormat('error', $assign['data']);
+        }
+        return response()->json($response);
     }
 }

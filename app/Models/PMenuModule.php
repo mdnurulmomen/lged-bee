@@ -40,4 +40,9 @@ class PMenuModule extends Model
     {
         return $this->belongsTo(PMenuModule::class, 'parent_module_id');
     }
+
+    public function menus()
+    {
+        return $this->hasMany(PMenu::class, 'module_menu_id')->where('parent_menu_id', null);
+    }
 }
