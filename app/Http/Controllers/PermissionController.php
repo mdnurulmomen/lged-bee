@@ -13,7 +13,8 @@ class PermissionController extends Controller
 {
     public function modules(Request $request)
     {
-        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', 1)->pluck('module_id');
+        $cdesk = json_decode($request->cdesk, false);
+        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', $cdesk->master_designation_id)->pluck('module_id');
         return PMenuModule::whereIn('id', $roleMenuMapIds)->with([
             'children' => function ($query) use ($roleMenuMapIds) {
                 $query->whereIn('id', $roleMenuMapIds);
@@ -22,7 +23,8 @@ class PermissionController extends Controller
 
     public function otherModules(Request $request)
     {
-        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', 1)->pluck('module_id');
+        $cdesk = json_decode($request->cdesk, false);
+        $roleMenuMapIds = PMenuModuleRoleMap::where('role_id', $cdesk->master_designation_id)->pluck('module_id');
         return PMenuModule::whereIn('id', $roleMenuMapIds)->with([
             'children' => function ($query) use ($roleMenuMapIds) {
                 $query->whereIn('id', $roleMenuMapIds);

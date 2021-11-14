@@ -10,9 +10,9 @@ class PMenuModuleController extends Controller
     public function index(Request $request)
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $modules = PMenuModule::paginate($request->per_page);
+            $modules = PMenuModule::with('children')->where('parent_module_id', null)->paginate($request->per_page);
         } else {
-            $modules = PMenuModule::all();
+            $modules = PMenuModule::with('children')->where('parent_module_id', null)->get();
         }
 
         if ($modules) {
