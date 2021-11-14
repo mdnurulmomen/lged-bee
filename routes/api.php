@@ -198,10 +198,16 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
 
+    Route::customApiResource('module-menus', PMenuModuleController::class);
+    Route::customApiResource('menus', PMenuController::class);
+    Route::customApiResource('roles', PMenuController::class);
+
     //Permission
-    Route::post('modules', [PermissionController::class, 'modules']);
-    Route::post('modules/other', [PermissionController::class, 'otherModules']);
-    Route::post('modules/menus', [PermissionController::class, 'menus']);
+    Route::group(['prefix' => 'role-permission/'], function () {
+        Route::post('modules', [PermissionController::class, 'modules']);
+        Route::post('modules/other', [PermissionController::class, 'otherModules']);
+        Route::post('modules/menus', [PermissionController::class, 'menus']);
+    });
 
     Route::group(['prefix' => 'migration'], function () {
         Route::post('audit-team-schedules', [MigrationController::class, 'migrateAuditTeamSchedules']);
