@@ -12,9 +12,10 @@ class PMenuModuleController extends Controller
     public function index(Request $request)
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $modules = PMenuModule::with(['parent'])->paginate($request->per_page);
+            $modules = PMenuModule::with(['parent'])->orderBy('id','DESC')
+                ->paginate($request->per_page);
         } else {
-            $modules = PMenuModule::with(['parent'])->get();
+            $modules = PMenuModule::with(['parent'])->orderBy('id','DESC')->get();
         }
 
         if ($modules) {
@@ -72,11 +73,11 @@ class PMenuModuleController extends Controller
             'module_name_en' => 'required',
             'module_name_bn' => 'required',
             'is_other_module' => 'required',
+            'display_order' => 'required',
             'parent_module_id' => 'nullable',
             'module_link' => 'nullable',
             'module_class' => 'nullable',
             'module_icon' => 'nullable',
-            'display_order' => 'nullable',
             'module_controller' => 'nullable',
             'module_method' => 'nullable',
         ])->validate();
