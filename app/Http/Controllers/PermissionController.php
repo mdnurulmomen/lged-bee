@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PMenuModule;
-use App\Models\PRole;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 

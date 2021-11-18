@@ -32,7 +32,6 @@ class PRoleController extends Controller
             'description_en' => 'required',
             'description_bn' => 'required',
             'user_level' => 'required|integer',
-            'master_designation_id' => 'required|integer',
         ])->validate();
 
         try {
