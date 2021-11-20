@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\PRole;
+use App\Models\PRoleDesignationMap;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use mysql_xdevapi\Exception;
 
 class PRoleController extends Controller
 {
@@ -68,7 +71,6 @@ class PRoleController extends Controller
             'description_en' => 'required',
             'description_bn' => 'required',
             'user_level' => 'required|integer',
-            'master_designation_id' => 'required|integer',
         ])->validate();
 
         try {
@@ -82,6 +84,35 @@ class PRoleController extends Controller
         return response()->json($response);
     }
 
+    public function assignMasterDesignationsToRole(Request $request)
+    {
+        Validator::make($request->all(), [
+            'role_id' => 'required',
+            'master_designations' => 'required',
+        ])->validate();
+        DB::beginTransaction();
+        try {
+            $master_designations = explode(',', $request->master_designations);
+            if ($master_designations) {
+                PRoleDesignationMap::where('p_role_id', $request->role_id)->delete();
+                foreach ($master_designations as $master_designation) {
+                    PRoleDesignationMap::create([
+                        'p_role_id' => $request->role_id,
+                        'master_designation_id' => $master_designation,
+                    ]);
+                }
+                $response = responseFormat('success', 'Successfully Updated');
+                DB::commit();
+            } else {
+                throw new Exception('No Designations');
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
 
     public function destroy(Request $request)
     {

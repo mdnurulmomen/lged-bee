@@ -46,10 +46,10 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function getMenuModuleLists(Request $request, PermissionService $permissionService)
+    public function getAllMenuActionLists(Request $request, PermissionService $permissionService)
     {
         $cdesk = json_decode($request->cdesk, false);
-        $menus = $permissionService->getMenuModuleLists();
+        $menus = $permissionService->getAllMenuActionLists();
         if (isSuccessResponse($menus)) {
             $response = responseFormat('success', $menus['data']);
         } else {

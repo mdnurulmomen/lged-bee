@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PMenu;
+use App\Models\PMenuAction;
 use App\Models\PMenuModule;
 use App\Models\PMenuModuleRoleMap;
 use App\Models\PMenuRoleMap;
@@ -65,10 +66,13 @@ class PermissionService
         }
     }
 
-    public function getMenuModuleLists()
+    public function getAllMenuActionLists()
     {
         try {
-            $data = PMenuModule::where('parent_module_id', null)->with(['children.menus.children', 'menus.children'])->orderBy('display_order')->get();
+            $data = PMenuAction::where('type', 'module')->where('parent_id', null)
+                ->with(['module_children.menu'])
+//                ->with(['children.menus.children', 'menus.children'])
+                ->orderBy('display_order')->get();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

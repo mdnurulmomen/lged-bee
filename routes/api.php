@@ -200,11 +200,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     //Menu Action
     Route::customApiResource('menu-actions', PMenuActionController::class);
+    Route::post('roles/assign-master-designations-to-role', [PRoleController::class, 'assignMasterDesignationsToRole']);
     Route::customApiResource('roles', PRoleController::class);
 
     //Permission
     Route::group(['prefix' => 'role-and-permissions/'], function () {
-        Route::post('get-module-menu-lists', [PermissionController::class, 'getMenuModuleLists']);
+        Route::post('get-module-menu-lists', [PermissionController::class, 'getAllMenuActionLists']);
         Route::post('assign-menus-to-role', [PermissionController::class, 'assignModulesToRole']);
         Route::post('modules', [PermissionController::class, 'modules']);
         Route::post('modules/other', [PermissionController::class, 'otherModules']);
