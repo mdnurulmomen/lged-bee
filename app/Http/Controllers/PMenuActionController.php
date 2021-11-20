@@ -63,11 +63,12 @@ class PMenuActionController extends Controller
             'menu_action_id' => 'required|integer',
         ])->validate();
 
-        $menu = PMenuAction::find($request->menu_action_id);
-        if ($menu) {
-            $response = responseFormat('success', $menu);
+        $menuAction = PMenuAction::find($request->menu_action_id);
+
+        if ($menuAction) {
+            $response = responseFormat('success', $menuAction);
         } else {
-            $response = responseFormat('error', 'Menu Not Found');
+            $response = responseFormat('error', 'Menu Action Not Found');
         }
         return response()->json($response, 200);
     }
@@ -75,6 +76,7 @@ class PMenuActionController extends Controller
     public function update(Request $request)
     {
         $data = Validator::make($request->all(), [
+            'menu_action_id' => 'required|integer',
             'title_en' => 'required',
             'title_bn' => 'required',
             'link' => 'required',
@@ -89,7 +91,7 @@ class PMenuActionController extends Controller
         ])->validate();
 
         try {
-            $menu_action = PMenuAction::find($request->menu_id);
+            $menu_action = PMenuAction::find($request->menu_action_id);
             $menu_action->update($data);
             $response = responseFormat('success', 'Successfully Updated');
         } catch (\Exception $exception) {
