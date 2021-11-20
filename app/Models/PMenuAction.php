@@ -25,4 +25,9 @@ class PMenuAction extends Model
         'created_by',
         'modified_by',
     ];
+
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenuAction::class, 'parent_id');
+    }
 }

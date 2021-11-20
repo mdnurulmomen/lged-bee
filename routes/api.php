@@ -198,8 +198,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
 
-    Route::customApiResource('module-menus', PMenuModuleController::class);
-    Route::customApiResource('menus', PMenuController::class);
+    //Menu Action
+    Route::customApiResource('menu-actions', PMenuActionController::class);
     Route::customApiResource('roles', PRoleController::class);
 
     //Permission
