@@ -206,7 +206,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     //Permission
     Route::group(['prefix' => 'role-and-permissions/'], function () {
         Route::post('get-module-menu-lists', [PermissionController::class, 'getAllMenuActionLists']);
-        Route::post('assign-menus-to-role', [PermissionController::class, 'assignModulesToRole']);
+        Route::post('assign-menu-actions-to-role', [PermissionController::class, 'assignMenuActionsToRole']);
         Route::post('modules', [PermissionController::class, 'modules']);
         Route::post('modules/other', [PermissionController::class, 'otherModules']);
         Route::post('module/menus', [PermissionController::class, 'menus']);

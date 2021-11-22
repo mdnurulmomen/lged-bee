@@ -58,9 +58,9 @@ class PermissionController extends Controller
         return response()->json($response);
     }
 
-    public function assignModulesToRole(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
+    public function assignMenuActionsToRole(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
-        $assign = $permissionService->assignModulesToRole($request);
+        $assign = $permissionService->assignMenuActionsToRole($request);
         if (isSuccessResponse($assign)) {
             $response = responseFormat('success', $assign['data']);
         } else {

@@ -20,6 +20,8 @@ class PMenuAction extends Model
         'display_order',
         'status',
         'parent_id',
+        'menu_module_id',
+        'action_menu_id',
         'is_other_module',
         'type',
         'created_by',
@@ -31,34 +33,34 @@ class PMenuAction extends Model
         return $this->belongsTo(PMenuAction::class, 'parent_id');
     }
 
-    public function module_children(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function module_childrens(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(PMenuAction::class, 'parent_id')->where('type', 'module')->orderBy('display_order', 'ASC')->with('module_children');
+        return $this->hasMany(PMenuAction::class, 'parent_id')->where('status', 1)->where('type', 'module')->orderBy('display_order', 'ASC')->with('module_childrens');
     }
 
     public function all_menu_action_children()
     {
-        return $this->hasMany(PMenuAction::class, 'parent_id')->where('type', 'module')->orderBy('display_order', 'ASC')->with('module_children.menu.menu_children.menu_action.menu_action_children');
+        return $this->hasMany(PMenuAction::class, 'parent_id')->where('status', 1)->where('type', 'module')->orderBy('display_order', 'ASC')->with('module_children.menu.menu_children.menu_action.menu_action_children');
     }
 
-    public function menu()
+    public function menus()
     {
-        return $this->hasMany(PMenuAction::class, 'parent_id')->where('type', 'menu');
+        return $this->hasMany(PMenuAction::class, 'menu_module_id')->where('status', 1)->where('type', 'menu')->orderBy('display_order', 'ASC')->with('menu_childrens');
     }
 
-    public function menu_children()
+    public function menu_childrens()
     {
-        return $this->hasMany(PMenuAction::class, 'parent_id')->where('type', 'menu')->orderBy('display_order', 'ASC')->with('menu_children');
+        return $this->hasMany(PMenuAction::class, 'parent_id')->where('status', 1)->where('type', 'menu')->orderBy('display_order', 'ASC')->with('menu_childrens');
     }
 
-    public function menu_action()
+    public function menu_actions()
     {
-        return $this->belongsTo(PMenuAction::class, 'parent_id')->where('type', 'action');
+        return $this->hasMany(PMenuAction::class, 'action_menu_id')->where('status', 1)->where('type', 'action')->orderBy('display_order', 'ASC')->with('menu_action_childrens');
     }
 
-    public function menu_action_children()
+    public function menu_action_childrens()
     {
-        return $this->hasMany(PMenuAction::class, 'parent_id')->where('type', 'action')->orderBy('display_order', 'ASC')->with('menu_action_children');
+        return $this->hasMany(PMenuAction::class, 'parent_id')->where('status', 1)->where('type', 'action')->orderBy('display_order', 'ASC')->with('menu_action_childrens');
     }
 
 
