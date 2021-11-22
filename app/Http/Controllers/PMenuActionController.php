@@ -106,7 +106,7 @@ class PMenuActionController extends Controller
     {
         try {
             PMenuAction::find($request->menu_action_id)->delete();
-            $response = responseFormat('success', 'Successfully Updated');
+            $response = responseFormat('success', 'Successfully Deleted');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
         }

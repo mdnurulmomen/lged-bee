@@ -8,6 +8,7 @@ use App\Models\ApRiskAssessmentItem;
 use App\Models\XRiskAssessment;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class ApRiskAssessmentService
@@ -28,27 +29,32 @@ class ApRiskAssessmentService
             $risk_assessment->activity_id = $request->activity_id;
             $risk_assessment->audit_plan_id = $request->audit_plan_id;
             $risk_assessment->risk_assessment_type = $request->risk_assessment_type;
-            $risk_assessment->total_risk_value = $request->total_number;
+            $risk_assessment->total_risk_value = $request->total_score;
             $risk_assessment->risk_rate = $request->risk_rate;
             $risk_assessment->risk = $request->risk;
             $risk_assessment->created_by = $cdesk->officer_id;
             $risk_assessment->created_by_name_en = $cdesk->officer_en;
             $risk_assessment->created_by_name_bn = $cdesk->officer_bn;
             $risk_assessment->save();
+            $lastInsertId = $risk_assessment->id;
 
+            //items
+            $riskAssessmentItems = array();
             foreach ($request->risk_assessments as $item) {
-                $risk_assessment_item = new ApRiskAssessmentItem;
-                $risk_assessment_item->ap_risk_assessment_id = $risk_assessment->id;
-                $risk_assessment_item->x_risk_assessment_id = $item['risk_assessment_id'];
-                $risk_assessment_item->risk_assessment_title_en = $item['risk_assessment_title_en'];
-                $risk_assessment_item->risk_assessment_title_bn = $item['risk_assessment_title_bn'];
-                $risk_assessment_item->yes = $item['yes'];
-                $risk_assessment_item->no = $item['no'];
-                $risk_assessment_item->risk_value = $item['risk_value'];
-                $risk_assessment_item->save();
+                $riskAssessmentItems[] = array(
+                    'ap_risk_assessment_id'=> $lastInsertId,
+                    'x_risk_assessment_id'=>  $item['risk_assessment_id'],
+                    'risk_assessment_title_en'=> $item['risk_assessment_title_en'],
+                    'risk_assessment_title_bn'=> $item['risk_assessment_title_bn'],
+                    'risk_value'=> $item['risk_value']
+                );
             }
+            if (!empty($riskAssessmentItems)) {
+                ApRiskAssessmentItem::insert($riskAssessmentItems);
+            }
+
             \DB::commit();
-            return ['status' => 'success', 'data' => 'save data successful'];
+            return ['status' => 'success', 'data' => 'save data successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -69,7 +75,7 @@ class ApRiskAssessmentService
             $risk_assessment->activity_id = $request->activity_id;
             $risk_assessment->audit_plan_id = $request->audit_plan_id;
             $risk_assessment->risk_assessment_type = $request->risk_assessment_type;
-            $risk_assessment->total_risk_value = $request->total_number;
+            $risk_assessment->total_risk_value = $request->total_score;
             $risk_assessment->risk_rate = $request->risk_rate;
             $risk_assessment->risk = $request->risk;
             $risk_assessment->updated_by = $cdesk->officer_id;
@@ -77,21 +83,26 @@ class ApRiskAssessmentService
             $risk_assessment->updated_by_name_bn = $cdesk->officer_bn;
             $risk_assessment->save();
 
+            //delete item
             ApRiskAssessmentItem::where('ap_risk_assessment_id',$request->id)->delete();
 
+            //items
+            $riskAssessmentItems = array();
             foreach ($request->risk_assessments as $item) {
-                $risk_assessment_item = new ApRiskAssessmentItem;
-                $risk_assessment_item->ap_risk_assessment_id = $risk_assessment->id;
-                $risk_assessment_item->x_risk_assessment_id = $item['risk_assessment_id'];
-                $risk_assessment_item->risk_assessment_title_en = $item['risk_assessment_title_en'];
-                $risk_assessment_item->risk_assessment_title_bn = $item['risk_assessment_title_bn'];
-                $risk_assessment_item->yes = $item['yes'];
-                $risk_assessment_item->no = $item['no'];
-                $risk_assessment_item->risk_value = $item['risk_value'];
-                $risk_assessment_item->save();
+                $riskAssessmentItems[] = array(
+                    'ap_risk_assessment_id'=> $request->id,
+                    'x_risk_assessment_id'=>  $item['risk_assessment_id'],
+                    'risk_assessment_title_en'=> $item['risk_assessment_title_en'],
+                    'risk_assessment_title_bn'=> $item['risk_assessment_title_bn'],
+                    'risk_value'=> $item['risk_value']
+                );
             }
+            if (!empty($riskAssessmentItems)) {
+                ApRiskAssessmentItem::insert($riskAssessmentItems);
+            }
+
             \DB::commit();
-            return ['status' => 'success', 'data' => 'update data successful'];
+            return ['status' => 'success', 'data' => 'update data successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -108,36 +119,12 @@ class ApRiskAssessmentService
         }
         try {
 
-            $ap_risk_assessment_list = ApRiskAssessment::select('id','total_risk_value','risk_rate','risk')->where('risk_assessment_type',$request->risk_assessment_type)
+            $ap_risk_assessment_list = ApRiskAssessment::with(['risk_assessment_items'])
+                ->select('id','total_risk_value','risk_rate','risk')
+                ->where('risk_assessment_type',$request->risk_assessment_type)
                 ->where('fiscal_year_id',$request->fiscal_year_id)
                 ->where('audit_plan_id',$request->audit_plan_id)
                 ->first();
-
-            if ($ap_risk_assessment_list) {
-
-                $ap_risk_assessment_item_list = ApRiskAssessmentItem::where('ap_risk_assessment_id', $ap_risk_assessment_list->id)->get();
-
-                $item = [];
-                foreach ($ap_risk_assessment_item_list as $item) {
-                    $item_arry[$item->x_risk_assessment_id] = array(
-                        'id' => $item->x_risk_assessment_id,
-                        'yes' => $item->yes,
-                        'no' => $item->no,
-                        'risk_value' => $item->risk_value,
-                    );
-                    $item = $item_arry;
-                }
-
-                $ap_risk_assessment_list = array(
-                    'id' => $ap_risk_assessment_list->id,
-                    'total_risk_value' => $ap_risk_assessment_list->total_risk_value,
-                    'risk_rate' => $ap_risk_assessment_list->risk_rate,
-                    'risk' => $ap_risk_assessment_list->risk,
-                    'risk_assessment_items' => $item,
-                );
-
-            }
-
 
             return ['status' => 'success', 'data' => $ap_risk_assessment_list];
 
