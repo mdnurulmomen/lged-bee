@@ -9,8 +9,7 @@ class PermissionController extends Controller
 {
     public function modules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
-        $cdesk = json_decode($request->cdesk, false);
-        $modules = $permissionService->permittedModules($cdesk->master_designation_id);
+        $modules = $permissionService->permittedModules($request);
         if (isSuccessResponse($modules)) {
             $response = responseFormat('success', $modules['data']);
         } else {
@@ -22,8 +21,7 @@ class PermissionController extends Controller
 
     public function otherModules(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
-        $cdesk = json_decode($request->cdesk, false);
-        $modules = $permissionService->permittedOtherModules($cdesk->master_designation_id);
+        $modules = $permissionService->permittedOtherModules($request);
         if (isSuccessResponse($modules)) {
             $response = responseFormat('success', $modules['data']);
         } else {
@@ -35,8 +33,7 @@ class PermissionController extends Controller
 
     public function menus(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
-        $cdesk = json_decode($request->cdesk, false);
-        $menus = $permissionService->permittedModuleWiseMenus($cdesk->master_designation_id, $request->module_link);
+        $menus = $permissionService->permittedModuleWiseMenus($request);
         if (isSuccessResponse($menus)) {
             $response = responseFormat('success', $menus['data']);
         } else {
@@ -48,8 +45,18 @@ class PermissionController extends Controller
 
     public function getAllMenuActionLists(Request $request, PermissionService $permissionService)
     {
-        $cdesk = json_decode($request->cdesk, false);
-        $menus = $permissionService->getAllMenuActionLists();
+        $menus = $permissionService->getAllMenuActionLists($request);
+        if (isSuccessResponse($menus)) {
+            $response = responseFormat('success', $menus['data']);
+        } else {
+            $response = responseFormat('error', $menus['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getAllMenuActionsRoleWise(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
+    {
+        $menus = $permissionService->getAllMenuActionsRoleWise($request);
         if (isSuccessResponse($menus)) {
             $response = responseFormat('success', $menus['data']);
         } else {
@@ -61,6 +68,17 @@ class PermissionController extends Controller
     public function assignMenuActionsToRole(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
     {
         $assign = $permissionService->assignMenuActionsToRole($request);
+        if (isSuccessResponse($assign)) {
+            $response = responseFormat('success', $assign['data']);
+        } else {
+            $response = responseFormat('error', $assign['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function assignMenuActionsToEmployee(Request $request, PermissionService $permissionService): \Illuminate\Http\JsonResponse
+    {
+        $assign = $permissionService->assignIndividualMenuActionsToEmployee($request);
         if (isSuccessResponse($assign)) {
             $response = responseFormat('success', $assign['data']);
         } else {
