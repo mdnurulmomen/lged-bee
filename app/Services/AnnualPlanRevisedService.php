@@ -102,6 +102,27 @@ class AnnualPlanRevisedService
 
     }
 
+    public function getAnnualPlanInfo(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $annualPlanInfo = AnnualPlan::where('id', $request->annual_plan_id)->first();
+
+            $data = ['status' => 'success', 'data' => $annualPlanInfo];
+
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $data;
+
+    }
+
     public function storeAnnualPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -153,6 +174,60 @@ class AnnualPlanRevisedService
             ], $plan_data);
 
             $data = ['status' => 'success', 'data' => 'Successfully Plan Created!'];
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $data;
+    }
+
+    public function updateAnnualPlan(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $ministry = json_decode($request->ministry_info);
+            $controlling_office = json_decode($request->controlling_office);
+            $parent_office = json_decode($request->parent_office);
+
+           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
+
+            $plan_data = [
+                'schedule_id' => $schedule_id,
+                'milestone_id' => $request->milestone_id,
+                'activity_id' => $request->activity_id,
+                'fiscal_year_id' => $request->fiscal_year_id,
+                'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
+
+                'ministry_name_en' => $ministry->ministry_name_en,
+                'ministry_name_bn' => $ministry->ministry_name_bn,
+                'ministry_id' => $ministry->ministry_id,
+
+                'controlling_office_en' => $controlling_office->controlling_office_name_en,
+                'controlling_office_bn' => $controlling_office->controlling_office_name_bn,
+                'controlling_office_id' => $controlling_office->controlling_office_id,
+
+                'parent_office_name_en' => $parent_office->parent_office_name_en,
+                'parent_office_name_bn' => $parent_office->parent_office_name_bn,
+                'parent_office_id' => $parent_office->parent_office_id,
+                'office_type' => $request->office_type,
+
+                'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
+                'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
+                'total_unit_no' => $request->total_unit_no,
+                'nominated_offices' => $request->nominated_offices,
+                'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
+                'subject_matter' => $request->subject_matter,
+                'nominated_man_powers' => $request->nominated_man_powers,
+                'nominated_man_power_counts' => $request->nominated_man_power_counts,
+                'comment' => empty($request->comment) ? null : $request->comment,
+            ];
+            $plan = AnnualPlan::where('id',$request->id)->update($plan_data);
+
+            $data = ['status' => 'success', 'data' => 'Successfully Plan Updated!'];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }

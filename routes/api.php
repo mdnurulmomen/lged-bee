@@ -77,6 +77,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
             Route::post('create', [AnnualPlanRevisedController::class, 'storeAnnualPlan']);
 
+            Route::post('update', [AnnualPlanRevisedController::class, 'updateAnnualPlan']);
+
             Route::post('book', [AnnualPlanRevisedController::class, 'exportAnnualPlan']);
 
             Route::post('submit-plan-to-ocag', [AnnualPlanRevisedController::class, 'submitToOCAG']);
@@ -84,6 +86,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('show', [AnnualPlanRevisedController::class, 'showAnnualPlan']);
 
             Route::post('show-entities', [AnnualPlanRevisedController::class, 'showAnnualPlanEntities']);
+
+            Route::post('get-annual-plan-info', [AnnualPlanRevisedController::class, 'getAnnualPlanInfo']);
 
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
 

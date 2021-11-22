@@ -66,6 +66,24 @@ class AnnualPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function getAnnualPlanInfo(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'annual_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $annual_plan_inof = $annualPlanRevisedService->getAnnualPlanInfo($request);
+
+        if (isSuccessResponse($annual_plan_inof)) {
+            $response = responseFormat('success', $annual_plan_inof['data']);
+        } else {
+            $response = responseFormat('error', $annual_plan_inof['data']);
+        }
+
+        return response()->json($response);
+    }
+
 
     public function showNominatedOffices(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
     {
@@ -96,6 +114,24 @@ class AnnualPlanRevisedController extends Controller
         ])->validate();
 
         $storeAnnualPlan = $annualPlanRevisedService->storeAnnualPlan($request);
+
+        if (isSuccessResponse($storeAnnualPlan)) {
+            $response = responseFormat('success', $storeAnnualPlan['data']);
+        } else {
+            $response = responseFormat('error', $storeAnnualPlan['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function updateAnnualPlan(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $storeAnnualPlan = $annualPlanRevisedService->updateAnnualPlan($request);
 
         if (isSuccessResponse($storeAnnualPlan)) {
             $response = responseFormat('success', $storeAnnualPlan['data']);
