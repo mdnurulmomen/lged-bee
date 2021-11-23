@@ -64,4 +64,9 @@ class AnnualPlan extends Model
         return $this->hasMany(ApEntityIndividualAuditPlan::class, 'annual_plan_id', 'id');
     }
 
+    public function ap_milestones()
+    {
+        return $this->hasMany(ApMilestone::class, 'annual_plan_id', 'id');
+    }
+
 }

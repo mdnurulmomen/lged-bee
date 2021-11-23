@@ -8,6 +8,7 @@ use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
 use App\Models\XResponsibleOffice;
+use App\Models\ApMilestone;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
 
@@ -112,7 +113,7 @@ class AnnualPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $annualPlanInfo = AnnualPlan::where('id', $request->annual_plan_id)->first();
+            $annualPlanInfo = AnnualPlan::with('ap_milestones.milestone')->where('id', $request->annual_plan_id)->first();
 
             $data = ['status' => 'success', 'data' => $annualPlanInfo];
 
@@ -135,11 +136,11 @@ class AnnualPlanRevisedService
             $controlling_office = json_decode($request->controlling_office);
             $parent_office = json_decode($request->parent_office);
 
-           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
+//           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
 
             $plan_data = [
-                'schedule_id' => $schedule_id,
-                'milestone_id' => $request->milestone_id,
+                'schedule_id' => 0,
+                'milestone_id' => 0,
                 'activity_id' => $request->activity_id,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
@@ -167,13 +168,22 @@ class AnnualPlanRevisedService
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
-            $plan = AnnualPlan::updateOrcreate([
-                'ministry_id' => $ministry->ministry_id,
-                'controlling_office_id' => $controlling_office->controlling_office_id,
-                'parent_office_id' => $parent_office->parent_office_id,
-            ], $plan_data);
 
-            $data = ['status' => 'success', 'data' => 'Successfully Plan Created!'];
+            $plan = AnnualPlan::create($plan_data);
+
+            foreach ($request->milestone_list as $milestone){
+               $ap_milestone =  New ApMilestone();
+               $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
+               $ap_milestone->annual_plan_id = $plan->id;
+               $ap_milestone->activity_id = $milestone['activity_id'];
+               $ap_milestone->milestone_id = $milestone['milestone_id'];
+               $ap_milestone->milestone_target_date = date('Y-m-d',strtotime($milestone['milestone_target_date']));
+               $ap_milestone->start_date = date('Y-m-d',strtotime($milestone['start_date']));
+               $ap_milestone->end_date = date('Y-m-d',strtotime($milestone['end_date']));
+               $ap_milestone->save();
+            }
+
+            $data = ['status' => 'success', 'data' => $plan];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -193,11 +203,11 @@ class AnnualPlanRevisedService
             $controlling_office = json_decode($request->controlling_office);
             $parent_office = json_decode($request->parent_office);
 
-           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
+//            $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
 
             $plan_data = [
-                'schedule_id' => $schedule_id,
-                'milestone_id' => $request->milestone_id,
+                'schedule_id' => 0,
+                'milestone_id' => 0,
                 'activity_id' => $request->activity_id,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
@@ -226,6 +236,20 @@ class AnnualPlanRevisedService
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
             $plan = AnnualPlan::where('id',$request->id)->update($plan_data);
+
+            ApMilestone::where('annual_plan_id',$request->id)->delete();
+
+            foreach ($request->milestone_list as $milestone){
+               $ap_milestone =  New ApMilestone();
+               $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
+               $ap_milestone->annual_plan_id = $request->id;
+               $ap_milestone->activity_id = $milestone['activity_id'];
+               $ap_milestone->milestone_id = $milestone['milestone_id'];
+               $ap_milestone->milestone_target_date = date('Y-m-d',strtotime($milestone['milestone_target_date']));
+               $ap_milestone->start_date = date('Y-m-d',strtotime($milestone['start_date']));
+               $ap_milestone->end_date = date('Y-m-d',strtotime($milestone['end_date']));
+               $ap_milestone->save();
+            }
 
             $data = ['status' => 'success', 'data' => 'Successfully Plan Updated!'];
         } catch (\Exception $exception) {
