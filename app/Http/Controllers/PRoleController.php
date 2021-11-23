@@ -7,16 +7,15 @@ use App\Models\PRoleDesignationMap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use mysql_xdevapi\Exception;
 
 class PRoleController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $roles = PRole::paginate($request->per_page);
+            $roles = PRole::orderBy('user_level')->paginate($request->per_page);
         } else {
-            $roles = PRole::all();
+            $roles = PRole::orderBy('user_level')->get();
         }
 
         if ($roles) {
@@ -104,7 +103,7 @@ class PRoleController extends Controller
                 $response = responseFormat('success', 'Successfully Updated');
                 DB::commit();
             } else {
-                throw new Exception('No Designations');
+                throw new \Exception('No Designations');
             }
         } catch (\Exception $exception) {
             DB::rollBack();

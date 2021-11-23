@@ -137,12 +137,10 @@ class PermissionService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $data = PMenuAction::where('type', 'module')->where('parent_id', null)
-                ->where('status', 1)
-                ->with(['menus', 'module_childrens.menus.menu_actions'])
-                ->orderBy('display_order')->get();
+
+            $roleMenuMappedIds = PMenuActionRoleMap::where('p_role_id', $request->role)->pluck('p_menu_action_id');
             $this->emptyOfficeDBConnection();
-            return ['status' => 'success', 'data' => $data];
+            return ['status' => 'success', 'data' => implode(',', $roleMenuMappedIds->toArray())];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
