@@ -13,13 +13,13 @@ class PMenuActionController extends Controller
 
         if ($request->per_page && $request->page && !$request->all) {
             $responseData = PMenuAction::with(['parent'])
-                ->where('type',$request->type)
-                ->orderBy('id','DESC')
+                ->where('type', $request->type)
+                ->orderBy('id', 'DESC')
                 ->paginate($request->per_page);
         } else {
             $responseData = PMenuAction::with(['parent'])
-                ->where('type',$request->type)
-                ->orderBy('id','DESC')
+                ->where('type', $request->type)
+                ->orderBy('id', 'DESC')
                 ->get();
         }
 
@@ -46,15 +46,14 @@ class PMenuActionController extends Controller
             'is_other_module' => 'nullable',
             'type' => 'nullable',
         ])->validate();
-
+        $data['is_other_module'] = $data['is_other_module'] ?: 0;
         try {
             PMenuAction::create($data);
             $response = responseFormat('success', 'Created Successfully');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage(), ['code' => $exception->getCode()]);
         }
-
-        return response()->json($response);
+        return response()->json($response, 200);
     }
 
     public function show(Request $request)
@@ -89,7 +88,7 @@ class PMenuActionController extends Controller
             'is_other_module' => 'nullable',
             'type' => 'nullable',
         ])->validate();
-
+        $data['is_other_module'] = $data['is_other_module'] ?: 0;
         try {
             $menu_action = PMenuAction::find($request->menu_action_id);
             $menu_action->update($data);
