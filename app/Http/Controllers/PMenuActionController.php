@@ -42,10 +42,18 @@ class PMenuActionController extends Controller
             'method' => 'nullable',
             'icon' => 'nullable',
             'display_order' => 'nullable',
-            'parent_id' => 'nullable',
             'is_other_module' => 'nullable',
             'type' => 'nullable',
+            'menu_module_id' => 'nullable',
+            'status' => 'nullable',
         ])->validate();
+
+        if ($request->type == 'action'){
+            $data['action_menu_id'] = $request->parent_id;
+        }
+        else{
+            $data['parent_id'] = $request->parent_id;
+        }
 
         try {
             PMenuAction::create($data);
@@ -88,9 +96,18 @@ class PMenuActionController extends Controller
             'parent_id' => 'nullable',
             'is_other_module' => 'nullable',
             'type' => 'nullable',
+            'menu_module_id' => 'nullable',
+            'status' => 'nullable',
         ])->validate();
 
         try {
+            if ($request->type == 'action'){
+                $data['action_menu_id'] = $request->parent_id;
+            }
+            else{
+                $data['parent_id'] = $request->parent_id;
+            }
+
             $menu_action = PMenuAction::find($request->menu_action_id);
             $menu_action->update($data);
             $response = responseFormat('success', 'Successfully Updated');
