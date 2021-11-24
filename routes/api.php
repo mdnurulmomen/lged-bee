@@ -205,6 +205,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     //Menu Action
     Route::customApiResource('menu-actions', PMenuActionController::class);
     Route::post('roles/assign-master-designations-to-role', [PRoleController::class, 'assignMasterDesignationsToRole']);
+    Route::post('roles/assigned-master-designations-to-role', [PRoleController::class, 'assignedMasterDesignationRole']);
     Route::customApiResource('roles', PRoleController::class);
 
     //Permission

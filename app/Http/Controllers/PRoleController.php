@@ -83,6 +83,18 @@ class PRoleController extends Controller
         return response()->json($response);
     }
 
+    public function assignedMasterDesignationRole(Request $request)
+    {
+        try {
+            $master_designation_ids = PRoleDesignationMap::where('p_role_id', $request->role)->pluck('master_designation_id');
+            return ['status' => 'success', 'data' => implode(',', $master_designation_ids->toArray())];
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
     public function assignMasterDesignationsToRole(Request $request)
     {
         Validator::make($request->all(), [
