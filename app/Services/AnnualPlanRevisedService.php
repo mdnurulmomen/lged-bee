@@ -90,9 +90,11 @@ class AnnualPlanRevisedService
             $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
                 ->where('office_id', $cdesk->office_id)
                 ->first()->approval_status;
+            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
             $annualPlan['annual_plan_list'] = $annualPlanList;
             $annualPlan['approval_status'] = $approval_status;
+            $annualPlan['op_audit_calendar_event_id'] = $op_audit_calendar_event_id;
 
             $data = ['status' => 'success', 'data' => $annualPlan];
 
