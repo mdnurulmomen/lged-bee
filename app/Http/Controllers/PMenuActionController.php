@@ -43,10 +43,11 @@ class PMenuActionController extends Controller
             'icon' => 'nullable',
             'display_order' => 'nullable',
             'is_other_module' => 'nullable',
-            'type' => 'nullable',
+            'type' => 'required',
             'menu_module_id' => 'nullable',
             'status' => 'nullable',
         ])->validate();
+        $data['display_order'] = $data['display_order'] ?: 1;
         $data['is_other_module'] = $data['is_other_module'] ?: 0;
 
         if ($request->type == 'action'){
@@ -95,10 +96,11 @@ class PMenuActionController extends Controller
             'display_order' => 'nullable',
             'parent_id' => 'nullable',
             'is_other_module' => 'nullable',
-            'type' => 'nullable',
+            'type' => 'required',
             'menu_module_id' => 'nullable',
             'status' => 'nullable',
         ])->validate();
+        $data['display_order'] = $data['display_order'] ?: 1;
         $data['is_other_module'] = $data['is_other_module'] ?: 0;
         try {
             if ($request->type == 'action'){
