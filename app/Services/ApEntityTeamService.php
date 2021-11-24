@@ -169,9 +169,9 @@ class ApEntityTeamService
                                 'entity_id' => $team_data->entity_id,
                                 'entity_name_en' => $team_data->entity_name_en,
                                 'entity_name_bn' => $team_data->entity_name_bn,
-                                'cost_center_id' => empty($schedule_datum['cost_center_id'])?null:$schedule_datum['cost_center_id'],
-                                'cost_center_name_en' => empty($schedule_datum['cost_center_name_en'])?null:$schedule_datum['cost_center_name_en'],
-                                'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn'])?null:$schedule_datum['cost_center_name_bn'],
+                                'cost_center_id' => empty($schedule_datum['cost_center_id']) ? null : $schedule_datum['cost_center_id'],
+                                'cost_center_name_en' => empty($schedule_datum['cost_center_name_en']) ? null : $schedule_datum['cost_center_name_en'],
+                                'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn']) ? null : $schedule_datum['cost_center_name_bn'],
                                 'team_member_name_en' => $member['officer_name_en'],
                                 'team_member_name_bn' => $member['officer_name_bn'],
                                 'team_member_designation_id' => $member['designation_id'],
@@ -184,13 +184,13 @@ class ApEntityTeamService
                                 'team_member_start_date' => $schedule_datum['team_member_start_date'],
                                 'team_member_end_date' => $schedule_datum['team_member_end_date'],
                                 //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
-                                'mobile_no' => empty($member['officer_mobile'])?null:$member['officer_mobile'],
-                                'activity_location' => empty($schedule_datum['activity_details'])?null:$schedule_datum['activity_details'],
+                                'mobile_no' => empty($member['officer_mobile']) ? null : $member['officer_mobile'],
+                                'activity_location' => empty($schedule_datum['activity_details']) ? null : $schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
                                 'status' => 'pending',
                                 'approve_status' => 'approved',
-                                'activity_man_days' => empty($schedule_datum['activity_man_days'])?null:$schedule_datum['activity_man_days'],
+                                'activity_man_days' => empty($schedule_datum['activity_man_days']) ? null : $schedule_datum['activity_man_days'],
                             ];
                             AuditVisitCalenderPlanMember::create($team_schedule);
                         }
@@ -198,6 +198,7 @@ class ApEntityTeamService
                 }
             }
         } catch (\Exception $exception) {
+            \Log::error('Team Schedule Making Error: ' . json_encode($exception));
             return $exception;
         }
     }
