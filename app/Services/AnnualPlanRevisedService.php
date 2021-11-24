@@ -157,6 +157,7 @@ class AnnualPlanRevisedService
                 'parent_office_name_bn' => $parent_office->parent_office_name_bn,
                 'parent_office_id' => $parent_office->parent_office_id,
                 'office_type' => $request->office_type,
+                'annual_plan_type' => $request->annual_plan_type,
 
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
@@ -224,6 +225,7 @@ class AnnualPlanRevisedService
                 'parent_office_name_bn' => $parent_office->parent_office_name_bn,
                 'parent_office_id' => $parent_office->parent_office_id,
                 'office_type' => $request->office_type,
+                'annual_plan_type' => $request->annual_plan_type,
 
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
