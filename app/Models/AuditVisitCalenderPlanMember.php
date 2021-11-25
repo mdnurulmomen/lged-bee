@@ -13,6 +13,7 @@ class AuditVisitCalenderPlanMember extends Model
 
     protected $fillable = [
         'team_id',
+        'team_parent_id',
         'fiscal_year_id',
         'duration_id',
         'outcome_id',

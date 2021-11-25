@@ -74,11 +74,12 @@ class MigrationController extends Controller
                             $team_schedule_data = [
                                 'fiscal_year_id' => $team_data->fiscal_year_id,
                                 'team_id' => $team_data->id,
+                                'team_parent_id' => $team_data->parent_id,
                                 'duration_id' => $team_data->duration_id,
                                 'outcome_id' => $team_data->outcome_id,
                                 'output_id' => $team_data->output_id,
                                 'activity_id' => $team_data->activity_id,
-                                'milestone_id' => $team_data->milestone_id,
+                                'milestone_id' => $team_data->milestone_id ?: 0,
                                 'annual_plan_id' => $team_data->annual_plan_id,
                                 'audit_plan_id' => $team_data->audit_plan_id,
                                 'ministry_id' => $team_data->ministry_id,
