@@ -16,7 +16,10 @@ class ApEntityTeamService
     public function storeAuditTeam(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
 
@@ -96,7 +99,10 @@ class ApEntityTeamService
     public function updateAuditTeam(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
 
@@ -119,7 +125,10 @@ class ApEntityTeamService
 //        return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
 
         $cdesk = json_decode($request->cdesk, false);
-        $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
         $team_schedules = json_decode($request->team_schedules, true);
         $team_schedules = $team_schedules['schedule'];
         DB::beginTransaction();
@@ -141,6 +150,7 @@ class ApEntityTeamService
     public function saveTeamSchedule($team_schedules, $audit_plan_id)
     {
         try {
+            DB::beginTransaction();
             foreach ($team_schedules as $designation_id => $schedule_data) {
                 $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
                     ->where('leader_designation_id', $designation_id)->first();
@@ -157,7 +167,7 @@ class ApEntityTeamService
                             $team_schedule = [
                                 'fiscal_year_id' => $team_data->fiscal_year_id,
                                 'team_id' => $team_data->id,
-                                'team_parent_id' => $team_data->team_parent_id,
+                                'team_parent_id' => $team_data->team_parent_id ?: 0,
                                 'duration_id' => $team_data->duration_id,
                                 'outcome_id' => $team_data->outcome_id,
                                 'output_id' => $team_data->output_id,
@@ -197,7 +207,9 @@ class ApEntityTeamService
                     }
                 }
             }
+            DB::commit();
         } catch (\Exception $exception) {
+            DB::rollBack();
             \Log::error('Team Schedule Making Error: ' . json_encode($exception));
             return $exception;
         }
@@ -208,7 +220,10 @@ class ApEntityTeamService
         //return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
 
         $cdesk = json_decode($request->cdesk, false);
-        $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
         $team_schedules = json_decode($request->team_schedules, true);
         $team_schedules = $team_schedules['schedule'];
         DB::beginTransaction();
