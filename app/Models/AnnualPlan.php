@@ -28,6 +28,7 @@ class AnnualPlan extends Model
         'parent_office_id',
         'office_type',
         'annual_plan_type',
+        'thematic_title',
         'budget',
         'cost_center_total_budget',
         'total_unit_no',

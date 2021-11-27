@@ -89,6 +89,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
             Route::post('get-annual-plan-info', [AnnualPlanRevisedController::class, 'getAnnualPlanInfo']);
 
+            Route::post('delete-annual-plan', [AnnualPlanRevisedController::class, 'deleteAnnualPlan']);
+
             Route::post('get-nominated-offices', [AnnualPlanRevisedController::class, 'showNominatedOffices']);
 
             Route::post('send-annual-plan-sender-to-receiver', [AnnualPlanRevisedController::class, 'sendAnnualPlanSenderToReceiver']);

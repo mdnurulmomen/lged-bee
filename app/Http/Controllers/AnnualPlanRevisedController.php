@@ -267,4 +267,22 @@ class AnnualPlanRevisedController extends Controller
         }
         return response()->json($response);
     }
+
+    public function deleteAnnualPlan(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'annual_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $annual_plan_delete = $annualPlanRevisedService->deleteAnnualPlan($request);
+
+        if (isSuccessResponse($annual_plan_delete)) {
+            $response = responseFormat('success', $annual_plan_delete['data']);
+        } else {
+            $response = responseFormat('error', $annual_plan_delete['data']);
+        }
+
+        return response()->json($response);
+    }
 }

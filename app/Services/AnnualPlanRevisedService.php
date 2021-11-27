@@ -160,6 +160,7 @@ class AnnualPlanRevisedService
                 'parent_office_id' => $parent_office->parent_office_id,
                 'office_type' => $request->office_type,
                 'annual_plan_type' => $request->annual_plan_type,
+                'thematic_title' => $request->thematic_title,
 
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
@@ -375,5 +376,26 @@ class AnnualPlanRevisedService
         } catch (\Exception $e) {
             return ['status' => 'error', 'data' => $e->getMessage()];
         }
+    }
+
+    public function deleteAnnualPlan(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+//            AnnualPlan::delete();
+
+            $data = ['status' => 'success', 'data' => ''];
+
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $data;
+
     }
 }
