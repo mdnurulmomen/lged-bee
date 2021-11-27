@@ -115,6 +115,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('office-order/store-approval-authority', [ApOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
             Route::post('office-order/approve', [ApOfficeOrderController::class, 'approveOfficeOrder']);
 
+            Route::post('risk-assessment/type-wise-item-list', [ApRiskAssessmentController::class, 'riskAssessmentTypeWiseItemList']);
             Route::post('risk-assessment/store', [ApRiskAssessmentController::class, 'store']);
             Route::post('risk-assessment/update', [ApRiskAssessmentController::class, 'update']);
             Route::post('risk-assessment/ap-risk-assessment-list', [ApRiskAssessmentController::class, 'apRiskAssessmentList']);

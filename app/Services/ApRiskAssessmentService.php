@@ -46,7 +46,9 @@ class ApRiskAssessmentService
                     'x_risk_assessment_id'=>  $item['risk_assessment_id'],
                     'risk_assessment_title_en'=> $item['risk_assessment_title_en'],
                     'risk_assessment_title_bn'=> $item['risk_assessment_title_bn'],
-                    'risk_value'=> $item['risk_value']
+                    'risk_value'=> $item['risk_value'] ?? null,
+                    'detection_risk_value_en'=> $item['detection_risk_value_en'] ?? null,
+                    'detection_risk_value_bn'=> $item['detection_risk_value_bn'] ?? null
                 );
             }
             if (!empty($riskAssessmentItems)) {
@@ -94,7 +96,9 @@ class ApRiskAssessmentService
                     'x_risk_assessment_id'=>  $item['risk_assessment_id'],
                     'risk_assessment_title_en'=> $item['risk_assessment_title_en'],
                     'risk_assessment_title_bn'=> $item['risk_assessment_title_bn'],
-                    'risk_value'=> $item['risk_value']
+                    'risk_value'=> $item['risk_value'] ?? null,
+                    'detection_risk_value_en'=> $item['detection_risk_value_en'] ?? null,
+                    'detection_risk_value_bn'=> $item['detection_risk_value_bn'] ?? null
                 );
             }
             if (!empty($riskAssessmentItems)) {
@@ -127,6 +131,41 @@ class ApRiskAssessmentService
                 ->first();
 
             return ['status' => 'success', 'data' => $ap_risk_assessment_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+
+        }
+
+    }
+
+    public function riskAssessmentTypeWiseItemList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $apRiskAssessmentList = ApRiskAssessment::with(['risk_assessment_items'])
+                ->select('id')
+                ->where('risk_assessment_type',$request->risk_assessment_type)
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->first();
+
+            $apRiskAssessmentIds = [];
+            if (!empty($apRiskAssessmentList['risk_assessment_items'])){
+                foreach ($apRiskAssessmentList['risk_assessment_items'] as $item){
+                    $apRiskAssessmentIds[] = $item['x_risk_assessment_id'];
+                }
+            }
+
+            $xRiskAssessment = XRiskAssessment::where('risk_assessment_type',$request->risk_assessment_type)
+                ->whereNotIn('id',$apRiskAssessmentIds)->get();
+
+            return ['status' => 'success', 'data' => $xRiskAssessment];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

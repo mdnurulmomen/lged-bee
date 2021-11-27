@@ -19,47 +19,47 @@ class XRiskAssessmentController extends Controller
     {
         if ($request->per_page && $request->page && !$request->all) {
             $risk_assessment = XRiskAssessment::paginate($request->per_page);
-        } else {
-        $fiscal_year_id  = $request->fiscal_year_id;
-        $activity_id = $request->activity_id;
-        $audit_plan_id  = $request->audit_plan_id;
-        $risk_assessment_type = $request->risk_assessment_type;
-        $total_risk_value = $request->total_risk_value;
-        $risk_rate = $request->risk_rate;
-        $risk = $request->risk;
+        }
+        else {
+            $fiscal_year_id  = $request->fiscal_year_id;
+            $activity_id = $request->activity_id;
+            $audit_plan_id  = $request->audit_plan_id;
+            $risk_assessment_type = $request->risk_assessment_type;
+            $total_risk_value = $request->total_risk_value;
+            $risk_rate = $request->risk_rate;
+            $risk = $request->risk;
 
-        $query = XRiskAssessment::query();
+            $query = XRiskAssessment::query();
 
-        $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
-            return $q->where('fiscal_year_id', $fiscal_year_id);
-        });
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
 
-        $query->when($activity_id, function ($q, $activity_id) {
-            return $q->where('activity_id', $activity_id);
-        });
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
 
-        $query->when($audit_plan_id, function ($q, $audit_plan_id) {
-            return $q->where('audit_plan_id', $audit_plan_id);
-        });
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
 
-        $query->when($risk_assessment_type, function ($q, $risk_assessment_type) {
-            return $q->where('risk_assessment_type', $risk_assessment_type);
-        });
+            $query->when($risk_assessment_type, function ($q, $risk_assessment_type) {
+                return $q->where('risk_assessment_type', $risk_assessment_type);
+            });
 
-        $query->when($total_risk_value, function ($q, $total_risk_value) {
-            return $q->where('total_risk_value', $total_risk_value);
-        });
+            $query->when($total_risk_value, function ($q, $total_risk_value) {
+                return $q->where('total_risk_value', $total_risk_value);
+            });
 
-        $query->when($risk_rate, function ($q, $risk_rate) {
-            return $q->where('risk_rate', $risk_rate);
-        });
+            $query->when($risk_rate, function ($q, $risk_rate) {
+                return $q->where('risk_rate', $risk_rate);
+            });
 
-        $query->when($risk, function ($q, $risk) {
-            return $q->where('risk', $risk);
-        });
+            $query->when($risk, function ($q, $risk) {
+                return $q->where('risk', $risk);
+            });
 
-        $risk_assessment = $query->get();
-
+            $risk_assessment = $query->get();
         }
 
         if ($risk_assessment) {

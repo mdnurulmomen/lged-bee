@@ -45,4 +45,17 @@ class ApRiskAssessmentController extends Controller
 
         return response()->json($response);
     }
+
+    public function riskAssessmentTypeWiseItemList(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
+    {
+        $store = $apRiskAssessmentService->riskAssessmentTypeWiseItemList($request);
+
+        if (isSuccessResponse($store)) {
+            $response = responseFormat('success', $store['data']);
+        } else {
+            $response = responseFormat('error', $store['data']);
+        }
+
+        return response()->json($response);
+    }
 }
