@@ -6,6 +6,7 @@ use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -33,6 +34,25 @@ class ApEntityAuditPlanRevisedService
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
+    }
+
+    public function getPreviouslyAssignedDesignations(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        try {
+            $designations = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('activity_id', $request->activity_id)->where('team_member_office_id', $request->office_id)->pluck('team_member_designation_id')->toArray();
+            $designations = implode(',', $designations);
+            return ['status' => 'success', 'data' => $designations];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
     }
 
     public function createNewAuditPlan(Request $request): array

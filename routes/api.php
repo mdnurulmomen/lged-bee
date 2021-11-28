@@ -110,6 +110,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/audit-team/update', [ApEntityAuditPlanRevisedController::class, 'updateAuditTeam']);
             Route::post('entity-audit-plan/audit-team/store-team-schedule', [ApEntityAuditPlanRevisedController::class, 'storeTeamSchedule']);
             Route::post('entity-audit-plan/audit-team/update-team-schedule', [ApEntityAuditPlanRevisedController::class, 'updateTeamSchedule']);
+            Route::post('entity-audit-plan/audit-team/previously-assigned-designations', [ApEntityAuditPlanRevisedController::class, 'previouslyAssignedDesignations']);
 
             Route::post('office-order/audit-plan-list', [ApOfficeOrderController::class, 'auditPlanList']);
             Route::post('office-order/generate', [ApOfficeOrderController::class, 'generateOfficeOrder']);

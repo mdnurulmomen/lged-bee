@@ -91,6 +91,23 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function previouslyAssignedDesignations(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'activity_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'office_id' => 'required|integer',
+        ])->validate();
+        $team_list = $apEntityAuditPlanRevisedService->getPreviouslyAssignedDesignations($request);
+
+        if (isSuccessResponse($team_list)) {
+            $response = responseFormat('success', $team_list['data']);
+        } else {
+            $response = responseFormat('error', $team_list['data']);
+        }
+        return response()->json($response);
+    }
+
     public function getAuditPlanWiseTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
