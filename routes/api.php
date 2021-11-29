@@ -171,6 +171,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store-audit-query', [AuditExecutionQueryController::class, 'storeAuditQuery']);
         Route::post('update-audit-query', [AuditExecutionQueryController::class, 'updateAuditQuery']);
         Route::post('view-audit-query', [AuditExecutionQueryController::class, 'viewAuditQuery']);
+        Route::post('authority-query-list', [AuditExecutionQueryController::class, 'authorityQueryList']);
     });
 
     Route::group(['prefix' => 'audit-conduct-memo'], function () {

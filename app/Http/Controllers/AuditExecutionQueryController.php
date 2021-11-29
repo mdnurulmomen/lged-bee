@@ -117,4 +117,16 @@ class AuditExecutionQueryController extends Controller
         }
         return response()->json($response);
     }
+
+    public function authorityQueryList(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $query_schedule_list = $auditExecutionQueryService->authorityQueryList($request);
+        if (isSuccessResponse($query_schedule_list)) {
+            $response = responseFormat('success', $query_schedule_list['data']);
+        } else {
+            $response = responseFormat('error', $query_schedule_list['data']);
+        }
+
+        return response()->json($response);
+    }
 }
