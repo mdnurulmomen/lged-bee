@@ -17,6 +17,7 @@ class AcMemoAttachment extends Model
         'user_define_name',
         'attachment_name',
         'attachment_path',
+        'relative_path',
         'sequence',
         'created_by',
         'modified_by',
