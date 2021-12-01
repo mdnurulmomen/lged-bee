@@ -30,8 +30,8 @@ class ApRiskAssessmentService
             $risk_assessment->audit_plan_id = $request->audit_plan_id;
             $risk_assessment->risk_assessment_type = $request->risk_assessment_type;
             $risk_assessment->total_risk_value = isset($request->total_risk_value)?$request->total_score:null;
-            $risk_assessment->risk_rate = isset($request->risk_rate)?$request->risk_rate:null;
-            $risk_assessment->risk = isset($request->risk)?$request->risk:null;
+            $risk_assessment->risk_rate = $request->risk_rate;
+            $risk_assessment->risk = $request->risk;
             $risk_assessment->created_by = $cdesk->officer_id;
             $risk_assessment->created_by_name_en = $cdesk->officer_en;
             $risk_assessment->created_by_name_bn = $cdesk->officer_bn;

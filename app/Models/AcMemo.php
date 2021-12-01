@@ -14,7 +14,7 @@ class AcMemo extends Model
     protected $appends = ['memo_type_name','memo_irregularity_type_name','memo_irregularity_sub_type_name','memo_status_name'];
 
     public static $memo_types = [
-        '0' => '',
+        '0' => 'N/A',
         '1' => 'এসএফআই',
         '2' => 'নন-এসএফআই',
         '3' => 'ড্রাফ্ট প্যারা',
@@ -22,14 +22,14 @@ class AcMemo extends Model
     ];
 
     public static $memo_status_list = [
-        '0' => '',
+        '0' => 'N/A',
         '1' => 'নিস্পন্ন',
         '2' => 'অনিস্পন্ন',
         '3' => 'আংশিক নিস্পন্ন',
     ];
 
     public static $memo_irregularity_types = [
-        '0' => '',
+        '0' => 'N/A',
         '1' => 'আত্মসাত, চুরি, প্রতারণা ও জালিয়াতিমূলক',
         '2' => 'সরকারের আর্থিক ক্ষতি',
         '3' => 'বিধি ও পদ্ধতিগত অনিয়ম',
@@ -37,7 +37,7 @@ class AcMemo extends Model
         '5' => 'বিশেষ ধরনের আপত্তি'
     ];
     public static $memo_irregularity_sub_types = [
-        '0' => '',
+        '0' => 'N/A',
         '1' => 'ভ্যাট-আইটিসহ সরকারি প্রাপ্য আদায় না করা',
         '2' => 'কম আদায় করাা',
         '3' => 'আদায় করা সত্ত্বেও কোষাগারে জমা না করা',
@@ -109,16 +109,6 @@ class AcMemo extends Model
         'rpu_acceptor_signature',
     ];
 
-    public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'id');
-    }
-
-    public function team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
-    }
-
     public function getMemoTypeNameAttribute(){
         return self::$memo_types[$this->attributes['memo_type']];
     }
@@ -133,6 +123,16 @@ class AcMemo extends Model
 
     public function getMemoIrregularitySubTypeNameAttribute($value){
         return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
+    }
+
+    public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'id');
+    }
+
+    public function team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
     }
 
 }

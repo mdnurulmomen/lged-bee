@@ -97,7 +97,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }
@@ -120,7 +119,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }
@@ -143,7 +141,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }
@@ -167,7 +164,8 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $memo_list = AcMemo::where('audit_plan_id', $request->audit_plan_id)
+            $memo_list = AcMemo::with(['ac_memo_attachments'])
+                ->where('audit_plan_id', $request->audit_plan_id)
                 ->where('cost_center_id', $request->cost_center_id)
                 ->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $memo_list];
@@ -265,7 +263,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }
@@ -288,7 +285,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }
@@ -311,7 +307,6 @@ class AcMemoService
                             'sequence' => 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
-                            'deleted_by' => $cdesk->officer_id,
                         )
                     );
                 }

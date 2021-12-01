@@ -4,17 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Services\ApRiskAssessmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ApRiskAssessmentController extends Controller
 {
     public function store(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
     {
-        $store = $apRiskAssessmentService->store($request);
+        Validator::make($request->all(), [
+            'risk_assessments' => 'required',
+            'fiscal_year_id' => 'required',
+            'activity_id' => 'required',
+            'audit_plan_id' => 'required',
+            'risk_rate' => 'required',
+            'risk' => 'required',
+        ])->validate();
 
-        if (isSuccessResponse($store)) {
-            $response = responseFormat('success', $store['data']);
+        $responseData = $apRiskAssessmentService->store($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $store['data']);
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);
@@ -22,12 +32,22 @@ class ApRiskAssessmentController extends Controller
 
     public function update(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
     {
-        $store = $apRiskAssessmentService->update($request);
+        Validator::make($request->all(), [
+            'id' => 'required',
+            'risk_assessments' => 'required',
+            'fiscal_year_id' => 'required',
+            'activity_id' => 'required',
+            'audit_plan_id' => 'required',
+            'risk_rate' => 'required',
+            'risk' => 'required',
+        ])->validate();
 
-        if (isSuccessResponse($store)) {
-            $response = responseFormat('success', $store['data']);
+        $responseData = $apRiskAssessmentService->update($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $store['data']);
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);
@@ -35,12 +55,12 @@ class ApRiskAssessmentController extends Controller
 
     public function apRiskAssessmentList(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
     {
-        $store = $apRiskAssessmentService->apRiskAssessmentList($request);
+        $responseData = $apRiskAssessmentService->apRiskAssessmentList($request);
 
-        if (isSuccessResponse($store)) {
-            $response = responseFormat('success', $store['data']);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $store['data']);
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);
@@ -48,12 +68,12 @@ class ApRiskAssessmentController extends Controller
 
     public function riskAssessmentTypeWiseItemList(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
     {
-        $store = $apRiskAssessmentService->riskAssessmentTypeWiseItemList($request);
+        $responseData = $apRiskAssessmentService->riskAssessmentTypeWiseItemList($request);
 
-        if (isSuccessResponse($store)) {
-            $response = responseFormat('success', $store['data']);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $store['data']);
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);
