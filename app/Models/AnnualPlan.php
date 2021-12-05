@@ -17,22 +17,12 @@ class AnnualPlan extends Model
         'activity_id',
         'milestone_id',
         'fiscal_year_id',
-        'ministry_name_en',
-        'ministry_name_bn',
-        'ministry_id',
-        'controlling_office_id',
-        'controlling_office_en',
-        'controlling_office_bn',
-        'parent_office_name_en',
-        'parent_office_name_bn',
-        'parent_office_id',
         'office_type',
         'annual_plan_type',
         'thematic_title',
         'budget',
         'cost_center_total_budget',
         'total_unit_no',
-        'nominated_offices',
         'nominated_office_counts',
         'subject_matter',
         'nominated_man_powers',
@@ -64,6 +54,11 @@ class AnnualPlan extends Model
     public function audit_plans(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ApEntityIndividualAuditPlan::class, 'annual_plan_id', 'id');
+    }
+
+    public function ap_entities()
+    {
+        return $this->hasMany(AnnualPlanEntitie::class, 'annual_plan_id', 'id');
     }
 
     public function ap_milestones()

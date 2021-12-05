@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AnnualPlan;
+use App\Models\AnnualPlanEntitie;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
@@ -83,7 +84,7 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $annualPlanList = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)
+            $annualPlanList = AnnualPlan::with('ap_entities')->where('fiscal_year_id', $request->fiscal_year_id)
 //                ->where('milestone_id', $request->milestone_id)
                 ->get();
 
@@ -115,7 +116,7 @@ class AnnualPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $annualPlanInfo = AnnualPlan::with('ap_milestones.milestone')->where('id', $request->annual_plan_id)->first();
+            $annualPlanInfo = AnnualPlan::with('ap_milestones.milestone','ap_entities')->where('id', $request->annual_plan_id)->first();
 
             $data = ['status' => 'success', 'data' => $annualPlanInfo];
 
@@ -133,12 +134,8 @@ class AnnualPlanRevisedService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
-            $ministry = json_decode($request->ministry_info);
-            $controlling_office = json_decode($request->controlling_office);
-            $parent_office = json_decode($request->parent_office);
-
-//           $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
 
             $plan_data = [
                 'schedule_id' => 0,
@@ -146,27 +143,13 @@ class AnnualPlanRevisedService
                 'activity_id' => $request->activity_id,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
-
-                'ministry_name_en' => $ministry->ministry_name_en,
-                'ministry_name_bn' => $ministry->ministry_name_bn,
-                'ministry_id' => $ministry->ministry_id,
-
-                'controlling_office_en' => $controlling_office->controlling_office_name_en,
-                'controlling_office_bn' => $controlling_office->controlling_office_name_bn,
-                'controlling_office_id' => $controlling_office->controlling_office_id,
-
-                'parent_office_name_en' => $parent_office->parent_office_name_en,
-                'parent_office_name_bn' => $parent_office->parent_office_name_bn,
-                'parent_office_id' => $parent_office->parent_office_id,
-                'office_type' => $request->office_type,
                 'annual_plan_type' => $request->annual_plan_type,
+                'office_type' => $request->office_type,
                 'thematic_title' => $request->thematic_title,
-
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
                 'total_unit_no' => $request->total_unit_no,
-                'nominated_offices' => $request->nominated_offices,
-                'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
+                'nominated_office_counts' => $request->total_selected_unit_no,
                 'subject_matter' => $request->subject_matter,
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
@@ -174,21 +157,37 @@ class AnnualPlanRevisedService
             ];
 
             $plan = AnnualPlan::create($plan_data);
-
             foreach ($request->milestone_list as $milestone){
-               $ap_milestone =  New ApMilestone();
-               $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
-               $ap_milestone->annual_plan_id = $plan->id;
-               $ap_milestone->activity_id = $milestone['activity_id'];
-               $ap_milestone->milestone_id = $milestone['milestone_id'];
-               $ap_milestone->milestone_target_date = date('Y-m-d',strtotime($milestone['milestone_target_date']));
-               $ap_milestone->start_date = date('Y-m-d',strtotime($milestone['start_date']));
-               $ap_milestone->end_date = date('Y-m-d',strtotime($milestone['end_date']));
-               $ap_milestone->save();
+                    $ap_milestone = new ApMilestone();
+                    $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
+                    $ap_milestone->annual_plan_id = $plan->id;
+                    $ap_milestone->activity_id = $milestone['activity_id'];
+                    $ap_milestone->milestone_id = $milestone['milestone_id'];
+                    $ap_milestone->milestone_target_date = date('Y-m-d', strtotime($milestone['milestone_target_date']));
+                    $ap_milestone->start_date = date('Y-m-d', strtotime($milestone['start_date']));
+                    $ap_milestone->end_date = date('Y-m-d', strtotime($milestone['end_date']));
+                    $ap_milestone->save();
             }
 
-            $data = ['status' => 'success', 'data' => $plan];
+            foreach ($request->entity_list as $key => $entity){
+                if ($key != 'undefined') {
+                    $ap_entity = new AnnualPlanEntitie();
+                    $ap_entity->annual_plan_id = $plan->id;
+                    $ap_entity->ministry_id = $entity['ministry_id'];
+                    $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
+                    $ap_entity->ministry_name_en = $entity['ministry_name_en'];
+                    $ap_entity->entity_id = $entity['entity_id'];
+                    $ap_entity->entity_name_bn = $entity['entity_bn'];
+                    $ap_entity->entity_name_en = $entity['entity_en'];
+                    $ap_entity->nominated_offices = json_encode($entity['nominated_offices']);
+                    $ap_entity->created_at = date('Y-m-d H:i:s');
+                    $ap_entity->save();
+                }
+            }
+            \DB::commit();
+            $data = ['status' => 'success', 'data' => 'Annual Plan Save Successfully'];
         } catch (\Exception $exception) {
+            \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
         $this->emptyOfficeDBConnection();

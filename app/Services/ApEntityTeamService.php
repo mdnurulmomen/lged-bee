@@ -57,13 +57,13 @@ class ApEntityTeamService
                 $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
                 $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
                 $auditVisitCalendarPlanTeam->audit_plan_id = $request->audit_plan_id;
-                $auditVisitCalendarPlanTeam->ministry_id = $annualPlan->ministry_id;
-                $auditVisitCalendarPlanTeam->controlling_office_id = $annualPlan->controlling_office_id;
-                $auditVisitCalendarPlanTeam->controlling_office_name_en = $annualPlan->controlling_office_en;
-                $auditVisitCalendarPlanTeam->controlling_office_name_bn = $annualPlan->controlling_office_bn;
-                $auditVisitCalendarPlanTeam->entity_id = $annualPlan->parent_office_id;
-                $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
-                $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
+//                $auditVisitCalendarPlanTeam->ministry_id = $annualPlan->ministry_id;
+//                $auditVisitCalendarPlanTeam->controlling_office_id = $annualPlan->controlling_office_id;
+//                $auditVisitCalendarPlanTeam->controlling_office_name_en = $annualPlan->controlling_office_en;
+//                $auditVisitCalendarPlanTeam->controlling_office_name_bn = $annualPlan->controlling_office_bn;
+//                $auditVisitCalendarPlanTeam->entity_id = $annualPlan->parent_office_id;
+//                $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
+//                $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
                 $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
                 $auditVisitCalendarPlanTeam->team_start_date = $teams['team_start_date'];
                 $auditVisitCalendarPlanTeam->team_end_date = $teams['team_end_date'];
@@ -175,10 +175,10 @@ class ApEntityTeamService
                                 'milestone_id' => $team_data->milestone_id,
                                 'annual_plan_id' => $team_data->annual_plan_id,
                                 'audit_plan_id' => $team_data->audit_plan_id,
-                                'ministry_id' => $team_data->ministry_id,
-                                'entity_id' => $team_data->entity_id,
-                                'entity_name_en' => $team_data->entity_name_en,
-                                'entity_name_bn' => $team_data->entity_name_bn,
+                                'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
+                                'entity_id' => empty($schedule_datum['entity_id']) ? null : $schedule_datum['entity_id'],
+                                'entity_name_en' => empty($schedule_datum['entity_name_en']) ? null : $schedule_datum['entity_name_en'],
+                                'entity_name_bn' => empty($schedule_datum['entity_name_bn']) ? null : $schedule_datum['entity_name_bn'],
                                 'cost_center_id' => empty($schedule_datum['cost_center_id']) ? null : $schedule_datum['cost_center_id'],
                                 'cost_center_name_en' => empty($schedule_datum['cost_center_name_en']) ? null : $schedule_datum['cost_center_name_en'],
                                 'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn']) ? null : $schedule_datum['cost_center_name_bn'],
@@ -202,7 +202,8 @@ class ApEntityTeamService
                                 'approve_status' => 'approved',
                                 'activity_man_days' => empty($schedule_datum['activity_man_days']) ? null : $schedule_datum['activity_man_days'],
                             ];
-                            AuditVisitCalenderPlanMember::create($team_schedule);
+                            $schedule_create = AuditVisitCalenderPlanMember::create($team_schedule);
+                            \Log::info($schedule_create);
                         }
                     }
                 }

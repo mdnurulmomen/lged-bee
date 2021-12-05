@@ -26,9 +26,9 @@ class ApEntityAuditPlanRevisedService
         }
         try {
             if ($request->per_page && $request->page && !$request->all) {
-                $all_entities = AnnualPlan::with('audit_plans')->where('fiscal_year_id', $fiscal_year_id)->paginate($request->per_page);
+                $all_entities = AnnualPlan::with('audit_plans','ap_entities')->where('fiscal_year_id', $fiscal_year_id)->paginate($request->per_page);
             } else {
-                $all_entities = AnnualPlan::with('audit_plans')->where('fiscal_year_id', $fiscal_year_id)->get();
+                $all_entities = AnnualPlan::with('audit_plans','ap_entities')->where('fiscal_year_id', $fiscal_year_id)->get();
             }
             return ['status' => 'success', 'data' => $all_entities];
         } catch (\Exception $exception) {
@@ -64,7 +64,7 @@ class ApEntityAuditPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $annual_plan = AnnualPlan::where('id', $request->annual_plan_id)->with('fiscal_year')->first()->toArray();
+            $annual_plan = AnnualPlan::with('ap_entities')->where('id', $request->annual_plan_id)->with('fiscal_year')->first()->toArray();
             $activity = OpActivity::where('id', $request->activity_id)->first()->toArray();
             $audit_template = AuditTemplate::where('template_type', $activity['activity_type'])->where('lang', 'bn')->first()->toArray();
 
@@ -85,7 +85,7 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $audit_template = ApEntityIndividualAuditPlan::with(['annual_plan'])->find($request->audit_plan_id)->toArray();
+            $audit_template = ApEntityIndividualAuditPlan::with(['annual_plan','annual_plan.ap_entities'])->find($request->audit_plan_id)->toArray();
             return ['status' => 'success', 'data' => $audit_template];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
