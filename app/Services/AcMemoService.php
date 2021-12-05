@@ -447,7 +447,8 @@ class AcMemoService
                 return $q->where('audit_year_end', $audit_year_end);
             });
 
-            $memo_list = $query->paginate(config('bee_config.per_page_pagination'));
+            $memo_list = $query->with(['ac_memo_attachments'])
+                ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $memo_list];
 
@@ -555,6 +556,25 @@ class AcMemoService
         try {
             $audit_memo_log_list = AcMemoLog::where('memo_id',$request->memo_id)->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $audit_memo_log_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function attachmentList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $data['porisishtos'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('attachment_type','porisishto')->get()->toArray();
+            $data['pramanoks'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('attachment_type','pramanok')->get()->toArray();
+            $data['memos'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('attachment_type','memo')->get()->toArray();
+            return ['status' => 'success', 'data' => $data];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

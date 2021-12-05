@@ -12,12 +12,12 @@ class PMenuActionController extends Controller
     {
 
         if ($request->per_page && $request->page && !$request->all) {
-            $responseData = PMenuAction::with(['parent'])
+            $responseData = PMenuAction::with(['parent','menu_module','action_menu'])
                 ->where('type', $request->type)
                 ->orderBy('id', 'DESC')
                 ->paginate($request->per_page);
         } else {
-            $responseData = PMenuAction::with(['parent'])
+            $responseData = PMenuAction::with(['parent','menu_module','action_menu'])
                 ->where('type', $request->type)
                 ->orderBy('id', 'DESC')
                 ->get();
@@ -36,7 +36,7 @@ class PMenuActionController extends Controller
         $data = Validator::make($request->all(), [
             'title_en' => 'required',
             'title_bn' => 'required',
-            'link' => 'required',
+            'link' => 'nullable',
             'class' => 'nullable',
             'controller' => 'nullable',
             'method' => 'nullable',
@@ -88,7 +88,7 @@ class PMenuActionController extends Controller
             'menu_action_id' => 'required|integer',
             'title_en' => 'required',
             'title_bn' => 'required',
-            'link' => 'required',
+            'link' => 'nullable',
             'class' => 'nullable',
             'controller' => 'nullable',
             'method' => 'nullable',

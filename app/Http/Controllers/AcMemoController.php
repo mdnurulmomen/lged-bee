@@ -137,4 +137,15 @@ class AcMemoController extends Controller
         }
         return response()->json($response);
     }
+
+    public function attachmentList(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $acMemoService->attachmentList($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Report\QCController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -183,12 +184,18 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('authority-memo-list', [AcMemoController::class, 'authorityMemoList']);
         Route::post('audit-memo-recommendation-store', [AcMemoController::class, 'auditMemoRecommendationStore']);
         Route::post('audit-memo-recommendation-list', [AcMemoController::class, 'auditMemoRecommendationList']);
+        Route::post('attachment-list', [AcMemoController::class, 'attachmentList']);
         Route::post('audit-memo-log-list', [AcMemoController::class, 'auditMemoLogList']);
         Route::post('audit-memo-response-of-rpu', [AcMemoController::class, 'responseOfRpuMemo']);
         Route::post('audit-memo-acknowledgment-of-rpu', [AcMemoController::class, 'acknowledgmentOfRpuMemo']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
+
+    //audit-report
+    Route::group(['prefix' => 'audit-report'],function (){
+        Route::post('create-air-report', [QCController::class, 'createNewAirReport']);
+    });
 
     //final plan
     Route::group(['prefix' => 'final-plan-file'], function () {

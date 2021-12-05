@@ -33,6 +33,16 @@ class PMenuAction extends Model
         return $this->belongsTo(PMenuAction::class, 'parent_id');
     }
 
+    public function menu_module(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenuAction::class, 'menu_module_id');
+    }
+
+    public function action_menu(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PMenuAction::class, 'action_menu_id');
+    }
+
     public function module_childrens(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PMenuAction::class, 'parent_id')->where('status', 1)->where('type', 'module')->orderBy('display_order', 'ASC')->with('module_childrens');

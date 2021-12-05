@@ -26,14 +26,10 @@ class AuditExecutionQueryService
         }
         try {
             $fiscal_year_id = XFiscalYear::select('id')->where('start', date("Y"))->first();
-            $cost_center_id = $request->cost_center_id;
 
             $schedule_list = AuditVisitCalenderPlanMember::where('fiscal_year_id', $fiscal_year_id->id)
                 ->with('plan_team:id,audit_year_start,audit_year_end')
-                ->with('office_order:id,audit_plan_id')
-                ->whereHas('office_order', function ($q) {
-                    $q->where('approve_status', 'approved');
-                })
+                ->with('office_order:id,audit_plan_id,approved_status')
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->whereNotNull('cost_center_id')
                 ->orderBy('team_member_start_date','DESC')
