@@ -167,7 +167,7 @@ class ApEntityTeamService
                             $team_schedule = [
                                 'fiscal_year_id' => $team_data->fiscal_year_id,
                                 'team_id' => $team_data->id,
-                                'team_parent_id' => $team_data->team_parent_id ?: 0,
+                                'team_parent_id' => $team_data->team_parent_id ?: $team_data->id,
                                 'duration_id' => $team_data->duration_id,
                                 'outcome_id' => $team_data->outcome_id,
                                 'output_id' => $team_data->output_id,
@@ -176,6 +176,8 @@ class ApEntityTeamService
                                 'annual_plan_id' => $team_data->annual_plan_id,
                                 'audit_plan_id' => $team_data->audit_plan_id,
                                 'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
+                                'ministry_name_bn' => empty($schedule_datum['ministry_name_bn']) ? null : $schedule_datum['ministry_name_bn'],
+                                'ministry_name_en' => empty($schedule_datum['ministry_name_en']) ? null : $schedule_datum['ministry_name_en'],
                                 'entity_id' => empty($schedule_datum['entity_id']) ? null : $schedule_datum['entity_id'],
                                 'entity_name_en' => empty($schedule_datum['entity_name_en']) ? null : $schedule_datum['entity_name_en'],
                                 'entity_name_bn' => empty($schedule_datum['entity_name_bn']) ? null : $schedule_datum['entity_name_bn'],

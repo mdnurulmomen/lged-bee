@@ -154,7 +154,7 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')->get()->unique('entity_id');
+            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')->whereNotNull('entity_id')->get()->unique('entity_id');
             return ['status' => 'success', 'data' => $entityList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

@@ -32,7 +32,6 @@ class AcMemoService
         try {
 
             $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity', 'office_order'])->where('id', $request->team_member_schedule_id)->first();
-
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)
                 ->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->count();
 
@@ -42,15 +41,12 @@ class AcMemoService
             $audit_memo->onucched_no = $onucched+1;
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audit_memo->ministry_id = $plan_member_schedule->plan_team->ministry_id;
-            $audit_memo->ministry_name_en = $plan_member_schedule->annual_plan->ministry_name_en;
-            $audit_memo->ministry_name_bn = $plan_member_schedule->annual_plan->ministry_name_en;
-            $audit_memo->controlling_office_id = $plan_member_schedule->plan_team->controlling_office_id;
-            $audit_memo->controlling_office_name_en = $plan_member_schedule->plan_team->controlling_office_name_en;
-            $audit_memo->controlling_office_name_bn = $plan_member_schedule->plan_team->controlling_office_name_bn;
-            $audit_memo->parent_office_id = $plan_member_schedule->plan_team->entity_id;
-            $audit_memo->parent_office_name_en = $plan_member_schedule->plan_team->entity_name_en;
-            $audit_memo->parent_office_name_bn = $plan_member_schedule->plan_team->entity_name_bn;
+            $audit_memo->ministry_id = $plan_member_schedule->ministry_id;
+            $audit_memo->ministry_name_en = $plan_member_schedule->ministry_name_en;
+            $audit_memo->ministry_name_bn = $plan_member_schedule->ministry_name_bn;
+            $audit_memo->parent_office_id = $plan_member_schedule->entity_id;
+            $audit_memo->parent_office_name_en = $plan_member_schedule->entity_name_en;
+            $audit_memo->parent_office_name_bn = $plan_member_schedule->entity_name_bn;
             $audit_memo->cost_center_id = $plan_member_schedule->cost_center_id;
             $audit_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
             $audit_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
