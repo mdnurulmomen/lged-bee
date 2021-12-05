@@ -25,12 +25,19 @@ class ApEntityAuditPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
+            $annualPlanQuery = AnnualPlan::with('audit_plans:id,annual_plan_id,fiscal_year_id')
+                ->with('ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
+                ->with('audit_plans.office_order:id,audit_plan_id,approved_status')
+                ->select('id','activity_id','fiscal_year_id','office_type','total_unit_no',
+                    'subject_matter','created_at')
+                ->where('fiscal_year_id', $fiscal_year_id);
+
             if ($request->per_page && $request->page && !$request->all) {
-                $all_entities = AnnualPlan::with('audit_plans','ap_entities')->where('fiscal_year_id', $fiscal_year_id)->paginate($request->per_page);
+                $annualPlanQuery = $annualPlanQuery->paginate($request->per_page);
             } else {
-                $all_entities = AnnualPlan::with('audit_plans','ap_entities')->where('fiscal_year_id', $fiscal_year_id)->get();
+                $annualPlanQuery = $annualPlanQuery->get();
             }
-            return ['status' => 'success', 'data' => $all_entities];
+            return ['status' => 'success', 'data' => $annualPlanQuery];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
