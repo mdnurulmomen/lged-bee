@@ -173,12 +173,14 @@ class AnnualPlanRevisedService
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $plan->id;
+                    $ap_entity->layer_id = $entity['layer_id'];
                     $ap_entity->ministry_id = $entity['ministry_id'];
                     $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
                     $ap_entity->ministry_name_en = $entity['ministry_name_en'];
                     $ap_entity->entity_id = $entity['entity_id'];
                     $ap_entity->entity_name_bn = $entity['entity_bn'];
                     $ap_entity->entity_name_en = $entity['entity_en'];
+                    $ap_entity->entity_total_unit = $entity['entity_total_unit'];
                     $ap_entity->nominated_offices = json_encode($entity['nominated_offices']);
                     $ap_entity->created_at = date('Y-m-d H:i:s');
                     $ap_entity->save();
@@ -214,33 +216,20 @@ class AnnualPlanRevisedService
                 'activity_id' => $request->activity_id,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
-
-                'ministry_name_en' => $ministry->ministry_name_en,
-                'ministry_name_bn' => $ministry->ministry_name_bn,
-                'ministry_id' => $ministry->ministry_id,
-
-                'controlling_office_en' => $controlling_office->controlling_office_name_en,
-                'controlling_office_bn' => $controlling_office->controlling_office_name_bn,
-                'controlling_office_id' => $controlling_office->controlling_office_id,
-
-                'parent_office_name_en' => $parent_office->parent_office_name_en,
-                'parent_office_name_bn' => $parent_office->parent_office_name_bn,
-                'parent_office_id' => $parent_office->parent_office_id,
                 'office_type' => $request->office_type,
                 'annual_plan_type' => $request->annual_plan_type,
                 'thematic_title' => $request->thematic_title,
-
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
                 'total_unit_no' => $request->total_unit_no,
-                'nominated_offices' => $request->nominated_offices,
-                'nominated_office_counts' => count(json_decode($request->nominated_offices, true)),
+                'nominated_office_counts' => $request->total_selected_unit_no,
                 'subject_matter' => $request->subject_matter,
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
-            $plan = AnnualPlan::where('id',$request->id)->update($plan_data);
+
+            AnnualPlan::where('id',$request->id)->update($plan_data);
 
             ApMilestone::where('annual_plan_id',$request->id)->delete();
 
@@ -254,6 +243,26 @@ class AnnualPlanRevisedService
                $ap_milestone->start_date = date('Y-m-d',strtotime($milestone['start_date']));
                $ap_milestone->end_date = date('Y-m-d',strtotime($milestone['end_date']));
                $ap_milestone->save();
+            }
+
+            AnnualPlanEntitie::where('annual_plan_id',$request->id)->delete();
+
+            foreach ($request->entity_list as $key => $entity){
+                if ($key != 'undefined') {
+                    $ap_entity = new AnnualPlanEntitie();
+                    $ap_entity->annual_plan_id = $request->id;
+                    $ap_entity->layer_id = $entity['layer_id'];
+                    $ap_entity->ministry_id = $entity['ministry_id'];
+                    $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
+                    $ap_entity->ministry_name_en = $entity['ministry_name_en'];
+                    $ap_entity->entity_id = $entity['entity_id'];
+                    $ap_entity->entity_name_bn = $entity['entity_bn'];
+                    $ap_entity->entity_name_en = $entity['entity_en'];
+                    $ap_entity->entity_total_unit = $entity['entity_total_unit'];
+                    $ap_entity->nominated_offices = json_encode($entity['nominated_offices']);
+                    $ap_entity->created_at = date('Y-m-d H:i:s');
+                    $ap_entity->save();
+                }
             }
 
             $data = ['status' => 'success', 'data' => 'Successfully Plan Updated!'];

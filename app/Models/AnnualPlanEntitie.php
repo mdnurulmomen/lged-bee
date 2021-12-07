@@ -16,6 +16,7 @@ class AnnualPlanEntitie extends Model
         'ministry_id',
         'ministry_name_bn',
         'ministry_name_en',
+        'layer_id',
         'entity_id',
         'entity_name_bn',
         'entity_name_en',
