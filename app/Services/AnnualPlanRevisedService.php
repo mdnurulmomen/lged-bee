@@ -136,7 +136,6 @@ class AnnualPlanRevisedService
         }
         \DB::beginTransaction();
         try {
-
             $plan_data = [
                 'schedule_id' => 0,
                 'milestone_id' => 0,
@@ -163,9 +162,9 @@ class AnnualPlanRevisedService
                     $ap_milestone->annual_plan_id = $plan->id;
                     $ap_milestone->activity_id = $milestone['activity_id'];
                     $ap_milestone->milestone_id = $milestone['milestone_id'];
-                    $ap_milestone->milestone_target_date = date('Y-m-d', strtotime($milestone['milestone_target_date']));
-                    $ap_milestone->start_date = date('Y-m-d', strtotime($milestone['start_date']));
-                    $ap_milestone->end_date = date('Y-m-d', strtotime($milestone['end_date']));
+                    $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
+                    $ap_milestone->start_date = $milestone['start_date'];
+                    $ap_milestone->end_date = $milestone['end_date'];
                     $ap_milestone->save();
             }
 
@@ -204,12 +203,6 @@ class AnnualPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $ministry = json_decode($request->ministry_info);
-            $controlling_office = json_decode($request->controlling_office);
-            $parent_office = json_decode($request->parent_office);
-
-//            $schedule_id =  OpOrganizationYearlyAuditCalendarEventSchedule::select('id')->where('activity_id',$request->activity_id)->where('activity_milestone_id',$request->milestone_id)->first()->id;
-
             $plan_data = [
                 'schedule_id' => 0,
                 'milestone_id' => 0,
@@ -239,9 +232,9 @@ class AnnualPlanRevisedService
                $ap_milestone->annual_plan_id = $request->id;
                $ap_milestone->activity_id = $milestone['activity_id'];
                $ap_milestone->milestone_id = $milestone['milestone_id'];
-               $ap_milestone->milestone_target_date = date('Y-m-d',strtotime($milestone['milestone_target_date']));
-               $ap_milestone->start_date = date('Y-m-d',strtotime($milestone['start_date']));
-               $ap_milestone->end_date = date('Y-m-d',strtotime($milestone['end_date']));
+               $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
+               $ap_milestone->start_date = $milestone['start_date'];
+               $ap_milestone->end_date = $milestone['end_date'];
                $ap_milestone->save();
             }
 
@@ -260,7 +253,6 @@ class AnnualPlanRevisedService
                     $ap_entity->entity_name_en = $entity['entity_en'];
                     $ap_entity->entity_total_unit = $entity['entity_total_unit'];
                     $ap_entity->nominated_offices = json_encode($entity['nominated_offices']);
-                    $ap_entity->created_at = date('Y-m-d H:i:s');
                     $ap_entity->save();
                 }
             }
