@@ -8,9 +8,35 @@ use Illuminate\Http\Request;
 
 class QCController extends Controller
 {
+    public function loadApprovePlanList(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->loadApprovePlanList($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function createNewAirReport(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
     {
         $responseData = $qCService->createNewAIRReport($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function storeAirReport(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->storeAirReport($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

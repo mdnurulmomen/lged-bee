@@ -199,7 +199,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     //audit-report
     Route::group(['prefix' => 'audit-report'],function (){
+        Route::post('load-approve-plan-list', [QCController::class, 'loadApprovePlanList']);
         Route::post('create-air-report', [QCController::class, 'createNewAirReport']);
+        Route::post('store-air-report', [QCController::class, 'storeAirReport']);
     });
 
     //final plan
