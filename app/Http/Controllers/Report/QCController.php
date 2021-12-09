@@ -46,4 +46,30 @@ class QCController extends Controller
 
         return response()->json($response);
     }
+
+    public function getAuditTeam(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->getAuditTeam($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getAuditTeamSchedule(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->getAuditTeamSchedule($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
 }

@@ -202,6 +202,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('load-approve-plan-list', [QCController::class, 'loadApprovePlanList']);
         Route::post('create-air-report', [QCController::class, 'createNewAirReport']);
         Route::post('store-air-report', [QCController::class, 'storeAirReport']);
+        Route::post('get-audit-team', [QCController::class, 'getAuditTeam']);
+        Route::post('get-audit-team-schedule', [QCController::class, 'getAuditTeamSchedule']);
     });
 
     //final plan

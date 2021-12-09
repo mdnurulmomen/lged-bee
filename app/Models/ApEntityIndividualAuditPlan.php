@@ -46,6 +46,11 @@ class ApEntityIndividualAuditPlan extends Model
         return $this->hasMany(AuditVisitCalendarPlanTeam::class, 'audit_plan_id', 'id');
     }
 
+    public function air_reports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RAir::class, 'audit_plan_id', 'id');
+    }
+
     public function office_order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id');

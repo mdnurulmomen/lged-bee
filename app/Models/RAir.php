@@ -9,6 +9,8 @@ class RAir extends Model
 {
     use HasFactory;
 
+    protected $connection = 'OfficeDB';
+
     protected $fillable = [
         'fiscal_year_id',
         'annual_plan_id',
