@@ -190,6 +190,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-acknowledgment-of-rpu', [AcMemoController::class, 'acknowledgmentOfRpuMemo']);
     });
 
+    Route::group(['prefix' => 'audit-conduct-apotti'], function () {
+        Route::post('get-apotti-list', [ApottiController::class, 'getApottilist']);
+        Route::post('onucched-merge', [ApottiController::class, 'onucchedMerge']);
+    });
+
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
     //audit-report
