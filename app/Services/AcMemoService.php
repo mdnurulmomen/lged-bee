@@ -33,14 +33,17 @@ class AcMemoService
         \DB::beginTransaction();
         try {
 
-            $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity', 'office_order'])->where('id', $request->team_member_schedule_id)->first();
+            $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
+                'office_order'])->where('id', $request->team_member_schedule_id)->first();
+
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)
                 ->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->count();
 
-            $fiscal_year_info = XFiscalYear::select('start','end')->find($plan_member_schedule->fiscal_year_id);
+            $fiscal_year_info = XFiscalYear::select('start','end')->where('id',$plan_member_schedule->fiscal_year_id)->first();
 
             $audit_memo = new AcMemo();
             $audit_memo->onucched_no = $onucched+1;
+            $audit_memo->memo_date = date('Y-m-d');
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audit_memo->ministry_id = $plan_member_schedule->ministry_id;
@@ -63,6 +66,7 @@ class AcMemoService
             $audit_memo->team_id = $plan_member_schedule->team_id;
             $audit_memo->memo_title_bn = $request->memo_title_bn;
             $audit_memo->memo_description_bn = $request->memo_description_bn;
+            $audit_memo->irregularity_cause = $request->irregularity_cause;
             $audit_memo->memo_type = $request->memo_type;
             $audit_memo->memo_status = $request->memo_status;
             $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
@@ -73,7 +77,10 @@ class AcMemoService
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
             $audit_memo->status = 'draft';
-            $audit_memo->comment = '';
+            $audit_memo->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
+            $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
+            $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
+            $audit_memo->rpu_acceptor_designation_name_en = $request->rpu_acceptor_designation_name_bn;
             $audit_memo->save();
 
             //for attachments
@@ -144,8 +151,11 @@ class AcMemoService
                 }
             }
 
+            if (!empty($finalAttachments)){
+                AcMemoAttachment::insert($finalAttachments);
+            }
 
-            AcMemoAttachment::insert($finalAttachments);
+            \DB::commit();
             return ['status' => 'success', 'data' => 'Memo Saved Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();

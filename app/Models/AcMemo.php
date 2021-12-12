@@ -9,6 +9,8 @@ class AcMemo extends Model
 {
     use HasFactory;
 
+    protected $connection = 'OfficeDB';
+
     public static $memo_types = [
         '0' => 'N/A',
         '1' => 'এসএফআই',
@@ -42,7 +44,7 @@ class AcMemo extends Model
         '8' => 'প্রাপ্যতাবিহীন ভাতা উত্তোলন',
         '9' => 'জাতীয় অন্যান্য সরকারী অর্থের ক্ষতি সংক্রান্ত আপত্তি।',
     ];
-    protected $connection = 'OfficeDB';
+
     protected $appends = ['memo_type_name', 'memo_irregularity_type_name', 'memo_irregularity_sub_type_name', 'memo_status_name'];
     protected $fillable = [
         'onucched_no',
@@ -71,6 +73,7 @@ class AcMemo extends Model
         'team_id',
         'memo_title_bn',
         'memo_description_bn',
+        'irregularity_cause',
         'memo_type',
         'memo_status',
         'jorito_ortho_poriman',
@@ -122,6 +125,16 @@ class AcMemo extends Model
     public function getMemoIrregularitySubTypeNameAttribute($value)
     {
         return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
+    }
+
+    public function setJoritoOrthoPorimanAttribute($value)
+    {
+        $this->attributes['jorito_ortho_poriman'] = str_replace(",","",$value);
+    }
+
+    public function setOnishponnoJoritoOrthoPorimanAttribute($value)
+    {
+        $this->attributes['onishponno_jorito_ortho_poriman'] = str_replace(",","",$value);
     }
 
     public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -54,9 +54,24 @@ class AuditVisitCalenderPlanMember extends Model
         'sequence_level',
     ];
 
+    public function activity()
+    {
+        return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
+    }
+
+    public function x_fiscal_year()
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
     public function plan_team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'team_id', 'id');
+    }
+
+    public function plan_parent_team(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'team_parent_id', 'id');
     }
 
     public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -67,15 +82,5 @@ class AuditVisitCalenderPlanMember extends Model
     public function office_order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'audit_plan_id');
-    }
-
-    public function activity()
-    {
-        return $this->belongsTo(OpActivity::class, 'activity_id', 'id');
-    }
-
-    public function x_fiscal_year()
-    {
-        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 }
