@@ -414,6 +414,12 @@ class AcMemoService
                    $apotti_item->onucched_no = 1;
                    $apotti_item->memo_irregularity_type = $memo_item['memo_irregularity_type'];
                    $apotti_item->memo_irregularity_sub_type = $memo_item['memo_irregularity_sub_type'];
+                   $apotti->ministry_id = $memo_item['ministry_id'];
+                   $apotti->ministry_name_en = $memo_item['ministry_name_en'];
+                   $apotti->ministry_name_bn = $memo_item['ministry_name_en'];
+                   $apotti->parent_office_id = $memo_item['parent_office_id'];
+                   $apotti->parent_office_name_en = $memo_item['parent_office_name_en'];
+                   $apotti->parent_office_name_bn = $memo_item['parent_office_name_bn'];
                    $apotti_item->cost_center_id = $memo_item['memo_irregularity_sub_type'];
                    $apotti_item->cost_center_name_en = $memo_item['cost_center_name_en'];
                    $apotti_item->cost_center_name_bn = $memo_item['cost_center_name_bn'];

@@ -37,6 +37,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('activity/all-by-fiscal-year', [OpActivityController::class, 'showActivitiesByFiscalYear']);
             Route::post('activity/milestones', [OpActivityController::class, 'showActivityMilestones']);
             Route::post('activity/get-all-activity', [OpActivityController::class, 'getAllActivity']);
+            Route::post('activity/activity-wise-audit-plan', [OpActivityController::class, 'getActivityWiseAuditPlan']);
             Route::customApiResource('activity', OpActivityController::class);
 
             Route::customApiResource('activity-milestone', OpActivityMilestoneController::class);
@@ -192,7 +193,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'audit-conduct-apotti'], function () {
         Route::post('get-apotti-list', [ApottiController::class, 'getApottilist']);
+        Route::post('get-apotti-info', [ApottiController::class, 'getApottiInfo']);
         Route::post('onucched-merge', [ApottiController::class, 'onucchedMerge']);
+        Route::post('onucched-unmerge', [ApottiController::class, 'onucchedUnMerge']);
+        Route::post('onucched-rearrange', [ApottiController::class, 'onucchedReArrange']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);

@@ -70,6 +70,19 @@ class OpActivityController extends Controller
         return response()->json($response);
     }
 
+    public function getActivityWiseAuditPlan(Request $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
+    {
+        $plan_list = $opActivity->getActivityWiseAuditPlan($request);
+
+        if (isSuccessResponse($plan_list)) {
+            $response = responseFormat('success', $plan_list['data']);
+        } else {
+            $response = responseFormat('error', $plan_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function store(SaveRequest $request, OpActivityRepository $opActivity): \Illuminate\Http\JsonResponse
     {
         try {

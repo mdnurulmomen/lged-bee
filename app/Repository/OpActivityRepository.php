@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\OpActivity;
 use App\Models\OpActivityMilestone;
 use App\Models\XFiscalYear;
@@ -154,6 +155,22 @@ class OpActivityRepository implements OpActivityInterface
         try {
             $activity_list = OpActivity::where('fiscal_year_id', $request->fiscal_year_id)->get();
             return ['status' => 'success', 'data' => $activity_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getActivityWiseAuditPlan(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+//        return ['status' => 'success', 'data' => $activity_plan_list];
+        try {
+            $activity_plan_list = ApEntityIndividualAuditPlan::with('ap_entities:id,annual_plan_id,ministry_id,entity_id,entity_name_bn,entity_name_en')->select('id','annual_plan_id')->where('fiscal_year_id', $request->fiscal_year_id)->where('activity_id', $request->activity_id)->get();
+            return ['status' => 'success', 'data' => $activity_plan_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

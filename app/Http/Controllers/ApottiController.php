@@ -19,12 +19,46 @@ class ApottiController extends Controller
         return response()->json($response);
     }
 
+    public function getApottiInfo(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_info = $apottiService->getApottiInfo($request);
+        if (isSuccessResponse($apotti_info)) {
+            $response = responseFormat('success', $apotti_info['data']);
+        } else {
+            $response = responseFormat('error', $apotti_info['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function onucchedMerge(Request $request, ApottiService $apottiService){
         $apotti_merge = $apottiService->onucchedMerge($request);
         if (isSuccessResponse($apotti_merge)) {
             $response = responseFormat('success', $apotti_merge['data']);
         } else {
             $response = responseFormat('error', $apotti_merge['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function onucchedUnMerge(Request $request, ApottiService $apottiService){
+        $apotti_merge = $apottiService->onucchedUnMerge($request);
+        if (isSuccessResponse($apotti_merge)) {
+            $response = responseFormat('success', $apotti_merge['data']);
+        } else {
+            $response = responseFormat('error', $apotti_merge['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function onucchedReArrange(Request $request, ApottiService $apottiService){
+        $apotti_rearrange = $apottiService->onucchedReArrange($request);
+        if (isSuccessResponse($apotti_rearrange)) {
+            $response = responseFormat('success', $apotti_rearrange['data']);
+        } else {
+            $response = responseFormat('error', $apotti_rearrange['data']);
         }
 
         return response()->json($response);
