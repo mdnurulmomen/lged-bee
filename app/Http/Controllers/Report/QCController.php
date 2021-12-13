@@ -72,4 +72,17 @@ class QCController extends Controller
 
         return response()->json($response);
     }
+
+    public function getAuditApotti(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->getAuditApotti($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
 }

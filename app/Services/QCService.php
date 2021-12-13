@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
+use App\Models\Apotti;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
@@ -134,6 +135,26 @@ class QCService
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamSchedule];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+
+    public function getAuditApotti(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $auditApottis= Apotti::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->get()
+                ->toArray();
+            return ['status' => 'success', 'data' => $auditApottis];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

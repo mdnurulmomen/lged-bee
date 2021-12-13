@@ -208,6 +208,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store-air-report', [QCController::class, 'storeAirReport']);
         Route::post('get-audit-team', [QCController::class, 'getAuditTeam']);
         Route::post('get-audit-team-schedule', [QCController::class, 'getAuditTeamSchedule']);
+        Route::post('get-audit-apotti', [QCController::class, 'getAuditApotti']);
     });
 
     //final plan
