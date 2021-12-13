@@ -351,6 +351,10 @@ class AcMemoService
         }
         try {
 
+//            $apotti_sequence = Apotti::max('apotti_sequence');
+//
+//            return ['status' => 'error', 'data' => $apotti_sequence];
+
             $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')
                 ->whereIn('id', $request->memos)
                 ->get();

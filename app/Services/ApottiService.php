@@ -115,6 +115,7 @@ class ApottiService
             $apotti_items = [];
             $total_onishponno_jorito_ortho_poriman = 0;
             foreach ($apotti_list as $apotti){
+                $audit_plan_id = $apotti['audit_plan_id'];
                 $ministry_id = $apotti['ministry_id'];
                 $ministry_name_en = $apotti['ministry_name_en'];
                 $ministry_name_bn = $apotti['ministry_name_bn'];
@@ -169,6 +170,7 @@ class ApottiService
             ApottiItem::whereIn('apotti_id',$request->apotti_id)->delete();
 
             $apotti = new Apotti();
+            $apotti->audit_plan_id = $audit_plan_id;
             $apotti->onucched_no = $request->onucched_no;
             $apotti->apotti_title = $request->apotti_title;
             $apotti->apotti_description = $request->apotti_description;
@@ -178,6 +180,7 @@ class ApottiService
             $apotti->parent_office_id = $parent_office_id;
             $apotti->parent_office_name_en = $parent_office_name_en;
             $apotti->parent_office_name_bn = $parent_office_name_bn;
+            $apotti->fiscal_year_id = $fiscal_year_id;
             $apotti->fiscal_year_id = $fiscal_year_id;
             $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->total_onishponno_jorito_ortho_poriman = $total_onishponno_jorito_ortho_poriman;
