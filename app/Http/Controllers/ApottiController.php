@@ -63,4 +63,36 @@ class ApottiController extends Controller
 
         return response()->json($response);
     }
+
+    public function apottiWiseAllItem(Request $request, ApottiService $apottiService){
+        $apotti_wise_item = $apottiService->apottiWiseAllItem($request);
+        if (isSuccessResponse($apotti_wise_item)) {
+            $response = responseFormat('success', $apotti_wise_item['data']);
+        } else {
+            $response = responseFormat('error', $apotti_wise_item['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getApottiItemInfo(Request $request, ApottiService $apottiService){
+        $apotti_item_info = $apottiService->getApottiItemInfo($request);
+        if (isSuccessResponse($apotti_item_info)) {
+            $response = responseFormat('success', $apotti_item_info['data']);
+        } else {
+            $response = responseFormat('error', $apotti_item_info['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function updateApotti(Request $request, ApottiService $apottiService){
+        $update_apotti = $apottiService->updateApotti($request);
+        if (isSuccessResponse($update_apotti)) {
+            $response = responseFormat('success', $update_apotti['data']);
+        } else {
+            $response = responseFormat('error', $update_apotti['data']);
+        }
+        return response()->json($response);
+    }
 }

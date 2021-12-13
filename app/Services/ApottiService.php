@@ -110,10 +110,10 @@ class ApottiService
         }
         \DB::beginTransaction();
         try {
+//            return ['status' => 'error', 'data' => $request->apotti_id];
             $apotti_list = Apotti::with(['apotti_items'])
                 ->whereIn('id',$request->apotti_id)->get();
             $apotti_items = [];
-            $total_jorito_ortho_poriman = 0;
             $total_onishponno_jorito_ortho_poriman = 0;
             foreach ($apotti_list as $apotti){
                 $ministry_id = $apotti['ministry_id'];
@@ -160,8 +160,6 @@ class ApottiService
                         'status' => 0,
                     ];
                     $apotti_items_info[] = $apotti_item_temp;
-
-                    $total_jorito_ortho_poriman += $apotti_item['jorito_ortho_poriman'];
                     $total_onishponno_jorito_ortho_poriman += $apotti_item['onishponno_jorito_ortho_poriman'];
                 }
             }
@@ -182,7 +180,7 @@ class ApottiService
             $apotti->parent_office_name_en = $parent_office_name_en;
             $apotti->parent_office_name_bn = $parent_office_name_bn;
             $apotti->fiscal_year_id = $fiscal_year_id;
-            $apotti->total_jorito_ortho_poriman = $total_jorito_ortho_poriman;
+            $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->total_onishponno_jorito_ortho_poriman = $total_onishponno_jorito_ortho_poriman;
             $apotti->irregularity_cause = $request->irregularity_cause;
             $apotti->response_of_rpu = $request->response_of_rpu;
@@ -226,6 +224,7 @@ class ApottiService
                    $apotti_item_save->status = $apotti_item['status'];
                    $apotti_item_save->save();
             }
+
             \DB::commit();
             return ['status' => 'success', 'data' => 'Merge Successfully'];
 
@@ -344,5 +343,81 @@ class ApottiService
         }
 
     }
+
+    public function apottiWiseAllItem(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $apotti_list = Apotti::with(['apotti_items'])
+                ->whereIn('id',$request->apottiId)->get();
+            $apotti_items = [];
+            foreach ($apotti_list as $apotti){
+                foreach ($apotti['apotti_items'] as $apotti_item){
+                    $apotti_item_temp = [
+                        'apotti_item_id' => $apotti_item['id'],
+                        'memo_title_bn' => $apotti_item['memo_title_bn'],
+                        'jorito_ortho_poriman' => $apotti_item['jorito_ortho_poriman'],
+                    ];
+                    $apotti_items_info[] = $apotti_item_temp;
+                }
+            }
+
+            $apotti_items =  $apotti_items_info;
+
+            return ['status' => 'success', 'data' => $apotti_items];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getApottiItemInfo(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $apotti_item_info = ApottiItem::find($request->apotti_item_id);
+            return ['status' => 'success', 'data' => $apotti_item_info];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function updateApotti(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $apotti = Apotti::find($request->apotti_id);
+            $apotti->onucched_no = $request->onucched_no;
+            $apotti->apotti_title = $request->apotti_title;
+            $apotti->apotti_description = $request->apotti_description;
+            $apotti->irregularity_cause = $request->irregularity_cause;
+            $apotti->response_of_rpu = $request->response_of_rpu;
+            $apotti->audit_conclusion = $request->audit_conclusion;
+            $apotti->audit_recommendation = $request->audit_recommendation;
+            $apotti->save();
+
+            return ['status' => 'success', 'data' => 'Update Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+
 
 }

@@ -389,6 +389,7 @@ class AcMemoService
 
                 foreach ($memo as $memo_item){
                    $apotti =  New Apotti();
+                   $apotti->audit_plan_id = $memo_item['audit_plan_id'];
                    $apotti->onucched_no = 1;
                    $apotti->apotti_title = $memo_item['memo_title_bn'];
                    $apotti->apotti_description = $memo_item['memo_description_bn'];
@@ -404,7 +405,7 @@ class AcMemoService
                    $apotti->created_by = $cdesk->officer_id;
                    $apotti->approve_status = 1;
                    $apotti->status = 0;
-                   $apotti->apotti_sequence = 0;
+                   $apotti->apotti_sequence = 1;
                    $apotti->is_combined = 0;
                    $apotti->save();
 
@@ -441,7 +442,6 @@ class AcMemoService
                    $apotti_item->created_by = $cdesk->officer_id;
                    $apotti_item->status = 0;
                    $apotti_item->save();
-
                 }
 
                 return ['status' => 'success', 'data' => 'Send Successfully'];

@@ -197,6 +197,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('onucched-merge', [ApottiController::class, 'onucchedMerge']);
         Route::post('onucched-unmerge', [ApottiController::class, 'onucchedUnMerge']);
         Route::post('onucched-rearrange', [ApottiController::class, 'onucchedReArrange']);
+        Route::post('apotti-wise-all-tiem', [ApottiController::class, 'apottiWiseAllItem']);
+        Route::post('get-apotti-item-info', [ApottiController::class, 'getApottiItemInfo']);
+        Route::post('update-apotti', [ApottiController::class, 'updateApotti']);
     });
 
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
