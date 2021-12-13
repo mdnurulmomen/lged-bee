@@ -188,7 +188,7 @@ class ApottiService
             $apotti->response_of_rpu = $request->response_of_rpu;
             $apotti->audit_conclusion = $request->audit_conclusion;
             $apotti->audit_recommendation = $request->audit_recommendation;
-            $apotti->created_by = $cdesk->officer_id,
+            $apotti->created_by = $cdesk->officer_id;
             $apotti->is_combined = 1;
             $apotti->save();
 
