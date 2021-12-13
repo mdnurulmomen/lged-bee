@@ -110,7 +110,6 @@ class ApottiService
         }
         \DB::beginTransaction();
         try {
-//            return ['status' => 'error', 'data' => $request->apotti_id];
             $apotti_list = Apotti::with(['apotti_items'])
                 ->whereIn('id',$request->apotti_id)->get();
             $apotti_items = [];
