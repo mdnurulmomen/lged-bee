@@ -7,7 +7,7 @@ use App\Models\ApottiItem;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
-
+use DB;
 class ApottiService
 {
     use GenericData, ApiHeart;
@@ -74,7 +74,7 @@ class ApottiService
 //            });
 
 
-            $apotti_list = $query->with(['apotti_items'])
+            $apotti_list = $query->with(['apotti_items','apotti_status'])
                 ->orderBy('apotti_sequence')
                 ->paginate(config('bee_config.per_page_pagination'));
 
@@ -108,7 +108,7 @@ class ApottiService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             $apotti_list = Apotti::with(['apotti_items'])
                 ->whereIn('id',$request->apotti_id)->get();
@@ -189,6 +189,8 @@ class ApottiService
             $apotti->audit_conclusion = $request->audit_conclusion;
             $apotti->audit_recommendation = $request->audit_recommendation;
             $apotti->created_by = $cdesk->officer_id;
+            $apotti->approve_status = 0;
+            $apotti->status = 0;
             $apotti->is_combined = 1;
             $apotti->save();
 
@@ -228,14 +230,14 @@ class ApottiService
                    $apotti_item_save->save();
             }
 
-            \DB::commit();
+            DB::commit();
             return ['status' => 'success', 'data' => 'Merge Successfully'];
 
         }catch (\Error $exception) {
-            \DB::rollback();
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         } catch (\Exception $exception) {
-            \DB::rollback();
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
@@ -248,7 +250,7 @@ class ApottiService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
 
             $apotti_item_info = ApottiItem::find($request->apotti_item_id);
@@ -313,11 +315,11 @@ class ApottiService
             $apotti_item->save();
 
             ApottiItem::where('id',$request->apotti_item_id)->delete();
-            \DB::commit();
+            DB::commit();
             return ['status' => 'success', 'data' => 'UnMerge Successfully'];
 
         } catch (\Exception $exception) {
-            \DB::rollback();
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
@@ -330,7 +332,7 @@ class ApottiService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             $apotti_sequence = $request->apotti_sequence;
 
@@ -340,11 +342,11 @@ class ApottiService
                $apotti->save();
             }
 
-            \DB::commit();
+            DB::commit();
             return ['status' => 'success', 'data' => 'Rearrange Successfully'];
 
         } catch (\Exception $exception) {
-            \DB::rollback();
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
