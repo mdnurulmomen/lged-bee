@@ -231,6 +231,9 @@ class ApottiService
             \DB::commit();
             return ['status' => 'success', 'data' => 'Merge Successfully'];
 
+        }catch (\Error $exception) {
+            \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];

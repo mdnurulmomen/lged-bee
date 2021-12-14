@@ -187,7 +187,12 @@ class AnnualPlanRevisedService
             }
             \DB::commit();
             $data = ['status' => 'success', 'data' => 'Annual Plan Save Successfully'];
-        } catch (\Exception $exception) {
+        }
+        catch (\Error $exception) {
+            \DB::rollback();
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        catch (\Exception $exception) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -202,6 +207,7 @@ class AnnualPlanRevisedService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
             $plan_data = [
                 'schedule_id' => 0,
@@ -256,9 +262,15 @@ class AnnualPlanRevisedService
                     $ap_entity->save();
                 }
             }
-
+            \DB::commit();
             $data = ['status' => 'success', 'data' => 'Successfully Plan Updated!'];
-        } catch (\Exception $exception) {
+        }
+        catch (\Error $exception) {
+            \DB::rollback();
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        catch (\Exception $exception) {
+            \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
         $this->emptyOfficeDBConnection();
