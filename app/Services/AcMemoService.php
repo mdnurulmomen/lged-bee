@@ -351,15 +351,9 @@ class AcMemoService
         }
         try {
 
-//            $apotti_sequence = Apotti::max('apotti_sequence');
-//
-//            return ['status' => 'error', 'data' => $apotti_sequence];
-
             $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')
                 ->whereIn('id', $request->memos)
                 ->get();
-
-//            return ['status' => 'success', 'data' => $memo];
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
@@ -391,10 +385,12 @@ class AcMemoService
                         'sender_designation_en'=>$cdesk->designation_en
                     ]);
 
+                $apotti_sequence = Apotti::max('apotti_sequence');
+
                 foreach ($memo as $memo_item){
                    $apotti =  New Apotti();
                    $apotti->audit_plan_id = $memo_item['audit_plan_id'];
-                   $apotti->onucched_no = 1;
+                   $apotti->onucched_no = $apotti_sequence + 1;
                    $apotti->apotti_title = $memo_item['memo_title_bn'];
                    $apotti->apotti_description = $memo_item['memo_description_bn'];
                    $apotti->ministry_id = $memo_item['ministry_id'];
@@ -409,7 +405,7 @@ class AcMemoService
                    $apotti->created_by = $cdesk->officer_id;
                    $apotti->approve_status = 1;
                    $apotti->status = 0;
-                   $apotti->apotti_sequence = 1;
+                   $apotti->apotti_sequence = $apotti_sequence + 1;
                    $apotti->is_combined = 0;
                    $apotti->save();
 
