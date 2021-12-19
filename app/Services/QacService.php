@@ -25,17 +25,6 @@ class QacService
         DB::beginTransaction();
 
         try {
-//            return ['status' => 'success', 'data' => $request->all()];
-//            $apotti_status = new ApottiStatus();
-//            $apotti_status->apotti_id = $request->apotti_id;
-//            $apotti_status->apotti_type = $request->apotti_type;
-//            $apotti_status->qac_type = $request->qac_type;
-//            $apotti_status->comment = $request->comment;
-//            $apotti_status->created_by = $cdesk->office_id;
-//            $apotti_status->created_by_name_en = $cdesk->officer_en;
-//            $apotti_status->created_by_name_bn = $cdesk->officer_bn;
-//            $apotti_status->save();
-
             ApottiStatus::updateOrCreate(
                 ['apotti_id' => $request->apotti_id,'qac_type' => $request->qac_type],
                 [
@@ -49,6 +38,7 @@ class QacService
                 ]
             );
 
+            Apotti::where('id',$request->apotti_id)->update(['apotti_type' => $request->apotti_type]);
             ApottiItem::where('apotti_id',$request->apotti_id)->update(['memo_type' => $request->apotti_type]);
 
             DB::commit();

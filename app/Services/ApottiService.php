@@ -21,6 +21,7 @@ class ApottiService
         }
         try {
             $fiscal_year_id = $request->fiscal_year_id;
+            $qac_type = $request->qac_type;
 //            $cost_center_id = $request->cost_center_id;
 //            $team_id = $request->team_id;
 //            $memo_irregularity_type= $request->memo_irregularity_type;
@@ -69,9 +70,11 @@ class ApottiService
 //                return $q->where('audit_year_start', $audit_year_start);
 //            });
 //
-//            $query->when($audit_year_end, function ($q, $audit_year_end) {
-//                return $q->where('audit_year_end', $audit_year_end);
-//            });
+            $query->when($qac_type, function ($q, $qac_type) {
+                if($qac_type == 'qac-2'){
+                    return $q->where('apotti_type', 'sfi');
+                }
+            });
 
 
             $apotti_list = $query->with(['apotti_items','apotti_status'])
