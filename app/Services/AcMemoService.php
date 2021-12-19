@@ -70,7 +70,6 @@ class AcMemoService
             $audit_memo->memo_type = $request->memo_type;
             $audit_memo->memo_status = $request->memo_status;
             $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
-            $audit_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
             $audit_memo->response_of_rpu = $request->response_of_rpu;
             $audit_memo->audit_conclusion = $request->audit_conclusion;
             $audit_memo->audit_recommendation = $request->audit_recommendation;
@@ -130,7 +129,7 @@ class AcMemoService
             }
 
             //for memos
-            if ($request->hasfile('memos')) {
+            /*if ($request->hasfile('memos')) {
                 foreach ($request->memos as $file){
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileName = 'memo_'.uniqid() . '.' . $file->extension();
@@ -149,7 +148,7 @@ class AcMemoService
                         )
                     );
                 }
-            }
+            }*/
 
             if (!empty($finalAttachments)){
                 AcMemoAttachment::insert($finalAttachments);

@@ -28,6 +28,7 @@ class FinalPlanRepo
                 Storage::disk('public')->put($fileName, File::get($attachment));
             }
 
+            $filePath = $request->document_type == 'strategic'?'strategic':'operational';
             $document = new Document();
             $document->document_type = $request->document_type;
             $document->relational_id = 1;
@@ -35,8 +36,8 @@ class FinalPlanRepo
             $document->attachment_type = $attachment->extension();
             $document->user_file_name = $attachment->getClientOriginalName();
             $document->file_custom_name = $fileName;
-            $document->file_location = 'storage/app/public/plan/' . $request->document_type . '/' . $fileName;
-            $document->file_url = url('storage/plan/' . $request->document_type . '/' . $fileName);
+            $document->file_location = 'storage/app/public/plan/' . $filePath . '/' . $fileName;
+            $document->file_url = url('storage/plan/' .$filePath . '/' . $fileName);
             $document->file_size_in_kb = $fileSize;
             $document->created_by = 1;
             $document->save();
@@ -56,13 +57,14 @@ class FinalPlanRepo
             $fileName = uniqid() . '.' . $attachment->extension();
 
             if ($request->document_type == 'strategic') {
-                Storage::disk('public')->put('strategic/' . $fileName, File::get($attachment));
+                Storage::disk('public')->put('plan/strategic/' . $fileName, File::get($attachment));
             } elseif ($request->document_type == 'operation') {
-                Storage::disk('public')->put('operational/' . $fileName, File::get($attachment));
+                Storage::disk('public')->put('plan/operational/' . $fileName, File::get($attachment));
             } else {
                 Storage::disk('public')->put($fileName, File::get($attachment));
             }
 
+            $filePath = $request->document_type == 'strategic'?'strategic':'operational';
             $document = Document::find($request->id);
             $document->document_type = $request->document_type;
             $document->relational_id = 1;
@@ -70,8 +72,8 @@ class FinalPlanRepo
             $document->attachment_type = $attachment->extension();
             $document->user_file_name = $attachment->getClientOriginalName();
             $document->file_custom_name = $fileName;
-            $document->file_location = 'storage/app/public/' . $request->document_type . '/' . $fileName;
-            $document->file_url = url('storage/' . $request->document_type . '/' . $fileName);
+            $document->file_location = 'storage/app/public/plan/' . $filePath . '/' . $fileName;
+            $document->file_url = url('storage/plan/' . $filePath . '/' . $fileName);
             $document->file_size_in_kb = $fileSize;
             $document->modified_by = 1;
             $document->save();
