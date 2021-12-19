@@ -57,7 +57,7 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
 
     public function annual_plan(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(AnnualPlan::class, 'milestone_id', 'activity_milestone_id');
+        return $this->hasMany(AnnualPlan::class, 'activity_id', 'activity_id');
     }
 
     public function annual_plan_milestones(): \Illuminate\Database\Eloquent\Relations\HasMany

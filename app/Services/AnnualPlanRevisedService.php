@@ -36,22 +36,7 @@ class AnnualPlanRevisedService
                 ->groupBy('activity_id')
                 ->toArray();
 
-            //return ['status' => 'success', 'data' => $schedules];
-
-            /*foreach ($schedules as $key => &$milestone) {
-                foreach ($milestone as &$ms) {
-                    $assigned_budget = 0;
-                    $assigned_staff = 0;
-                    foreach ($ms['annual_plan_milestones'] as $annual_plan_milestone) {
-                        foreach ($annual_plan_milestone['annual_plan'] as $annual_plan) {
-                            $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
-                            $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
-                        }
-                    }
-                    $ms['assigned_budget'] = $assigned_budget;
-                    $ms['assigned_staff'] = $assigned_staff;
-                }
-            }*/
+//            return ['status' => 'success', 'data' => $schedules];
 
 
             foreach ($schedules as $key => &$milestone) {
