@@ -71,8 +71,6 @@ class AcMemoService
             $audit_memo->memo_status = $request->memo_status;
             $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $audit_memo->response_of_rpu = $request->response_of_rpu;
-            $audit_memo->audit_conclusion = $request->audit_conclusion;
-            $audit_memo->audit_recommendation = $request->audit_recommendation;
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
             $audit_memo->status = 'draft';
@@ -217,19 +215,17 @@ class AcMemoService
         \DB::beginTransaction();
         try {
             $audit_memo = AcMemo::find($request->memo_id);
-            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
-            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audit_memo->audit_year_start = $request->audit_year_start;
-            $audit_memo->audit_year_end = $request->audit_year_end;
             $audit_memo->memo_title_bn = $request->memo_title_bn;
             $audit_memo->memo_description_bn = $request->memo_description_bn;
+            $audit_memo->irregularity_cause = $request->irregularity_cause;
+            $audit_memo->response_of_rpu = $request->response_of_rpu;
+            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $audit_memo->audit_year_start = $request->audit_year_start;
+            $audit_memo->audit_year_end = $request->audit_year_end;
+            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
+            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audit_memo->memo_type = $request->memo_type;
             $audit_memo->memo_status = $request->memo_status;
-            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
-            $audit_memo->onishponno_jorito_ortho_poriman = $request->onishponno_jorito_ortho_poriman;
-            $audit_memo->response_of_rpu = $request->response_of_rpu;
-            $audit_memo->audit_conclusion = $request->audit_conclusion;
-            $audit_memo->audit_recommendation = $request->audit_recommendation;
             $audit_memo->updated_by = $cdesk->officer_id;
 
             $changes = array();

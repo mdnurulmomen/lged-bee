@@ -31,10 +31,28 @@ class AnnualPlanRevisedService
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-                ->with(['annual_plan', 'op_organization_yearly_audit_calendar_event'])
+                ->with(['annual_plan','op_organization_yearly_audit_calendar_event'])
                 ->get()
                 ->groupBy('activity_id')
                 ->toArray();
+
+            //return ['status' => 'success', 'data' => $schedules];
+
+            /*foreach ($schedules as $key => &$milestone) {
+                foreach ($milestone as &$ms) {
+                    $assigned_budget = 0;
+                    $assigned_staff = 0;
+                    foreach ($ms['annual_plan_milestones'] as $annual_plan_milestone) {
+                        foreach ($annual_plan_milestone['annual_plan'] as $annual_plan) {
+                            $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
+                            $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
+                        }
+                    }
+                    $ms['assigned_budget'] = $assigned_budget;
+                    $ms['assigned_staff'] = $assigned_staff;
+                }
+            }*/
+
 
             foreach ($schedules as $key => &$milestone) {
                 foreach ($milestone as &$ms) {
@@ -289,7 +307,7 @@ class AnnualPlanRevisedService
 
             $directorate = XResponsibleOffice::where('office_id', $office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
-            $plan_datas = AnnualPlan::where('fiscal_year_id', $request->fiscal_year_id)->with('activity.milestones.milestone_calendar')->get()->toArray();
+            $plan_datas = AnnualPlan::with(['ap_entities'])->where('fiscal_year_id', $request->fiscal_year_id)->with('activity.milestones.milestone_calendar')->get()->toArray();
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
             $all_ministries = [];
@@ -305,12 +323,22 @@ class AnnualPlanRevisedService
                         $annual_plan = [];
                     }
                 }
+
+                $ministriesBn = [];
+                $ministriesEn = [];
+                foreach($plan_data['ap_entities'] as $ap_entities){
+                    $ministryBn =  $ap_entities['ministry_name_bn'];
+                    $ministriesBn[] = $ministryBn;
+                    $ministryEn =  $ap_entities['ministry_name_en'];
+                    $ministriesEn[] = $ministryEn;
+                }
+
                 $ministries = [
-                    'ministry_name_en' => $plan_data['ministry_name_en'],
-                    'ministry_name_bn' => $plan_data['ministry_name_bn'],
+                    'ministry_name_en' => implode(' , ', array_unique($ministriesBn)),
+                    'ministry_name_bn' => implode(' , ', array_unique($ministriesEn)),
                 ];
 
-                $all_ministries[$plan_data['ministry_id']] = $ministries;
+                $all_ministries[$plan_data['id']] = $ministries;
                 $plan_data_final[$activity['id']] = $activity + ['ministries' => $ministries] + ['annual_plans' => $annual_plan];
             }
             $pdf_data = [

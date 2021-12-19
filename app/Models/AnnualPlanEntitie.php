@@ -10,6 +10,7 @@ class AnnualPlanEntitie extends Model
     use HasFactory;
 
     protected $connection = "OfficeDB";
+    protected $table = 'annual_plan_entities';
 
     protected $fillable = [
         'annual_plan_id',
