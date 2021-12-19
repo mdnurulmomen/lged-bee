@@ -515,8 +515,10 @@ class AcMemoService
                 return $q->where('audit_year_end', $audit_year_end);
             });
 
-            $memo_list = $query->with(['ac_memo_attachments'])
+            $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])
                 ->paginate(config('bee_config.per_page_pagination'));
+
+            $memo_list['total_memo'] = AcMemo::count('id');
 
             return ['status' => 'success', 'data' => $memo_list];
 

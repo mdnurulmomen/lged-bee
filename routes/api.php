@@ -206,6 +206,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'audit-quality-control'], function () {
         Route::post('qac-apotti', [QacController::class, 'qacApotti']);
+        Route::post('get-qac-apotti-status', [QacController::class, 'getQacApottiStatus']);
     });
 
     //audit-report
