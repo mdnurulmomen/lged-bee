@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\PIndividualActionPermissionMap;
 use App\Models\PMenuAction;
 use App\Models\PMenuActionRoleMap;
-use App\Models\PMenuRoleMap;
 use App\Models\PRole;
 use App\Models\PRoleDesignationMap;
 use App\Traits\ApiHeart;
@@ -89,7 +88,7 @@ class PermissionService
             $menus = [];
             $roleDesignationMapId = PRoleDesignationMap::where('master_designation_id', $master_designation_id)->first();
             if (!empty($roleDesignationMapId)) {
-                $roleMenuMapIds = PMenuRoleMap::where('p_role_id', $roleDesignationMapId->p_role_id)->pluck('p_menu_action_id');
+                $roleMenuMapIds = PMenuActionRoleMap::where('p_role_id', $roleDesignationMapId->p_role_id)->pluck('p_menu_action_id');
                 $menu_ids = $menu_ids->merge($roleMenuMapIds);
             }
             $individualPermittedMap = PIndividualActionPermissionMap::where('designation_id', $cdesk->designation_id)->pluck('p_menu_action_id');
