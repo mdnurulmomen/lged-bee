@@ -22,13 +22,15 @@ class FinalPlanRepo
 
             if ($request->document_type == 'strategic') {
                 Storage::disk('public')->put('plan/strategic/' . $fileName, File::get($attachment));
-            } elseif ($request->document_type == 'operation') {
+                $filePath = 'strategic';
+            } elseif ($request->document_type == 'operational') {
                 Storage::disk('public')->put('plan/operational/' . $fileName, File::get($attachment));
+                $filePath = 'operational';
             } else {
                 Storage::disk('public')->put($fileName, File::get($attachment));
+                $filePath = 'others';
             }
 
-            $filePath = $request->document_type == 'strategic'?'strategic':'operational';
             $document = new Document();
             $document->document_type = $request->document_type;
             $document->relational_id = 1;
@@ -58,13 +60,15 @@ class FinalPlanRepo
 
             if ($request->document_type == 'strategic') {
                 Storage::disk('public')->put('plan/strategic/' . $fileName, File::get($attachment));
-            } elseif ($request->document_type == 'operation') {
+                $filePath = 'strategic';
+            } elseif ($request->document_type == 'operational') {
                 Storage::disk('public')->put('plan/operational/' . $fileName, File::get($attachment));
+                $filePath = 'operational';
             } else {
                 Storage::disk('public')->put($fileName, File::get($attachment));
+                $filePath = 'others';
             }
 
-            $filePath = $request->document_type == 'strategic'?'strategic':'operational';
             $document = Document::find($request->id);
             $document->document_type = $request->document_type;
             $document->relational_id = 1;
