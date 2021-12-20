@@ -319,8 +319,8 @@ class AnnualPlanRevisedService
                 }
 
                 $ministries = [
-                    'ministry_name_en' => implode(' , ', array_unique($ministriesBn)),
-                    'ministry_name_bn' => implode(' , ', array_unique($ministriesEn)),
+                    'ministry_name_en' => implode(' , ', array_unique($ministriesEn)),
+                    'ministry_name_bn' => implode(' , ', array_unique($ministriesBn)),
                 ];
 
                 $all_ministries[$plan_data['id']] = $ministries;
