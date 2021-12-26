@@ -175,7 +175,8 @@ class AnnualPlanRevisedService
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $plan->id;
-                    $ap_entity->layer_id = $entity['layer_id'];
+//                    $ap_entity->layer_id = $entity['layer_id'];
+                    $ap_entity->layer_id = 0;
                     $ap_entity->ministry_id = $entity['ministry_id'];
                     $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
                     $ap_entity->ministry_name_en = $entity['ministry_name_en'];
@@ -253,7 +254,8 @@ class AnnualPlanRevisedService
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $request->id;
-                    $ap_entity->layer_id = $entity['layer_id'];
+//                    $ap_entity->layer_id = $entity['layer_id'];
+                    $ap_entity->layer_id = 0;
                     $ap_entity->ministry_id = $entity['ministry_id'];
                     $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
                     $ap_entity->ministry_name_en = $entity['ministry_name_en'];
