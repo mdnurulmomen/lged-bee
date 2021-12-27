@@ -18,6 +18,8 @@ class AnnualPlan extends Model
         'milestone_id',
         'fiscal_year_id',
         'office_type',
+        'office_type_id',
+        'office_type_en',
         'annual_plan_type',
         'thematic_title',
         'budget',

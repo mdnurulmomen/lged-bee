@@ -31,7 +31,7 @@ class AnnualPlanRevisedService
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
                 ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
-                ->with(['annual_plan','op_organization_yearly_audit_calendar_event'])
+                ->with(['annual_plan', 'op_organization_yearly_audit_calendar_event'])
                 ->get()
                 ->groupBy('activity_id')
                 ->toArray();
@@ -119,7 +119,7 @@ class AnnualPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $annualPlanInfo = AnnualPlan::with('ap_milestones.milestone','ap_entities')->where('id', $request->annual_plan_id)->first();
+            $annualPlanInfo = AnnualPlan::with('ap_milestones.milestone', 'ap_entities')->where('id', $request->annual_plan_id)->first();
 
             $data = ['status' => 'success', 'data' => $annualPlanInfo];
 
@@ -147,6 +147,8 @@ class AnnualPlanRevisedService
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
                 'annual_plan_type' => $request->annual_plan_type,
                 'office_type' => $request->office_type,
+                'office_type_id' => $request->office_type_id,
+                'office_type_en' => $request->office_type_en,
                 'thematic_title' => $request->thematic_title,
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
                 'cost_center_total_budget' => filter_var(bnToen($request->cost_center_total_budget), FILTER_SANITIZE_NUMBER_INT),
@@ -159,19 +161,19 @@ class AnnualPlanRevisedService
             ];
 
             $plan = AnnualPlan::create($plan_data);
-            foreach ($request->milestone_list as $milestone){
-                    $ap_milestone = new ApMilestone();
-                    $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
-                    $ap_milestone->annual_plan_id = $plan->id;
-                    $ap_milestone->activity_id = $milestone['activity_id'];
-                    $ap_milestone->milestone_id = $milestone['milestone_id'];
-                    $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
-                    $ap_milestone->start_date = $milestone['start_date'];
-                    $ap_milestone->end_date = $milestone['end_date'];
-                    $ap_milestone->save();
+            foreach ($request->milestone_list as $milestone) {
+                $ap_milestone = new ApMilestone();
+                $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
+                $ap_milestone->annual_plan_id = $plan->id;
+                $ap_milestone->activity_id = $milestone['activity_id'];
+                $ap_milestone->milestone_id = $milestone['milestone_id'];
+                $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
+                $ap_milestone->start_date = $milestone['start_date'];
+                $ap_milestone->end_date = $milestone['end_date'];
+                $ap_milestone->save();
             }
 
-            foreach ($request->entity_list as $key => $entity){
+            foreach ($request->entity_list as $key => $entity) {
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $plan->id;
@@ -191,12 +193,10 @@ class AnnualPlanRevisedService
             }
             \DB::commit();
             $data = ['status' => 'success', 'data' => 'Annual Plan Save Successfully'];
-        }
-        catch (\Error $exception) {
+        } catch (\Error $exception) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -220,6 +220,8 @@ class AnnualPlanRevisedService
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
                 'office_type' => $request->office_type,
+                'office_type_id' => $request->office_type_id,
+                'office_type_en' => $request->office_type_en,
                 'annual_plan_type' => $request->annual_plan_type,
                 'thematic_title' => $request->thematic_title,
                 'budget' => filter_var(bnToen($request->budget), FILTER_SANITIZE_NUMBER_INT),
@@ -232,25 +234,25 @@ class AnnualPlanRevisedService
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
 
-            AnnualPlan::where('id',$request->id)->update($plan_data);
+            AnnualPlan::where('id', $request->id)->update($plan_data);
 
-            ApMilestone::where('annual_plan_id',$request->id)->delete();
+            ApMilestone::where('annual_plan_id', $request->id)->delete();
 
-            foreach ($request->milestone_list as $milestone){
-               $ap_milestone =  New ApMilestone();
-               $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
-               $ap_milestone->annual_plan_id = $request->id;
-               $ap_milestone->activity_id = $milestone['activity_id'];
-               $ap_milestone->milestone_id = $milestone['milestone_id'];
-               $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
-               $ap_milestone->start_date = $milestone['start_date'];
-               $ap_milestone->end_date = $milestone['end_date'];
-               $ap_milestone->save();
+            foreach ($request->milestone_list as $milestone) {
+                $ap_milestone = new ApMilestone();
+                $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
+                $ap_milestone->annual_plan_id = $request->id;
+                $ap_milestone->activity_id = $milestone['activity_id'];
+                $ap_milestone->milestone_id = $milestone['milestone_id'];
+                $ap_milestone->milestone_target_date = $milestone['milestone_target_date'];
+                $ap_milestone->start_date = $milestone['start_date'];
+                $ap_milestone->end_date = $milestone['end_date'];
+                $ap_milestone->save();
             }
 
-            AnnualPlanEntitie::where('annual_plan_id',$request->id)->delete();
+            AnnualPlanEntitie::where('annual_plan_id', $request->id)->delete();
 
-            foreach ($request->entity_list as $key => $entity){
+            foreach ($request->entity_list as $key => $entity) {
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $request->id;
@@ -269,12 +271,10 @@ class AnnualPlanRevisedService
             }
             \DB::commit();
             $data = ['status' => 'success', 'data' => 'Successfully Plan Updated!'];
-        }
-        catch (\Error $exception) {
+        } catch (\Error $exception) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -313,10 +313,10 @@ class AnnualPlanRevisedService
 
                 $ministriesBn = [];
                 $ministriesEn = [];
-                foreach($plan_data['ap_entities'] as $ap_entities){
-                    $ministryBn =  $ap_entities['ministry_name_bn'];
+                foreach ($plan_data['ap_entities'] as $ap_entities) {
+                    $ministryBn = $ap_entities['ministry_name_bn'];
                     $ministriesBn[] = $ministryBn;
-                    $ministryEn =  $ap_entities['ministry_name_en'];
+                    $ministryEn = $ap_entities['ministry_name_en'];
                     $ministriesEn[] = $ministryEn;
                 }
 
