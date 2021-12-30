@@ -34,6 +34,19 @@ class QCController extends Controller
         return response()->json($response);
     }
 
+    public function editAirReport(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $qCService->editAirReport($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function storeAirReport(Request $request, QCService $qCService): \Illuminate\Http\JsonResponse
     {
         $responseData = $qCService->storeAirReport($request);

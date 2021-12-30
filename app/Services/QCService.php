@@ -68,6 +68,21 @@ class QCService
         }
     }
 
+    public function editAirReport(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $airReport = RAir::find($request->air_report_id)->toArray();
+            return ['status' => 'success', 'data' => $airReport];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function storeAirReport(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
