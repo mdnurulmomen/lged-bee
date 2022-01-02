@@ -30,6 +30,20 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::customApiResource('required-capacity', XStrategicPlanRequiredCapacityController::class);
     });
 
+    Route::customApiResource('audit-assessment-category', XAuditAssessmentCategoryController::class);
+    Route::customApiResource('audit-assessment-criteria', XAuditAssessmentCriteriaController::class);
+
+
+    Route::group(['prefix' => 'audit-assessment-score/'], function () {
+        Route::post('list', [AuditAssessmentScoreController::class, 'list']);
+        Route::post('store', [AuditAssessmentScoreController::class, 'store']);
+    });
+
+    Route::group(['prefix' => 'audit-assessment/'], function () {
+        Route::post('list', [AuditAssessmentController::class, 'list']);
+        Route::post('store', [AuditAssessmentController::class, 'store']);
+    });
+
     Route::group(['prefix' => 'planning/'], function () {
         Route::group(['prefix' => 'operational-plan/'], function () {
 
