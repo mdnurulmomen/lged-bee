@@ -41,6 +41,7 @@ class AuditAssessmentScoreService
             $finalItems = [];
             foreach ($request->criteria_ids as $key => $criteria_id){
                 array_push($finalItems, array(
+                        'audit_assessment_score_id' => $auditAssessmentScore->id,
                         'criteria_id' => $criteria_id,
                         'weight' => $request->weights[$key],
                         'value' =>  $request->values[$key],
