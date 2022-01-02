@@ -72,6 +72,12 @@ class AuditAssessmentScoreService
         }
         try {
             $responseData = AuditAssessmentScore::with(['fiscal_year','audit_assessment_category'])
+                ->addSelect(['total_score' => function ($query) {
+                    $query->select(\DB::raw('sum(score)'))
+                        ->from('audit_assessment_score_items')
+                        ->whereColumn('audit_assessment_score_id', 'audit_assessment_scores.id')
+                        ->groupBy('audit_assessment_score_id');
+                }])
                 ->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $responseData];
         } catch (\Exception $exception) {

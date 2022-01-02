@@ -71,6 +71,12 @@ class AuditAssessmentService
         }
         try {
             $responseData = AuditAssessmentScore::with(['fiscal_year','audit_assessment_category'])
+                ->addSelect(['total_score' => function ($query) {
+                    $query->select(\DB::raw('sum(score)'))
+                        ->from('audit_assessment_score_items')
+                        ->whereColumn('audit_assessment_score_id', 'audit_assessment_scores.id')
+                        ->groupBy('audit_assessment_score_id');
+                }])
                 ->where('fiscal_year_id',$request->fiscal_year_id)
                 ->get();
             return ['status' => 'success', 'data' => $responseData];
