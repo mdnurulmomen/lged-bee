@@ -26,6 +26,8 @@ class AuditAssessmentScoreService
         try {
             $auditAssessmentScore = new AuditAssessmentScore();
             $auditAssessmentScore->category_id = $request->category_id;
+            $auditAssessmentScore->category_title_en = $request->category_title_en;
+            $auditAssessmentScore->category_title_bn = $request->category_title_bn;
             $auditAssessmentScore->fiscal_year_id = $request->fiscal_year_id;
             $auditAssessmentScore->ministry_id = $request->ministry_id;
             $auditAssessmentScore->ministry_name_en = $request->ministry_name_en;
@@ -40,14 +42,16 @@ class AuditAssessmentScoreService
             //for items
             $finalItems = [];
             foreach ($request->criteria_ids as $key => $criteria_id){
-                array_push($finalItems, array(
-                        'audit_assessment_score_id' => $auditAssessmentScore->id,
-                        'criteria_id' => $criteria_id,
-                        'weight' => $request->weights[$key],
-                        'value' =>  $request->values[$key],
-                        'score' =>  $request->scores[$key]
-                    )
-                );
+                if (!empty($request->weights[$key])){
+                    array_push($finalItems, array(
+                            'audit_assessment_score_id' => $auditAssessmentScore->id,
+                            'criteria_id' => $criteria_id,
+                            'weight' => $request->weights[$key],
+                            'value' =>  $request->values[$key],
+                            'score' =>  $request->scores[$key]
+                        )
+                    );
+                }
             }
 
             if (!empty($finalItems)){
@@ -71,13 +75,15 @@ class AuditAssessmentScoreService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $responseData = AuditAssessmentScore::with(['fiscal_year','audit_assessment_category'])
+            $responseData = AuditAssessmentScore::with(['fiscal_year'])
                 ->addSelect(['total_score' => function ($query) {
                     $query->select(\DB::raw('sum(score)'))
                         ->from('audit_assessment_score_items')
                         ->whereColumn('audit_assessment_score_id', 'audit_assessment_scores.id')
                         ->groupBy('audit_assessment_score_id');
                 }])
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->orderBy('id','DESC')
                 ->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $responseData];
         } catch (\Exception $exception) {

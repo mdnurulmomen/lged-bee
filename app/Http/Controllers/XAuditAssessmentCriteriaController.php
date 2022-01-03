@@ -18,10 +18,9 @@ class XAuditAssessmentCriteriaController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $criteriaList = XAuditAssessmentCriteria::with(['audit_assessment_category'])
-            ->paginate($request->per_page);
+            $criteriaList = XAuditAssessmentCriteria::paginate($request->per_page);
         } else {
-            $criteriaList = XAuditAssessmentCriteria::with(['audit_assessment_category'])->get();
+            $criteriaList = XAuditAssessmentCriteria::get();
         }
 
         if ($criteriaList) {
@@ -43,6 +42,8 @@ class XAuditAssessmentCriteriaController extends Controller
         try {
             XAuditAssessmentCriteria::create([
                 'category_id' => $request->category_id,
+                'category_title_en' => $request->category_title_en,
+                'category_title_bn' => $request->category_title_bn,
                 'name_en' => $request->name_en,
                 'name_bn' => $request->name_bn,
                 'weight' => $request->weight,

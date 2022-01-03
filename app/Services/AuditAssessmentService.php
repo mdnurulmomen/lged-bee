@@ -26,6 +26,8 @@ class AuditAssessmentService
         try {
             $auditAssessmentScore = new AuditAssessmentScore();
             $auditAssessmentScore->category_id = $request->category_id;
+            $auditAssessmentScore->category_title_en = $request->category_title_en;
+            $auditAssessmentScore->category_title_bn = $request->category_title_bn;
             $auditAssessmentScore->fiscal_year_id = $request->fiscal_year_id;
             $auditAssessmentScore->ministry_id = $request->ministry_id;
             $auditAssessmentScore->ministry_name_en = $request->ministry_name_en;
@@ -70,7 +72,7 @@ class AuditAssessmentService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $responseData = AuditAssessmentScore::with(['fiscal_year','audit_assessment_category'])
+            $responseData = AuditAssessmentScore::with(['fiscal_year'])
                 ->addSelect(['total_score' => function ($query) {
                     $query->select(\DB::raw('sum(score)'))
                         ->from('audit_assessment_score_items')

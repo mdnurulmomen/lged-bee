@@ -30,7 +30,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::customApiResource('required-capacity', XStrategicPlanRequiredCapacityController::class);
     });
 
-    Route::customApiResource('audit-assessment-category', XAuditAssessmentCategoryController::class);
     Route::customApiResource('audit-assessment-criteria', XAuditAssessmentCriteriaController::class);
 
 

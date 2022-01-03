@@ -13,16 +13,13 @@ class XAuditAssessmentCriteria extends Model
 
     protected $fillable = [
         'category_id',
+        'category_title_en',
+        'category_title_bn',
         'name_en',
         'name_bn',
         'weight',
         'created_at',
         'updated_at',
     ];
-
-    public function audit_assessment_category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(XAuditAssessmentCategory::class, 'category_id', 'id');
-    }
 
 }

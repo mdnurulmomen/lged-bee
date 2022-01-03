@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +13,8 @@ class AuditAssessmentScore extends Model
 
     protected $fillable = [
         'category_id',
+        'category_title_en',
+        'category_title_bn',
         'fiscal_year_id',
         'ministry_id',
         'ministry_name_bn',
@@ -29,10 +30,4 @@ class AuditAssessmentScore extends Model
     {
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
-
-    public function audit_assessment_category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(XAuditAssessmentCategory::class, 'category_id', 'id');
-    }
-
 }
