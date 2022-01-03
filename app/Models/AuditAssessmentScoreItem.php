@@ -14,7 +14,6 @@ class AuditAssessmentScoreItem extends Model
 
     protected $fillable = [
         'criteria_id',
-        'weight',
         'value',
         'score'
     ];
