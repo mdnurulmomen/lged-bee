@@ -24,7 +24,8 @@ class AuditAssessmentScore extends Model
         'entity_name_en',
         'is_first_half',
         'is_second_half',
-        'has_annual_plan',
+        'has_first_half_annual_plan',
+        'has_second_half_annual_plan',
         'created_by',
         'updated_by'
     ];

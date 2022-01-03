@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\AnnualPlan;
+use App\Models\AnnualPlanEntitie;
 use App\Models\AuditAssessmentScore;
+use App\Models\OpActivity;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Database\Eloquent\Model;
@@ -50,11 +53,82 @@ class AuditAssessmentService
         \DB::beginTransaction();
 
         try {
+            $opActivity = OpActivity::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('activity_type',$request->compliance)
+                ->get();
+
+            //for items
+            $annualPlanEntityList = [];
             foreach ($request->audit_assessment_score_ids as $key => $score_id){
-                $auditAssessmentScore = AuditAssessmentScore::find($score_id);
-                $auditAssessmentScore->is_first_half = $request->first_half_data[$key];
-                $auditAssessmentScore->is_second_half = $request->second_half_data[$key];
-                $auditAssessmentScore->save();
+                //for first half
+                if ($request->first_half_data[$key] == 1 && $request->has_first_half_annual_plans[$key]==0){
+                    $auditAssessmentScore = AuditAssessmentScore::find($score_id);
+                    $auditAssessmentScore->is_first_half = $request->first_half_data[$key];
+                    $auditAssessmentScore->has_first_half_annual_plan = 1;
+                    $auditAssessmentScore->save();
+
+                    $annualPlanData = [
+                        'schedule_id' => 0,
+                        'milestone_id' => 0,
+                        'activity_id' => 7,
+                        'fiscal_year_id' => $request->fiscal_year_id,
+                        'op_audit_calendar_event_id' => 2,
+                        'annual_plan_type' => 'entity_based',
+                        'office_type' => $request->bn_category_titles[$key],
+                        'office_type_id' => $request->category_ids[$key],
+                        'office_type_en' => $request->en_category_titles[$key]
+                    ];
+
+                    $annualPlan = AnnualPlan::create($annualPlanData);
+
+                    array_push($annualPlanEntityList, array(
+                            'annual_plan_id' => $annualPlan->id,
+                            'ministry_id' => $request->ministry_ids[$key],
+                            'ministry_name_bn' => $request->bn_ministry_names[$key],
+                            'ministry_name_en' => $request->en_ministry_names[$key],
+                            'entity_id' => $request->entity_ids[$key],
+                            'entity_name_bn' => $request->bn_entity_names[$key],
+                            'entity_name_en' => $request->bn_entity_names[$key]
+                        )
+                    );
+                }
+
+                //for second half
+                if ($request->second_half_data[$key] == 1 && $request->has_second_half_annual_plans[$key]==0){
+                    $auditAssessmentScore = AuditAssessmentScore::find($score_id);
+                    $auditAssessmentScore->is_second_half = $request->second_half_data[$key];
+                    $auditAssessmentScore->has_second_half_annual_plan = 1;
+                    $auditAssessmentScore->save();
+
+                    $annualPlanData = [
+                        'schedule_id' => 0,
+                        'milestone_id' => 0,
+                        'activity_id' => 8,
+                        'fiscal_year_id' => $request->fiscal_year_id,
+                        'op_audit_calendar_event_id' => 2,
+                        'annual_plan_type' => 'entity_based',
+                        'office_type' => $request->bn_category_titles[$key],
+                        'office_type_id' => $request->category_ids[$key],
+                        'office_type_en' => $request->en_category_titles[$key]
+                    ];
+
+                    $annualPlan = AnnualPlan::create($annualPlanData);
+
+                    array_push($annualPlanEntityList, array(
+                            'annual_plan_id' => $annualPlan->id,
+                            'ministry_id' => $request->ministry_ids[$key],
+                            'ministry_name_bn' => $request->bn_ministry_names[$key],
+                            'ministry_name_en' => $request->en_ministry_names[$key],
+                            'entity_id' => $request->entity_ids[$key],
+                            'entity_name_bn' => $request->bn_entity_names[$key],
+                            'entity_name_en' => $request->bn_entity_names[$key]
+                        )
+                    );
+                }
+            }
+
+            if (!empty($annualPlanEntityList)){
+                AnnualPlanEntitie::insert($annualPlanEntityList);
             }
 
             \DB::commit();
