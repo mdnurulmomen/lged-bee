@@ -186,7 +186,7 @@ class AnnualPlanRevisedService
                     $ap_entity->entity_name_bn = $entity['entity_bn'];
                     $ap_entity->entity_name_en = $entity['entity_en'];
                     $ap_entity->entity_total_unit = $entity['entity_total_unit'];
-                    $ap_entity->nominated_offices = json_encode($entity['nominated_offices']);
+                    $ap_entity->nominated_offices =  isset($entity['nominated_offices']) ? json_encode($entity['nominated_offices']) : json_encode([]);
                     $ap_entity->created_at = date('Y-m-d H:i:s');
                     $ap_entity->save();
                 }
