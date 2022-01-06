@@ -31,11 +31,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     });
 
     Route::customApiResource('audit-assessment-criteria', XAuditAssessmentCriteriaController::class);
+    Route::post('audit-assessment-criteria/list-category-wise', [XAuditAssessmentCriteriaController::class, 'loadCategoryWiseCriteriaList']);
 
 
     Route::group(['prefix' => 'audit-assessment-score/'], function () {
         Route::post('list', [AuditAssessmentScoreController::class, 'list']);
         Route::post('store', [AuditAssessmentScoreController::class, 'store']);
+        Route::post('edit', [AuditAssessmentScoreController::class, 'edit']);
     });
 
     Route::group(['prefix' => 'audit-assessment/'], function () {

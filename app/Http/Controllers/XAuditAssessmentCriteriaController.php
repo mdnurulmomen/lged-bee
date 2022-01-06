@@ -31,6 +31,18 @@ class XAuditAssessmentCriteriaController extends Controller
         return response()->json($response, 200);
     }
 
+
+    public function loadCategoryWiseCriteriaList(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $criteriaList = XAuditAssessmentCriteria::where('category_id',$request->category_id)->get();
+        if ($criteriaList) {
+            $response = responseFormat('success', $criteriaList);
+        } else {
+            $response = responseFormat('error', 'Criteria Not Found');
+        }
+        return response()->json($response, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -26,6 +26,7 @@ class AuditAssessmentScore extends Model
         'is_second_half',
         'has_first_half_annual_plan',
         'has_second_half_annual_plan',
+        'point',
         'created_by',
         'updated_by'
     ];
@@ -33,5 +34,10 @@ class AuditAssessmentScore extends Model
     public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
+    public function audit_assessment_score_items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AuditAssessmentScoreItem::class, 'audit_assessment_score_id', 'id');
     }
 }

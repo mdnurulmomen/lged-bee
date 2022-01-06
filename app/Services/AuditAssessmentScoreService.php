@@ -35,6 +35,7 @@ class AuditAssessmentScoreService
             $auditAssessmentScore->entity_id = $request->entity_id;
             $auditAssessmentScore->entity_name_bn = $request->entity_name_bn;
             $auditAssessmentScore->entity_name_en = $request->entity_name_en;
+            $auditAssessmentScore->point = $request->point;
             $auditAssessmentScore->created_by = $cdesk->officer_id;
             $auditAssessmentScore->updated_by = $cdesk->officer_id;
             $auditAssessmentScore->save();
@@ -98,23 +99,22 @@ class AuditAssessmentScoreService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-
         try {
-            $memo_list = AuditAssessmentScore::with(['ac_memo_attachments'])
-                ->where('id', $request->memo_id)
+            $responseData = AuditAssessmentScore::with(['fiscal_year','audit_assessment_score_items.criteria'])
+                ->addSelect(['total_score' => function ($query) {
+                    $query->select(\DB::raw('sum(score)'))
+                        ->from('audit_assessment_score_items')
+                        ->whereColumn('audit_assessment_score_id', 'audit_assessment_scores.id')
+                        ->groupBy('audit_assessment_score_id');
+                }])
+                ->where('id',$request->audit_assessment_score_id)
                 ->first();
-
-            /*$data['sender_officer_id'] = $memo_list['sender_officer_id'];
-            $employee_signature = $this->initDoptorHttp($cdesk->user_id)
-                ->post(config('cag_doptor_api.employee_signature'), $data)
-                ->json();*/
-
-            return ['status' => 'success', 'data' => $memo_list];
+            return ['status' => 'success', 'data' => $responseData];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
+
 
     public function auditMemoUpdate(Request $request): array
     {

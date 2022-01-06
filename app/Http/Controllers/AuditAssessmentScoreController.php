@@ -31,13 +31,13 @@ class AuditAssessmentScoreController extends Controller
         return response()->json($response);
     }
 
-    public function auditMemoEdit(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    public function edit(Request $request, AuditAssessmentScoreService $auditAssessmentScoreService): \Illuminate\Http\JsonResponse
     {
-        $query_schedule_list = $acMemoService->auditMemoEdit($request);
-        if (isSuccessResponse($query_schedule_list)) {
-            $response = responseFormat('success', $query_schedule_list['data']);
+        $responseData = $auditAssessmentScoreService->edit($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
         } else {
-            $response = responseFormat('error', $query_schedule_list['data']);
+            $response = responseFormat('error', $responseData['data']);
         }
 
         return response()->json($response);

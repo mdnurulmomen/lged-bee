@@ -18,4 +18,9 @@ class AuditAssessmentScoreItem extends Model
         'score'
     ];
 
+    public function criteria(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(XAuditAssessmentCriteria::class, 'criteria_id', 'id');
+    }
+
 }
