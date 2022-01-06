@@ -42,4 +42,16 @@ class AuditAssessmentController extends Controller
 
         return response()->json($response);
     }
+
+    public function getAssessmentEntity(Request $request, AuditAssessmentService $auditAssessmentService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAssessmentService->getAssessmentEntity($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
 }

@@ -114,6 +114,8 @@ class ApottiService
         DB::beginTransaction();
         try {
 
+
+
 //            return ['status' => 'error', 'data' => $request->sequence];
 
             $apotti_list = Apotti::with(['apotti_items'])
@@ -172,6 +174,8 @@ class ApottiService
 
             $apotti_items =  $apotti_items_info;
 
+//            return ['status' => 'success', 'data' => $higher_sequence];
+
             Apotti::whereIn('id',$request->apotti_id)->delete();
             ApottiItem::whereIn('apotti_id',$request->apotti_id)->delete();
 
@@ -187,7 +191,6 @@ class ApottiService
             $apotti->parent_office_name_en = $parent_office_name_en;
             $apotti->parent_office_name_bn = $parent_office_name_bn;
             $apotti->fiscal_year_id = $fiscal_year_id;
-            $apotti->fiscal_year_id = $fiscal_year_id;
             $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->total_onishponno_jorito_ortho_poriman = $total_onishponno_jorito_ortho_poriman;
             $apotti->irregularity_cause = $request->irregularity_cause;
@@ -196,6 +199,7 @@ class ApottiService
             $apotti->audit_recommendation = $request->audit_recommendation;
             $apotti->created_by = $cdesk->officer_id;
             $apotti->approve_status = 0;
+            $apotti->apotti_sequence = $request->sequence;
             $apotti->status = 0;
             $apotti->is_combined = 1;
             $apotti->save();
@@ -234,6 +238,16 @@ class ApottiService
                    $apotti_item_save->created_by = $cdesk->officer_id;
                    $apotti_item_save->status = $apotti_item['status'];
                    $apotti_item_save->save();
+            }
+
+            $higher_sequence = Apotti::where('audit_plan_id',$audit_plan_id)->where('apotti_sequence','>',$request->sequence)->pluck('id');
+
+            $sequence = $request->sequence;
+
+            foreach ($higher_sequence as $sequence_apotti){
+                $sequence++;
+//                return ['status' => 'success', 'data' => $sequence];
+                Apotti::where('id',$sequence_apotti)->update(['apotti_sequence' => $sequence]);
             }
 
             DB::commit();
