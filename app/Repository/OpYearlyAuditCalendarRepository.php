@@ -157,9 +157,12 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 
     public function yearlyAuditCalendarEventList(Request $request): array
     {
+        $calendar_id = OpYearlyAuditCalendar::where('fiscal_year_id',$request->fiscal_year_id)->first()->id;
+
         $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status',
             'approval_status', 'activity_count', 'milestone_count')
-            ->where('op_yearly_audit_calendar_id', $request->calendar_id)
+            ->where('op_yearly_audit_calendar_id', $calendar_id)
+            ->where('approval_status','!=','draft')
             ->with('office')
             ->get()
             ->toArray();

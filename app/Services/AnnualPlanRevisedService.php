@@ -140,8 +140,6 @@ class AnnualPlanRevisedService
         }
         \DB::beginTransaction();
         try {
-
-//            return ['status' => 'error', 'data' => $assigned_staffs];
             $plan_data = [
                 'schedule_id' => 0,
                 'milestone_id' => 0,
@@ -162,15 +160,6 @@ class AnnualPlanRevisedService
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
-
-            $assigned_info = OpYearlyAuditCalendarResponsible::select('assigned_staffs','assigned_budget')->where('activity_id',$request->activity_id)
-                ->where('office_id',$cdesk->office_id)->first();
-
-            $assigned_staffs = $assigned_info->assigned_staffs + $request->nominated_man_power_counts;
-            $assigned_budget = $assigned_info->assigned_budget + $request->budget;
-
-            OpYearlyAuditCalendarResponsible::where('activity_id',$request->activity_id)
-                ->where('office_id',$cdesk->office_id)->update(['assigned_staffs'=> $assigned_staffs,'assigned_budget' => $assigned_budget]);
 
             $plan = AnnualPlan::create($plan_data);
             foreach ($request->milestone_list as $milestone) {

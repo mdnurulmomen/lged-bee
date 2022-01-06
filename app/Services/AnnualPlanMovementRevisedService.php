@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\AnnualPlan;
 use App\Models\AnnualPlanMovement;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
+use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
-
+use DB;
 class AnnualPlanMovementRevisedService
 {
     use GenericData;
@@ -135,6 +137,23 @@ class AnnualPlanMovementRevisedService
                 //update op organization yearly audit calendar event
                 OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
                     ->update(["approval_status" => $request->status]);
+
+                if($request->status == 'approved'){
+                    $office_id = OpOrganizationYearlyAuditCalendarEvent::find($request->op_audit_calendar_event_id)->office_id;
+                    $office_db_con_response = $this->switchOffice($office_id);
+                    if (!isSuccessResponse($office_db_con_response)) {
+                        return ['status' => 'error', 'data' => $office_db_con_response];
+                    }
+
+                    $activity_list = AnnualPlan::Where('fiscal_year_id',$request->fiscal_year_id)
+                        ->select(['activity_id',DB::raw("SUM(nominated_man_power_counts) as staff_assign"), DB::raw("SUM(budget) as budget")])
+                        ->groupBy('activity_id')
+                        ->get();
+                    foreach ($activity_list as $activity){
+                        OpYearlyAuditCalendarResponsible::where('office_id',$office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0]);
+                    }
+                    $this->emptyOfficeDBConnection();
+                }
 
                 $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
             }

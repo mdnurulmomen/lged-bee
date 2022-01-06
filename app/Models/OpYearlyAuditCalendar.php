@@ -29,4 +29,9 @@ class OpYearlyAuditCalendar extends Model
     {
         return $this->hasMany(OpYearlyAuditCalendarMovement::class, 'op_yearly_calendar_id', 'id');
     }
+
+    public function op_audit_calendar_events(){
+        return $this->hasMany(OpOrganizationYearlyAuditCalendarEvent::class, 'op_yearly_audit_calendar_id', 'id');
+
+    }
 }

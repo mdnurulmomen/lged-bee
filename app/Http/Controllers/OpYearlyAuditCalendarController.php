@@ -174,7 +174,7 @@ class OpYearlyAuditCalendarController extends Controller
     public function yearlyAuditCalendarEventList(Request $request, OpYearlyAuditCalendarRepository $opYearlyAuditCalendarRepository): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'calendar_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
         ])->validate();
 
         $res = $opYearlyAuditCalendarRepository->yearlyAuditCalendarEventList($request);
