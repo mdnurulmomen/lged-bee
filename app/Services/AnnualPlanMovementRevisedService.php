@@ -146,11 +146,11 @@ class AnnualPlanMovementRevisedService
                     }
 
                     $activity_list = AnnualPlan::Where('fiscal_year_id',$request->fiscal_year_id)
-                        ->select(['activity_id',DB::raw("SUM(nominated_man_power_counts) as staff_assign"), DB::raw("SUM(budget) as budget")])
+                        ->select(['activity_id',DB::raw("COUNT(id) as total_plan"),DB::raw("SUM(nominated_man_power_counts) as staff_assign"), DB::raw("SUM(budget) as budget")])
                         ->groupBy('activity_id')
                         ->get();
                     foreach ($activity_list as $activity){
-                        OpYearlyAuditCalendarResponsible::where('office_id',$office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0]);
+                        OpYearlyAuditCalendarResponsible::where('office_id',$office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0,'total_plan' => $activity['total_plan'] ? $activity['total_plan'] : 0]);
                     }
                     $this->emptyOfficeDBConnection();
                 }
