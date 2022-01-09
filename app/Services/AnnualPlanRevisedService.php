@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
+use App\Models\Apotti;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
@@ -88,9 +89,15 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $annualPlanList = AnnualPlan::with('ap_entities')->where('fiscal_year_id', $request->fiscal_year_id)
-//                ->where('milestone_id', $request->milestone_id)
-                ->get();
+
+            $activity_id = $request->activity_id;
+            $query = AnnualPlan::query();
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $annualPlanList = $query->with('ap_entities')->where('fiscal_year_id', $request->fiscal_year_id)->get();
 
             $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
                 ->where('office_id', $cdesk->office_id)
