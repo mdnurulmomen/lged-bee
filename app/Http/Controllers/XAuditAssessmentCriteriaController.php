@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\XFiscalYear\SaveRequest;
-use App\Http\Requests\XFiscalYear\ShowOrDeleteRequest;
-use App\Http\Requests\XFiscalYear\UpdateRequest;
 use App\Models\XAuditAssessmentCriteria;
 use Illuminate\Http\Request;
 
@@ -58,7 +55,6 @@ class XAuditAssessmentCriteriaController extends Controller
                 'category_title_bn' => $request->category_title_bn,
                 'name_en' => $request->name_en,
                 'name_bn' => $request->name_bn,
-                'weight' => $request->weight,
             ]);
             $response = responseFormat('success', 'Created Successfully');
         } catch (\Exception $exception) {
@@ -73,13 +69,13 @@ class XAuditAssessmentCriteriaController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(ShowOrDeleteRequest $request): \Illuminate\Http\JsonResponse
+    public function show(Request $request): \Illuminate\Http\JsonResponse
     {
-        $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id);
-        if ($fiscal_year) {
-            $response = responseFormat('success', $fiscal_year);
+        $criteriaInfo = XAuditAssessmentCriteria::findOrFail($request->criteria_id);
+        if ($criteriaInfo) {
+            $response = responseFormat('success', $criteriaInfo);
         } else {
-            $response = responseFormat('error', 'Fiscal Year Not Found');
+            $response = responseFormat('error', 'Criteria Not Found');
         }
         return response()->json($response, 200);
     }
@@ -90,45 +86,22 @@ class XAuditAssessmentCriteriaController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateRequest $request)
+    public function update(Request $request)
     {
-        $fiscal_year = XFiscalYear::find($request->fiscal_year_id);
         try {
-            $fiscal_year->update($request->validated());
+            $criteria = XAuditAssessmentCriteria::find($request->criteria_id);
+            $criteria->category_id = $request->category_id;
+            $criteria->category_title_en = $request->category_title_en;
+            $criteria->category_title_bn = $request->category_title_bn;
+            $criteria->name_en = $request->name_en;
+            $criteria->name_bn = $request->name_bn;
+            $criteria->save();
+
             $response = responseFormat('success', 'Successfully Updated');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
         }
 
-        return response()->json($response);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Models\XFiscalYear $xFiscalYear
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(ShowOrDeleteRequest $request)
-    {
-        try {
-            XFiscalYear::find($request->fiscal_year_id)->delete();
-            $response = responseFormat('success', 'Successfully Updated');
-        } catch (\Exception $exception) {
-            $response = responseFormat('error', $exception->getMessage());
-        }
-        return response()->json($response);
-    }
-
-
-    public function currentFiscalYear(ShowOrDeleteRequest $request)
-    {
-        try {
-            $current_fiscal_year = XFiscalYear::where('start',date("Y"))->first();
-            $response = responseFormat('success', $current_fiscal_year);
-        } catch (\Exception $exception) {
-            $response = responseFormat('error', $exception->getMessage());
-        }
         return response()->json($response);
     }
 }

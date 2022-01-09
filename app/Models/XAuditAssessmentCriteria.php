@@ -17,7 +17,6 @@ class XAuditAssessmentCriteria extends Model
         'category_title_bn',
         'name_en',
         'name_bn',
-        'weight',
         'created_at',
         'updated_at',
     ];
