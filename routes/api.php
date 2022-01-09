@@ -43,7 +43,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'audit-assessment/'], function () {
         Route::post('list', [AuditAssessmentController::class, 'list']);
         Route::post('store', [AuditAssessmentController::class, 'store']);
-        Route::post('store-annual-plan', [AuditAssessmentController::class, 'storeAnnualPlan']);
         Route::post('get-assessment-entity', [AuditAssessmentController::class, 'getAssessmentEntity']);
     });
 
