@@ -25,12 +25,18 @@ class QacService
         DB::beginTransaction();
 
         try {
+//            return ['status' => 'success', 'data' => $request->all()];
             ApottiStatus::updateOrCreate(
                 ['apotti_id' => $request->apotti_id,'qac_type' => $request->qac_type],
                 [
                     'apotti_id' => $request->apotti_id,
                     'apotti_type' => $request->apotti_type,
                     'qac_type' => $request->qac_type,
+                    'is_same_porishisto' => $request->is_same_porishisto,
+                    'is_rules_and_regulation' => $request->is_rules_and_regulation,
+                    'is_imperfection' => $request->is_imperfection,
+                    'is_risk_analysis' => $request->is_risk_analysis,
+                    'is_broadsheet_response' => $request->is_broadsheet_response,
                     'comment' => $request->comment,
                     'created_by' => $cdesk->office_id,
                     'created_by_name_en' => $cdesk->officer_en,
