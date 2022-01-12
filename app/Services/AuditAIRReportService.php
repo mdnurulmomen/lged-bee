@@ -211,6 +211,25 @@ class AuditAIRReportService
         }
     }
 
+
+    public function getAirWiseAuditApottiList(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $apottis = ApottiRAirMap::where('rairs_id',$request->air_id)->pluck('apotti_id');
+            $apottiList = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$apottis)->get()->toArray();
+            return ['status' => 'success', 'data' => $apottiList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function getAuditApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -305,6 +324,28 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $lastAirMovementInfo];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getApprovePreliminaryAir(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $airList = RAir::select('id','fiscal_year_id','audit_plan_id')
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->where('status','approved')
+                ->get()
+                ->toArray();
+
+            return ['status' => 'success', 'data' => $airList];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
