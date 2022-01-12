@@ -22,7 +22,10 @@ class ApEntityTeamService
         }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
-
+        if($request->modal_type == 'data-collection'){
+            $annualPlan->has_dc_schedule = 1;
+            $annualPlan->save();
+        }
         $teams = json_decode($request->teams, true);
         $teams = $teams['teams'];
         try {
@@ -105,7 +108,10 @@ class ApEntityTeamService
         }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
-
+        if($request->modal_type == 'data-collection'){
+            $annualPlan->has_dc_schedule = 1;
+            $annualPlan->save();
+        }
         $teams = json_decode($request->teams, true);
         $teams = $teams['teams'];
         try {

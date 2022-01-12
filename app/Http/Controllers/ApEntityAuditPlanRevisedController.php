@@ -158,7 +158,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             'fiscal_year_id' => 'required|integer',
             'activity_id' => 'required|integer',
             'annual_plan_id' => 'required|integer',
-            'audit_plan_id' => 'required|integer',
+            'audit_plan_id' => 'integer',
             'teams' => 'required',
         ])->validate();
 
@@ -196,7 +196,7 @@ class ApEntityAuditPlanRevisedController extends Controller
     {
 
         Validator::make($request->all(), [
-            'audit_plan_id' => 'required|integer',
+            'audit_plan_id' => 'integer',
             'team_schedules' => 'required|json',
         ])->validate();
 

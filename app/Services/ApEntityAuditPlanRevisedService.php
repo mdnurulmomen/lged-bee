@@ -26,7 +26,7 @@ class ApEntityAuditPlanRevisedService
         }
         try {
             $annualPlanQuery = AnnualPlan::with('audit_plans:id,annual_plan_id,fiscal_year_id')
-                ->with('ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
+                ->with('ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->with('audit_plans.office_order:id,audit_plan_id,approved_status')
                 ->select('id','activity_id','fiscal_year_id','office_type','total_unit_no',
                     'subject_matter','created_at')

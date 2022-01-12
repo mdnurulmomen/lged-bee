@@ -12,36 +12,25 @@ use App\Traits\GenericData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class ApOfficerOrderService
+class ApDcOfficerOrderService
 {
     use GenericData;
 
-    public function auditPlanList(Request $request): array
+    public function annualPlanList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
-
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            if ($request->per_page && $request->page && !$request->all) {
-                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
-                    ->where('fiscal_year_id', $request->fiscal_year_id)
-                    ->where('status','approved')
-                    ->paginate($request->per_page);
-            }
-            else{
-                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
-                    ->where('fiscal_year_id', $request->fiscal_year_id)
-                    ->where('status','approved')
-                    ->get();
-            }
+            $annualPlanList = AnnualPlan::with(['ap_entities','office_order.office_order_movement'])
+                ->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('has_dc_schedule', 1)
+//                ->where('status','approved')
+                ->paginate($request->per_page);
+            $responseData = ['status' => 'success', 'data' => $annualPlanList];
 
-            $responseData = ['status' => 'success', 'data' => $auditPlanList];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -103,17 +92,12 @@ class ApOfficerOrderService
         try {
             $annualPlan = AnnualPlan::find($request->annual_plan_id);
 
-            //audit plan
-            $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
-            $auditPlan->has_office_order = 1;
-            $auditPlan->save();
-
             $data = [
                 'annual_plan_id' => $request->annual_plan_id,
-                'schedule_id' => $auditPlan->schedule_id,
-                'activity_id' => $auditPlan->activity_id,
-                'milestone_id' => $auditPlan->milestone_id,
-                'fiscal_year_id' => $auditPlan->fiscal_year_id,
+                'schedule_id' => $annualPlan->schedule_id,
+                'activity_id' => $annualPlan->activity_id,
+                'milestone_id' => 0,
+                'fiscal_year_id' => $annualPlan->fiscal_year_id,
                 'audit_plan_id' => $request->audit_plan_id,
                 'duration_id' => $annualPlan->activity->duration_id,
                 'outcome_id' => $annualPlan->activity->outcome_id,
@@ -139,8 +123,8 @@ class ApOfficerOrderService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id,
-                'audit_plan_id' => $request->audit_plan_id],$data);
+            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id],$data);
+
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];

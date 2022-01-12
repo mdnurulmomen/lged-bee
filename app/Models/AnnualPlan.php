@@ -68,4 +68,9 @@ class AnnualPlan extends Model
         return $this->hasMany(ApMilestone::class, 'annual_plan_id', 'id');
     }
 
+    public function office_order(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ApOfficeOrder::class, 'annual_plan_id', 'id')->where('audit_plan_id',0);
+    }
+
 }

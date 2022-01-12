@@ -136,6 +136,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('office-order/store-approval-authority', [ApOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
             Route::post('office-order/approve', [ApOfficeOrderController::class, 'approveOfficeOrder']);
 
+            //data collection office order
+            Route::post('office-order-dc/annual-plan-list', [ApDcOfficeOrderController::class, 'annualPlanList']);
+            Route::post('office-order-dc/generate', [ApDcOfficeOrderController::class, 'generateOfficeOrder']);
+            Route::post('office-order-dc/show', [ApDcOfficeOrderController::class, 'showOfficeOrder']);
+            Route::post('office-order-dc/store-approval-authority', [ApDcOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
+            Route::post('office-order-dc/approve', [ApDcOfficeOrderController::class, 'approveOfficeOrder']);
+
             Route::post('risk-assessment/type-wise-item-list', [ApRiskAssessmentController::class, 'riskAssessmentTypeWiseItemList']);
             Route::post('risk-assessment/store', [ApRiskAssessmentController::class, 'store']);
             Route::post('risk-assessment/update', [ApRiskAssessmentController::class, 'update']);
