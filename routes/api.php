@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Report\QCController;
+use App\Http\Controllers\Report\AuditAIRReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -170,6 +170,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
     });
 
+    //follow up
     Route::group(['prefix' => 'follow-up'], function () {
         Route::customApiResource('audit-observations', AuditObservationController::class);
         Route::group(['prefix' => 'audit-observation/'], function () {
@@ -181,10 +182,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
     });
 
+    //mis and dashboard
     Route::group(['prefix' => 'mis-and-dashboard'], function () {
         Route::post('load-all-team-lists', [MISAndDashboardController::class, 'allTeams']);
     });
 
+    //audit conduct query
     Route::group(['prefix' => 'audit-conduct-query'], function () {
         Route::post('audit-query-schedule-list', [AuditExecutionQueryController::class, 'auditQueryScheduleList']);
         Route::post('send-audit-query', [AuditExecutionQueryController::class, 'sendAuditQuery']);
@@ -199,6 +202,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('authority-query-list', [AuditExecutionQueryController::class, 'authorityQueryList']);
     });
 
+    //audit conduct memo
     Route::group(['prefix' => 'audit-conduct-memo'], function () {
         Route::post('audit-memo-store', [AcMemoController::class, 'auditMemoStore']);
         Route::post('audit-memo-list', [AcMemoController::class, 'auditMemoList']);
@@ -214,6 +218,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-acknowledgment-of-rpu', [AcMemoController::class, 'acknowledgmentOfRpuMemo']);
     });
 
+    //audit conduct apotti
     Route::group(['prefix' => 'audit-conduct-apotti'], function () {
         Route::post('get-apotti-list', [ApottiController::class, 'getApottilist']);
         Route::post('get-apotti-info', [ApottiController::class, 'getApottiInfo']);
@@ -225,23 +230,32 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('update-apotti', [ApottiController::class, 'updateAp\otti']);
     });
 
+    //audit template
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
+    //audit qc
     Route::group(['prefix' => 'audit-quality-control'], function () {
         Route::post('qac-apotti', [QacController::class, 'qacApotti']);
         Route::post('get-qac-apotti-status', [QacController::class, 'getQacApottiStatus']);
     });
 
-    //audit-report
-    Route::group(['prefix' => 'audit-report'],function (){
-        Route::post('load-approve-plan-list', [QCController::class, 'loadApprovePlanList']);
-        Route::post('create-air-report', [QCController::class, 'createNewAirReport']);
-        Route::post('edit-air-report', [QCController::class, 'editAirReport']);
-        Route::post('store-air-report', [QCController::class, 'storeAirReport']);
-        Route::post('get-audit-team', [QCController::class, 'getAuditTeam']);
-        Route::post('get-audit-team-schedule', [QCController::class, 'getAuditTeamSchedule']);
-        Route::post('get-audit-apotti', [QCController::class, 'getAuditApotti']);
+    //audit report
+    Route::group(['prefix' => 'audit-report'], function () {
+        //air
+        Route::group(['prefix' => 'air'],function (){
+            Route::post('load-approve-plan-list', [AuditAIRReportController::class, 'loadApprovePlanList']);
+            Route::post('create-air-report', [AuditAIRReportController::class, 'createNewAirReport']);
+            Route::post('edit-air-report', [AuditAIRReportController::class, 'editAirReport']);
+            Route::post('store-air-report', [AuditAIRReportController::class, 'storeAirReport']);
+            Route::post('get-audit-team', [AuditAIRReportController::class, 'getAuditTeam']);
+            Route::post('get-audit-team-schedule', [AuditAIRReportController::class, 'getAuditTeamSchedule']);
+            Route::post('get-audit-apotti-list', [AuditAIRReportController::class, 'getAuditApottiList']);
+            Route::post('get-audit-apotti', [AuditAIRReportController::class, 'getAuditApotti']);
+            Route::post('store-air-movement', [AuditAIRReportController::class, 'storeAirMovement']);
+            Route::post('get-air-last-movement', [AuditAIRReportController::class, 'getAirLastMovement']);
+        });
     });
+
 
     //final plan
     Route::group(['prefix' => 'final-plan-file'], function () {
@@ -251,11 +265,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('update', [FinalPlanController::class, 'update']);
     });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
-
-    /*Route::post('final-plan-file-edit', [FinalPlanController::class, 'edit']);
-    Route::post('final-plan-file-update', [FinalPlanController::class, 'update']);
-    Route::post('final-plan-file-list', [FinalPlanController::class, 'list']);
-    Route::post('final-plan-document-is-exist', [FinalPlanController::class, 'documentIsExist']);*/
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);

@@ -17,6 +17,8 @@ class RAir extends Model
         'audit_plan_id',
         'activity_id',
         'air_description',
+        'type',
+        'status',
         'created_by',
         'modified_by',
     ];
