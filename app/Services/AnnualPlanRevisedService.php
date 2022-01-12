@@ -97,7 +97,7 @@ class AnnualPlanRevisedService
                 return $q->where('activity_id', $activity_id);
             });
 
-            $annualPlanList = $query->with('ap_entities')->where('fiscal_year_id', $request->fiscal_year_id)->get();
+            $annualPlanList = $query->with('ap_entities')->with('activity:id,title_en,title_bn,activity_key')->where('fiscal_year_id', $request->fiscal_year_id)->orderBy('activity_id','ASC')->get();
 
             $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
                 ->where('office_id', $cdesk->office_id)
