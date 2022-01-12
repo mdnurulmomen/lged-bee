@@ -36,7 +36,7 @@ class PermissionService
             $modules = PMenuAction::where('is_other_module', 0)->whereIn('id', $menu_ids)->where('type', 'module')->with([
                 'module_childrens' => function ($query) use ($menu_ids) {
                     $query->where('type', 'module')->whereIn('id', $menu_ids);
-                }])->where('parent_id', null)->get();
+                }])->where('parent_id', null)->orderBy('display_order')->get();
             $this->emptyOfficeDBConnection();
             return ['status' => 'success', 'data' => $modules];
         } catch (\Exception $exception) {
