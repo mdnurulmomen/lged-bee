@@ -43,4 +43,16 @@ class AuditAssessmentController extends Controller
 
         return response()->json($response);
     }
+
+    public function storeAnnualPlan(Request $request, AuditAssessmentService $auditAssessmentService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAssessmentService->storeAnnualPlan($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
 }
