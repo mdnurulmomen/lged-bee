@@ -12,6 +12,8 @@ class RAir extends Model
     protected $connection = 'OfficeDB';
 
     protected $fillable = [
+        'parent_id',
+        'report_number',
         'fiscal_year_id',
         'annual_plan_id',
         'audit_plan_id',
@@ -36,5 +38,10 @@ class RAir extends Model
     public function audit_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'id', 'audit_plan_id');
+    }
+
+    public function r_air_child(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(RAir::class, 'id', 'parent_id');
     }
 }

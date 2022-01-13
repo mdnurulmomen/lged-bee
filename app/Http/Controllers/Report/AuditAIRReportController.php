@@ -60,6 +60,19 @@ class AuditAIRReportController extends Controller
         return response()->json($response);
     }
 
+    public function updateQACAirReport(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->updateQACAirReport($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function getAuditTeam(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->getAuditTeam($request);
@@ -89,6 +102,19 @@ class AuditAIRReportController extends Controller
     public function getAuditApottiList(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->getAuditApottiList($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getAirWiseQACApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->getAirWiseQACApotti($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
@@ -155,6 +181,19 @@ class AuditAIRReportController extends Controller
     public function getApprovePreliminaryAir(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->getApprovePreliminaryAir($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function deleteAirReportWiseApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->deleteAirReportWiseApotti($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

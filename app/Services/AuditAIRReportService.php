@@ -138,6 +138,26 @@ class AuditAIRReportService
         }
     }
 
+    public function updateQACAirReport(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $airData = [
+                'air_description' => $request->air_description,
+                'created_by' => $cdesk->officer_id,
+                'modified_by' => $cdesk->officer_id,
+            ];
+            RAir::where('id',$request->air_id)->update($airData);
+            return ['status' => 'success', 'data' => ['air_id' => $request->air_id]];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
 
     public function getAuditTeam(Request $request): array
     {
@@ -201,7 +221,7 @@ class AuditAIRReportService
             $responseData['auditApottis'] = $auditApottis->get()->toArray();
 
 
-            $responseData['auditMapApottis'] = ApottiRAirMap::with('apotti_map_list')
+            $responseData['auditMapApottis'] = ApottiRAirMap::with('apotti_map_data')
                 ->where('rairs_id',$request->air_id)
                 ->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
@@ -221,8 +241,33 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $apottis = ApottiRAirMap::where('rairs_id',$request->air_id)->pluck('apotti_id');
-            $apottiList = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$apottis)->get()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child'])->where('id',$request->air_id)->first()->toArray();
+            $responseData['rAirInfo'] = $preliminaryAir;
+
+            $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
+            //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
+            //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
+            return ['status' => 'success', 'data' => $responseData];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    //for set qac apotti
+    public function getAirWiseQACApotti(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)->where('is_delete',0)->pluck('apotti_id');
+            $apottiList = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
+                ->whereIn('id',$qacApottis)
+                ->get()
+                ->toArray();
             return ['status' => 'success', 'data' => $apottiList];
 
         } catch (\Exception $exception) {
@@ -298,8 +343,39 @@ class AuditAIRReportService
                 'sender_officer_email'  => $cdesk->email,
                 'comments'  => $request->comments
             ];
-
             RAirMovement::create($airMovementData);
+
+            //for qac 01 insert
+            if ($request->status == 'approved'){
+                $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
+                $airData = [
+                    'parent_id' => $rAirData['id'],
+                    'fiscal_year_id' => $rAirData['fiscal_year_id'],
+                    'annual_plan_id' => $rAirData['annual_plan_id'],
+                    'audit_plan_id' => $rAirData['audit_plan_id'],
+                    'activity_id' => $rAirData['activity_id'],
+                    'air_description' => $rAirData['air_description'],
+                    'type' => 'qac-1',
+                    'status' => 'draft',
+                    'created_by' => $cdesk->officer_id,
+                    'modified_by' => $cdesk->officer_id,
+                ];
+                $storeQAC01Air = RAir::create($airData);
+
+                //for map data
+                $apottiRAirMap = ApottiRAirMap::where('rairs_id',$request->r_air_id)->get()->toArray();
+                $mappingData = [];
+                foreach ($apottiRAirMap as $apotti){
+                    array_push($mappingData,[
+                        'apotti_id' => $apotti['apotti_id'],
+                        'rairs_id' => $storeQAC01Air->id
+                    ]);
+                }
+
+                if (!empty($mappingData)){
+                    ApottiRAirMap::insert($mappingData);
+                }
+            }
 
             return ['status' => 'success', 'data' => ['apottis' => $request->apottis]];
         } catch (\Exception $exception) {
@@ -346,6 +422,26 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $airList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function deleteAirReportWiseApotti(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            ApottiRAirMap::where('apotti_id',$request->apotti_id)
+                ->where('rairs_id',$request->air_report_id)
+                ->update(['is_delete'=> $request->is_delete]);
+
+            return ['status' => 'success', 'data' => []];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

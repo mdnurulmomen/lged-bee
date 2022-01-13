@@ -15,11 +15,12 @@ class ApottiRAirMap extends Model
     protected $fillable = [
         'apotti_id',
         'rairs_id',
+        'is_delete',
         'created_by',
         'updated_by',
     ];
 
-    public function apotti_map_list(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function apotti_map_data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Apotti::class, 'apotti_id');
     }

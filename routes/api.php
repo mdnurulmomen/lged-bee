@@ -248,14 +248,17 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('create-air-report', [AuditAIRReportController::class, 'createNewAirReport']);
             Route::post('edit-air-report', [AuditAIRReportController::class, 'editAirReport']);
             Route::post('store-air-report', [AuditAIRReportController::class, 'storeAirReport']);
+            Route::post('update-qac-air-report', [AuditAIRReportController::class, 'updateQACAirReport']);
             Route::post('get-audit-team', [AuditAIRReportController::class, 'getAuditTeam']);
             Route::post('get-audit-team-schedule', [AuditAIRReportController::class, 'getAuditTeamSchedule']);
             Route::post('get-audit-apotti-list', [AuditAIRReportController::class, 'getAuditApottiList']);
+            Route::post('get-air-wise-qac-apotti', [AuditAIRReportController::class, 'getAirWiseQACApotti']);
             Route::post('get-air-wise-audit-apotti-list', [AuditAIRReportController::class, 'getAirWiseAuditApottiList']);
             Route::post('get-audit-apotti', [AuditAIRReportController::class, 'getAuditApotti']);
             Route::post('store-air-movement', [AuditAIRReportController::class, 'storeAirMovement']);
             Route::post('get-air-last-movement', [AuditAIRReportController::class, 'getAirLastMovement']);
             Route::post('get-approve-preliminary-air', [AuditAIRReportController::class, 'getApprovePreliminaryAir']);
+            Route::post('delete-air-report-wise-apotti', [AuditAIRReportController::class, 'deleteAirReportWiseApotti']);
         });
     });
 
