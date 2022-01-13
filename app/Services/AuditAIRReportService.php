@@ -346,7 +346,7 @@ class AuditAIRReportService
             RAirMovement::create($airMovementData);
 
             //for qac 01 insert
-            if ($request->status == 'approved'){
+            if ($request->status == 'approved' && $request->air_type == 'preliminary'){
                 $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
                 $airData = [
                     'parent_id' => $rAirData['id'],
@@ -417,6 +417,7 @@ class AuditAIRReportService
 
             $airList = RAir::select('id','fiscal_year_id','audit_plan_id')
                 ->where('audit_plan_id',$request->audit_plan_id)
+                ->where('type','preliminary')
                 ->where('status','approved')
                 ->get()
                 ->toArray();
