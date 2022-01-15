@@ -29,7 +29,7 @@ class ApEntityAuditPlanRevisedService
                 ->with('ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->with('audit_plans.office_order:id,audit_plan_id,approved_status')
                 ->select('id','activity_id','fiscal_year_id','office_type','total_unit_no',
-                    'subject_matter','created_at')
+                    'subject_matter','has_dc_schedule','created_at')
                 ->where('fiscal_year_id', $fiscal_year_id);
 
             if ($request->per_page && $request->page && !$request->all) {
