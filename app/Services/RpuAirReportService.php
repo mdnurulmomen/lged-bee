@@ -70,6 +70,8 @@ class RpuAirReportService
             $send_air_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_air_to_rpu'), $send_air_data)->json();
             return ['status' => 'success', 'data' => $send_air_to_rpu];
             if ($send_air_to_rpu['status'] == 'success') {
+                $air_info->is_sent = 1;
+                $air_info->save();
                 return ['status' => 'success', 'data' => 'Air Send Successfully'];
             }
 //            return ['status' => 'success', 'data' => $air_info];
