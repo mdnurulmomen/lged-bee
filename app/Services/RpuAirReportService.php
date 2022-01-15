@@ -2,6 +2,8 @@
 
 namespace App\Services;
 use App\Models\AcMemo;
+use App\Models\AnnualPlan;
+use App\Models\AnnualPlanEntitie;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\Apotti;
 use App\Models\ApottiRAirMap;
@@ -36,26 +38,36 @@ class RpuAirReportService
 //                }
 //            }
 
+            $entity_list = AnnualPlanEntitie::where('annual_plan_id',$air_info->annual_plan_id)->get();
 
-            $data['fiscal_year_id'] = $air_info->fiscal_year_id;
-            $data['cost_center_id'] = $air_info->entity_id;
-            $data['fiscal_year'] = $fiscal_year->start.'-'.$fiscal_year->end;
-            $data['annual_plan_id'] = $air_info->annual_plan_id;
-            $data['audit_plan_id'] = $air_info->audit_plan_id;
-            $data['activity_id'] = $air_info->activity_id;
-            $data['air_description'] = gzuncompress(getDecryptedData($air_info->air_description));
-            $data['directorate_id'] = $cdesk->office_id;
-            $data['directorate_en'] = $cdesk->office_name_en;
-            $data['directorate_bn'] = $cdesk->office_name_bn;
-            $data['sender_id'] = $cdesk->officer_id;
-            $data['sender_en'] = $cdesk->officer_en;
-            $data['sender_bn'] = $cdesk->officer_bn;
-            $data['send_date'] = date('Y-m-d');
+//            return ['status' => 'success', 'data' => $entity_list];
+            foreach ($entity_list as $entity){
 
-//            return ['status' => 'success', 'data' => $data];
+                $data['report_number'] = $air_info->report_number;
+                $data['fiscal_year_id'] = $air_info->fiscal_year_id;
+                $data['cost_center_id'] = $entity->entity_id;
+                $data['fiscal_year'] = $fiscal_year->start.'-'.$fiscal_year->end;
+                $data['annual_plan_id'] = $air_info->annual_plan_id;
+                $data['audit_plan_id'] = $air_info->audit_plan_id;
+                $data['activity_id'] = $air_info->activity_id;
+                $data['air_description'] = gzuncompress(getDecryptedData($air_info->air_description));
+                $data['directorate_id'] = $cdesk->office_id;
+                $data['directorate_en'] = $cdesk->office_name_en;
+                $data['directorate_bn'] = $cdesk->office_name_bn;
+                $data['sender_id'] = $cdesk->officer_id;
+                $data['sender_en'] = $cdesk->officer_en;
+                $data['sender_bn'] = $cdesk->officer_bn;
+                $data['send_date'] = date('Y-m-d');
 
-            $send_air_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_air_to_rpu'), $data)->json();
-//            return ['status' => 'success', 'data' => $send_air_to_rpu];
+                $air_list[] = $data;
+
+            }
+            $send_air_data['air_list'] = $air_list;
+
+//            return ['status' => 'success', 'data' => $send_air_data];
+
+            $send_air_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_air_to_rpu'), $send_air_data)->json();
+            return ['status' => 'success', 'data' => $send_air_to_rpu];
             if ($send_air_to_rpu['status'] == 'success') {
                 return ['status' => 'success', 'data' => 'Air Send Successfully'];
             }
