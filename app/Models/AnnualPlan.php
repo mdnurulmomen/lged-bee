@@ -27,6 +27,7 @@ class AnnualPlan extends Model
         'total_unit_no',
         'nominated_office_counts',
         'subject_matter',
+        'sub_subject_matter',
         'nominated_man_powers',
         'nominated_man_power_counts',
         'comment',
