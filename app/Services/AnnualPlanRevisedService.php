@@ -427,16 +427,16 @@ class AnnualPlanRevisedService
     public function deleteAnnualPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
-            if (!isSuccessResponse($office_db_con_response)) {
-                return ['status' => 'error', 'data' => $office_db_con_response];
-            }
+            AnnualPlan::find($request->annual_plan_id)->delete();
+            AnnualPlanEntitie::where('annual_plan_id',$request->annual_plan_id)->delete();
+            ApMilestone::where('annual_plan_id',$request->annual_plan_id)->delete();
 
-//            AnnualPlan::delete();
-
-            $data = ['status' => 'success', 'data' => ''];
+            $data = ['status' => 'success', 'data' => 'Annual Plan Delete Successfully'];
 
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];

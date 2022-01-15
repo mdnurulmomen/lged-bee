@@ -44,6 +44,7 @@ class RpuAirReportService
             foreach ($entity_list as $entity){
 
                 $data['report_number'] = $air_info->report_number;
+                $data['air_id'] = $air_info->id;
                 $data['fiscal_year_id'] = $air_info->fiscal_year_id;
                 $data['cost_center_id'] = $entity->entity_id;
                 $data['fiscal_year'] = $fiscal_year->start.'-'.$fiscal_year->end;
@@ -76,7 +77,22 @@ class RpuAirReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+    }
 
+    public function receivedAirByRpu(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $air_info = RAir::find($request->air_id);
+            $air_info->is_received = 1;
+            $air_info->save();
+            return ['status' => 'success', 'data' => 'Air Received Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
 
     }
 }
