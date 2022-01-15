@@ -79,7 +79,10 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $airReport = RAir::find($request->air_report_id)->toArray();
+            $airReport = RAir::with('latest_r_air_movement')
+                ->where('id',$request->air_report_id)
+                ->first()
+                ->toArray();
             return ['status' => 'success', 'data' => $airReport];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -241,7 +244,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child'])->where('id',$request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement'])->where('id',$request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
             $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
@@ -265,9 +268,13 @@ class AuditAIRReportService
             }
             $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)->where('is_delete',0)->pluck('apotti_id');
             $apottiList = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
-                ->whereIn('id',$qacApottis)
-                ->get()
-                ->toArray();
+                ->whereIn('id',$qacApottis);
+
+            if ($request->qac_type == 'qac-2'){
+                $apottiList = $apottiList->where('apotti_type','sfi');
+            }
+            $apottiList = $apottiList->get()->toArray();
+
             return ['status' => 'success', 'data' => $apottiList];
 
         } catch (\Exception $exception) {
@@ -346,7 +353,22 @@ class AuditAIRReportService
             RAirMovement::create($airMovementData);
 
             //for qac 01 insert
-            if ($request->status == 'approved' && $request->air_type == 'preliminary'){
+            if ($request->status == 'approved'){
+
+                $newAirType = 'draft';
+                if ($request->air_type == 'preliminary'){
+                    $newAirType = 'qac-1';
+                }
+                elseif ($request->air_type == 'qac-1'){
+                    $newAirType = 'qac-2';
+                }
+                elseif ($request->air_type == 'qac-2'){
+                    $newAirType = 'cqat';
+                }
+                elseif ($request->air_type == 'cqat'){
+                    $newAirType = 'final';
+                }
+
                 $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
                 $airData = [
                     'parent_id' => $rAirData['id'],
@@ -355,7 +377,7 @@ class AuditAIRReportService
                     'audit_plan_id' => $rAirData['audit_plan_id'],
                     'activity_id' => $rAirData['activity_id'],
                     'air_description' => $rAirData['air_description'],
-                    'type' => 'qac-1',
+                    'type' => $newAirType,
                     'status' => 'draft',
                     'created_by' => $cdesk->officer_id,
                     'modified_by' => $cdesk->officer_id,
@@ -415,9 +437,19 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
+            if ($request->qac_type == 'qac-1'){
+                $newAirType = 'preliminary';
+            }
+            elseif ($request->qac_type == 'qac-2'){
+                $newAirType = 'qac-1';
+            }
+            elseif ($request->qac_type == 'cqat'){
+                $newAirType = 'qac-2';
+            }
+
             $airList = RAir::select('id','fiscal_year_id','audit_plan_id')
                 ->where('audit_plan_id',$request->audit_plan_id)
-                ->where('type','preliminary')
+                ->where('type',$newAirType)
                 ->where('status','approved')
                 ->get()
                 ->toArray();

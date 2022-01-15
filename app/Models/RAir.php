@@ -44,4 +44,9 @@ class RAir extends Model
     {
         return $this->belongsTo(RAir::class, 'id', 'parent_id');
     }
+
+    public function latest_r_air_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(RAirMovement::class)->latest();
+    }
 }
