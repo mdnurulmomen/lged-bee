@@ -35,7 +35,7 @@ class AuditAIRReportService
                 ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
                 ->with('office_order:id,audit_plan_id,memorandum_no,memorandum_date,approved_status')
                 ->with('air_reports', function ($query) use($air_type) {
-                    return $query->select('id','audit_plan_id','status')->where('type',$air_type);
+                    return $query->with(['latest_r_air_movement'])->select('id','audit_plan_id','status')->where('type',$air_type);
                 })
                 ->select('id','annual_plan_id','schedule_id','activity_id','fiscal_year_id','created_at')
                 ->whereHas('office_order', function($query){
