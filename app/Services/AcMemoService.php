@@ -553,6 +553,7 @@ class AcMemoService
 
     public function responseOfRpuMemo(Request $request): array
     {
+        return ['status' => 'success', 'data' => $request->all()];
         $office_db_con_response = $this->switchOffice($request->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
