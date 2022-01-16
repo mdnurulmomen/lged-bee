@@ -560,7 +560,7 @@ class AcMemoService
         try {
 
             AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-            return ['status' => 'success', 'data' => $request->all()];
+            return ['status' => 'success', 'data' => 'Response Send Successfully'];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
