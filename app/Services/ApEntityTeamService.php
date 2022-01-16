@@ -22,7 +22,7 @@ class ApEntityTeamService
         }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
-        if($request->modal_type == 'data-collection'){
+        if ($request->modal_type == 'data-collection') {
             $annualPlan->has_dc_schedule = 1;
             $annualPlan->save();
         }
@@ -108,7 +108,7 @@ class ApEntityTeamService
         }
 
         $annualPlan = AnnualPlan::find($request->annual_plan_id);
-        if($request->modal_type == 'data-collection'){
+        if ($request->modal_type == 'data-collection') {
             $annualPlan->has_dc_schedule = 1;
             $annualPlan->save();
         }
@@ -139,18 +139,23 @@ class ApEntityTeamService
         $team_schedules = $team_schedules['schedule'];
         DB::beginTransaction();
         try {
-            $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
-            $data = ['status' => 'success', 'data' => 'successfully saved'];
-            DB::commit();
+            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
+            if (isSuccessResponse($saveSchedule)) {
+                $data = ['status' => 'success', 'data' => 'successfully saved'];
+            } else {
+                throw new \Exception($saveSchedule['data']);
+            }
             $this->emptyOfficeDBConnection();
-            return $data;
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['status' => 'error', 'data' => $e->getMessage()];
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
         } catch (\Error $e) {
             DB::rollBack();
-            return ['status' => 'error', 'data' => $e->getMessage()];
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
+        DB::commit();
+        return $data;
+
     }
 
     public function saveTeamSchedule($team_schedules, $audit_plan_id)
@@ -217,11 +222,15 @@ class ApEntityTeamService
                 }
             }
             DB::commit();
-        } catch (\Exception $exception) {
+            $data = ['status' => 'success', 'data' => 'Saved'];
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Team Schedule Making Error: ' . json_encode($exception));
-            return $exception;
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
+        } catch (\Error $e) {
+            DB::rollBack();
+            $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
+        return $data;
     }
 
     public function updateTeamSchedule(Request $request): array
@@ -238,8 +247,12 @@ class ApEntityTeamService
         DB::beginTransaction();
         try {
             AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
-            $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
-            $data = ['status' => 'success', 'data' => 'successfully saved'];
+            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
+            if (isSuccessResponse($saveSchedule)) {
+                $data = ['status' => 'success', 'data' => 'successfully saved'];
+            } else {
+                throw new \Exception($saveSchedule['data']);
+            }
             DB::commit();
             $this->emptyOfficeDBConnection();
             return $data;
