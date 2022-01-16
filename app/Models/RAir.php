@@ -20,6 +20,7 @@ class RAir extends Model
         'activity_id',
         'air_description',
         'type',
+        'is_sent',
         'status',
         'created_by',
         'modified_by',

@@ -6,6 +6,7 @@ use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
 use App\Models\AuditAssessmentScore;
 use App\Models\OpActivity;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Database\Eloquent\Model;
@@ -119,6 +120,8 @@ class AuditAssessmentService
                 ->where('activity_type',$request->compliance)
                 ->get();
 
+            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
+
             //for items
             $annualPlanEntityList = [];
             foreach ($request->audit_assessment_score_ids as $key => $score_id){
@@ -140,7 +143,7 @@ class AuditAssessmentService
                         'milestone_id' => 0,
                         'activity_id' => 7,
                         'fiscal_year_id' => $request->fiscal_year_id,
-                        'op_audit_calendar_event_id' => 2,
+                        'op_audit_calendar_event_id' => $op_audit_calendar_event_id,
                         'annual_plan_type' => 'entity_based',
                         'office_type' => $request->bn_category_titles[$key],
                         'office_type_id' => $request->category_ids[$key],

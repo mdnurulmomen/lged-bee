@@ -558,10 +558,8 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $ac_memo = AcMemo::find($request->memo_id);
-            $ac_memo->response_of_rpu = $request->response_of_rpu;
-            $ac_memo->save();
 
+            AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
             return ['status' => 'success', 'data' => 'Response Send Successfully'];
 
         } catch (\Exception $exception) {

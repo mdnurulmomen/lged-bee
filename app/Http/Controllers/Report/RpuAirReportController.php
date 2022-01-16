@@ -21,4 +21,17 @@ class RpuAirReportController extends Controller
         return response()->json($response);
     }
 
+    public function receivedAirByRpu(Request $request, RpuAirReportService $rpuAirReportServices): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $rpuAirReportServices->receivedAirByRpu($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
 }
