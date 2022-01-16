@@ -121,7 +121,11 @@ class AuditAssessmentService
                 ->get();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
-
+            $nominated_man_powers = [
+                'comment' => '',
+                'nominated_man_power_counts' => 0,
+                'staffs' => [],
+            ];
             //for items
             $annualPlanEntityList = [];
             foreach ($request->audit_assessment_score_ids as $key => $score_id){
@@ -131,12 +135,6 @@ class AuditAssessmentService
                     $auditAssessmentScore->is_first_half = $request->first_half_data[$key];
                     $auditAssessmentScore->has_first_half_annual_plan = 1;
                     $auditAssessmentScore->save();
-
-                    $nominated_man_powers = [
-                        'comment' => '',
-                        'nominated_man_power_counts' => 0,
-                        'staffs' => [],
-                    ];
 
                     $annualPlanData = [
                         'schedule_id' => 0,
@@ -179,11 +177,12 @@ class AuditAssessmentService
                         'milestone_id' => 0,
                         'activity_id' => 8,
                         'fiscal_year_id' => $request->fiscal_year_id,
-                        'op_audit_calendar_event_id' => 2,
+                        'op_audit_calendar_event_id' => $op_audit_calendar_event_id,
                         'annual_plan_type' => 'entity_based',
                         'office_type' => $request->bn_category_titles[$key],
                         'office_type_id' => $request->category_ids[$key],
-                        'office_type_en' => $request->en_category_titles[$key]
+                        'office_type_en' => $request->en_category_titles[$key],
+                        'nominated_man_powers' => json_encode($nominated_man_powers, JSON_UNESCAPED_UNICODE),
                     ];
 
                     $annualPlan = AnnualPlan::create($annualPlanData);
