@@ -179,7 +179,7 @@ class AuditAssessmentService
                         'milestone_id' => 0,
                         'activity_id' => 8,
                         'fiscal_year_id' => $request->fiscal_year_id,
-                        'op_audit_calendar_event_id' => 2,
+                        'op_audit_calendar_event_id' => $op_audit_calendar_event_id,
                         'annual_plan_type' => 'entity_based',
                         'office_type' => $request->bn_category_titles[$key],
                         'office_type_id' => $request->category_ids[$key],
