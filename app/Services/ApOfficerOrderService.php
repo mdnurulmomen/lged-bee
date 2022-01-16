@@ -29,6 +29,9 @@ class ApOfficerOrderService
             if ($request->per_page && $request->page && !$request->all) {
                 $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
                     ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
+                    ->whereHas('office_order', function($q){
+                        $q->where('audit_plan_id', '>', 0);
+                    })
                     ->where('fiscal_year_id', $request->fiscal_year_id)
                     ->where('status','approved')
                     ->paginate($request->per_page);
