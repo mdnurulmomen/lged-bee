@@ -559,8 +559,8 @@ class AcMemoService
         }
         try {
 
-            $memo_info =  AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-            return ['status' => 'success', 'data' => $memo_info.' '.$request->all()];
+            AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            return ['status' => 'success', 'data' => $request->all()];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
