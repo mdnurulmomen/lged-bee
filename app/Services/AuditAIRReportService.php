@@ -428,7 +428,7 @@ class AuditAIRReportService
         }
     }
 
-    public function getApprovePreliminaryAir(Request $request): array
+    public function getAuditPlanAndTypeWiseAir(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
         try {

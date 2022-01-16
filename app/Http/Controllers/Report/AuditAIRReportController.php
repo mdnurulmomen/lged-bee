@@ -178,9 +178,9 @@ class AuditAIRReportController extends Controller
     }
 
 
-    public function getApprovePreliminaryAir(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    public function getAuditPlanAndTypeWiseAir(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
-        $responseData = $auditAIRReportService->getApprovePreliminaryAir($request);
+        $responseData = $auditAIRReportService->getAuditPlanAndTypeWiseAir($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
