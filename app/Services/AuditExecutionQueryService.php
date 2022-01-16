@@ -28,6 +28,7 @@ class AuditExecutionQueryService
             $schedule_list = AuditVisitCalenderPlanMember::with('plan_parent_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('plan_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('office_order:id,audit_plan_id,approved_status')
+                ->where('audit_plan_id', '>',0)
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->whereNotNull('cost_center_id')
