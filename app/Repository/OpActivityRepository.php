@@ -153,7 +153,22 @@ class OpActivityRepository implements OpActivityInterface
     public function getAllActivity(Request $request): array
     {
         try {
-            $activity_list = OpActivity::where('fiscal_year_id', $request->fiscal_year_id)->get();
+
+            $activity_type = $request->activity_type;
+            $activity_key = $request->activity_key;
+
+            $query = OpActivity::query();
+
+            $query->when($activity_type, function ($q, $activity_type) {
+                return $q->where('activity_type', $activity_type);
+            });
+
+            $query->when($activity_key, function ($q, $activity_key) {
+                return $q->where('activity_key', $activity_key);
+            });
+
+            $activity_list =  $query->where('fiscal_year_id', $request->fiscal_year_id)->get();
+
             return ['status' => 'success', 'data' => $activity_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

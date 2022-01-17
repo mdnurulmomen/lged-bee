@@ -97,7 +97,10 @@ class AnnualPlanRevisedService
                 return $q->where('activity_id', $activity_id);
             });
 
-            $annualPlanList = $query->with('ap_entities')->with('activity:id,title_en,title_bn,activity_key')->where('fiscal_year_id', $request->fiscal_year_id)->orderBy('activity_id','ASC')->get();
+            $annualPlanList = $query->with('ap_entities')
+                                    ->with('activity:id,title_en,title_bn,activity_key')
+                                    ->where('fiscal_year_id', $request->fiscal_year_id)
+                                    ->orderBy('activity_id','ASC')->get();
 
             $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
                 ->where('office_id', $cdesk->office_id)
@@ -164,6 +167,9 @@ class AnnualPlanRevisedService
                 'nominated_office_counts' => $request->total_selected_unit_no,
                 'subject_matter' => $request->subject_matter,
                 'sub_subject_matter' => $request->sub_subject_matter,
+                'vumika' => $request->vumika,
+                'audit_objective' => $request->audit_objective,
+                'audit_approach' => $request->audit_approach,
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,
@@ -239,6 +245,9 @@ class AnnualPlanRevisedService
                 'nominated_office_counts' => $request->total_selected_unit_no,
                 'subject_matter' => $request->subject_matter,
                 'sub_subject_matter' => $request->sub_subject_matter,
+                'vumika' => $request->vumika,
+                'audit_objective' => $request->audit_objective,
+                'audit_approach' => $request->audit_approach,
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,

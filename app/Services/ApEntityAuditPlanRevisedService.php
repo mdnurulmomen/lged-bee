@@ -18,6 +18,7 @@ class ApEntityAuditPlanRevisedService
     public function allEntityAuditPlanLists(Request $request): array
     {
         $fiscal_year_id = $request->fiscal_year_id;
+        $activity_id = $request->activity_id;
         $cdesk = json_decode($request->cdesk, false);
 
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
@@ -30,7 +31,8 @@ class ApEntityAuditPlanRevisedService
                 ->with('audit_plans.office_order:id,audit_plan_id,approved_status')
                 ->select('id','activity_id','fiscal_year_id','office_type','total_unit_no',
                     'subject_matter','has_dc_schedule','created_at')
-                ->where('fiscal_year_id', $fiscal_year_id);
+                ->where('fiscal_year_id', $fiscal_year_id)
+                ->where('activity_id', $activity_id);
 
             if ($request->per_page && $request->page && !$request->all) {
                 $annualPlanQuery = $annualPlanQuery->paginate($request->per_page);
