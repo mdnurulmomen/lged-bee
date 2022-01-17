@@ -27,6 +27,8 @@ class AuditAssessmentScore extends Model
         'has_first_half_annual_plan',
         'has_second_half_annual_plan',
         'point',
+        'last_audit_year_start',
+        'last_audit_year_end',
         'created_by',
         'updated_by'
     ];

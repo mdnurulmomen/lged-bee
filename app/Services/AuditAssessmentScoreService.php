@@ -36,6 +36,8 @@ class AuditAssessmentScoreService
             $auditAssessmentScore->entity_name_bn = $request->entity_name_bn;
             $auditAssessmentScore->entity_name_en = $request->entity_name_en;
             $auditAssessmentScore->point = $request->point;
+            $auditAssessmentScore->last_audit_year_start = empty($request->last_audit_year_start)?null:$request->last_audit_year_start;
+            $auditAssessmentScore->last_audit_year_end = empty($request->last_audit_year_end)?null:$request->last_audit_year_end;
             $auditAssessmentScore->created_by = $cdesk->officer_id;
             $auditAssessmentScore->updated_by = $cdesk->officer_id;
             $auditAssessmentScore->save();
