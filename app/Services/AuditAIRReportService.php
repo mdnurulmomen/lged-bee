@@ -247,7 +247,30 @@ class AuditAIRReportService
             $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement'])->where('id',$request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
-            $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
+            if($request->qac_type == 'qac-1'){
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
+            }
+            elseif($request->qac_type == 'qac-2'){
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
+                    ->whereHas('apotti_map_data', function($q){
+                        $q->where('apotti_type','sfi');
+                    })
+                    ->where('rairs_id',$preliminaryAir['r_air_child']['id'])
+                    ->get()
+                    ->toArray();
+            }
+            elseif($request->qac_type == 'cqat'){
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
+                    ->whereHas('apotti_map_data', function($q){
+                        $q->where('apotti_type','sfi');
+                    })
+                    ->where('rairs_id',$preliminaryAir['r_air_child']['id'])
+                    ->get()
+                    ->toArray();
+            }
+            else{
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
+            }
             //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
             //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
@@ -267,10 +290,9 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)->where('is_delete',0)->pluck('apotti_id');
-            $apottiList = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
-                ->whereIn('id',$qacApottis);
+            $apottiList = Apotti::whereIn('id',$qacApottis);
 
-            if ($request->qac_type == 'qac-2'){
+            if ($request->qac_type == 'qac-2' || $request->qac_type == 'cqat'){
                 $apottiList = $apottiList->where('apotti_type','sfi');
             }
             $apottiList = $apottiList->get()->toArray();
@@ -470,10 +492,29 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
+            Apotti::where('id',$request->apotti_id)->update(['is_delete'=> $request->is_delete]);
+
             ApottiRAirMap::where('apotti_id',$request->apotti_id)
                 ->where('rairs_id',$request->air_report_id)
                 ->update(['is_delete'=> $request->is_delete]);
 
+            return ['status' => 'success', 'data' => []];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function apottiFinalApproval(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            Apotti::where('id',$request->apotti_id)->update(['final_status'=> $request->final_status]);
             return ['status' => 'success', 'data' => []];
 
         } catch (\Exception $exception) {

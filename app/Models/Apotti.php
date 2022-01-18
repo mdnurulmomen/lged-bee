@@ -55,6 +55,8 @@ class Apotti extends Model
         'apotti_sequence',
         'is_combined',
         'air_generate_type',
+        'is_delete',
+        'final_status',
     ];
 
     public function apotti_items(){
