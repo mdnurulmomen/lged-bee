@@ -84,19 +84,21 @@ class OpActivityRepository implements OpActivityInterface
                     $q->with(['activities' => function ($q) use ($fiscal_year_id) {
                         $q->where('activity_parent_id', 0);
                         $q->where('fiscal_year_id', $fiscal_year_id);
-                    }, 'activities.children']);
+                    }, 'activities.milestones', 'activities.children', 'activities.children.milestones']);
                 } else {
                     $q->with(['activities.children' => function ($q) {
                         $q->where('activity_parent_id', 0);
-                    }]);
+                    }, 'activities.milestones']);
                 }
             }]);
         } else {
             $outcomes->with(['plan_output.activities' => function ($q) {
                 $q->where('activity_parent_id', 0);
                 $q->with(['children']);
-            }]);
+            }, 'activities.milestones']);
         }
+
+
 
         $activities['data'] = $outcomes->get();
         $activities['fiscal_year_id'] = $fiscal_year_id;
