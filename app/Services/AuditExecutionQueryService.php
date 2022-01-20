@@ -58,7 +58,7 @@ class AuditExecutionQueryService
 
             $fiscal_year_info =  XFiscalYear::select('start','end')->find($acQuery->fiscal_year_id);
 
-            $acQueryItems = AcQueryItem::select('ac_query_id','item_title_en','item_title_bn','status')
+            $acQueryItems = AcQueryItem::select('id','ac_query_id','item_title_en','item_title_bn','status')
                 ->where('ac_query_id',$request->ac_query_id)
                 ->get();
 
@@ -113,6 +113,7 @@ class AuditExecutionQueryService
                 ->get();
 
             $data['ac_query_id'] = $request->ac_query_id;
+            $data['ac_query_item_id'] = $request->ac_query_item_id;
             $data['ac_query_items'] = json_encode_unicode($acQueryItems);
 
             $received_query = $this->initRPUHttp()->post(config('cag_rpu_api.received_query_from_rpu'), $data)->json();
@@ -359,5 +360,25 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+    }
+
+    public function responseOfRpuQuery(Request $request): array
+    {
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            AcQueryItem::where('id',$request->query_item_id)->update(
+                [
+                    'status' => $request->status,
+                    'comment' => $request->comment,
+                ]
+            );
+            return ['status' => 'success', 'data' => 'Response Send Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
     }
 }

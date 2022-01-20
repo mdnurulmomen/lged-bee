@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Report\AuditAIRReportController;
 use App\Http\Controllers\Report\RpuAirReportController;
-use App\Services\RpuAirReportService;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -203,6 +202,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('update-audit-query', [AuditExecutionQueryController::class, 'updateAuditQuery']);
         Route::post('view-audit-query', [AuditExecutionQueryController::class, 'viewAuditQuery']);
         Route::post('authority-query-list', [AuditExecutionQueryController::class, 'authorityQueryList']);
+        Route::post('audit-query-response-of-rpu', [AuditExecutionQueryController::class, 'responseOfRpuQuery']);
     });
 
     //audit conduct memo

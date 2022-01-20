@@ -129,4 +129,16 @@ class AuditExecutionQueryController extends Controller
 
         return response()->json($response);
     }
+
+    public function responseOfRpuQuery(Request $request, AuditExecutionQueryService $auditExecutionQueryService): \Illuminate\Http\JsonResponse
+    {
+        $auditMemoRecommendationStore = $auditExecutionQueryService->responseOfRpuQuery($request);
+        if (isSuccessResponse($auditMemoRecommendationStore)) {
+            $response = responseFormat('success', $auditMemoRecommendationStore['data']);
+        } else {
+            $response = responseFormat('error', $auditMemoRecommendationStore['data']);
+        }
+
+        return response()->json($response);
+    }
 }
