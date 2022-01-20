@@ -43,7 +43,7 @@ class ApEntityIndividualAuditPlan extends Model
 
     public function ap_entities()
     {
-        return $this->hasMany(AnnualPlanEntitie::class, 'annual_plan_id', 'id');
+        return $this->hasMany(AnnualPlanEntitie::class, 'annual_plan_id', 'annual_plan_id');
     }
 
     public function audit_teams(): \Illuminate\Database\Eloquent\Relations\HasMany
