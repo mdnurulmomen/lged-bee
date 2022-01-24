@@ -27,12 +27,12 @@ class OpActivity extends Model
 
     public function activity_output()
     {
-        return $this->belongsTo(XstrategicPlanOutput::class, 'output_id', 'id');
+        return $this->belongsTo(XStrategicPlanOutput::class, 'output_id', 'id');
     }
 
     public function activity_outcome()
     {
-        return $this->belongsTo(XstrategicPlanOutcome::class, 'outcome_id', 'id');
+        return $this->belongsTo(XStrategicPlanOutcome::class, 'outcome_id', 'id');
     }
 
     public function activity_fiscal_year()
