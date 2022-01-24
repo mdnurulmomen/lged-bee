@@ -28,6 +28,7 @@ class ApOfficeOrder extends Model
         'advices',
         'approved_status',
         'order_cc_list',
+        'cc_sender_details',
         'team_members',
         'team_schedules',
         'draft_officer_id',
