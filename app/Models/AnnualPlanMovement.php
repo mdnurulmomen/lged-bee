@@ -14,6 +14,8 @@ class AnnualPlanMovement extends Model
     protected $fillable = [
         'fiscal_year_id',
         'op_audit_calendar_event_id',
+        'annual_plan_main_id',
+        'activity_type',
         'duration_id',
         'sender_office_id',
         'sender_office_name_en',

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
+use App\Models\AnnualPlanMain;
 use App\Models\AuditAssessmentScore;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
@@ -128,6 +129,8 @@ class AuditAssessmentService
             ];
             //for items
             $annualPlanEntityList = [];
+//            return ['status' => 'success', 'data' => $annual_plan_main;
+
             foreach ($request->audit_assessment_score_ids as $key => $score_id){
                 //for first half
                 if ($request->first_half_data[$key] == 1 && $request->has_first_half_annual_plans[$key]==0){
@@ -148,6 +151,22 @@ class AuditAssessmentService
                         'office_type_en' => $request->en_category_titles[$key],
                         'nominated_man_powers' => json_encode($nominated_man_powers, JSON_UNESCAPED_UNICODE),
                     ];
+
+                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
+                        ->where('op_audit_calendar_event_id',$op_audit_calendar_event_id)
+                        ->first();
+
+                    if($annual_plan_main){
+                        $annualPlanData ['annual_plan_main_id'] = $annual_plan_main->id;
+                    }else{
+                        $main_plan = New AnnualPlanMain();
+                        $main_plan->fiscal_year_id = $request->fiscal_year_id;
+                        $main_plan->op_audit_calendar_event_id = $op_audit_calendar_event_id;
+                        $main_plan->activity_type = 'compliance';
+                        $main_plan->approval_status = 'draft';
+                        $main_plan->save();
+                        $annualPlanData['annual_plan_main_id'] = $main_plan->id;
+                    }
 
                     $annualPlan = AnnualPlan::create($annualPlanData);
 
@@ -184,6 +203,22 @@ class AuditAssessmentService
                         'office_type_en' => $request->en_category_titles[$key],
                         'nominated_man_powers' => json_encode($nominated_man_powers, JSON_UNESCAPED_UNICODE),
                     ];
+
+                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
+                        ->where('op_audit_calendar_event_id',$op_audit_calendar_event_id)
+                        ->first();
+
+                    if($annual_plan_main){
+                        $annualPlanData ['annual_plan_main_id'] = $annual_plan_main->id;
+                    }else{
+                        $main_plan = New AnnualPlanMain();
+                        $main_plan->fiscal_year_id = $request->fiscal_year_id;
+                        $main_plan->op_audit_calendar_event_id = $op_audit_calendar_event_id;
+                        $main_plan->activity_type = 'compliance';
+                        $main_plan->approval_status = 'draft';
+                        $main_plan->save();
+                        $annualPlanData['annual_plan_main_id'] = $main_plan->id;
+                    }
 
                     $annualPlan = AnnualPlan::create($annualPlanData);
 

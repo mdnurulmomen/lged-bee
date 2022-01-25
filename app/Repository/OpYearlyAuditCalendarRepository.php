@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\AnnualPlanApproval;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
@@ -159,13 +160,14 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
     {
         $calendar_id = OpYearlyAuditCalendar::where('fiscal_year_id',$request->fiscal_year_id)->first()->id;
 
-        $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status',
-            'approval_status', 'activity_count', 'milestone_count')
-            ->where('op_yearly_audit_calendar_id', $calendar_id)
-            ->where('approval_status','!=','draft')
-            ->with('office')
-            ->get()
-            ->toArray();
+//        $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status',
+//            'approval_status', 'activity_count', 'milestone_count')
+//            ->where('op_yearly_audit_calendar_id', $calendar_id)
+//            ->where('approval_status','!=','draft')
+//            ->with('office')
+//            ->get()
+//            ->toArray();
+        $calendar_events = AnnualPlanApproval::where('fiscal_year_id',$request->fiscal_year_id)->where('activity_type',$request->activity_type)->get();
 
         if ($calendar_events) {
             return responseFormat('success', $calendar_events);

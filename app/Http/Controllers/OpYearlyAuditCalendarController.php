@@ -175,6 +175,7 @@ class OpYearlyAuditCalendarController extends Controller
     {
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
+            'activity_type' => 'nullable',
         ])->validate();
 
         $res = $opYearlyAuditCalendarRepository->yearlyAuditCalendarEventList($request);

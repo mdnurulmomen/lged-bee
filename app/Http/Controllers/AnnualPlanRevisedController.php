@@ -149,6 +149,8 @@ class AnnualPlanRevisedController extends Controller
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
             'office_id' => 'required|integer',
+            'annual_plan_main_id' => 'required|integer',
+            'activity_type' => 'nullable',
             'cdesk' => 'required|json',
         ])->validate();
 
@@ -221,6 +223,7 @@ class AnnualPlanRevisedController extends Controller
 
         Validator::make($request->all(), [
             'fiscal_year_id' => 'required|integer',
+            'office_id' => 'required|integer',
             'op_audit_calendar_event_id' => 'required|integer',
             'receiver_type' => 'required',
             'status' => 'required',

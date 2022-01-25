@@ -7,6 +7,7 @@ use App\Models\ApPsrAduitObject;
 use App\Models\ApPsrLineOfEnquire;
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
+use App\Models\AnnualPlanMain;
 use App\Models\Apotti;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
@@ -64,8 +65,8 @@ class AnnualPlanRevisedService
                     $ms['assigned_staff'] = $assigned_staff;
                 }
 
-                $milestone['total_no_of_items'] = $total_no_of_items;
-                $milestone['total_assigned_staff'] = $total_assigned_staff;
+//                $milestone['total_no_of_items'] = $total_no_of_items;
+//                $milestone['total_assigned_staff'] = $total_assigned_staff;
             }
 
             $data = ['status' => 'success', 'data' => $schedules];
@@ -103,26 +104,23 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-
             $activity_id = $request->activity_id;
-            $query = AnnualPlan::query();
+            $activity_type = $request->activity_type;
+            $query = AnnualPlanMain::query();
 
-            $query->when($activity_id, function ($q, $activity_id) {
-                return $q->where('activity_id', $activity_id);
-            });
 
-            $annualPlanList = $query->with('ap_entities')
-                                    ->with('activity:id,title_en,title_bn,activity_key')
+            $annualPlanList = $query->with('annual_plan_items.ap_entities')
+                                    ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
                                     ->where('fiscal_year_id', $request->fiscal_year_id)
-                                    ->orderBy('activity_id','ASC')->get();
+                                    ->where('activity_type', $activity_type)
+                                    ->whereHas('annual_plan_items', function($q) use ($activity_id){
+                                        $q->where('activity_id', $activity_id);
+                                    })->first();
 
-            $approval_status = OpOrganizationYearlyAuditCalendarEvent::select('approval_status')
-                ->where('office_id', $cdesk->office_id)
-                ->first()->approval_status;
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
             $annualPlan['annual_plan_list'] = $annualPlanList;
-            $annualPlan['approval_status'] = $approval_status;
+            $annualPlan['approval_status'] = '';
             $annualPlan['op_audit_calendar_event_id'] = $op_audit_calendar_event_id;
 
             $data = ['status' => 'success', 'data' => $annualPlan];
@@ -165,6 +163,7 @@ class AnnualPlanRevisedService
         \DB::beginTransaction();
         try {
 
+//            return ['status' => 'error', 'data' => $request->all()];
             $plan_data = [
                 'schedule_id' => 0,
                 'milestone_id' => 0,
@@ -190,73 +189,79 @@ class AnnualPlanRevisedService
                 'comment' => empty($request->comment) ? null : $request->comment,
             ];
 
-            $plan = AnnualPlan::create($plan_data);
-
-            $subject_matter_data = [
-                'annual_plan_main_id' => '',
-                'annual_plan_id' => '',
-                'vumika' => $request->vumika,
-                'subject_matter_en' => $request->subject_matter,
-                'subject_matter_bn' => '',
-                'parent_id' => 0,
-            ];
-
-            $subject_matter = ApPsrSubjectMatter::create($subject_matter_data);
-
-            if($subject_matter->id){
-                foreach ($request->sub_subject_list as $key => $sub_m) {
-                    if ($key != 'undefined') {
-                        $ap_sub = new ApPsrSubjectMatter();
-                        $ap_sub->parent_id = $subject_matter->id;
-                        $ap_sub->annual_plan_main_id = '';
-                        $ap_sub->annual_plan_id = '';
-                        $ap_sub->vumika = '';
-                        $ap_sub->subject_matter_en = $sub_m['sub_subject_matter'];
-                        $ap_sub->subject_matter_bn = '';
-                        $log=$ap_sub->save();
-                    }
-                }
+            if($request->annual_plan_main_id){
+                $plan_data['annual_plan_main_id'] = $request->annual_plan_main_id;
+            }else{
+                $main_plan = New AnnualPlanMain();
+                $main_plan->fiscal_year_id = $request->fiscal_year_id;
+                $main_plan->op_audit_calendar_event_id = $request->audit_calendar_event_id;
+                $main_plan->activity_type = $request->activity_type;
+                $main_plan->approval_status = 'draft';
+                $main_plan->save();
+                $plan_data['annual_plan_main_id'] = $main_plan->id;
             }
 
-            $audit_object_data = [
-                'annual_plan_main_id' => '',
-                'annual_plan_id' => '',
-                'audit_objective_en' => $request->audit_objective,
-                'audit_objective_bn' => '',
-                'parent_id' => 0,
-            ];
+            $plan = AnnualPlan::create($plan_data);
 
-            $audit_object = ApPsrAduitObject::create($audit_object_data);
+            if($request->activity_type == 'performance'){
+                $subject_matter_data = [
+                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+                    'annual_plan_id' => $plan->id,
+                    'vumika' => $request->vumika,
+                    'subject_matter_en' => $request->subject_matter,
+                    'subject_matter_bn' => '',
+                    'parent_id' => 0,
+                ];
 
-            if($audit_object->id){
-                foreach ($request->sub_objective_list as $key => $sub_o) {
-                    if ($key != 'undefined') {
-                        // $ap_subo = new ApPsrAduitObject();
-                        // $ap_subo->parent_id = $audit_object->id;
-                        // $ap_subo->annual_plan_main_id = '';
-                        // $ap_subo->annual_plan_id = '';
-                        // $ap_subo->audit_objective_en = $sub_o['sub_objective'];
-                        // $ap_sub->audit_objective_bn = '';
-                        // $ap_sub->save();
+                $subject_matter = ApPsrSubjectMatter::create($subject_matter_data);
 
-                        $sub_object_data = [
-                            'annual_plan_main_id' => '',
-                            'annual_plan_id' => '',
-                            'audit_objective_en' => $sub_o['sub_objective'],
-                            'audit_objective_bn' => '',
-                            'parent_id' => $audit_object->id,
-                        ];
+                if($subject_matter->id){
+                    foreach ($request->sub_subject_list as $key => $sub_m) {
+                        if ($key != 'undefined') {
+                            $ap_sub = new ApPsrSubjectMatter();
+                            $ap_sub->parent_id = $subject_matter->id;
+                            $ap_sub->annual_plan_main_id = $plan_data['annual_plan_main_id'];
+                            $ap_sub->annual_plan_id = $plan->id;
+                            $ap_sub->vumika = '';
+                            $ap_sub->subject_matter_en = $sub_m['sub_subject_matter'];
+                            $ap_sub->subject_matter_bn = '';
+                            $log=$ap_sub->save();
+                        }
+                    }
+                }
 
-                        $sub_object = ApPsrAduitObject::create($sub_object_data);
-                        if($sub_object->id){
-                            foreach ($sub_o['line_of_enquires'] as $val ) {
+                $audit_object_data = [
+                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+                    'annual_plan_id' => $plan->id,
+                    'audit_objective_en' => $request->audit_objective,
+                    'audit_objective_bn' => $plan->id,
+                    'parent_id' => 0,
+                ];
 
-                                $ap_sub = new ApPsrLineOfEnquire();
-                                $ap_sub->sub_objective_id = $sub_object->id;
-                                $ap_sub->line_of_enquire_en = $val;
-                                $ap_sub->line_of_enquire_bn = '';
-                                $ap_sub->save();
+                $audit_object = ApPsrAduitObject::create($audit_object_data);
 
+                if($audit_object->id){
+                    foreach ($request->sub_objective_list as $key => $sub_o) {
+                        if ($key != 'undefined') {
+                            $sub_object_data = [
+                                'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+                                'annual_plan_id' => $plan->id,
+                                'audit_objective_en' => $sub_o['sub_objective'],
+                                'audit_objective_bn' => '',
+                                'parent_id' => $audit_object->id,
+                            ];
+
+                            $sub_object = ApPsrAduitObject::create($sub_object_data);
+                            if($sub_object->id){
+                                foreach ($sub_o['line_of_enquires'] as $val ) {
+
+                                    $ap_sub = new ApPsrLineOfEnquire();
+                                    $ap_sub->sub_objective_id = $sub_object->id;
+                                    $ap_sub->line_of_enquire_en = $val;
+                                    $ap_sub->line_of_enquire_bn = '';
+                                    $ap_sub->save();
+
+                                }
                             }
                         }
                     }
@@ -266,6 +271,7 @@ class AnnualPlanRevisedService
 
             foreach ($request->milestone_list as $milestone) {
                 $ap_milestone = new ApMilestone();
+                $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
                 $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
                 $ap_milestone->annual_plan_id = $plan->id;
                 $ap_milestone->activity_id = $milestone['activity_id'];
@@ -411,12 +417,20 @@ class AnnualPlanRevisedService
 
             $directorate = XResponsibleOffice::where('office_id', $office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
-            $plan_datas = AnnualPlan::with(['ap_entities'])->where('fiscal_year_id', $request->fiscal_year_id)->with('activity.milestones.milestone_calendar')->get()->toArray();
+            $plan_datas = AnnualPlanMain::with('annual_plan_items')
+                ->with('annual_plan_items.ap_entities')
+                ->with('annual_plan_items.activity.milestones.milestone_calendar')
+                ->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('activity_type', $request->activity_type)
+                ->where('id', $request->annual_plan_main_id)
+                ->first();
+//            return ['status' => 'success', 'data' => $plan_datas['annual_plan_items']];
+
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
             $all_ministries = [];
             $annual_plan = [];
-            foreach ($plan_datas as $plan_data) {
+            foreach ($plan_datas['annual_plan_items'] as $plan_data) {
                 $activity = $plan_data['activity'];
                 unset($plan_data['activity']);
                 $annual_plan[$plan_data['id']] = $plan_data;
@@ -442,8 +456,11 @@ class AnnualPlanRevisedService
                     'ministry_name_bn' => implode(' , ', array_unique($ministriesBn)),
                 ];
 
+
+
                 $all_ministries[$plan_data['id']] = $ministries;
-                $plan_data_final[$activity['id']] = $activity + ['ministries' => $ministries] + ['annual_plans' => $annual_plan];
+//                return ['status' => 'success', 'data' => $activity];
+                $plan_data_final[$activity['id']] = ['activity' => $activity] + ['ministries' => $ministries] + ['annual_plans' => $annual_plan];
             }
             $pdf_data = [
                 'office_info' => $directorate,

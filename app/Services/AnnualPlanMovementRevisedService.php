@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\AnnualPlan;
+use App\Models\AnnualPlanApproval;
+use App\Models\AnnualPlanMain;
 use App\Models\AnnualPlanMovement;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
@@ -18,18 +20,25 @@ class AnnualPlanMovementRevisedService
     public function sendAnnualPlanSenderToReceiver(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-
-        $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
         try {
+            $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
             $isExistApprovalAuthority = AnnualPlanMovement::where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
                 ->where('receiver_officer_id', $request->receiver_officer_id)
+                ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                ->where('activity_type', $request->activity_type)
                 ->exists();
 
             if ($isExistApprovalAuthority == false){
                 $data = [
                     'fiscal_year_id' => $request->fiscal_year_id,
                     'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,
+                    'annual_plan_main_id' => $request->annual_plan_main_id,
+                    'activity_type' => $request->activity_type,
                     'duration_id' => $xFiscalYear->duration_id,
 
                     'sender_office_id' => $cdesk->office_id,
@@ -65,9 +74,26 @@ class AnnualPlanMovementRevisedService
 
                 AnnualPlanMovement::create($data);
 
+                $annual_plan_approval = New AnnualPlanApproval();
+                $annual_plan_approval->fiscal_year_id = $request->fiscal_year_id;
+                $annual_plan_approval->office_id = $cdesk->office_id;
+                $annual_plan_approval->office_en = $cdesk->office_name_en;
+                $annual_plan_approval->office_bn = $cdesk->office_name_bn;
+                $annual_plan_approval->op_audit_calendar_event_id = $request->op_audit_calendar_event_id;
+                $annual_plan_approval->annual_plan_main_id = $request->annual_plan_main_id;
+                $annual_plan_approval->activity_type = $request->activity_type;
+                $annual_plan_approval->approval_status = 'pending';
+//                $annual_plan_approval->status = 'null';
+                $annual_plan_approval->save();
+
+                AnnualPlanMain::where('id',$request->annual_plan_main_id)->update(['approval_status' => 'pending']);
+
+
+
                 //update op organization yearly audit calendar event
-                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
-                    ->update(["approval_status" => $request->status]);
+//                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
+//                    ->update(["approval_status" => $request->status]);
+
 
                 $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
             }
@@ -77,13 +103,17 @@ class AnnualPlanMovementRevisedService
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
+        $this->emptyOfficeDBConnection();
         return $responseData;
     }
 
     public function sendAnnualPlanReceiverToSender(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
         try {
             $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
             $annualPlanMovement = AnnualPlanMovement::where('fiscal_year_id',$request->fiscal_year_id)
@@ -101,7 +131,8 @@ class AnnualPlanMovementRevisedService
                     'fiscal_year_id' => $request->fiscal_year_id,
                     'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,
                     'duration_id' => $xFiscalYear->duration_id,
-
+                    'annual_plan_main_id' => $request->annual_plan_main_id,
+                    'activity_type' => $request->activity_type,
                     'sender_office_id' => $cdesk->office_id,
                     'sender_office_name_en' => $cdesk->office_name_en,
                     'sender_office_name_bn' => $cdesk->office_name_bn,
@@ -136,24 +167,23 @@ class AnnualPlanMovementRevisedService
                 AnnualPlanMovement::create($data);
 
                 //update op organization yearly audit calendar event
-                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
+//                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
+//                    ->update(["approval_status" => $request->status]);
+
+                AnnualPlanApproval::where("annual_plan_main_id", $request->annual_plan_main_id)
+                    ->update(["approval_status" => $request->status]);
+
+                AnnualPlanMain::where("id", $request->annual_plan_main_id)
                     ->update(["approval_status" => $request->status]);
 
                 if($request->status == 'approved'){
-                    $office_id = OpOrganizationYearlyAuditCalendarEvent::find($request->op_audit_calendar_event_id)->office_id;
-                    $office_db_con_response = $this->switchOffice($office_id);
-                    if (!isSuccessResponse($office_db_con_response)) {
-                        return ['status' => 'error', 'data' => $office_db_con_response];
-                    }
-
                     $activity_list = AnnualPlan::Where('fiscal_year_id',$request->fiscal_year_id)
                         ->select(['activity_id',DB::raw("COUNT(id) as total_plan"),DB::raw("SUM(nominated_man_power_counts) as staff_assign"), DB::raw("SUM(budget) as budget")])
                         ->groupBy('activity_id')
                         ->get();
                     foreach ($activity_list as $activity){
-                        OpYearlyAuditCalendarResponsible::where('office_id',$office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0,'total_plan' => $activity['total_plan'] ? $activity['total_plan'] : 0]);
+                        OpYearlyAuditCalendarResponsible::where('office_id',$request->office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0,'total_plan' => $activity['total_plan'] ? $activity['total_plan'] : 0]);
                     }
-                    $this->emptyOfficeDBConnection();
                 }
 
                 $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
@@ -164,6 +194,7 @@ class AnnualPlanMovementRevisedService
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
+        $this->emptyOfficeDBConnection();
         return $responseData;
     }
 
@@ -181,9 +212,17 @@ class AnnualPlanMovementRevisedService
     }
     public function getScheduleInfo(Request $request): array
     {
-        try{
-            $ScheduleInfo = OpOrganizationYearlyAuditCalendarEventSchedule::where('id',$request->schedule_id)->first();
+//        return ['status' => 'success', 'data' => $request->cdesk];
 
+        $cdesk = json_decode($request->cdesk, false);
+        try{
+
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $ScheduleInfo = OpOrganizationYearlyAuditCalendarEventSchedule::where('id',$request->schedule_id)->first();
             $responseData = ['status' => 'success', 'data' => $ScheduleInfo];
         }catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
@@ -194,11 +233,14 @@ class AnnualPlanMovementRevisedService
 
     public function submitMilestoneValue(Request $request): array
     {
+        $cdesk = json_decode($request->cdesk, false);
         try{
-
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
             OpOrganizationYearlyAuditCalendarEventSchedule::where("id", $request->schedule_id)
             ->update(["no_of_items" => $request->no_of_items, 'staff_assigne' => $request->staff_assigne]);
-
             $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
 
         }catch (\Exception $exception) {

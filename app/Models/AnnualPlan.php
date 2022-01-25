@@ -12,6 +12,7 @@ class AnnualPlan extends Model
     protected $connection = "OfficeDB";
 
     protected $fillable = [
+        'annual_plan_main_id',
         'op_audit_calendar_event_id',
         'schedule_id',
         'activity_id',
