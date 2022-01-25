@@ -276,7 +276,6 @@ class AnnualPlanRevisedController extends Controller
         Validator::make($request->all(), [
             'schedule_id' => 'required|integer',
             'no_of_items' => 'required|integer',
-            'no_of_items' => 'required|integer',
         ])->validate();
 
         $responseData = $annualPlanMovementRevisedService->submitMilestoneValue($request);

@@ -43,17 +43,17 @@ class AnnualPlanRevisedService
                 ->groupBy('activity_id')
                 ->toArray();
 
-//            return ['status' => 'success', 'data' => $schedules];
-
-
             foreach ($schedules as $key => &$milestone) {
-                $total_no_of_items = 0;
-                $total_assigned_staff = 0;
+
+                $no_of_items = array_column($milestone, 'no_of_items');
+                $total_no_of_items =  array_sum($no_of_items);
+
+                $assigned_staff = array_column($milestone, 'staff_assigne');
+                $total_assigned_staff =  array_sum($assigned_staff);
+
                 foreach ($milestone as &$ms) {
                     $assigned_budget = 0;
                     $assigned_staff = 0;
-                    $total_no_of_items = $total_no_of_items + (int)$ms['no_of_items'];
-                    $total_assigned_staff = $total_assigned_staff + (int)$ms['staff_assigne'];
 
                     foreach ($ms['annual_plan'] as $annual_plan) {
                         $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
@@ -63,10 +63,10 @@ class AnnualPlanRevisedService
 
                     $ms['assigned_budget'] = $assigned_budget;
                     $ms['assigned_staff'] = $assigned_staff;
+                    $ms['total_no_of_items'] = $total_no_of_items;
+                    $ms['total_assigned_staff'] = $total_assigned_staff;
                 }
 
-//                $milestone['total_no_of_items'] = $total_no_of_items;
-//                $milestone['total_assigned_staff'] = $total_assigned_staff;
             }
 
             $data = ['status' => 'success', 'data' => $schedules];
