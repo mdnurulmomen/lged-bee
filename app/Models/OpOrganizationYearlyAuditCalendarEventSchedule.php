@@ -28,6 +28,8 @@ class OpOrganizationYearlyAuditCalendarEventSchedule extends Model
         'milestone_title_en',
         'milestone_title_bn',
         'milestone_target',
+        'no_of_items',
+        'staff_assigne',
     ];
 
     public function milestones()

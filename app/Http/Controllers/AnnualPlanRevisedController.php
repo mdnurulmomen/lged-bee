@@ -115,6 +115,8 @@ class AnnualPlanRevisedController extends Controller
 
         $storeAnnualPlan = $annualPlanRevisedService->storeAnnualPlan($request);
 
+
+
         if (isSuccessResponse($storeAnnualPlan)) {
             $response = responseFormat('success', $storeAnnualPlan['data']);
         } else {
@@ -243,6 +245,38 @@ class AnnualPlanRevisedController extends Controller
         ])->validate();
 
         $responseData = $annualPlanMovementRevisedService->getMovementHistories($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+    public function getScheduleInfo(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'schedule_id' => 'required|integer',
+        ])->validate();
+
+        $responseData = $annualPlanMovementRevisedService->getScheduleInfo($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+    public function submitMilestoneValue(Request $request, AnnualPlanMovementRevisedService $annualPlanMovementRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'schedule_id' => 'required|integer',
+            'no_of_items' => 'required|integer',
+            'no_of_items' => 'required|integer',
+        ])->validate();
+
+        $responseData = $annualPlanMovementRevisedService->submitMilestoneValue($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

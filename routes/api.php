@@ -116,6 +116,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('send-annual-plan-sender-to-receiver', [AnnualPlanRevisedController::class, 'sendAnnualPlanSenderToReceiver']);
             Route::post('get-movement-histories', [AnnualPlanRevisedController::class, 'getMovementHistories']);
             Route::post('get-current-desk-approval-authority', [AnnualPlanRevisedController::class, 'getCurrentDeskApprovalAuthority']);
+            Route::post('submit-milestone-value', [AnnualPlanRevisedController::class, 'submitMilestoneValue']);
+            Route::post('get-schedule-info', [AnnualPlanRevisedController::class, 'getScheduleInfo']);
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {

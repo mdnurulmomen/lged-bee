@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanMovement;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
+use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
 use App\Models\XFiscalYear;
 use App\Traits\GenericData;
@@ -173,6 +174,33 @@ class AnnualPlanMovementRevisedService
                 ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
                 ->get();
             $responseData = ['status' => 'success', 'data' => $annualPlanMovementList];
+        }catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $responseData;
+    }
+    public function getScheduleInfo(Request $request): array
+    {
+        try{
+            $ScheduleInfo = OpOrganizationYearlyAuditCalendarEventSchedule::where('id',$request->schedule_id)->first();
+
+            $responseData = ['status' => 'success', 'data' => $ScheduleInfo];
+        }catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $responseData;
+    }
+
+
+    public function submitMilestoneValue(Request $request): array
+    {
+        try{
+
+            OpOrganizationYearlyAuditCalendarEventSchedule::where("id", $request->schedule_id)
+            ->update(["no_of_items" => $request->no_of_items, 'staff_assigne' => $request->staff_assigne]);
+
+            $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
+
         }catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\ApPsrSubjectMatter;
+use App\Models\ApPsrAduitObject;
+use App\Models\ApPsrLineOfEnquire;
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
 use App\Models\Apotti;
@@ -14,6 +17,7 @@ use App\Models\XResponsibleOffice;
 use App\Models\ApMilestone;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
+use DB;
 
 class AnnualPlanRevisedService
 {
@@ -32,7 +36,7 @@ class AnnualPlanRevisedService
 
             $schedules = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_responsible_id', $cdesk->office_id)
-                ->select('id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
+                ->select('staff_assigne', 'no_of_items', 'id AS schedule_id', 'op_audit_calendar_event_id', 'fiscal_year_id', 'activity_id', 'activity_type', 'activity_title_en', 'activity_title_bn', 'activity_responsible_id AS office_id', 'activity_milestone_id', 'op_yearly_audit_calendar_activity_id', 'op_yearly_audit_calendar_id', 'milestone_title_en', 'milestone_title_bn', 'milestone_target')
                 ->with(['annual_plan', 'op_organization_yearly_audit_calendar_event'])
                 ->get()
                 ->groupBy('activity_id')
@@ -42,16 +46,26 @@ class AnnualPlanRevisedService
 
 
             foreach ($schedules as $key => &$milestone) {
+                $total_no_of_items = 0;
+                $total_assigned_staff = 0;
                 foreach ($milestone as &$ms) {
                     $assigned_budget = 0;
                     $assigned_staff = 0;
+                    $total_no_of_items = $total_no_of_items + (int)$ms['no_of_items'];
+                    $total_assigned_staff = $total_assigned_staff + (int)$ms['staff_assigne'];
+
                     foreach ($ms['annual_plan'] as $annual_plan) {
                         $assigned_budget = $assigned_budget + (int)$annual_plan['budget'];
                         $assigned_staff = $assigned_staff + (int)$annual_plan['nominated_man_power_counts'];
                     }
+
+
                     $ms['assigned_budget'] = $assigned_budget;
                     $ms['assigned_staff'] = $assigned_staff;
                 }
+
+                $milestone['total_no_of_items'] = $total_no_of_items;
+                $milestone['total_assigned_staff'] = $total_assigned_staff;
             }
 
             $data = ['status' => 'success', 'data' => $schedules];
@@ -150,6 +164,7 @@ class AnnualPlanRevisedService
         }
         \DB::beginTransaction();
         try {
+
             $plan_data = [
                 'schedule_id' => 0,
                 'milestone_id' => 0,
@@ -176,6 +191,79 @@ class AnnualPlanRevisedService
             ];
 
             $plan = AnnualPlan::create($plan_data);
+
+            $subject_matter_data = [
+                'annual_plan_main_id' => '',
+                'annual_plan_id' => '',
+                'vumika' => $request->vumika,
+                'subject_matter_en' => $request->subject_matter,
+                'subject_matter_bn' => '',
+                'parent_id' => 0,
+            ];
+
+            $subject_matter = ApPsrSubjectMatter::create($subject_matter_data);
+
+            if($subject_matter->id){
+                foreach ($request->sub_subject_list as $key => $sub_m) {
+                    if ($key != 'undefined') {
+                        $ap_sub = new ApPsrSubjectMatter();
+                        $ap_sub->parent_id = $subject_matter->id;
+                        $ap_sub->annual_plan_main_id = '';
+                        $ap_sub->annual_plan_id = '';
+                        $ap_sub->vumika = '';
+                        $ap_sub->subject_matter_en = $sub_m['sub_subject_matter'];
+                        $ap_sub->subject_matter_bn = '';
+                        $log=$ap_sub->save();
+                    }
+                }
+            }
+
+            $audit_object_data = [
+                'annual_plan_main_id' => '',
+                'annual_plan_id' => '',
+                'audit_objective_en' => $request->audit_objective,
+                'audit_objective_bn' => '',
+                'parent_id' => 0,
+            ];
+
+            $audit_object = ApPsrAduitObject::create($audit_object_data);
+
+            if($audit_object->id){
+                foreach ($request->sub_objective_list as $key => $sub_o) {
+                    if ($key != 'undefined') {
+                        // $ap_subo = new ApPsrAduitObject();
+                        // $ap_subo->parent_id = $audit_object->id;
+                        // $ap_subo->annual_plan_main_id = '';
+                        // $ap_subo->annual_plan_id = '';
+                        // $ap_subo->audit_objective_en = $sub_o['sub_objective'];
+                        // $ap_sub->audit_objective_bn = '';
+                        // $ap_sub->save();
+
+                        $sub_object_data = [
+                            'annual_plan_main_id' => '',
+                            'annual_plan_id' => '',
+                            'audit_objective_en' => $sub_o['sub_objective'],
+                            'audit_objective_bn' => '',
+                            'parent_id' => $audit_object->id,
+                        ];
+
+                        $sub_object = ApPsrAduitObject::create($sub_object_data);
+                        if($sub_object->id){
+                            foreach ($sub_o['line_of_enquires'] as $val ) {
+
+                                $ap_sub = new ApPsrLineOfEnquire();
+                                $ap_sub->sub_objective_id = $sub_object->id;
+                                $ap_sub->line_of_enquire_en = $val;
+                                $ap_sub->line_of_enquire_bn = '';
+                                $ap_sub->save();
+
+                            }
+                        }
+                    }
+                }
+            }
+
+
             foreach ($request->milestone_list as $milestone) {
                 $ap_milestone = new ApMilestone();
                 $ap_milestone->fiscal_year_id = $milestone['fiscal_year_id'];
@@ -187,6 +275,8 @@ class AnnualPlanRevisedService
                 $ap_milestone->end_date = $milestone['end_date'];
                 $ap_milestone->save();
             }
+
+
 
             foreach ($request->entity_list as $key => $entity) {
                 if ($key != 'undefined') {
