@@ -239,9 +239,22 @@ class AnnualPlanMovementRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            OpOrganizationYearlyAuditCalendarEventSchedule::where("id", $request->schedule_id)
+
+            OpOrganizationYearlyAuditCalendarEventSchedule::where("id", $request->schedule_id)->where('fiscal_year_id',$request->fiscal_year_id)
             ->update(["no_of_items" => $request->no_of_items, 'staff_assigne' => $request->staff_assigne]);
-            $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
+
+            $schedule_data = OpOrganizationYearlyAuditCalendarEventSchedule::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('activity_id',$request->activity_id)
+                ->select(DB::raw("SUM(staff_assigne) as staff_assigne"),DB::raw("SUM(no_of_items) as no_of_items"))
+                ->first();
+
+            OpYearlyAuditCalendarResponsible::where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('activity_id',$request->activity_id)
+                ->where('office_id',$cdesk->office_id)
+                ->update(['assigned_staffs' => $schedule_data->staff_assigne,'total_plan' => $schedule_data->no_of_items]);
+
+            $responseData = ['status' => 'success', 'data' => 'Calender Update Successfully'];
 
         }catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];

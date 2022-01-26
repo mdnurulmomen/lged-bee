@@ -275,6 +275,8 @@ class AnnualPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'schedule_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'activity_id' => 'required|integer',
             'no_of_items' => 'required|integer',
         ])->validate();
 
