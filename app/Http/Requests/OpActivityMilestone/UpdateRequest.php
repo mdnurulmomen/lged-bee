@@ -31,7 +31,6 @@ class UpdateRequest extends FormRequest
             'activity_id' => 'integer|required',
             'title_en' => 'string|required',
             'title_bn' => 'string|required',
-            'target_date' => 'date|required',
         ];
     }
 
@@ -48,7 +47,6 @@ class UpdateRequest extends FormRequest
             'output_id.integer' => 'Output ID Should Be Number',
             'activity_id.required' => 'Activity ID Required',
             'activity_id.integer' => 'Activity ID Should Be Number',
-            'target_date.required' => 'Target date is required',
             'target_date.date' => 'Target Date should be in date format.',
             'title_en.required' => 'Activity Title (English) Required',
             'title_en.string' => 'Activity Title (English) Should Be Text',
