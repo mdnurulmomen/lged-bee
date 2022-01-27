@@ -113,8 +113,8 @@ class AnnualPlanRevisedService
                                     ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
                                     ->where('fiscal_year_id', $request->fiscal_year_id)
                                     ->where('activity_type', $activity_type)
-                                    ->whereHas('annual_plan_items', function($q) use ($activity_id){
-                                        $q->where('activity_id', $activity_id);
+                                    ->with('annual_plan_items', function($q) use ($activity_id){
+                                       return $q->where('activity_id', $activity_id);
                                     })->first();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
