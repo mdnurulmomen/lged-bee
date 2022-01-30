@@ -15,4 +15,10 @@ class ApPsrLineOfEnquire extends Model
         'line_of_enquire_bn'
 
     ];
+
+
+    public function audit_object()
+    {
+        return $this->belongsTo(ApPsrAduitObject::class, 'id', 'sub_objective_id');
+    }
 }

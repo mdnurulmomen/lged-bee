@@ -17,4 +17,9 @@ class ApPsrAduitObject extends Model
         'parent_id'
 
     ];
+
+    public function line_of_enquiries()
+    {
+        return $this->hasMany(ApPsrLineOfEnquire::class, 'sub_objective_id', 'id');
+    }
 }

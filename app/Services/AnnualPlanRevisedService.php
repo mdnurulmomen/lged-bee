@@ -152,6 +152,37 @@ class AnnualPlanRevisedService
         return $data;
 
     }
+    public function getAnnualPlanSubjectMatterInfo(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $annualPlanSubjectMatter = ApPsrSubjectMatter::where('annual_plan_id', $request->annual_plan_id)->where('parent_id',0)->first();
+            $annualPlanSubSubjectMatter = ApPsrSubjectMatter::where('parent_id', $annualPlanSubjectMatter->id)->get();
+
+            $annualPlanAduitObjective = ApPsrAduitObject::where('annual_plan_id', $request->annual_plan_id)->where('parent_id',0)->first();
+            $annualPlanSubAduitObjective = ApPsrAduitObject::where('parent_id', $annualPlanAduitObjective->id)
+                                                        ->with('line_of_enquiries')
+                                                        ->get();
+
+            $annualPlanSubjectMatterInfo['main_topic'] = $annualPlanSubjectMatter;
+            $annualPlanSubjectMatterInfo['sub_topic'] = $annualPlanSubSubjectMatter;
+            $annualPlanSubjectMatterInfo['aduit_object'] = $annualPlanAduitObjective;
+            $annualPlanSubjectMatterInfo['sub_object'] = $annualPlanSubAduitObjective;
+
+            $data = ['status' => 'success', 'data' => $annualPlanSubjectMatterInfo];
+
+        } catch (\Exception $exception) {
+            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        return $data;
+
+    }
 
     public function storeAnnualPlan(Request $request): array
     {

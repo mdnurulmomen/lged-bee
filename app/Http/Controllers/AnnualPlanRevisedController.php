@@ -83,6 +83,23 @@ class AnnualPlanRevisedController extends Controller
 
         return response()->json($response);
     }
+    public function getAnnualPlanSubjectMatterInfo(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'annual_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $get_annual_plan_subject_matter_info = $annualPlanRevisedService->getAnnualPlanSubjectMatterInfo($request);
+
+        if (isSuccessResponse($get_annual_plan_subject_matter_info)) {
+            $response = responseFormat('success', $get_annual_plan_subject_matter_info['data']);
+        } else {
+            $response = responseFormat('error', $get_annual_plan_subject_matter_info['data']);
+        }
+
+        return response()->json($response);
+    }
 
 
     public function showNominatedOffices(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
