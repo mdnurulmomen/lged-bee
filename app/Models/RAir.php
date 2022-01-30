@@ -28,17 +28,17 @@ class RAir extends Model
 
     public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(XFiscalYear::class, 'id', 'fiscal_year_id');
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 
     public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(AnnualPlan::class, 'id', 'annual_plan_id');
+        return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
     }
 
     public function audit_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'id', 'audit_plan_id');
+        return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
     }
 
     public function r_air_child(): \Illuminate\Database\Eloquent\Relations\BelongsTo

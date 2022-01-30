@@ -5,12 +5,12 @@ namespace App\Services;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\ApottiStatus;
-use App\Models\AuditPlanTeamInfo;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use DB;
+
 class QacService
 {
     use GenericData, ApiHeart;

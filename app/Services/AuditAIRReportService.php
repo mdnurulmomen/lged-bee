@@ -80,6 +80,8 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airReport = RAir::with('latest_r_air_movement')
+                ->with('annual_plan:id,office_type,total_unit_no,subject_matter')
+                ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
                 ->where('id',$request->air_report_id)
                 ->first()
                 ->toArray();
@@ -161,7 +163,6 @@ class AuditAIRReportService
         }
     }
 
-
     public function getAuditTeam(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -204,7 +205,6 @@ class AuditAIRReportService
         }
     }
 
-
     public function getAuditApottiList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -233,7 +233,6 @@ class AuditAIRReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
-
 
     public function getAirWiseAuditApottiList(Request $request): array
     {
@@ -430,7 +429,6 @@ class AuditAIRReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
-
 
     public function getAirLastMovement(Request $request): array
     {

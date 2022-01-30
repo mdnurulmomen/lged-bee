@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Followup\BroadsheetReplyController;
 use App\Http\Controllers\Report\AuditAIRReportController;
 use App\Http\Controllers\Report\RpuAirReportController;
 use Illuminate\Support\Facades\Route;
@@ -185,6 +186,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('observation_communication', [AuditObservationController::class, 'observationCommunication']);
             Route::post('observation_communication_lists', [AuditObservationController::class, 'observationCommunicationLists']);
         });
+
+        //broadsheet reply
+        Route::group(['prefix' => 'broadsheet-reply/'], function () {
+            Route::post('get-apotti-item-list', [BroadsheetReplyController::class, 'getApottiItemList']);
+            Route::post('get-apotti-item-info', [BroadsheetReplyController::class, 'getApottiItemInfo']);
+        });
     });
 
     //mis and dashboard
@@ -267,6 +274,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('apotti-final-approval', [AuditAIRReportController::class, 'apottiFinalApproval']);
             Route::post('air-send-to-rpu', [RpuAirReportController::class, 'airSendToRpu']);
             Route::post('received-air-by-rpu', [RpuAirReportController::class, 'receivedAirByRpu']);
+            Route::post('audit-apotti-item-response-by-rpu', [RpuAirReportController::class, 'apottiItemResponseByRpu']);
         });
     });
 

@@ -34,4 +34,17 @@ class RpuAirReportController extends Controller
         return response()->json($response);
     }
 
+    public function apottiItemResponseByRpu(Request $request, RpuAirReportService $rpuAirReportServices): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $rpuAirReportServices->apottiItemResponseByRpu($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
 }
