@@ -250,6 +250,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'audit-quality-control'], function () {
         Route::post('qac-apotti', [QacController::class, 'qacApotti']);
         Route::post('get-qac-apotti-status', [QacController::class, 'getQacApottiStatus']);
+        Route::post('store-qac-committee', [QacController::class, 'storeQacCommittee']);
+        Route::post('get-qac-committee-list', [QacController::class, 'getQacCommitteeList']);
+        Route::post('get-qac-committee-wise-members', [QacController::class, 'getQacCommitteeWiseMember']);
+        Route::post('store-air-wise-committee', [QacController::class, 'storeAirWiseCommittee']);
+        Route::post('get-air-wise-committee', [QacController::class, 'getAirWiseCommittee']);
     });
 
     //audit report

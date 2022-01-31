@@ -244,7 +244,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement'])->where('id',$request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities'])->where('id',$request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
             if($request->qac_type == 'qac-1'){

@@ -31,4 +31,64 @@ class QacController extends Controller
         return response()->json($response);
     }
 
+    public function storeQacCommittee(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->storeQacCommittee($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getQacCommitteeList(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->getQacCommitteeList($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getQacCommitteeWiseMember(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->getQacCommitteeWiseMember($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function storeAirWiseCommittee(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->storeAirWiseCommittee($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getAirWiseCommittee(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->getAirWiseCommittee($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
 }

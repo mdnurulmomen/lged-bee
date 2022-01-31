@@ -37,6 +37,11 @@ class RAir extends Model
         return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
     }
 
+    public function ap_entities()
+    {
+        return $this->hasMany(AnnualPlanEntitie::class, 'annual_plan_id', 'annual_plan_id');
+    }
+
     public function audit_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
