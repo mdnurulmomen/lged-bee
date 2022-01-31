@@ -23,4 +23,10 @@ class ApottiItem extends Model
     {
         return self::$memo_status_list[$this->attributes['memo_status']];
     }
+
+    public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
 }

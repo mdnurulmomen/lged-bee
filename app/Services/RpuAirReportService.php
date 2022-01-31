@@ -47,6 +47,7 @@ class RpuAirReportService
             $air_list = [];
             foreach ($entity_list as $entity){
                 $data['report_number'] = $air_info->report_number;
+                $data['report_name'] = $air_info->report_name;
                 $data['air_id'] = $air_info->id;
                 $data['fiscal_year_id'] = $air_info->fiscal_year_id;
                 $data['cost_center_id'] = $entity->entity_id;

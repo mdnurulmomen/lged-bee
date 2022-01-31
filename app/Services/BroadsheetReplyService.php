@@ -42,7 +42,7 @@ class BroadsheetReplyService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $apottiIteminfo = ApottiItem::find($request->apotti_item_id);
+            $apottiIteminfo = ApottiItem::with(['fiscal_year'])->find($request->apotti_item_id);
             return ['status' => 'success', 'data' => $apottiIteminfo];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

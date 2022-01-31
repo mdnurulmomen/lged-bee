@@ -14,6 +14,7 @@ class RAir extends Model
     protected $fillable = [
         'parent_id',
         'report_number',
+        'report_name',
         'fiscal_year_id',
         'annual_plan_id',
         'audit_plan_id',

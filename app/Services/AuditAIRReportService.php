@@ -100,6 +100,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airData = [
+                'report_name' => $request->audit_plan_entities,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id,
@@ -396,6 +397,7 @@ class AuditAIRReportService
 
                 $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
                 $airData = [
+                    'report_name' => $rAirData['report_name'],
                     'parent_id' => $rAirData['id'],
                     'fiscal_year_id' => $rAirData['fiscal_year_id'],
                     'annual_plan_id' => $rAirData['annual_plan_id'],
