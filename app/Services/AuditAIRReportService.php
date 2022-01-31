@@ -308,6 +308,27 @@ class AuditAIRReportService
         }
     }
 
+    //for set qac apotti
+    public function getAirAndApottiTypeWiseQACApotti(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)->where('is_delete',0)->pluck('apotti_id');
+            $apottiList = Apotti::whereIn('id',$qacApottis)
+                ->where('apotti_type',$request->apotti_type)
+                ->get()
+                ->toArray();
+            return ['status' => 'success', 'data' => $apottiList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function getAuditApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);

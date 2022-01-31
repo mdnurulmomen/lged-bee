@@ -15,6 +15,7 @@ use App\Traits\GenericData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use DB;
 
 class AcMemoService
 {
@@ -557,12 +558,20 @@ class AcMemoService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
+        DB::beginTransaction();
         try {
 
             AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            ApottiItem::where('memo_id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            $onucchedItem = ApottiItem::where('memo_id',$request->memo_id)->first()->toArray();
+            Apotti::where('id',$onucchedItem['apotti_id'])->update(['response_of_rpu' => $request->response_of_rpu]);
+
+            DB::commit();
             return ['status' => 'success', 'data' => 'Response Send Successfully'];
 
         } catch (\Exception $exception) {
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }

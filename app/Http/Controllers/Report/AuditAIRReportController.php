@@ -125,6 +125,19 @@ class AuditAIRReportController extends Controller
         return response()->json($response);
     }
 
+    public function getAirAndApottiTypeWiseQACApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->getAirAndApottiTypeWiseQACApotti($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function getAirWiseAuditApottiList(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->getAirWiseAuditApottiList($request);
