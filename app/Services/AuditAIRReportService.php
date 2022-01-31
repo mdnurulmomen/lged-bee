@@ -252,7 +252,7 @@ class AuditAIRReportService
             }
             elseif($request->qac_type == 'qac-2'){
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
-                    ->whereHas('apotti_map_data', function($q){
+                    ->whereHas('apotti_map_data.apotti_status', function($q){
                         $q->where('apotti_type','sfi');
                     })
                     ->where('rairs_id',$preliminaryAir['r_air_child']['id'])

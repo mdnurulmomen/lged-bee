@@ -75,6 +75,8 @@ class AcMemoService
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
             $audit_memo->status = 'draft';
+            $audit_memo->team_leader_name = $request->team_leader_name;
+            $audit_memo->team_leader_designation = $request->team_leader_designation;
             $audit_memo->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
@@ -347,9 +349,13 @@ class AcMemoService
         }
         try {
 
+//            return ['status' => 'error', 'data' => $request->memos];
+
             $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')
-                ->whereIn('id', $request->memos)
+                ->where('id', $request->memos)
                 ->get();
+
+//            return ['status' => 'error', 'data' => $memo];
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
@@ -367,7 +373,7 @@ class AcMemoService
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
             if ($send_audit_memo_to_rpu['status'] == 'success') {
-                AcMemo::whereIn('id', $request->memos)
+                AcMemo::where('id', $request->memos)
                     ->update([
                         'has_sent_to_rpu'=>1,
                         'sender_officer_id'=>$cdesk->officer_id,
@@ -378,7 +384,10 @@ class AcMemoService
                         'sender_unit_name_en'=>$cdesk->office_unit_en,
                         'sender_designation_id'=>$cdesk->designation_id,
                         'sender_designation_bn'=>$cdesk->designation_bn,
-                        'sender_designation_en'=>$cdesk->designation_en
+                        'sender_designation_en'=>$cdesk->designation_en,
+                        'memo_sharok_no'=>$request->memo_sharok_no,
+                        'memo_send_date'=> $request->memo_send_date,
+                        'memo_cc'=>$request->memo_cc
                     ]);
 
                 $apotti_sequence = Apotti::max('apotti_sequence');
@@ -408,7 +417,7 @@ class AcMemoService
                    $apotti_item =  New ApottiItem();
                    $apotti_item->apotti_id = $apotti->id;
                    $apotti_item->memo_id = $memo_item['id'];
-                   $apotti_item->onucched_no = 1;
+                   $apotti_item->onucched_no = $apotti_sequence + 1;
                    $apotti_item->memo_irregularity_type = $memo_item['memo_irregularity_type'];
                    $apotti_item->memo_irregularity_sub_type = $memo_item['memo_irregularity_sub_type'];
                    $apotti_item->ministry_id = $memo_item['ministry_id'];
