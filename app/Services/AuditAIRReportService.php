@@ -494,7 +494,7 @@ class AuditAIRReportService
                 $newAirType = 'qac-2';
             }
 
-            $airList = RAir::select('id','fiscal_year_id','audit_plan_id')
+            $airList = RAir::select('id','report_name','fiscal_year_id','audit_plan_id')
                 ->where('audit_plan_id',$request->audit_plan_id)
                 ->where('type',$newAirType)
                 ->where('status','approved')
