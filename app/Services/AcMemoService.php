@@ -572,9 +572,12 @@ class AcMemoService
         try {
 
             AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-            ApottiItem::where('memo_id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-            $onucchedItem = ApottiItem::where('memo_id',$request->memo_id)->first();
-            Apotti::where('id',$onucchedItem->apotti_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            $apottiItem = ApottiItem::where('memo_id',$request->memo_id)->get();
+            if (count($apottiItem) > 0){
+                ApottiItem::where('memo_id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+                $onucchedItem = ApottiItem::where('memo_id',$request->memo_id)->first();
+                Apotti::where('id',$onucchedItem->apotti_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            }
 
             DB::commit();
             return ['status' => 'success', 'data' => 'Response Send Successfully'];
