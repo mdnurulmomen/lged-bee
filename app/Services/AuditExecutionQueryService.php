@@ -32,7 +32,7 @@ class AuditExecutionQueryService
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->whereNotNull('cost_center_id')
-                ->orderBy('team_member_start_date','DESC')
+                ->orderBy('team_member_start_date','ASC')
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
