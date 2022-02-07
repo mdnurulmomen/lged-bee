@@ -65,5 +65,23 @@ trait ApiHeart
         }
         return session('_rpu_token');
     }
+
+    public function initPonjikaHttp(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withoutVerifying()->withHeaders($this->apiHeaders())->withToken($this->getPonjikaToken());
+    }
+
+    public function getPonjikaToken()
+    {
+        $url = config('cag_ponjika_api.auth.client_login_url');
+        $client_id = config('cag_ponjika_api.auth.client_id');
+        $client_pass = config('cag_ponjika_api.auth.client_pass');
+        if (!session()->has('_ponjika_token') || session('_ponjika_token') == '') {
+            $token = $this->getClientToken($url, $client_id, $client_pass);
+            session(['_ponjika_token' => $token]);
+        }
+        return session('_ponjika_token');
+    }
+
 }
 
