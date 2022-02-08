@@ -244,7 +244,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities'])->where('id',$request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities','qac_committee'])->where('id',$request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
             if($request->qac_type == 'qac-1'){
@@ -262,11 +262,11 @@ class AuditAIRReportService
             elseif($request->qac_type == 'cqat'){
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
                     ->whereHas('apotti_map_data', function($q){
-                        $q->where('apotti_type','sfi')
-                            ->where(function($query){
-                                $query->where('final_status','draft')
-                                    ->orWhere('final_status','approved');
-                            });
+                        $q->where('apotti_type','draft');
+//                            ->where(function($query){
+//                                $query->where('final_status','draft')
+//                                    ->orWhere('final_status','approved');
+//                            });
                     })
                     ->where('rairs_id',$preliminaryAir['r_air_child']['id'])
                     ->get()

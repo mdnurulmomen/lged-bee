@@ -56,4 +56,9 @@ class RAir extends Model
     {
         return $this->hasOne(RAirMovement::class)->latest();
     }
+
+    public function qac_committee()
+    {
+        return $this->hasOne(QacCommitteeAirMap::class, 'qac_committee_id', 'air_report_id');
+    }
 }

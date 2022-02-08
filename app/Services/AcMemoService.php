@@ -391,7 +391,9 @@ class AcMemoService
                         'memo_cc'=>$request->memo_cc,
                     ]);
 
-                $apotti_sequence = Apotti::max('apotti_sequence');
+                $apotti_sequence = Apotti::where('fiscal_year_id',$memo[0]['fiscal_year_id'])
+                                           ->where('parent_office_id',$memo[0]['parent_office_id'])
+                                           ->max('apotti_sequence');
 
                 foreach ($memo as $memo_item){
                    $apotti =  New Apotti();

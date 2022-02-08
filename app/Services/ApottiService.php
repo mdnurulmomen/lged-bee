@@ -22,6 +22,8 @@ class ApottiService
         try {
             $fiscal_year_id = $request->fiscal_year_id;
             $qac_type = $request->qac_type;
+            $audit_plan_id = $request->audit_plan_id;
+            $entity_id = $request->entity_id;
 //            $cost_center_id = $request->cost_center_id;
 //            $team_id = $request->team_id;
 //            $memo_irregularity_type= $request->memo_irregularity_type;
@@ -38,9 +40,14 @@ class ApottiService
                 return $q->where('fiscal_year_id', $fiscal_year_id);
             });
 
-//            $query->when($cost_center_id, function ($q, $cost_center_id) {
-//                return $q->where('cost_center_id', $cost_center_id);
-//            });
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
+
+            $query->when($entity_id, function ($q, $entity_id) {
+                return $q->where('parent_office_id', $entity_id);
+            });
+
 
 //            $query->when($team_id, function ($q, $team_id) {
 //                return $q->where('team_id', $team_id);
