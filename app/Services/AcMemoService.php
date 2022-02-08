@@ -12,6 +12,7 @@ use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -77,6 +78,9 @@ class AcMemoService
             $audit_memo->status = 'draft';
             $audit_memo->team_leader_name = $request->team_leader_name;
             $audit_memo->team_leader_designation = $request->team_leader_designation;
+            $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
+            $audit_memo->sub_team_leader_designation = $request->sub_team_leader_designation;
+            $audit_memo->issued_by = $request->issued_by;
             $audit_memo->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
@@ -349,13 +353,14 @@ class AcMemoService
         }
         try {
 
+            //return ['status' => 'error', 'data' => $request->memo_send_date];
 //            return ['status' => 'error', 'data' => $request->memos];
 
             $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,attachment_type,user_define_name,attachment_path,sequence')
                 ->where('id', $request->memos)
                 ->get();
 
-//            return ['status' => 'error', 'data' => $memo];
+//            return ['status' => 'error', 'data' => $request->memo_send_date];
 
             $data['memos'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
@@ -372,6 +377,7 @@ class AcMemoService
 
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
+            $memo_send_date = str_replace('/','-',$request->memo_send_date);
             if ($send_audit_memo_to_rpu['status'] == 'success') {
                 AcMemo::where('id', $request->memos)
                     ->update([
@@ -385,10 +391,11 @@ class AcMemoService
                         'sender_designation_id'=>$cdesk->designation_id,
                         'sender_designation_bn'=>$cdesk->designation_bn,
                         'sender_designation_en'=>$cdesk->designation_en,
-                        'memo_sharok_no'=>$request->memo_sharok_no,
-                        'memo_send_date'=> $request->memo_send_date,
+                        'memo_sharok_no'=> $request->memo_sharok_no,
+                        'memo_send_date' => Carbon::parse($memo_send_date)->format('Y-m-d'),
                         'rpu_acceptor_designation_name_bn'=> $request->rpu_acceptor_designation_name_bn,
-                        'memo_cc'=>$request->memo_cc,
+                        'memo_cc' => $request->memo_cc,
+                        'issued_by' => $request->issued_by,
                     ]);
 
                 $apotti_sequence = Apotti::where('fiscal_year_id',$memo[0]['fiscal_year_id'])

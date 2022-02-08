@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -101,6 +102,9 @@ class AcMemo extends Model
         'sender_designation_en',
         'team_leader_name',
         'team_leader_designation',
+        'sub_team_leader_name',
+        'sub_team_leader_designation',
+        'issued_by',
         'rpu_acceptor_officer_id',
         'rpu_acceptor_officer_name_bn',
         'rpu_acceptor_officer_name_en',
@@ -111,6 +115,19 @@ class AcMemo extends Model
         'rpu_acceptor_signature',
         'memo_date',
     ];
+
+    public function getMemoSendDateAttribute($value): string
+    {
+        return Carbon::parse($value)->format('d/m/Y');
+    }
+
+    public function setMemoSendDateAttribute($value)
+    {
+        if (strstr($value, '/')){
+            $value = str_replace('/','-',$value);
+        }
+        $this->attributes['memo_send_date'] = Carbon::parse($value)->format('Y-m-d');
+    }
 
     public function getMemoTypeNameAttribute()
     {
