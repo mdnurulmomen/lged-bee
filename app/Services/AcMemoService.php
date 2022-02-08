@@ -387,7 +387,8 @@ class AcMemoService
                         'sender_designation_en'=>$cdesk->designation_en,
                         'memo_sharok_no'=>$request->memo_sharok_no,
                         'memo_send_date'=> $request->memo_send_date,
-                        'memo_cc'=>$request->memo_cc
+                        'rpu_acceptor_designation_name_bn'=> $request->rpu_acceptor_designation_name_bn,
+                        'memo_cc'=>$request->memo_cc,
                     ]);
 
                 $apotti_sequence = Apotti::max('apotti_sequence');
