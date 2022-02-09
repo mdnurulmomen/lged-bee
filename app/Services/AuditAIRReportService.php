@@ -294,11 +294,15 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)->where('is_delete',0)->pluck('apotti_id');
-            $apottiList = Apotti::whereIn('id',$qacApottis);
+            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)
+                ->where('is_delete',0)->pluck('apotti_id');
+            $apottiList = Apotti::whereIn('id',$qacApottis)->where('apotti_type','!=','reject');
 
-            if ($request->qac_type == 'qac-2' || $request->qac_type == 'cqat'){
-                $apottiList = $apottiList->where('apotti_type','sfi');
+            if ($request->qac_type == 'qac-2'){
+                $apottiList = $apottiList->where('apotti_type','draft');
+            }
+            if ($request->qac_type == 'cqat'){
+                $apottiList = $apottiList->where('apotti_type','final');
             }
             $apottiList = $apottiList->get()->toArray();
 
