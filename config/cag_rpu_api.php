@@ -13,4 +13,6 @@ return [
     'received_query_from_rpu' => env('API_URL_RPU', '') . '/receive-query-from-rpu',
     'remove_query_to_rpu' => env('API_URL_RPU', '') . '/remove-query-from-rpu',
     'send_air_to_rpu' => env('API_URL_RPU', '') . '/send-air-to-rpu',
+
+    'get-offices-info' => env('API_URL_RPU', '') . '/get-offices-info',
 ];

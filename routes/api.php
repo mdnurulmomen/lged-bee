@@ -260,7 +260,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     //audit report
     Route::group(['prefix' => 'audit-report'], function () {
         //air
-        Route::group(['prefix' => 'air'],function (){
+        Route::group(['prefix' => 'air'], function () {
             Route::post('load-approve-plan-list', [AuditAIRReportController::class, 'loadApprovePlanList']);
             Route::post('create-air-report', [AuditAIRReportController::class, 'createNewAirReport']);
             Route::post('edit-air-report', [AuditAIRReportController::class, 'editAirReport']);
@@ -316,6 +316,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'migration'], function () {
         Route::post('audit-team-schedules', [MigrationController::class, 'migrateAuditTeamSchedules']);
+    });
+
+    Route::group(['prefix' => 'notify'], function () {
+        Route::post('/send/mail', [NotificationController::class, 'sendMail']);
     });
 
 });

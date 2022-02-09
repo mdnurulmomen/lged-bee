@@ -8,7 +8,7 @@ trait ApiHeart
 {
     public function initDoptorHttp($username): \Illuminate\Http\Client\PendingRequest
     {
-        return Http::withHeaders($this->apiHeaders())->withToken($this->getDoptorToken($username));
+        return Http::withoutVerifying()->withHeaders($this->apiHeaders())->withToken($this->getDoptorToken($username));
     }
 
     public function apiHeaders(): array
@@ -46,12 +46,12 @@ trait ApiHeart
 
     public function initHttp(): \Illuminate\Http\Client\PendingRequest
     {
-        return Http::withHeaders($this->apiHeaders());
+        return Http::withoutVerifying()->withHeaders($this->apiHeaders());
     }
 
     public function initRPUHttp(): \Illuminate\Http\Client\PendingRequest
     {
-        return Http::withHeaders($this->apiHeaders())->withToken($this->getRPUniverseToken());
+        return Http::withoutVerifying()->withHeaders($this->apiHeaders())->withToken($this->getRPUniverseToken());
     }
 
     public function getRPUniverseToken()

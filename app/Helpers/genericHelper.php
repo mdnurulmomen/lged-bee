@@ -249,6 +249,17 @@ if (!function_exists('isSuccessResponse')) {
     }
 }
 
+if (!function_exists('isSuccess')) {
+    function isSuccess($arr, $key = 'status', $val = 'success'): bool
+    {
+        if ((array_key_exists('status', $arr)) && ($arr[$key] == $val)) {
+            return true;
+        }
+        return false;
+    }
+}
+
+
 if (!function_exists('formatRequestHeader')) {
     function formatRequestHeader($header)
     {

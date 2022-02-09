@@ -4,13 +4,11 @@ namespace App\Services;
 
 use App\Models\AcQuery;
 use App\Models\AcQueryItem;
-use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\Query;
 use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class AuditExecutionQueryService
@@ -28,11 +26,11 @@ class AuditExecutionQueryService
             $schedule_list = AuditVisitCalenderPlanMember::with('plan_parent_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('plan_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('office_order:id,audit_plan_id,approved_status')
-                ->where('audit_plan_id', '>',0)
+                ->where('audit_plan_id', '>', 0)
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->whereNotNull('cost_center_id')
-                ->orderBy('team_member_start_date','ASC')
+                ->orderBy('team_member_start_date', 'ASC')
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
@@ -52,14 +50,14 @@ class AuditExecutionQueryService
         \DB::beginTransaction();
         try {
             //todo
-            $acQuery = AcQuery::where('id',$request->ac_query_id)
+            $acQuery = AcQuery::where('id', $request->ac_query_id)
                 ->with('plan_team:id,team_name,team_parent_id,leader_name_en,leader_name_bn')
                 ->first();
 
-            $fiscal_year_info =  XFiscalYear::select('start','end')->find($acQuery->fiscal_year_id);
+            $fiscal_year_info = XFiscalYear::select('start', 'end')->find($acQuery->fiscal_year_id);
 
-            $acQueryItems = AcQueryItem::select('id','ac_query_id','item_title_en','item_title_bn','status')
-                ->where('ac_query_id',$request->ac_query_id)
+            $acQueryItems = AcQueryItem::select('id', 'ac_query_id', 'item_title_en', 'item_title_bn', 'status')
+                ->where('ac_query_id', $request->ac_query_id)
                 ->get();
 
             $data = [];
@@ -68,7 +66,7 @@ class AuditExecutionQueryService
             $data['directorate_id'] = $cdesk->office_id;
             $data['directorate_en'] = $cdesk->office_name_en;
             $data['directorate_bn'] = $cdesk->office_name_bn;
-            $data['fiscal_year'] = $fiscal_year_info->start.'-'.$fiscal_year_info->end;
+            $data['fiscal_year'] = $fiscal_year_info->start . '-' . $fiscal_year_info->end;
 
             $send_audit_query_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_query_to_rpu'), $data)->json();
 
@@ -108,8 +106,8 @@ class AuditExecutionQueryService
             $acQueryItemUpdate->receiver_designation_name_en = $cdesk->designation_en;
             $acQueryItemUpdate->save();
 
-            $acQueryItems = AcQueryItem::select('ac_query_id','item_title_en','item_title_bn','status')
-                ->where('ac_query_id',$request->ac_query_id)
+            $acQueryItems = AcQueryItem::select('ac_query_id', 'item_title_en', 'item_title_bn', 'status')
+                ->where('ac_query_id', $request->ac_query_id)
                 ->get();
 
             $data['ac_query_id'] = $request->ac_query_id;
@@ -137,7 +135,7 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $ac_query_list = AcQuery::where('cost_center_id',$request->cost_center_id)->get();
+            $ac_query_list = AcQuery::where('cost_center_id', $request->cost_center_id)->get();
             return ['status' => 'success', 'data' => $ac_query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -148,7 +146,7 @@ class AuditExecutionQueryService
     public function loadTypeWiseAuditQuery(Request $request)
     {
         try {
-            $query_list = Query::where('cost_center_type_id',$request->cost_center_type_id)->get();
+            $query_list = Query::where('cost_center_type_id', $request->cost_center_type_id)->get();
             return ['status' => 'success', 'data' => $query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -188,7 +186,7 @@ class AuditExecutionQueryService
                 } else {
                     throw new \Exception(json_encode($update_audit_query_to_rpu));
                 }
-            }else{
+            } else {
                 return ['status' => 'success', 'data' => 'Remove Successfully'];
             }
 
@@ -205,10 +203,10 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $ac_query_list = AcQuery::where('cost_center_type_id',$request->cost_center_type_id)
-                ->where('cost_center_id',$request->cost_center_id)
-                ->where('is_query_sent',1)
-                ->where('status','!=','removed')
+            $ac_query_list = AcQuery::where('cost_center_type_id', $request->cost_center_type_id)
+                ->where('cost_center_id', $request->cost_center_id)
+                ->where('is_query_sent', 1)
+                ->where('status', '!=', 'removed')
                 ->get();
             return ['status' => 'success', 'data' => $ac_query_list];
         } catch (\Exception $exception) {
@@ -265,12 +263,12 @@ class AuditExecutionQueryService
             //for insert items
             $acQueryItems = array();
             foreach ($request->audit_query_items as $value) {
-                if (!empty($value)){
+                if (!empty($value)) {
                     $acQueryItems[] = array(
-                        'ac_query_id'=> $ac_query->id,
-                        'item_title_en'=> $value,
-                        'item_title_bn'=> $value,
-                        'status'=> 'pending'
+                        'ac_query_id' => $ac_query->id,
+                        'item_title_en' => $value,
+                        'item_title_bn' => $value,
+                        'status' => 'pending'
                     );
                 }
             }
@@ -308,12 +306,12 @@ class AuditExecutionQueryService
             AcQueryItem::where('ac_query_id', $request->ac_query_id)->delete();
             $acQueryItems = array();
             foreach ($request->audit_query_items as $value) {
-                if (!empty($value)){
+                if (!empty($value)) {
                     $acQueryItems[] = array(
-                        'ac_query_id'=> $ac_query->id,
-                        'item_title_en'=> $value,
-                        'item_title_bn'=> $value,
-                        'status'=> 'pending'
+                        'ac_query_id' => $ac_query->id,
+                        'item_title_en' => $value,
+                        'item_title_bn' => $value,
+                        'status' => 'pending'
                     );
                 }
             }
@@ -337,7 +335,7 @@ class AuditExecutionQueryService
         try {
             $ac_query = AcQuery::with('query_items')
                 ->with('plan_team:id,team_name,team_parent_id')
-                ->where('id',$request->ac_query_id)
+                ->where('id', $request->ac_query_id)
                 ->first();
             return ['status' => 'success', 'data' => $ac_query];
 
@@ -369,7 +367,7 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            AcQueryItem::where('id',$request->query_item_id)->update(
+            AcQueryItem::where('id', $request->query_item_id)->update(
                 [
                     'status' => $request->status,
                     'comment' => $request->comment,
