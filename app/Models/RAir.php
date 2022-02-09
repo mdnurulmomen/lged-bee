@@ -59,6 +59,8 @@ class RAir extends Model
 
     public function qac_committee()
     {
-        return $this->hasOne(QacCommitteeAirMap::class, 'qac_committee_id', 'air_report_id');
+        return $this->hasMany(QacCommitteeAirMap::class, 'air_report_id', 'id');
+//                return $this->belongsToMany(QacCommittee::class, 'qac_commitee_air_map');
+
     }
 }
