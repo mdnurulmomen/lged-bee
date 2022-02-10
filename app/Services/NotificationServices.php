@@ -36,6 +36,7 @@ class NotificationServices
                     ];
                     SendMailJob::dispatch($mail_data);
                 }
+                return responseFormat('success', 'Mail dispatched!');
             } else {
                 throw new \Exception('ERROR CODE: MDI - No Proper Meta Data!');
             }
