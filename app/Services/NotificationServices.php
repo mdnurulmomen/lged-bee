@@ -40,7 +40,7 @@ class NotificationServices
                 throw new \Exception('ERROR CODE: MDI - No Proper Meta Data!');
             }
         } catch (\Exception $exception) {
-            \Log::error($exception->getMessage());
+            \Log::error('ERROR CODE: NS - ' . $exception->getMessage());
             return responseFormat('error', $exception->getMessage());
         }
     }

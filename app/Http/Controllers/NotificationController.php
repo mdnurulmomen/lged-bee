@@ -27,6 +27,7 @@ class NotificationController extends Controller
             }
             return response()->json(responseFormat('status', 'Sent Mail to RPU'));
         } catch (\Exception $exception) {
+            \Log::error('ERROR CODE: NC - ', $exception->getMessage());
             return response()->json(responseFormat('error', $exception->getMessage()));
         }
     }
