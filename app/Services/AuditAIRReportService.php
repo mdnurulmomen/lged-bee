@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\Apotti;
 use App\Models\ApottiRAirMap;
+use App\Models\ApottiStatus;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
@@ -541,14 +542,25 @@ class AuditAIRReportService
     public function apottiFinalApproval(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            Apotti::where('id',$request->apotti_id)->update(['final_status'=> $request->final_status]);
-            return ['status' => 'success', 'data' => []];
+            Apotti::where('id',$request->apotti_id)->update(['apotti_type'=> $request->final_status]);
+
+            $apotti_status = new ApottiStatus();
+            $apotti_status->apotti_id = $request->apotti_id;
+            $apotti_status->qac_type = $request->qac_type;
+            $apotti_status->apotti_type = $request->final_status;
+            $apotti_status->created_by = $cdesk->officer_id;
+            $apotti_status->created_by_name_en = $cdesk->officer_en;
+            $apotti_status->created_by_name_bn = $cdesk->officer_bn;
+            $apotti_status->save();
+
+            return ['status' => 'success', 'data' => 'Approved For Final Report'];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

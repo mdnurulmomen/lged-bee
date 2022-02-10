@@ -479,6 +479,7 @@ class AcMemoService
         try {
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
+            $entity_id = $request->entity_id;
             $team_id = $request->team_id;
             $memo_irregularity_type= $request->memo_irregularity_type;
             $memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
@@ -492,6 +493,10 @@ class AcMemoService
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
                 return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($entity_id, function ($q, $entity_id) {
+                return $q->where('parent_office_id', $entity_id);
             });
 
             $query->when($cost_center_id, function ($q, $cost_center_id) {
