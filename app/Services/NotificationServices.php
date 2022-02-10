@@ -34,6 +34,7 @@ class NotificationServices
                         'body' => $request->mail_body ?: '',
                         'email' => $office_info['office_email'],
                     ];
+                    \Log::info($office_info['office_email']);
                     SendMailJob::dispatch($mail_data);
                 }
                 return responseFormat('success', 'Mail dispatched!');
