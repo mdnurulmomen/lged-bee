@@ -204,6 +204,19 @@ class AuditAIRReportController extends Controller
         return response()->json($response);
     }
 
+    public function getAuditFinalReport(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->getAuditFinalReport($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function deleteAirReportWiseApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->deleteAirReportWiseApotti($request);
@@ -220,6 +233,19 @@ class AuditAIRReportController extends Controller
     public function apottiFinalApproval(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->apottiFinalApproval($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function finalReportMovement(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->finalReportMovement($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

@@ -251,6 +251,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('qac-apotti', [QacController::class, 'qacApotti']);
         Route::post('get-qac-apotti-status', [QacController::class, 'getQacApottiStatus']);
         Route::post('store-qac-committee', [QacController::class, 'storeQacCommittee']);
+        Route::post('update-qac-committee', [QacController::class, 'updateQacCommittee']);
+        Route::post('delete-qac-committee', [QacController::class, 'deleteQacCommittee']);
         Route::post('get-qac-committee-list', [QacController::class, 'getQacCommitteeList']);
         Route::post('get-qac-committee-wise-members', [QacController::class, 'getQacCommitteeWiseMember']);
         Route::post('store-air-wise-committee', [QacController::class, 'storeAirWiseCommittee']);
@@ -276,11 +278,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('store-air-movement', [AuditAIRReportController::class, 'storeAirMovement']);
             Route::post('get-air-last-movement', [AuditAIRReportController::class, 'getAirLastMovement']);
             Route::post('get-audit-plan-and-type-wise-air', [AuditAIRReportController::class, 'getAuditPlanAndTypeWiseAir']);
+            Route::post('get-audit-final-report', [AuditAIRReportController::class, 'getAuditFinalReport']);
             Route::post('delete-air-report-wise-apotti', [AuditAIRReportController::class, 'deleteAirReportWiseApotti']);
             Route::post('apotti-final-approval', [AuditAIRReportController::class, 'apottiFinalApproval']);
             Route::post('air-send-to-rpu', [RpuAirReportController::class, 'airSendToRpu']);
             Route::post('received-air-by-rpu', [RpuAirReportController::class, 'receivedAirByRpu']);
             Route::post('audit-apotti-item-response-by-rpu', [RpuAirReportController::class, 'apottiItemResponseByRpu']);
+            Route::post('final-report-movement', [AuditAIRReportController::class, 'finalReportMovement']);
         });
     });
 

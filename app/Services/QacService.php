@@ -127,6 +127,54 @@ class QacService
 
     }
 
+    public function updateQacCommittee(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        try {
+
+            $qac_committee =  QacCommittee::find($request->committee_id);
+            $qac_committee->title_bn = $request->title;
+            $qac_committee->title_en = '';
+//            $qac_committee->update_by = $cdesk->officer_id;
+//            $qac_committee->updated_by_bn = $cdesk->officer_bn;
+//            $qac_committee->updated_by_en = $cdesk->officer_en;
+            $qac_committee->save();
+
+            QacCommitteeMember::where('qac_committee_id',$request->committee_id)->delete();
+
+            if($qac_committee->id){
+                foreach (json_decode($request->member_info,true) as $member){
+                    $qac_committee_member =  new QacCommitteeMember();
+                    $qac_committee_member->fiscal_year_id = $qac_committee->fiscal_year_id;
+                    $qac_committee_member->qac_type = $qac_committee->qac_type;
+                    $qac_committee_member->qac_committee_id = $qac_committee->id;
+                    $qac_committee_member->officer_id = $member['officer_id'];
+                    $qac_committee_member->officer_bn = $member['officer_bn'];
+                    $qac_committee_member->officer_en = $member['officer_en'];
+                    $qac_committee_member->officer_unit_id = $member['officer_unit_id'];
+                    $qac_committee_member->officer_unit_bn = $member['officer_unit_bn'];
+                    $qac_committee_member->officer_unit_en = $member['officer_unit_en'];
+                    $qac_committee_member->officer_designation_grade = $member['officer_designation_grade'];
+                    $qac_committee_member->officer_designation_id = $member['officer_designation_id'];
+                    $qac_committee_member->officer_designation_bn = $member['officer_designation_bn'];
+                    $qac_committee_member->officer_designation_en = $member['officer_designation_en'];
+                    $qac_committee_member->save();
+                }
+            }
+
+            return ['status' => 'success', 'data' => 'QAC Committee Updated Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
     public function getQacCommitteeList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -138,6 +186,28 @@ class QacService
         try {
             $qac_committee_list =  QacCommittee::with('qac_committee_members')->where('fiscal_year_id',$request->fiscal_year_id)->where('qac_type',$request->qac_type)->get();
             return ['status' => 'success', 'data' => $qac_committee_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function deleteQacCommittee(Request $request): array
+    {
+//        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+
+        try {
+             $committee_has_air = QacCommitteeAirMap::where('qac_committee_id',$request->committee_id)->first();
+             if($committee_has_air){
+                 return ['status' => 'success', 'data' => 'exist'];
+             }
+             QacCommittee::find($request->committee_id)->delete();
+             QacCommitteeMember::where('qac_committee_id',$request->committee_id)->delete();
+             return ['status' => 'success', 'data' => 'কমিটি বাতিল করা হয়েছে'];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

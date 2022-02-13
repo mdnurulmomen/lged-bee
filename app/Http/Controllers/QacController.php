@@ -43,6 +43,31 @@ class QacController extends Controller
         return response()->json($response);
     }
 
+    public function updateQacCommittee(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->updateQacCommittee($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function deleteQacCommittee(Request $request, QacService $qacService)
+    {
+        $qac_committee = $qacService->deleteQacCommittee($request);
+        if (isSuccessResponse($qac_committee)) {
+            $response = responseFormat('success', $qac_committee['data']);
+        } else {
+            $response = responseFormat('error', $qac_committee['data']);
+        }
+
+        return response()->json($response);
+    }
+
+
     public function getQacCommitteeList(Request $request, QacService $qacService)
     {
         $qac_committee = $qacService->getQacCommitteeList($request);

@@ -149,17 +149,51 @@ class AuditAIRReportService
     public function updateQACAirReport(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airData = [
-                'air_description' => $request->air_description,
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
+
+            if($request->air_description){
+                $airData['air_description'] = $request->air_description;
+            }
+
+            if($request->status){
+                $airData['status'] = $request->status;
+            }
+
+            if($request->approved_date){
+                $airData['approved_date'] = date('Y-m-d',strtotime($request->approved_date));
+            }
+
+            if($request->is_bg_press){
+                $airData['is_bg_press'] = $request->is_bg_press;
+            }
+
+            if($request->is_printing_done){
+                $airData['is_printing_done'] = $request->is_printing_done;
+            }
+
+            if($request->comment){
+                $airData['comment'] = $request->comment;
+            }
+
+            if($request->approval_status){
+                $airData['approval_status'] = $request->approval_status;
+            }
+
+            if($request->final_approval_status){
+                $airData['final_approval_status'] = $request->final_approval_status;
+            }
+
             RAir::where('id',$request->air_id)->update($airData);
+
             return ['status' => 'success', 'data' => ['air_id' => $request->air_id]];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -408,7 +442,7 @@ class AuditAIRReportService
             RAirMovement::create($airMovementData);
 
             //for qac 01 insert
-            if ($request->status == 'approved'){
+            if ($request->status == 'approved' && $request->air_type != 'cqat'){
 
                 $newAirType = 'draft';
                 if ($request->air_type == 'preliminary'){
@@ -420,9 +454,9 @@ class AuditAIRReportService
                 elseif ($request->air_type == 'qac-2'){
                     $newAirType = 'cqat';
                 }
-                elseif ($request->air_type == 'cqat'){
-                    $newAirType = 'final';
-                }
+//                elseif ($request->air_type == 'cqat'){
+//                    $newAirType = 'final';
+//                }
 
                 $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
                 $airData = [
@@ -517,6 +551,29 @@ class AuditAIRReportService
         }
     }
 
+    public function getAuditFinalReport(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $airList = RAir::where('audit_plan_id',$request->audit_plan_id)
+                ->where('type','cqat')
+                ->where('status','approved')
+                ->get()
+                ->toArray();
+
+            return ['status' => 'success', 'data' => $airList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function deleteAirReportWiseApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -562,6 +619,54 @@ class AuditAIRReportService
 
             return ['status' => 'success', 'data' => 'Approved For Final Report'];
 
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function finalReportMovement(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        try {
+
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            //air movement data
+            $airMovementData = [
+                'r_air_id'  => $request->r_air_id,
+                'receiver_officer_id'  => $request->receiver_officer_id,
+                'receiver_office_id'  => $request->receiver_office_id,
+                'receiver_unit_id'  => $request->receiver_unit_id,
+                'receiver_unit_name_en'  => $request->receiver_unit_name_en,
+                'receiver_unit_name_bn'  => $request->receiver_unit_name_bn,
+                'receiver_employee_id'  => $request->receiver_employee_id,
+                'receiver_employee_name_en'  => $request->receiver_employee_name_en,
+                'receiver_employee_name_bn'  => $request->receiver_employee_name_bn,
+                'receiver_employee_designation_id'  => $request->receiver_employee_designation_id,
+                'receiver_employee_designation_en'  => $request->receiver_employee_designation_en,
+                'receiver_employee_designation_bn'  => $request->receiver_employee_designation_bn,
+                'receiver_officer_phone'  => $request->receiver_officer_phone,
+                'receiver_officer_email'  => $request->receiver_officer_email,
+                'sender_officer_id'  => $cdesk->officer_id,
+                'sender_office_id'  => $cdesk->office_id,
+                'sender_unit_id'  => $cdesk->office_unit_id,
+                'sender_unit_name_en'  => $cdesk->office_unit_en,
+                'sender_unit_name_bn'  => $cdesk->office_unit_bn,
+                'sender_employee_id'  => $cdesk->officer_id,
+                'sender_employee_name_en'  => $cdesk->officer_en,
+                'sender_employee_name_bn'  => $cdesk->officer_bn,
+                'sender_employee_designation_id'  => $cdesk->designation_id,
+                'sender_employee_designation_en'  => $cdesk->designation_en,
+                'sender_employee_designation_bn'  => $cdesk->designation_bn,
+                'sender_officer_phone'  => $cdesk->phone,
+                'sender_officer_email'  => $cdesk->email,
+                'comments'  => $request->comments
+            ];
+            RAirMovement::create($airMovementData);
+            return ['status' => 'success', 'data' => ['Movement Successfully']];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
