@@ -14,7 +14,11 @@ class ApottiStatus extends Model
         'apotti_type',
         'qac_type',
         'apotti_id',
+        'is_audit_criteria',
+        'is_5w_pera_model',
+        'is_apotti_evidence',
         'is_same_porishisto',
+        'is_criteria_same_as_irregularity',
         'is_rules_and_regulation',
         'is_imperfection',
         'is_risk_analysis',
@@ -27,5 +31,4 @@ class ApottiStatus extends Model
         'updated_by_name_en',
         'updated_by_name_bn',
     ];
-
 }
