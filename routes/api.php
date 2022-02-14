@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Followup\BroadsheetReplyController;
 use App\Http\Controllers\Report\AuditAIRReportController;
 use App\Http\Controllers\Report\RpuAirReportController;
@@ -288,6 +289,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
     });
 
+
+    Route::post('get-total-daily-query-and-memo', [DashboardController::class, 'getTotalDailyQueryAndMemo']);
+    Route::post('get-total-weekly-query-and-memo', [DashboardController::class, 'getTotalWeeklyQueryAndMemo']);
 
     //final plan
     Route::group(['prefix' => 'final-plan-file'], function () {
