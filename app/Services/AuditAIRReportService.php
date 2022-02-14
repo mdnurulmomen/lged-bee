@@ -335,10 +335,10 @@ class AuditAIRReportService
             $apottiList = Apotti::whereIn('id',$qacApottis)->where('apotti_type','!=','reject');
 
             if ($request->qac_type == 'qac-2'){
-                $apottiList = $apottiList->where('apotti_type','draft');
+                 $apottiList->where('apotti_type','draft');
             }
             if ($request->qac_type == 'cqat'){
-                $apottiList = $apottiList->where('apotti_type','final');
+                $apottiList->where('apotti_type','approved');
             }
             $apottiList = $apottiList->get()->toArray();
 
@@ -498,14 +498,14 @@ class AuditAIRReportService
     public function getAirLastMovement(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $lastAirMovementInfo = RAirMovement::select('id','r_air_id','receiver_officer_id','receiver_unit_name_en','receiver_unit_name_bn','receiver_employee_name_en','receiver_employee_name_bn','receiver_employee_designation_id','receiver_employee_designation_en','receiver_employee_designation_bn')
-                ->where('r_air_id',$request->r_air_id)
+            $lastAirMovementInfo = RAirMovement::where('r_air_id',$request->r_air_id)
                 ->latest()
                 ->first()
                 ->toArray();
@@ -561,7 +561,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $airList = RAir::where('audit_plan_id',$request->audit_plan_id)
+            $airList = RAir::with('latest_r_air_movement')->where('audit_plan_id',$request->audit_plan_id)
                 ->where('type','cqat')
                 ->where('status','approved')
                 ->get()
