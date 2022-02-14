@@ -561,7 +561,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $airList = RAir::with('latest_r_air_movement')->where('audit_plan_id',$request->audit_plan_id)
+            $airList = RAir::with('latest_r_air_movement')->where('activity_id',$request->activity_id)
                 ->where('type','cqat')
                 ->where('status','approved')
                 ->get()
