@@ -39,11 +39,11 @@ class DashboardService
             $toDate = date('Y-m-d');
             $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'));
 
-            $data['total_query'] = AcQuery::where('created_at', '>=', $fromDate)
-                ->where('created_at', '<=', $toDate)->count();
+            $data['total_query'] = AcQuery::whereDate('created_at', '>=', $fromDate)
+                ->whereDate('created_at', '<=', $toDate)->count();
 
-            $data['total_memo'] = AcMemo::where('created_at', '>=', $fromDate)
-                ->where('created_at', '<=', $toDate)->count();
+            $data['total_memo'] = AcMemo::whereDate('created_at', '>=', $fromDate)
+                ->whereDate('created_at', '<=', $toDate)->count();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
