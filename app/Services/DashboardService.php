@@ -19,9 +19,30 @@ class DashboardService
             return ['status' => 'error', 'data' => $connectOfficeDB];
         }
         try {
-            $data['total_query'] = AcQuery::whereDate('created_at', date('Y-m-d'))->count();
-            $data['total_memo'] = AcMemo::whereDate('created_at', date('Y-m-d'))->count();
+            //for total query
+            $acQuery = AcQuery::where('fiscal_year_id',$request->fiscal_year_id);
+            if (!empty($request->cost_center_id)){
+                $acQuery = $acQuery->where('cost_center_id',$request->cost_center_id);
+            }
+            if (!empty($request->team_id)){
+                $acQuery = $acQuery->where('team_id',$request->team_id);
+            }
+            $getTotalQuery = $acQuery->whereDate('created_at', date('Y-m-d'))->count();
+
+            //for total memo
+            $acMemo = AcMemo::where('fiscal_year_id',$request->fiscal_year_id);
+            if (!empty($request->cost_center_id)){
+                $acMemo = $acMemo->where('cost_center_id',$request->cost_center_id);
+            }
+            if (!empty($request->team_id)){
+                $acMemo = $acMemo->where('team_id',$request->team_id);
+            }
+            $getTotalMemo = $acMemo->whereDate('created_at', date('Y-m-d'))->count();
+
+            $data['total_query'] = $getTotalQuery;
+            $data['total_memo'] = $getTotalMemo;
             return ['status' => 'success', 'data' => $data];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -39,12 +60,32 @@ class DashboardService
             $toDate = date('Y-m-d');
             $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'));
 
-            $data['total_query'] = AcQuery::whereDate('created_at', '>=', $fromDate)
+            //for total query
+            $acQuery = AcQuery::where('fiscal_year_id',$request->fiscal_year_id);
+            if (!empty($request->cost_center_id)){
+                $acQuery = $acQuery->where('cost_center_id',$request->cost_center_id);
+            }
+            if (!empty($request->team_id)){
+                $acQuery = $acQuery->where('team_id',$request->team_id);
+            }
+            $getTotalQuery = $acQuery->whereDate('created_at', '>=', $fromDate)
                 ->whereDate('created_at', '<=', $toDate)->count();
 
-            $data['total_memo'] = AcMemo::whereDate('created_at', '>=', $fromDate)
+            //for total memo
+            $acMemo = AcMemo::where('fiscal_year_id',$request->fiscal_year_id);
+            if (!empty($request->cost_center_id)){
+                $acMemo = $acMemo->where('cost_center_id',$request->cost_center_id);
+            }
+            if (!empty($request->team_id)){
+                $acMemo = $acMemo->where('team_id',$request->team_id);
+            }
+            $getTotalMemo = $acMemo->whereDate('created_at', '>=', $fromDate)
                 ->whereDate('created_at', '<=', $toDate)->count();
+
+            $data['total_query'] = $getTotalQuery;
+            $data['total_memo'] = $getTotalMemo;
             return ['status' => 'success', 'data' => $data];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
