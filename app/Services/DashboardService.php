@@ -36,10 +36,14 @@ class DashboardService
             return ['status' => 'error', 'data' => $connectOfficeDB];
         }
         try {
-            $toDate = date('Y-m-d')." 00:00:00";
-            $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'))." 23:59:59";
-            $data['total_query'] = AcQuery::whereBetween('created_at', [$fromDate,$toDate])->count();
-            $data['total_memo'] = AcMemo::whereBetween('created_at', [$fromDate,$toDate])->count();
+            $toDate = date('Y-m-d');
+            $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'));
+
+            $data['total_query'] = AcQuery::where('created_at', '>=', $fromDate)
+                ->where('created_at', '<=', $toDate)->count();
+
+            $data['total_memo'] = AcMemo::where('created_at', '>=', $fromDate)
+                ->where('created_at', '<=', $toDate)->count();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
