@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\AcMemo;
-use App\Models\Query;
+use App\Models\AcQuery;
 use App\Traits\GenericData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,8 +19,8 @@ class DashboardService
             return ['status' => 'error', 'data' => $connectOfficeDB];
         }
         try {
-            $data['total_query'] = Query::whereDate('created_at', Carbon::today())->count();
-            $data['total_memo'] = AcMemo::whereDate('created_at', Carbon::today())->count();
+            $data['total_query'] = AcQuery::whereDate('created_at', date('Y-m-d'))->count();
+            $data['total_memo'] = AcMemo::whereDate('created_at', date('Y-m-d'))->count();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -36,8 +36,10 @@ class DashboardService
             return ['status' => 'error', 'data' => $connectOfficeDB];
         }
         try {
-            $data['total_query'] = Query::whereBetween('created_at', [Carbon::now()->subDays(7), Carbon::today()])->count();
-            $data['total_memo'] = AcMemo::whereBetween('created_at', [Carbon::now()->subDays(7),Carbon::today()])->count();
+            $toDate = date('Y-m-d');
+            $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'));
+            $data['total_query'] = AcQuery::whereBetween('created_at', [$fromDate,$toDate])->count();
+            $data['total_memo'] = AcMemo::whereBetween('created_at', [$fromDate,$toDate])->count();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
