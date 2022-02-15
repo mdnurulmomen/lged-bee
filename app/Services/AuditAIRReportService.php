@@ -192,9 +192,13 @@ class AuditAIRReportService
                 $airData['final_approval_status'] = $request->final_approval_status;
             }
 
+            if($request->qac_report_date){
+                $airData['qac_report_date'] = $request->qac_report_date;
+            }
+
             RAir::where('id',$request->air_id)->update($airData);
 
-            return ['status' => 'success', 'data' => ['air_id' => $request->air_id]];
+            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

@@ -19,6 +19,7 @@ class RAir extends Model
         'annual_plan_id',
         'audit_plan_id',
         'activity_id',
+        'qac_report_date',
         'air_description',
         'type',
         'is_sent',
