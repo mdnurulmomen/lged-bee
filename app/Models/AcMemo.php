@@ -169,4 +169,9 @@ class AcMemo extends Model
         return $this->belongsTo(AuditVisitCalendarPlanTeam::class, 'id', 'team_id');
     }
 
+    public function audit_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
+    }
+
 }
