@@ -135,7 +135,10 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $ac_query_list = AcQuery::where('cost_center_id', $request->cost_center_id)->get();
+            $ac_query_list = AcQuery::where('audit_plan_id', $request->audit_plan_id)
+                ->where('entity_office_id', $request->entity_id)
+                ->where('cost_center_id', $request->cost_center_id)
+                ->get();
             return ['status' => 'success', 'data' => $ac_query_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
