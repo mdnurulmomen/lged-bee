@@ -116,19 +116,6 @@ class AcMemo extends Model
         'memo_date',
     ];
 
-    public function getMemoSendDateAttribute($value): string
-    {
-        return Carbon::parse($value)->format('d/m/Y');
-    }
-
-    public function setMemoSendDateAttribute($value)
-    {
-        if (strstr($value, '/')){
-            $value = str_replace('/','-',$value);
-        }
-        $this->attributes['memo_send_date'] = Carbon::parse($value)->format('Y-m-d');
-    }
-
     public function getMemoTypeNameAttribute()
     {
         return self::$memo_types[$this->attributes['memo_type']];

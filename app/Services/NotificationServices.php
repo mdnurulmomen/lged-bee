@@ -15,13 +15,15 @@ class NotificationServices
         try {
             $meta_data = json_decode($request->meta_data, true);
 
-            if (\Arr::has($meta_data, 'cost_center_id') || \Arr::has($meta_data, 'entity_id')) {
+            if (\Arr::has($meta_data, 'cost_center_ids') || \Arr::has($meta_data, 'entity_ids')) {
                 $office_ids = [];
                 if ($request->notifiable_type == 'air') {
-                    $office_ids = [$meta_data['entity_id']];
+                    $entity_ids = $meta_data['entity_ids'];
+                    $entity_ids = is_array($entity_ids) ?: explode(',', $entity_ids);
+                    $office_ids = $entity_ids;
                 }
                 if ($request->notifiable_type == 'memo' || $request->notifiable_type == 'query') {
-                    $office_ids = [$meta_data['cost_center_id']];
+                    $office_ids = [$meta_data['cost_center_ids']];
                 }
                 $office_ids = implode(',', $office_ids);
                 $office_infos = $this->initRPUHttp()->post(config('cag_rpu_api.get-offices-info'), ['office_ids' => $office_ids])->json();

@@ -290,8 +290,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     });
 
 
-    Route::post('get-total-daily-query-and-memo', [DashboardController::class, 'getTotalDailyQueryAndMemo']);
-    Route::post('get-total-weekly-query-and-memo', [DashboardController::class, 'getTotalWeeklyQueryAndMemo']);
+    Route::post('get-total-query-and-memo-report', [DashboardController::class, 'getTotalQueryAndMemoReport']);
 
     //final plan
     Route::group(['prefix' => 'final-plan-file'], function () {
