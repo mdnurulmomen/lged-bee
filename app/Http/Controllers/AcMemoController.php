@@ -43,6 +43,18 @@ class AcMemoController extends Controller
         return response()->json($response);
     }
 
+    public function singleAuditMemoInfo(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $query_schedule_list = $acMemoService->singleAuditMemoInfo($request);
+        if (isSuccessResponse($query_schedule_list)) {
+            $response = responseFormat('success', $query_schedule_list['data']);
+        } else {
+            $response = responseFormat('error', $query_schedule_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function auditMemoUpdate(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
     {
         $query_schedule_list = $acMemoService->auditMemoUpdate($request);
@@ -146,6 +158,18 @@ class AcMemoController extends Controller
         } else {
             $response = responseFormat('error', $responseData['data']);
         }
+        return response()->json($response);
+    }
+
+    public function auditMemoAttachmentDelete(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $auditMemoRecommendationStore = $acMemoService->auditMemoAttachmentDelete($request);
+        if (isSuccessResponse($auditMemoRecommendationStore)) {
+            $response = responseFormat('success', $auditMemoRecommendationStore['data']);
+        } else {
+            $response = responseFormat('error', $auditMemoRecommendationStore['data']);
+        }
+
         return response()->json($response);
     }
 }

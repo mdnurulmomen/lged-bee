@@ -222,6 +222,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-list', [AcMemoController::class, 'auditMemoList']);
         Route::post('send-audit-memo-to-rpu', [AcMemoController::class, 'sendMemoToRpu']);
         Route::post('audit-memo-edit', [AcMemoController::class, 'auditMemoEdit']);
+        Route::post('audit-memo-info', [AcMemoController::class, 'singleAuditMemoInfo']);
         Route::post('audit-memo-update', [AcMemoController::class, 'auditMemoUpdate']);
         Route::post('authority-memo-list', [AcMemoController::class, 'authorityMemoList']);
         Route::post('audit-memo-recommendation-store', [AcMemoController::class, 'auditMemoRecommendationStore']);
@@ -230,6 +231,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-log-list', [AcMemoController::class, 'auditMemoLogList']);
         Route::post('audit-memo-response-of-rpu', [AcMemoController::class, 'responseOfRpuMemo']);
         Route::post('audit-memo-acknowledgment-of-rpu', [AcMemoController::class, 'acknowledgmentOfRpuMemo']);
+        Route::post('audit-memo-attachment-delete', [AcMemoController::class, 'auditMemoAttachmentDelete']);
     });
 
     //audit conduct apotti
