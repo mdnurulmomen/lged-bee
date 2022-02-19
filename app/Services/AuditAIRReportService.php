@@ -336,13 +336,16 @@ class AuditAIRReportService
             }
             $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)
                 ->where('is_delete',0)->pluck('apotti_id');
-            $apottiList = Apotti::whereIn('id',$qacApottis)->where('apotti_type','!=','reject');
+
+            $apottiList = ApottiStatus::with('apotti')->whereIn('apotti_id',$qacApottis);
 
             if ($request->qac_type == 'qac-2'){
-                 $apottiList->where('apotti_type','draft');
+                 $apottiList->where('qac_type',$request->qac_type)
+                     ->where('apotti_type','draft');
             }
             if ($request->qac_type == 'cqat'){
-                $apottiList->where('apotti_type','approved');
+                $apottiList->where('qac_type',$request->qac_type)
+                    ->where('apotti_type','approved');
             }
             $apottiList = $apottiList->get()->toArray();
 
