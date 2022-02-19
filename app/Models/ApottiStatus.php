@@ -31,4 +31,9 @@ class ApottiStatus extends Model
         'updated_by_name_en',
         'updated_by_name_bn',
     ];
+
+
+    public function apotti(){
+        return $this->belongsTo(Apotti::class, 'apotti_id', 'id');
+    }
 }
