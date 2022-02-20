@@ -450,7 +450,9 @@ class AuditAIRReportService
             ];
 
             RAirMovement::create($airMovementData);
-
+            if ($request->status != 'approved') {
+                $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
+            }
             //for qac 01 insert
             if ($request->status == 'approved' && $request->air_type != 'cqat') {
 
@@ -494,42 +496,42 @@ class AuditAIRReportService
                 if (!empty($mappingData)) {
                     ApottiRAirMap::insert($mappingData);
                 }
-
-                //Create Task for Approval
-                $task_data = [
-                    'task_assignee' => [
-                        'user_email' => $request->receiver_officer_email,
-                        'user_phone' => $request->receiver_officer_phone,
-                        'user_name_en' => $request->receiver_officer_en,
-                        'user_name_bn' => $request->receiver_officer_bn,
-                        'user_officer_id' => $request->receiver_officer_id,
-                        'username' => $request->receiver_user_id,
-                        'user_office_id' => $request->receiver_office_id,
-                        'user_office_name_en' => $cdesk->office_name_en,
-                        'user_office_name_bn' => $cdesk->office_name_bn,
-                        'user_unit_id' => $request->receiver_unit_id,
-                        'user_office_unit_name_en' => $request->receiver_unit_name_en,
-                        'user_office_unit_name_bn' => $request->receiver_unit_name_bn,
-                        'user_designation_id' => $request->receiver_employee_designation_id,
-                        'user_designation_name_en' => $request->receiver_employee_designation_en,
-                        'user_designation_name_bn' => $request->receiver_employee_designation_bn,
-                        'user_type' => 'assigned',
-                    ],
-                    'task_title_en' => $rAirData['report_name'],
-                    'task_title_bn' => $rAirData['report_name'],
-                    'description' => $request->comments,
-                    'meta_data' => base64_encode(json_encode(['r_air_id' => $request->r_air_id, 'return_url' => ''])),
-                    'task_start_end_date_time' => Carbon::now()->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDay()->format('d/m/Y H:i A'),
-                    'notifications' => json_encode([[
-                        "medium" => "email",
-                        "interval" => "30",
-                        "unit" => "minutes",
-                    ]]),
-                ];
-
-                $create_task = (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
-                //end task creation for approval
             }
+
+            //Create Task for Approval
+            $task_data = [
+                'task_assignee' => [
+                    'user_email' => $request->receiver_officer_email,
+                    'user_phone' => $request->receiver_officer_phone,
+                    'user_name_en' => $request->receiver_officer_en,
+                    'user_name_bn' => $request->receiver_officer_bn,
+                    'user_officer_id' => $request->receiver_officer_id,
+                    'username' => $request->receiver_user_id,
+                    'user_office_id' => $request->receiver_office_id,
+                    'user_office_name_en' => $cdesk->office_name_en,
+                    'user_office_name_bn' => $cdesk->office_name_bn,
+                    'user_unit_id' => $request->receiver_unit_id,
+                    'user_office_unit_name_en' => $request->receiver_unit_name_en,
+                    'user_office_unit_name_bn' => $request->receiver_unit_name_bn,
+                    'user_designation_id' => $request->receiver_employee_designation_id,
+                    'user_designation_name_en' => $request->receiver_employee_designation_en,
+                    'user_designation_name_bn' => $request->receiver_employee_designation_bn,
+                    'user_type' => 'assigned',
+                ],
+                'task_title_en' => $rAirData['report_name'],
+                'task_title_bn' => $rAirData['report_name'],
+                'description' => $request->comments,
+                'meta_data' => base64_encode(json_encode(['r_air_id' => $request->r_air_id, 'return_url' => ''])),
+                'task_start_end_date_time' => Carbon::now()->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDay()->format('d/m/Y H:i A'),
+                'notifications' => json_encode([[
+                    "medium" => "email",
+                    "interval" => "30",
+                    "unit" => "minutes",
+                ]]),
+            ];
+
+            $create_task = (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+            //end task creation for approval
 
             return ['status' => 'success', 'data' => ['apottis' => $request->apottis]];
         } catch (\Exception $exception) {

@@ -45,6 +45,7 @@ class AmmsPonjikaServices
         $storeTask = $this->initPonjikaHttp()->post(config('cag_ponjika_api.tasks.store'), $task_data)->json();
 
         if (isSuccess($storeTask)) {
+            \Log::error($storeTask['data']);
             return responseFormat('success', 'Successfully created task');
         } else {
             \Log::error($storeTask['message']);
