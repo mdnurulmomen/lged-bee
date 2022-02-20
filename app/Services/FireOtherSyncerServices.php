@@ -4,7 +4,7 @@ namespace App\Services;
 
 class FireOtherSyncerServices
 {
-    public function syncEventForCalendar($data)
+    public function storeTask($data, $cdesk)
     {
 
     }

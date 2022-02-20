@@ -9,24 +9,46 @@ class AmmsPonjikaServices
 {
     use GenericData, ApiHeart;
 
-    public function storeTask($validated_data)
+    public function createTask($data, $cdesk): array
     {
-        $data = [
-            'task_title_en' => $validated_data['title'],
-            'task_title_bn' => $validated_data['title'],
-            'task_description' => $validated_data['description'],
-            'start_date' => $validated_data['start_date'],
-            'start_time' => $validated_data['start_time'],
-            'end_date' => $validated_data['end_date'],
-            'end_time' => $validated_data['end_time'],
-            'task_organizer' => $validated_data['task_organizer'],
-            'task_to_event' => $validated_data['task_to_event'],
-            'task_status' => $validated_data['task_status'],
-            'system_type' => 'amms-api',
-            'notifications' => $validated_data['notifications'],
-            'task_assignee' => $validated_data['task_assignee'],
-            'meta_data' => $validated_data['meta_data'],
+        $task_organizer = [
+            'user_email' => $cdesk->email,
+            'user_name_en' => $cdesk->officer_en,
+            'user_name_bn' => $cdesk->officer_bn,
+            'username' => $cdesk->user_id,
+            'user_phone' => $cdesk->phone,
+            'user_officer_id' => $cdesk->officer_id,
+            'user_designation_id' => $cdesk->designation_id,
+            'user_office_id' => $cdesk->office_id,
+            'user_office_name_en' => $cdesk->office_name_en,
+            'user_office_name_bn' => $cdesk->office_name_bn,
+            'user_unit_id' => $cdesk->office_unit_id,
+            'user_office_unit_name_en' => $cdesk->office_unit_en,
+            'user_office_unit_name_bn' => $cdesk->office_unit_bn,
+            'user_designation_name_en' => $cdesk->designation_en,
+            'user_designation_name_bn' => $cdesk->designation_bn,
+            'user_type' => 'organizer',
         ];
-        $storeTask = $this->initPonjikaHttp()->post(config('cag_ponjika_api.tasks.store'), $data)->json();
+
+        $task_data = [
+            'task_organizer' => json_encode($task_organizer),
+            'task_assignee' => json_encode($data['task_assignee']),
+            'task_title_en' => $data['task_title_en'],
+            'task_title_bn' => $data['task_title_bn'],
+            'description' => $data['description'],
+            'meta_data' => $data['meta_data'],
+            'task_start_end_date_time' => $data['task_start_end_date_time'],
+            'notifications' => $data['notifications'],
+            'system_type' => 'amms-api',
+        ];
+
+        $storeTask = $this->initPonjikaHttp()->post(config('cag_ponjika_api.tasks.store'), $task_data)->json();
+
+        if (isSuccess($storeTask)) {
+            return responseFormat('success', 'Successfully created task');
+        } else {
+            \Log::error($storeTask['message']);
+            return responseFormat('error', $storeTask['message']);
+        }
     }
 }

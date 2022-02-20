@@ -13,7 +13,7 @@ use App\Models\RAir;
 use App\Models\RAirMovement;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
-use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AuditAIRReportService
@@ -35,11 +35,11 @@ class AuditAIRReportService
             $annualPlanQuery = ApEntityIndividualAuditPlan::with('annual_plan:id,office_type,total_unit_no,subject_matter')
                 ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
                 ->with('office_order:id,audit_plan_id,memorandum_no,memorandum_date,approved_status')
-                ->with('air_reports', function ($query) use($air_type) {
-                    return $query->with(['latest_r_air_movement'])->select('id','audit_plan_id','status')->where('type',$air_type);
+                ->with('air_reports', function ($query) use ($air_type) {
+                    return $query->with(['latest_r_air_movement'])->select('id', 'audit_plan_id', 'status')->where('type', $air_type);
                 })
-                ->select('id','annual_plan_id','schedule_id','activity_id','fiscal_year_id','created_at')
-                ->whereHas('office_order', function($query){
+                ->select('id', 'annual_plan_id', 'schedule_id', 'activity_id', 'fiscal_year_id', 'created_at')
+                ->whereHas('office_order', function ($query) {
                     $query->where('approved_status', 'approved');
                 })
                 ->where('fiscal_year_id', $fiscal_year_id);
@@ -63,7 +63,7 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $auditTemplate= AuditTemplate::where('template_type', $request->template_type)
+            $auditTemplate = AuditTemplate::where('template_type', $request->template_type)
                 ->where('lang', 'bn')->first()->toArray();
             return ['status' => 'success', 'data' => $auditTemplate];
 
@@ -84,7 +84,7 @@ class AuditAIRReportService
             $airReport = RAir::with('latest_r_air_movement')
                 ->with('annual_plan:id,office_type,total_unit_no,subject_matter')
                 ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
-                ->where('id',$request->air_report_id)
+                ->where('id', $request->air_report_id)
                 ->first()
                 ->toArray();
             return ['status' => 'success', 'data' => $airReport];
@@ -113,29 +113,29 @@ class AuditAIRReportService
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
-            if($request->air_id){
-                RAir::where('id',$request->air_id)->update($airData);
-                $airId =$request->air_id;
-            }else{
+            if ($request->air_id) {
+                RAir::where('id', $request->air_id)->update($airData);
+                $airId = $request->air_id;
+            } else {
                 $storeAirData = RAir::create($airData);
                 $airId = $storeAirData->id;
             }
 
             //for apotti
-            if (!empty($request->apottis)){
-                Apotti::whereIn('id',$request->all_apottis)->update(['air_generate_type'=> null]);
-                Apotti::whereIn('id',$request->apottis)->update(['air_generate_type'=>'preliminary']);
+            if (!empty($request->apottis)) {
+                Apotti::whereIn('id', $request->all_apottis)->update(['air_generate_type' => null]);
+                Apotti::whereIn('id', $request->apottis)->update(['air_generate_type' => 'preliminary']);
 
                 $mappingData = [];
-                foreach ($request->apottis as $apotti){
-                    array_push($mappingData,[
+                foreach ($request->apottis as $apotti) {
+                    array_push($mappingData, [
                         'apotti_id' => $apotti,
                         'rairs_id' => $airId
                     ]);
                 }
 
-                if (!empty($mappingData)){
-                    ApottiRAirMap::where('rairs_id',$airId)->delete();
+                if (!empty($mappingData)) {
+                    ApottiRAirMap::where('rairs_id', $airId)->delete();
                     ApottiRAirMap::insert($mappingData);
                 }
             }
@@ -160,43 +160,43 @@ class AuditAIRReportService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            if($request->air_description){
+            if ($request->air_description) {
                 $airData['air_description'] = $request->air_description;
             }
 
-            if($request->status){
+            if ($request->status) {
                 $airData['status'] = $request->status;
             }
 
-            if($request->approved_date){
-                $airData['approved_date'] = date('Y-m-d',strtotime($request->approved_date));
+            if ($request->approved_date) {
+                $airData['approved_date'] = date('Y-m-d', strtotime($request->approved_date));
             }
 
-            if($request->is_bg_press){
+            if ($request->is_bg_press) {
                 $airData['is_bg_press'] = $request->is_bg_press;
             }
 
-            if($request->is_printing_done){
+            if ($request->is_printing_done) {
                 $airData['is_printing_done'] = $request->is_printing_done;
             }
 
-            if($request->comment){
+            if ($request->comment) {
                 $airData['comment'] = $request->comment;
             }
 
-            if($request->approval_status){
+            if ($request->approval_status) {
                 $airData['approval_status'] = $request->approval_status;
             }
 
-            if($request->final_approval_status){
+            if ($request->final_approval_status) {
                 $airData['final_approval_status'] = $request->final_approval_status;
             }
 
-            if($request->qac_report_date){
+            if ($request->qac_report_date) {
                 $airData['qac_report_date'] = $request->qac_report_date;
             }
 
-            RAir::where('id',$request->air_id)->update($airData);
+            RAir::where('id', $request->air_id)->update($airData);
 
             return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
@@ -213,11 +213,11 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $auditTeamMembers = AuditVisitCalenderPlanMember::distinct()
-                ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
-                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no')
-                ->where('audit_plan_id',$request->audit_plan_id)
-                ->where('annual_plan_id',$request->annual_plan_id)
-                ->orderBy('team_member_role_en','DESC')
+                ->select('team_member_name_bn', 'team_member_name_en', 'team_member_designation_bn',
+                    'team_member_designation_en', 'team_member_role_bn', 'team_member_role_en', 'mobile_no')
+                ->where('audit_plan_id', $request->audit_plan_id)
+                ->where('annual_plan_id', $request->annual_plan_id)
+                ->orderBy('team_member_role_en', 'DESC')
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamMembers];
@@ -235,8 +235,8 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $auditTeamSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
-                ->where('annual_plan_id',$request->annual_plan_id)
+            $auditTeamSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)
+                ->where('annual_plan_id', $request->annual_plan_id)
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamSchedule];
@@ -255,18 +255,18 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $auditApottis = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
-                ->where('fiscal_year_id',$request->fiscal_year_id)
-                ->where('audit_plan_id',$request->audit_plan_id);
+            $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence', 'air_generate_type')
+                ->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('audit_plan_id', $request->audit_plan_id);
 
-            if ($request->air_type == 'preliminary'){
+            if ($request->air_type == 'preliminary') {
                 $auditApottis = $auditApottis->whereNull('air_generate_type');
             }
             $responseData['auditApottis'] = $auditApottis->get()->toArray();
 
 
             $responseData['auditMapApottis'] = ApottiRAirMap::with('apotti_map_data')
-                ->where('rairs_id',$request->air_id)
+                ->where('rairs_id', $request->air_id)
                 ->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
 
@@ -285,36 +285,33 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities','qac_committee.committee.qac_committee_members'])->where('id',$request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child', 'r_air_child.latest_r_air_movement', 'ap_entities', 'qac_committee.committee.qac_committee_members'])->where('id', $request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
-            if($request->qac_type == 'qac-1'){
-                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
-            }
-            elseif($request->qac_type == 'qac-2'){
-                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
-                    ->whereHas('apotti_map_data.apotti_status', function($q){
-                        $q->where('apotti_type','sfi');
+            if ($request->qac_type == 'qac-1') {
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
+            } elseif ($request->qac_type == 'qac-2') {
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
+                    ->whereHas('apotti_map_data.apotti_status', function ($q) {
+                        $q->where('apotti_type', 'sfi');
                     })
-                    ->where('rairs_id',$preliminaryAir['r_air_child']['id'])
+                    ->where('rairs_id', $preliminaryAir['r_air_child']['id'])
                     ->get()
                     ->toArray();
-            }
-            elseif($request->qac_type == 'cqat'){
-                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])
-                    ->whereHas('apotti_map_data', function($q){
-                        $q->where('apotti_type','draft')->orWhere('apotti_type','approved');
+            } elseif ($request->qac_type == 'cqat') {
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
+                    ->whereHas('apotti_map_data', function ($q) {
+                        $q->where('apotti_type', 'draft')->orWhere('apotti_type', 'approved');
 //                            ->where(function($query){
 //                                $query->where('final_status','draft')
 //                                    ->orWhere('final_status','approved');
 //                            });
                     })
-                    ->where('rairs_id',$preliminaryAir['r_air_child']['id'])
+                    ->where('rairs_id', $preliminaryAir['r_air_child']['id'])
                     ->get()
                     ->toArray();
-            }
-            else{
-                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data','apotti_map_data.apotti_items','apotti_map_data.apotti_status'])->where('rairs_id',$preliminaryAir['r_air_child']['id'])->get()->toArray();
+            } else {
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
             }
             //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
             //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
@@ -334,18 +331,18 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)
-                ->where('is_delete',0)->pluck('apotti_id');
+            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)
+                ->where('is_delete', 0)->pluck('apotti_id');
 
-            $apottiList = ApottiStatus::with('apotti')->whereIn('apotti_id',$qacApottis);
+            $apottiList = ApottiStatus::with('apotti')->whereIn('apotti_id', $qacApottis);
 
-            if ($request->qac_type == 'qac-2'){
-                 $apottiList->where('qac_type',$request->qac_type)
-                     ->where('apotti_type','draft');
+            if ($request->qac_type == 'qac-2') {
+                $apottiList->where('qac_type', $request->qac_type)
+                    ->where('apotti_type', 'draft');
             }
-            if ($request->qac_type == 'cqat'){
-                $apottiList->where('qac_type',$request->qac_type)
-                    ->where('apotti_type','approved');
+            if ($request->qac_type == 'cqat') {
+                $apottiList->where('qac_type', $request->qac_type)
+                    ->where('apotti_type', 'approved');
             }
             $apottiList = $apottiList->get()->toArray();
 
@@ -365,13 +362,13 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $qacApottis = ApottiRAirMap::where('rairs_id',$request->air_id)
-                ->where('is_delete',0)
+            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)
+                ->where('is_delete', 0)
                 ->pluck('apotti_id');
 
-            $apottiList = ApottiStatus::with('apotti')->whereIn('apotti_id',$qacApottis)
-                ->where('apotti_type',$request->apotti_type)
-                ->where('qac_type',$request->qac_type)
+            $apottiList = ApottiStatus::with('apotti')->whereIn('apotti_id', $qacApottis)
+                ->where('apotti_type', $request->apotti_type)
+                ->where('qac_type', $request->qac_type)
                 ->get()
                 ->toArray();
 
@@ -391,12 +388,12 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            if (empty($request->apottis)){
+            if (empty($request->apottis)) {
                 return ['status' => 'error', 'data' => []];
             }
 
-            $auditApottis = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence')
-                ->whereIn('id',$request->apottis)
+            $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence')
+                ->whereIn('id', $request->apottis)
                 ->get()
                 ->toArray();
 
@@ -411,66 +408,65 @@ class AuditAIRReportService
     public function storeAirMovement(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_id = $request->office_id ?: $cdesk->office_id;
         try {
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            RAir::where('id',$request->r_air_id)->update(['status'=> $request->status]);
+            RAir::where('id', $request->r_air_id)->update(['status' => $request->status]);
 
             //air movement data
             $airMovementData = [
-                'r_air_id'  => $request->r_air_id,
-                'receiver_officer_id'  => $request->receiver_officer_id,
-                'receiver_office_id'  => $request->receiver_office_id,
-                'receiver_unit_id'  => $request->receiver_unit_id,
-                'receiver_unit_name_en'  => $request->receiver_unit_name_en,
-                'receiver_unit_name_bn'  => $request->receiver_unit_name_bn,
-                'receiver_employee_id'  => $request->receiver_employee_id,
-                'receiver_employee_name_en'  => $request->receiver_employee_name_en,
-                'receiver_employee_name_bn'  => $request->receiver_employee_name_bn,
-                'receiver_employee_designation_id'  => $request->receiver_employee_designation_id,
-                'receiver_employee_designation_en'  => $request->receiver_employee_designation_en,
-                'receiver_employee_designation_bn'  => $request->receiver_employee_designation_bn,
-                'receiver_officer_phone'  => $request->receiver_officer_phone,
-                'receiver_officer_email'  => $request->receiver_officer_email,
-                'sender_officer_id'  => $cdesk->officer_id,
-                'sender_office_id'  => $cdesk->office_id,
-                'sender_unit_id'  => $cdesk->office_unit_id,
-                'sender_unit_name_en'  => $cdesk->office_unit_en,
-                'sender_unit_name_bn'  => $cdesk->office_unit_bn,
-                'sender_employee_id'  => $cdesk->officer_id,
-                'sender_employee_name_en'  => $cdesk->officer_en,
-                'sender_employee_name_bn'  => $cdesk->officer_bn,
-                'sender_employee_designation_id'  => $cdesk->designation_id,
-                'sender_employee_designation_en'  => $cdesk->designation_en,
-                'sender_employee_designation_bn'  => $cdesk->designation_bn,
-                'sender_officer_phone'  => $cdesk->phone,
-                'sender_officer_email'  => $cdesk->email,
-                'comments'  => $request->comments
+                'r_air_id' => $request->r_air_id,
+                'receiver_officer_id' => $request->receiver_officer_id,
+                'receiver_office_id' => $request->receiver_office_id,
+                'receiver_unit_id' => $request->receiver_unit_id,
+                'receiver_unit_name_en' => $request->receiver_unit_name_en,
+                'receiver_unit_name_bn' => $request->receiver_unit_name_bn,
+                'receiver_employee_id' => $request->receiver_employee_id,
+                'receiver_employee_name_en' => $request->receiver_employee_name_en,
+                'receiver_employee_name_bn' => $request->receiver_employee_name_bn,
+                'receiver_employee_designation_id' => $request->receiver_employee_designation_id,
+                'receiver_employee_designation_en' => $request->receiver_employee_designation_en,
+                'receiver_employee_designation_bn' => $request->receiver_employee_designation_bn,
+                'receiver_officer_phone' => $request->receiver_officer_phone,
+                'receiver_officer_email' => $request->receiver_officer_email,
+                'sender_officer_id' => $cdesk->officer_id,
+                'sender_office_id' => $cdesk->office_id,
+                'sender_unit_id' => $cdesk->office_unit_id,
+                'sender_unit_name_en' => $cdesk->office_unit_en,
+                'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                'sender_employee_id' => $cdesk->officer_id,
+                'sender_employee_name_en' => $cdesk->officer_en,
+                'sender_employee_name_bn' => $cdesk->officer_bn,
+                'sender_employee_designation_id' => $cdesk->designation_id,
+                'sender_employee_designation_en' => $cdesk->designation_en,
+                'sender_employee_designation_bn' => $cdesk->designation_bn,
+                'sender_officer_phone' => $cdesk->phone,
+                'sender_officer_email' => $cdesk->email,
+                'comments' => $request->comments
             ];
+
             RAirMovement::create($airMovementData);
 
             //for qac 01 insert
-            if ($request->status == 'approved' && $request->air_type != 'cqat'){
+            if ($request->status == 'approved' && $request->air_type != 'cqat') {
 
                 $newAirType = 'draft';
-                if ($request->air_type == 'preliminary'){
+                if ($request->air_type == 'preliminary') {
                     $newAirType = 'qac-1';
-                }
-                elseif ($request->air_type == 'qac-1'){
+                } elseif ($request->air_type == 'qac-1') {
                     $newAirType = 'qac-2';
-                }
-                elseif ($request->air_type == 'qac-2'){
+                } elseif ($request->air_type == 'qac-2') {
                     $newAirType = 'cqat';
                 }
 //                elseif ($request->air_type == 'cqat'){
 //                    $newAirType = 'final';
 //                }
 
-                $rAirData = RAir::where('id',$request->r_air_id)->first()->toArray();
+                $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 $airData = [
                     'report_name' => $rAirData['report_name'],
                     'parent_id' => $rAirData['id'],
@@ -487,18 +483,52 @@ class AuditAIRReportService
                 $storeQAC01Air = RAir::create($airData);
 
                 //for map data
-                $apottiRAirMap = ApottiRAirMap::where('rairs_id',$request->r_air_id)->get()->toArray();
+                $apottiRAirMap = ApottiRAirMap::where('rairs_id', $request->r_air_id)->get()->toArray();
                 $mappingData = [];
-                foreach ($apottiRAirMap as $apotti){
-                    array_push($mappingData,[
+                foreach ($apottiRAirMap as $apotti) {
+                    array_push($mappingData, [
                         'apotti_id' => $apotti['apotti_id'],
                         'rairs_id' => $storeQAC01Air->id
                     ]);
                 }
-
-                if (!empty($mappingData)){
+                if (!empty($mappingData)) {
                     ApottiRAirMap::insert($mappingData);
                 }
+
+                //Create Task for Approval
+                $task_data = [
+                    'task_assignee' => [
+                        'user_email' => $request->receiver_officer_email,
+                        'user_phone' => $request->receiver_officer_phone,
+                        'user_name_en' => $request->receiver_officer_en,
+                        'user_name_bn' => $request->receiver_officer_bn,
+                        'user_officer_id' => $request->receiver_officer_id,
+                        'username' => $request->receiver_user_id,
+                        'user_office_id' => $request->receiver_office_id,
+                        'user_office_name_en' => $cdesk->office_name_en,
+                        'user_office_name_bn' => $cdesk->office_name_bn,
+                        'user_unit_id' => $request->receiver_unit_id,
+                        'user_office_unit_name_en' => $request->receiver_unit_name_en,
+                        'user_office_unit_name_bn' => $request->receiver_unit_name_bn,
+                        'user_designation_id' => $request->receiver_employee_designation_id,
+                        'user_designation_name_en' => $request->receiver_employee_designation_en,
+                        'user_designation_name_bn' => $request->receiver_employee_designation_bn,
+                        'user_type' => 'assigned',
+                    ],
+                    'task_title_en' => $rAirData['report_name'],
+                    'task_title_bn' => $rAirData['report_name'],
+                    'description' => $request->comments,
+                    'meta_data' => base64_encode(json_encode(['r_air_id' => $request->r_air_id, 'return_url' => ''])),
+                    'task_start_end_date_time' => Carbon::now()->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDay()->format('d/m/Y H:i A'),
+                    'notifications' => json_encode([[
+                        "medium" => "email",
+                        "interval" => "30",
+                        "unit" => "minutes",
+                    ]]),
+                ];
+
+                $create_task = (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+                //end task creation for approval
             }
 
             return ['status' => 'success', 'data' => ['apottis' => $request->apottis]];
@@ -517,7 +547,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $lastAirMovementInfo = RAirMovement::where('r_air_id',$request->r_air_id)
+            $lastAirMovementInfo = RAirMovement::where('r_air_id', $request->r_air_id)
                 ->latest()
                 ->first()
                 ->toArray();
@@ -539,20 +569,18 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            if ($request->qac_type == 'qac-1'){
+            if ($request->qac_type == 'qac-1') {
                 $newAirType = 'preliminary';
-            }
-            elseif ($request->qac_type == 'qac-2'){
+            } elseif ($request->qac_type == 'qac-2') {
                 $newAirType = 'qac-1';
-            }
-            elseif ($request->qac_type == 'cqat'){
+            } elseif ($request->qac_type == 'cqat') {
                 $newAirType = 'qac-2';
             }
 
-            $airList = RAir::select('id','report_name','fiscal_year_id','audit_plan_id')
-                ->where('audit_plan_id',$request->audit_plan_id)
-                ->where('type',$newAirType)
-                ->where('status','approved')
+            $airList = RAir::select('id', 'report_name', 'fiscal_year_id', 'audit_plan_id')
+                ->where('audit_plan_id', $request->audit_plan_id)
+                ->where('type', $newAirType)
+                ->where('status', 'approved')
                 ->get()
                 ->toArray();
 
@@ -573,9 +601,9 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $airList = RAir::with('latest_r_air_movement')->where('activity_id',$request->activity_id)
-                ->where('type','cqat')
-                ->where('status','approved')
+            $airList = RAir::with('latest_r_air_movement')->where('activity_id', $request->activity_id)
+                ->where('type', 'cqat')
+                ->where('status', 'approved')
                 ->get()
                 ->toArray();
 
@@ -595,11 +623,11 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            Apotti::where('id',$request->apotti_id)->update(['is_delete'=> $request->is_delete]);
+            Apotti::where('id', $request->apotti_id)->update(['is_delete' => $request->is_delete]);
 
-            ApottiRAirMap::where('apotti_id',$request->apotti_id)
-                ->where('rairs_id',$request->air_report_id)
-                ->update(['is_delete'=> $request->is_delete]);
+            ApottiRAirMap::where('apotti_id', $request->apotti_id)
+                ->where('rairs_id', $request->air_report_id)
+                ->update(['is_delete' => $request->is_delete]);
 
             return ['status' => 'success', 'data' => []];
 
@@ -618,7 +646,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            Apotti::where('id',$request->apotti_id)->update(['apotti_type'=> $request->final_status]);
+            Apotti::where('id', $request->apotti_id)->update(['apotti_type' => $request->final_status]);
 
             $apotti_status = new ApottiStatus();
             $apotti_status->apotti_id = $request->apotti_id;
@@ -648,34 +676,34 @@ class AuditAIRReportService
             }
             //air movement data
             $airMovementData = [
-                'r_air_id'  => $request->r_air_id,
-                'receiver_officer_id'  => $request->receiver_officer_id,
-                'receiver_office_id'  => $request->receiver_office_id,
-                'receiver_unit_id'  => $request->receiver_unit_id,
-                'receiver_unit_name_en'  => $request->receiver_unit_name_en,
-                'receiver_unit_name_bn'  => $request->receiver_unit_name_bn,
-                'receiver_employee_id'  => $request->receiver_employee_id,
-                'receiver_employee_name_en'  => $request->receiver_employee_name_en,
-                'receiver_employee_name_bn'  => $request->receiver_employee_name_bn,
-                'receiver_employee_designation_id'  => $request->receiver_employee_designation_id,
-                'receiver_employee_designation_en'  => $request->receiver_employee_designation_en,
-                'receiver_employee_designation_bn'  => $request->receiver_employee_designation_bn,
-                'receiver_officer_phone'  => $request->receiver_officer_phone,
-                'receiver_officer_email'  => $request->receiver_officer_email,
-                'sender_officer_id'  => $cdesk->officer_id,
-                'sender_office_id'  => $cdesk->office_id,
-                'sender_unit_id'  => $cdesk->office_unit_id,
-                'sender_unit_name_en'  => $cdesk->office_unit_en,
-                'sender_unit_name_bn'  => $cdesk->office_unit_bn,
-                'sender_employee_id'  => $cdesk->officer_id,
-                'sender_employee_name_en'  => $cdesk->officer_en,
-                'sender_employee_name_bn'  => $cdesk->officer_bn,
-                'sender_employee_designation_id'  => $cdesk->designation_id,
-                'sender_employee_designation_en'  => $cdesk->designation_en,
-                'sender_employee_designation_bn'  => $cdesk->designation_bn,
-                'sender_officer_phone'  => $cdesk->phone,
-                'sender_officer_email'  => $cdesk->email,
-                'comments'  => $request->comments
+                'r_air_id' => $request->r_air_id,
+                'receiver_officer_id' => $request->receiver_officer_id,
+                'receiver_office_id' => $request->receiver_office_id,
+                'receiver_unit_id' => $request->receiver_unit_id,
+                'receiver_unit_name_en' => $request->receiver_unit_name_en,
+                'receiver_unit_name_bn' => $request->receiver_unit_name_bn,
+                'receiver_employee_id' => $request->receiver_employee_id,
+                'receiver_employee_name_en' => $request->receiver_employee_name_en,
+                'receiver_employee_name_bn' => $request->receiver_employee_name_bn,
+                'receiver_employee_designation_id' => $request->receiver_employee_designation_id,
+                'receiver_employee_designation_en' => $request->receiver_employee_designation_en,
+                'receiver_employee_designation_bn' => $request->receiver_employee_designation_bn,
+                'receiver_officer_phone' => $request->receiver_officer_phone,
+                'receiver_officer_email' => $request->receiver_officer_email,
+                'sender_officer_id' => $cdesk->officer_id,
+                'sender_office_id' => $cdesk->office_id,
+                'sender_unit_id' => $cdesk->office_unit_id,
+                'sender_unit_name_en' => $cdesk->office_unit_en,
+                'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                'sender_employee_id' => $cdesk->officer_id,
+                'sender_employee_name_en' => $cdesk->officer_en,
+                'sender_employee_name_bn' => $cdesk->officer_bn,
+                'sender_employee_designation_id' => $cdesk->designation_id,
+                'sender_employee_designation_en' => $cdesk->designation_en,
+                'sender_employee_designation_bn' => $cdesk->designation_bn,
+                'sender_officer_phone' => $cdesk->phone,
+                'sender_officer_email' => $cdesk->email,
+                'comments' => $request->comments
             ];
             RAirMovement::create($airMovementData);
             return ['status' => 'success', 'data' => ['Movement Successfully']];
