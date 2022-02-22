@@ -13,6 +13,7 @@ use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -336,15 +337,27 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,sequence')
-                ->where('id', $request->memos)
-                ->get();
+            //for memo send date
+            $memo_send_date = str_replace('/','-',$request->memo_send_date);
 
-            $data['memos'] = $memo;
+            //for memo info
+            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,file_size,file_extension,sequence')
+                ->where('id', $request->memo_id)
+                ->first();
+
+            //data ready for RP
+            $data['memo'] = $memo;
             $data['memo_send_date'] = date('Y-m-d');
+            $data['memo_sharok_no'] = $request->memo_sharok_no;
+            $data['memo_sharok_date'] = Carbon::parse($memo_send_date)->format('Y-m-d');
             $data['directorate_id'] = $cdesk->office_id;
             $data['directorate_en'] = $cdesk->office_name_en;
             $data['directorate_bn'] = $cdesk->office_name_bn;
+            $data['directorate_address'] = $request->directorate_address;
+            $data['directorate_website'] = $request->directorate_website;
+            $data['rpu_acceptor_designation_name_bn'] = $request->rpu_acceptor_designation_name_bn;
+            $data['memo_cc'] = $request->memo_cc;
+            $data['issued_by'] = $request->issued_by;
             $data['sender_officer_id'] = $cdesk->officer_id;
             $data['sender_officer_id'] = $cdesk->officer_id;
             $data['sender_officer_name_bn'] = $cdesk->officer_bn;
@@ -355,9 +368,8 @@ class AcMemoService
 
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
 
-            $memo_send_date = str_replace('/','-',$request->memo_send_date);
             if ($send_audit_memo_to_rpu['status'] == 'success') {
-                AcMemo::where('id', $request->memos)
+                AcMemo::where('id', $request->memo_id)
                     ->update([
                         'has_sent_to_rpu'=>1,
                         'sender_officer_id'=>$cdesk->officer_id,
@@ -376,66 +388,64 @@ class AcMemoService
                         'issued_by' => $request->issued_by,
                     ]);
 
-                $apotti_sequence = Apotti::where('fiscal_year_id',$memo[0]['fiscal_year_id'])
-                                           ->where('parent_office_id',$memo[0]['parent_office_id'])
+                $apotti_sequence = Apotti::where('fiscal_year_id',$memo['fiscal_year_id'])
+                                           ->where('parent_office_id',$memo['parent_office_id'])
                                            ->max('apotti_sequence');
 
-                foreach ($memo as $memo_item){
-                   $apotti =  New Apotti();
-                   $apotti->audit_plan_id = $memo_item['audit_plan_id'];
-                   $apotti->onucched_no = $apotti_sequence + 1;
-                   $apotti->apotti_title = $memo_item['memo_title_bn'];
-                   $apotti->apotti_description = $memo_item['memo_description_bn'];
-                   $apotti->ministry_id = $memo_item['ministry_id'];
-                   $apotti->ministry_name_en = $memo_item['ministry_name_en'];
-                   $apotti->ministry_name_bn = $memo_item['ministry_name_en'];
-                   $apotti->parent_office_id = $memo_item['parent_office_id'];
-                   $apotti->parent_office_name_en = $memo_item['parent_office_name_en'];
-                   $apotti->parent_office_name_bn = $memo_item['parent_office_name_bn'];
-                   $apotti->fiscal_year_id = $memo_item['fiscal_year_id'];
-                   $apotti->total_jorito_ortho_poriman = $memo_item['jorito_ortho_poriman'];
-                   $apotti->total_onishponno_jorito_ortho_poriman = $memo_item['onishponno_jorito_ortho_poriman'];
-                   $apotti->created_by = $cdesk->officer_id;
-                   $apotti->approve_status = 1;
-                   $apotti->status = 0;
-                   $apotti->apotti_sequence = $apotti_sequence + 1;
-                   $apotti->is_combined = 0;
-                   $apotti->save();
+                $apotti =  New Apotti();
+                $apotti->audit_plan_id = $memo['audit_plan_id'];
+                $apotti->onucched_no = $apotti_sequence + 1;
+                $apotti->apotti_title = $memo['memo_title_bn'];
+                $apotti->apotti_description = $memo['memo_description_bn'];
+                $apotti->ministry_id = $memo['ministry_id'];
+                $apotti->ministry_name_en = $memo['ministry_name_en'];
+                $apotti->ministry_name_bn = $memo['ministry_name_en'];
+                $apotti->parent_office_id = $memo['parent_office_id'];
+                $apotti->parent_office_name_en = $memo['parent_office_name_en'];
+                $apotti->parent_office_name_bn = $memo['parent_office_name_bn'];
+                $apotti->fiscal_year_id = $memo['fiscal_year_id'];
+                $apotti->total_jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
+                $apotti->total_onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
+                $apotti->created_by = $cdesk->officer_id;
+                $apotti->approve_status = 1;
+                $apotti->status = 0;
+                $apotti->apotti_sequence = $apotti_sequence + 1;
+                $apotti->is_combined = 0;
+                $apotti->save();
 
-                   $apotti_item =  New ApottiItem();
-                   $apotti_item->apotti_id = $apotti->id;
-                   $apotti_item->memo_id = $memo_item['id'];
-                   $apotti_item->onucched_no = $apotti_sequence + 1;
-                   $apotti_item->memo_irregularity_type = $memo_item['memo_irregularity_type'];
-                   $apotti_item->memo_irregularity_sub_type = $memo_item['memo_irregularity_sub_type'];
-                   $apotti_item->ministry_id = $memo_item['ministry_id'];
-                   $apotti_item->ministry_name_en = $memo_item['ministry_name_en'];
-                   $apotti_item->ministry_name_bn = $memo_item['ministry_name_en'];
-                   $apotti_item->parent_office_id = $memo_item['parent_office_id'];
-                   $apotti_item->parent_office_name_en = $memo_item['parent_office_name_en'];
-                   $apotti_item->parent_office_name_bn = $memo_item['parent_office_name_bn'];
-                   $apotti_item->cost_center_id = $memo_item['cost_center_id'];
-                   $apotti_item->cost_center_name_en = $memo_item['cost_center_name_en'];
-                   $apotti_item->cost_center_name_bn = $memo_item['cost_center_name_bn'];
-                   $apotti_item->fiscal_year_id = $memo_item['fiscal_year_id'];
-                   $apotti_item->audit_year_start = $memo_item['audit_year_start'];
-                   $apotti_item->audit_year_end = $memo_item['audit_year_end'];
-                   $apotti_item->ac_query_potro_no = $memo_item['ac_query_potro_no'];
-                   $apotti_item->ap_office_order_id = $memo_item['ap_office_order_id'];
-                   $apotti_item->audit_plan_id = $memo_item['audit_plan_id'];
-                   $apotti_item->audit_type = $memo_item['audit_type'];
-                   $apotti_item->team_id = $memo_item['team_id'];
-                   $apotti_item->memo_title_bn = $memo_item['memo_title_bn'];
-                   $apotti_item->memo_description_bn = $memo_item['memo_description_bn'];
-                   $apotti_item->memo_title_bn = $memo_item['memo_title_bn'];
-                   $apotti_item->memo_type = $memo_item['memo_type'];
-                   $apotti_item->memo_status = $memo_item['memo_status'];
-                   $apotti_item->jorito_ortho_poriman = $memo_item['jorito_ortho_poriman'];
-                   $apotti_item->onishponno_jorito_ortho_poriman = $memo_item['onishponno_jorito_ortho_poriman'];
-                   $apotti_item->created_by = $cdesk->officer_id;
-                   $apotti_item->status = 0;
-                   $apotti_item->save();
-                }
+                $apotti_item =  New ApottiItem();
+                $apotti_item->apotti_id = $apotti->id;
+                $apotti_item->memo_id = $memo['id'];
+                $apotti_item->onucched_no = $apotti_sequence + 1;
+                $apotti_item->memo_irregularity_type = $memo['memo_irregularity_type'];
+                $apotti_item->memo_irregularity_sub_type = $memo['memo_irregularity_sub_type'];
+                $apotti_item->ministry_id = $memo['ministry_id'];
+                $apotti_item->ministry_name_en = $memo['ministry_name_en'];
+                $apotti_item->ministry_name_bn = $memo['ministry_name_en'];
+                $apotti_item->parent_office_id = $memo['parent_office_id'];
+                $apotti_item->parent_office_name_en = $memo['parent_office_name_en'];
+                $apotti_item->parent_office_name_bn = $memo['parent_office_name_bn'];
+                $apotti_item->cost_center_id = $memo['cost_center_id'];
+                $apotti_item->cost_center_name_en = $memo['cost_center_name_en'];
+                $apotti_item->cost_center_name_bn = $memo['cost_center_name_bn'];
+                $apotti_item->fiscal_year_id = $memo['fiscal_year_id'];
+                $apotti_item->audit_year_start = $memo['audit_year_start'];
+                $apotti_item->audit_year_end = $memo['audit_year_end'];
+                $apotti_item->ac_query_potro_no = $memo['ac_query_potro_no'];
+                $apotti_item->ap_office_order_id = $memo['ap_office_order_id'];
+                $apotti_item->audit_plan_id = $memo['audit_plan_id'];
+                $apotti_item->audit_type = $memo['audit_type'];
+                $apotti_item->team_id = $memo['team_id'];
+                $apotti_item->memo_title_bn = $memo['memo_title_bn'];
+                $apotti_item->memo_description_bn = $memo['memo_description_bn'];
+                $apotti_item->memo_title_bn = $memo['memo_title_bn'];
+                $apotti_item->memo_type = $memo['memo_type'];
+                $apotti_item->memo_status = $memo['memo_status'];
+                $apotti_item->jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
+                $apotti_item->onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
+                $apotti_item->created_by = $cdesk->officer_id;
+                $apotti_item->status = 0;
+                $apotti_item->save();
 
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
