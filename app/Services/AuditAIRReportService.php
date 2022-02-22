@@ -450,7 +450,7 @@ class AuditAIRReportService
             ];
 
             RAirMovement::create($airMovementData);
-            if ($request->status != 'approved') {
+            if (!empty($request->receiver_user_id)) {
                 $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 //Create Task for Approval
                 $task_data = [

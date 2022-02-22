@@ -1,17 +1,16 @@
 <?php
 
 namespace App\Services;
-use App\Models\AcMemo;
-use App\Models\AnnualPlan;
 use App\Models\AnnualPlanEntitie;
-use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\ApottiRAirMap;
 use App\Models\RAir;
+use App\Models\XDefaultSetting;
 use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -82,6 +81,47 @@ class RpuAirReportService
                 if ($send_air_to_rpu['status'] == 'success') {
                     $air_info->is_sent = 1;
                     $air_info->save();
+
+                    $tagidPotroSendingDays = XDefaultSetting::select('setting_value')
+                        ->where('setting_key','tagid_potro_sending_days')
+                        ->first()
+                        ->toArray();
+
+                    //tagid potro
+                    $tagid_potro_task_data = [
+                        'task_title_en' => $air_info->report_name.' এ তাগিদ পত্র প্রেরণ করুন',
+                        'task_title_bn' => $air_info->report_name.' এ তাগিদ পত্র প্রেরণ করুন',
+                        'description' => '',
+                        'meta_data' => base64_encode(json_encode(['r_air_id' => $air_info->id, 'return_url' => ''])),
+                        'task_start_end_date_time' => Carbon::now()->addDays($tagidPotroSendingDays['setting_value'])->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDays($tagidPotroSendingDays['setting_value'])->format('d/m/Y H:i A'),
+                        'notifications' => json_encode([[
+                            "medium" => "email",
+                            "interval" => "1",
+                            "unit" => "days",
+                        ]]),
+                    ];
+                    (new AmmsPonjikaServices())->createTask($tagid_potro_task_data, $cdesk);
+
+                    $doLetterSendingDays = XDefaultSetting::select('setting_value')
+                        ->where('setting_key','do_letter_sending_days')
+                        ->first()
+                        ->toArray();
+                    
+                    //do letter
+                    $do_letter_task_data = [
+                        'task_title_en' => $air_info->report_name.' এ ডিও লেটার প্রেরণ করুন',
+                        'task_title_bn' => $air_info->report_name.' এ ডিও লেটার প্রেরণ করুন',
+                        'description' => '',
+                        'meta_data' => base64_encode(json_encode(['r_air_id' => $air_info->id, 'return_url' => ''])),
+                        'task_start_end_date_time' => Carbon::now()->addDays($doLetterSendingDays['setting_value'])->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDays($doLetterSendingDays['setting_value'])->format('d/m/Y H:i A'),
+                        'notifications' => json_encode([[
+                            "medium" => "email",
+                            "interval" => "1",
+                            "unit" => "days",
+                        ]]),
+                    ];
+                    (new AmmsPonjikaServices())->createTask($do_letter_task_data, $cdesk);
+
                     return ['status' => 'success', 'data' => 'Air Send Successfully'];
                 }
                 return ['status' => 'error', 'data' => $send_air_to_rpu];

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Illuminate\Support\Arr;
 
 class AmmsPonjikaServices
 {
@@ -32,7 +33,6 @@ class AmmsPonjikaServices
 
         $task_data = [
             'task_organizer' => json_encode($task_organizer),
-            'task_assignee' => json_encode($data['task_assignee']),
             'task_title_en' => $data['task_title_en'],
             'task_title_bn' => $data['task_title_bn'],
             'description' => $data['description'],
@@ -41,6 +41,9 @@ class AmmsPonjikaServices
             'notifications' => $data['notifications'],
             'system_type' => 'amms-api',
         ];
+        if (Arr::has($data, 'task_assignee')) {
+            $task_data['task_assignee'] = json_encode($data['task_assignee']);
+        }
 
         $storeTask = $this->initPonjikaHttp()->post(config('cag_ponjika_api.tasks.store'), $task_data)->json();
 
