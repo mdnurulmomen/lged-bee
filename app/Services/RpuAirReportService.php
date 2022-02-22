@@ -106,7 +106,7 @@ class RpuAirReportService
                         ->where('setting_key','do_letter_sending_days')
                         ->first()
                         ->toArray();
-                    
+
                     //do letter
                     $do_letter_task_data = [
                         'task_title_en' => $air_info->report_name.' এ ডিও লেটার প্রেরণ করুন',
