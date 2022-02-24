@@ -664,7 +664,12 @@ class AcMemoService
     public function attachmentList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if ($request->has('directorate_id')) {
+            $office_db_con_response = $this->switchOffice($request->directorate_id);
+        } else {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        }
+
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
