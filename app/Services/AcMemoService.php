@@ -13,11 +13,10 @@ use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use DB;
 
 class AcMemoService
 {
@@ -39,10 +38,10 @@ class AcMemoService
             $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)
                 ->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->count();
 
-            $fiscal_year_info = XFiscalYear::select('start','end')->where('id',$plan_member_schedule->fiscal_year_id)->first();
+            $fiscal_year_info = XFiscalYear::select('start', 'end')->where('id', $plan_member_schedule->fiscal_year_id)->first();
 
             $audit_memo = new AcMemo();
-            $audit_memo->onucched_no = $onucched+1;
+            $audit_memo->onucched_no = $onucched + 1;
             $audit_memo->memo_date = date('Y-m-d');
             $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
             $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
@@ -56,7 +55,7 @@ class AcMemoService
             $audit_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
             $audit_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
             $audit_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
-            $audit_memo->fiscal_year = $fiscal_year_info->start.'-'.$fiscal_year_info->end;
+            $audit_memo->fiscal_year = $fiscal_year_info->start . '-' . $fiscal_year_info->end;
             $audit_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
             $audit_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
             $audit_memo->audit_year_start = $request->audit_year_start;
@@ -90,11 +89,11 @@ class AcMemoService
 
             //for porisishtos
             if ($request->hasfile('porisishtos')) {
-                foreach ($request->porisishtos as $key=>$file){
+                foreach ($request->porisishtos as $key => $file) {
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'porisishto_'.uniqid() . '.' . $fileExtension;
+                    $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
@@ -105,7 +104,7 @@ class AcMemoService
                             'file_path' => url('storage/memo/dicfia/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
-                            'sequence' => $key+1,
+                            'sequence' => $key + 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
                         )
@@ -115,11 +114,11 @@ class AcMemoService
 
             //for pramanoks
             if ($request->hasfile('pramanoks')) {
-                foreach ($request->pramanoks as $key=>$file){
+                foreach ($request->pramanoks as $key => $file) {
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'pramanok_'.uniqid() . '.' . $fileExtension;
+                    $fileName = 'pramanok_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
 
@@ -131,7 +130,7 @@ class AcMemoService
                             'file_path' => url('storage/memo/dicfia/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
-                            'sequence' => $key+1,
+                            'sequence' => $key + 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
                         )
@@ -139,7 +138,7 @@ class AcMemoService
                 }
             }
 
-            if (!empty($finalAttachments)){
+            if (!empty($finalAttachments)) {
                 AcMemoAttachment::insert($finalAttachments);
             }
 
@@ -174,7 +173,11 @@ class AcMemoService
     public function auditMemoEdit(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if ($request->has('directorate_id')) {
+            $office_db_con_response = $this->switchOffice($request->directorate_id);
+        } else {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        }
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
@@ -201,9 +204,9 @@ class AcMemoService
         try {
             $data['memo'] = AcMemo::where('id', $request->memo_id)->first();
             $data['porisishto_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
-                ->where('file_type','porisishto')->get();
+                ->where('file_type', 'porisishto')->get();
             $data['pramanok_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
-                ->where('file_type','pramanok')->get();
+                ->where('file_type', 'pramanok')->get();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -258,11 +261,11 @@ class AcMemoService
 
             //for porisishtos
             if ($request->hasfile('porisishtos')) {
-                foreach ($request->porisishtos as $key=>$file){
+                foreach ($request->porisishtos as $key => $file) {
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'porisishto_'.uniqid() . '.' . $fileExtension;
+                    $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
@@ -273,7 +276,7 @@ class AcMemoService
                             'file_path' => url('storage/memo/dicfia/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
-                            'sequence' => $key+1,
+                            'sequence' => $key + 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
                         )
@@ -283,11 +286,11 @@ class AcMemoService
 
             //for pramanoks
             if ($request->hasfile('pramanoks')) {
-                foreach ($request->pramanoks as $key=>$file){
+                foreach ($request->pramanoks as $key => $file) {
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'pramanok_'.uniqid() . '.' . $file->extension();
+                    $fileName = 'pramanok_' . uniqid() . '.' . $file->extension();
 
                     Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
 
@@ -299,7 +302,7 @@ class AcMemoService
                             'file_path' => url('storage/memo/dicfia/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
-                            'sequence' => $key+1,
+                            'sequence' => $key + 1,
                             'created_by' => $cdesk->officer_id,
                             'modified_by' => $cdesk->officer_id,
                         )
@@ -310,7 +313,7 @@ class AcMemoService
 
             $memo_info = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,sequence')->where('id', $request->memo_id)->first();
 //            return ['status' => 'success', 'data' => $memo_info];
-            if($memo_info->has_sent_to_rpu){
+            if ($memo_info->has_sent_to_rpu) {
                 $data['memo_info'] = $memo_info;
                 $update_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_memo_to_rpu'), $data)->json();
                 if ($update_audit_memo_to_rpu['status'] == 'success') {
@@ -318,7 +321,7 @@ class AcMemoService
                 } else {
                     throw new \Exception(json_encode($update_audit_memo_to_rpu));
                 }
-            }else{
+            } else {
                 return ['status' => 'success', 'data' => 'Memo Update Successfully'];
             }
 
@@ -338,7 +341,7 @@ class AcMemoService
         }
         try {
             //for memo send date
-            $memo_send_date = str_replace('/','-',$request->memo_send_date);
+            $memo_send_date = str_replace('/', '-', $request->memo_send_date);
 
             //for memo info
             $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,file_size,file_extension,sequence')
@@ -371,28 +374,28 @@ class AcMemoService
             if ($send_audit_memo_to_rpu['status'] == 'success') {
                 AcMemo::where('id', $request->memo_id)
                     ->update([
-                        'has_sent_to_rpu'=>1,
-                        'sender_officer_id'=>$cdesk->officer_id,
-                        'sender_officer_name_bn'=>$cdesk->officer_bn,
-                        'sender_officer_name_en'=>$cdesk->officer_en,
-                        'sender_unit_id'=>$cdesk->office_unit_id,
-                        'sender_unit_name_bn'=>$cdesk->office_unit_bn,
-                        'sender_unit_name_en'=>$cdesk->office_unit_en,
-                        'sender_designation_id'=>$cdesk->designation_id,
-                        'sender_designation_bn'=>$cdesk->designation_bn,
-                        'sender_designation_en'=>$cdesk->designation_en,
-                        'memo_sharok_no'=> $request->memo_sharok_no,
+                        'has_sent_to_rpu' => 1,
+                        'sender_officer_id' => $cdesk->officer_id,
+                        'sender_officer_name_bn' => $cdesk->officer_bn,
+                        'sender_officer_name_en' => $cdesk->officer_en,
+                        'sender_unit_id' => $cdesk->office_unit_id,
+                        'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                        'sender_unit_name_en' => $cdesk->office_unit_en,
+                        'sender_designation_id' => $cdesk->designation_id,
+                        'sender_designation_bn' => $cdesk->designation_bn,
+                        'sender_designation_en' => $cdesk->designation_en,
+                        'memo_sharok_no' => $request->memo_sharok_no,
                         'memo_send_date' => Carbon::parse($memo_send_date)->format('Y-m-d'),
-                        'rpu_acceptor_designation_name_bn'=> $request->rpu_acceptor_designation_name_bn,
+                        'rpu_acceptor_designation_name_bn' => $request->rpu_acceptor_designation_name_bn,
                         'memo_cc' => $request->memo_cc,
                         'issued_by' => $request->issued_by,
                     ]);
 
-                $apotti_sequence = Apotti::where('fiscal_year_id',$memo['fiscal_year_id'])
-                                           ->where('parent_office_id',$memo['parent_office_id'])
-                                           ->max('apotti_sequence');
+                $apotti_sequence = Apotti::where('fiscal_year_id', $memo['fiscal_year_id'])
+                    ->where('parent_office_id', $memo['parent_office_id'])
+                    ->max('apotti_sequence');
 
-                $apotti =  New Apotti();
+                $apotti = new Apotti();
                 $apotti->audit_plan_id = $memo['audit_plan_id'];
                 $apotti->onucched_no = $apotti_sequence + 1;
                 $apotti->apotti_title = $memo['memo_title_bn'];
@@ -413,7 +416,7 @@ class AcMemoService
                 $apotti->is_combined = 0;
                 $apotti->save();
 
-                $apotti_item =  New ApottiItem();
+                $apotti_item = new ApottiItem();
                 $apotti_item->apotti_id = $apotti->id;
                 $apotti_item->memo_id = $memo['id'];
                 $apotti_item->onucched_no = $apotti_sequence + 1;
@@ -470,7 +473,7 @@ class AcMemoService
             $entity_id = $request->entity_id;
             $activity_id = $request->activity_id;
             $team_id = $request->team_id;
-            $memo_irregularity_type= $request->memo_irregularity_type;
+            $memo_irregularity_type = $request->memo_irregularity_type;
             $memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $memo_type = $request->memo_type;
             $memo_status = $request->memo_status;
@@ -485,7 +488,7 @@ class AcMemoService
             });
 
             $query->when($activity_id, function ($q, $activity_id) {
-                $q->whereHas('audit_plan', function($q) use ($activity_id){
+                $q->whereHas('audit_plan', function ($q) use ($activity_id) {
                     return $q->where('activity_id', $activity_id);
                 });
             });
@@ -560,7 +563,7 @@ class AcMemoService
             $audit_memo_recommendaton->created_by_name_bn = $cdesk->officer_bn;
             $audit_memo_recommendaton->save();
 
-            AcMemo::where('id',$request->memo_id)->update(['audit_recommendation' => $request->audit_recommendation]);
+            AcMemo::where('id', $request->memo_id)->update(['audit_recommendation' => $request->audit_recommendation]);
 
             \DB::commit();
             return ['status' => 'success', 'data' => 'Memo Recommendation Successfully'];
@@ -582,12 +585,12 @@ class AcMemoService
         DB::beginTransaction();
         try {
 
-            AcMemo::where('id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-            $apottiItem = ApottiItem::where('memo_id',$request->memo_id)->get();
-            if (count($apottiItem) > 0){
-                ApottiItem::where('memo_id',$request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
-                $onucchedItem = ApottiItem::where('memo_id',$request->memo_id)->first();
-                Apotti::where('id',$onucchedItem->apotti_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            AcMemo::where('id', $request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+            $apottiItem = ApottiItem::where('memo_id', $request->memo_id)->get();
+            if (count($apottiItem) > 0) {
+                ApottiItem::where('memo_id', $request->memo_id)->update(['response_of_rpu' => $request->response_of_rpu]);
+                $onucchedItem = ApottiItem::where('memo_id', $request->memo_id)->first();
+                Apotti::where('id', $onucchedItem->apotti_id)->update(['response_of_rpu' => $request->response_of_rpu]);
             }
 
             DB::commit();
@@ -649,7 +652,7 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $audit_memo_log_list = AcMemoLog::where('memo_id',$request->memo_id)->paginate(config('bee_config.per_page_pagination'));
+            $audit_memo_log_list = AcMemoLog::where('memo_id', $request->memo_id)->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $audit_memo_log_list];
 
         } catch (\Exception $exception) {
@@ -666,9 +669,9 @@ class AcMemoService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $data['porisishtos'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('file_type','porisishto')->get()->toArray();
-            $data['pramanoks'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('file_type','pramanok')->get()->toArray();
-            $data['memos'] = AcMemoAttachment::where('ac_memo_id',$request->memo_id)->where('file_type','memo')->get()->toArray();
+            $data['porisishtos'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)->where('file_type', 'porisishto')->get()->toArray();
+            $data['pramanoks'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)->where('file_type', 'pramanok')->get()->toArray();
+            $data['memos'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)->where('file_type', 'memo')->get()->toArray();
             return ['status' => 'success', 'data' => $data];
 
         } catch (\Exception $exception) {
@@ -686,7 +689,7 @@ class AcMemoService
         }
         \DB::beginTransaction();
         try {
-            AcMemoAttachment::where('id',$request->memo_attachment_id)
+            AcMemoAttachment::where('id', $request->memo_attachment_id)
                 ->update(['deleted_by' => $cdesk->officer_id]);
             AcMemoAttachment::find($request->memo_attachment_id)->delete();
             \DB::commit();
