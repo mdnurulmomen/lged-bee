@@ -33,7 +33,7 @@ class AuditAIRReportService
             }
 
             $annualPlanQuery = ApEntityIndividualAuditPlan::with('annual_plan:id,office_type,total_unit_no,subject_matter')
-                ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
+                ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->with('office_order:id,audit_plan_id,memorandum_no,memorandum_date,approved_status')
                 ->with('air_reports', function ($query) use ($air_type) {
                     return $query->with(['latest_r_air_movement'])->select('id', 'audit_plan_id', 'status')->where('type', $air_type);
@@ -101,12 +101,21 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
+
+//            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
+
             $airData = [
-                'report_name' => $request->audit_plan_entities,
+                'report_name' => $request->entity_name_bn,
                 'fiscal_year_id' => $request->fiscal_year_id,
+                'activity_id' => $request->activity_id,
                 'annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id,
-                'activity_id' => $request->activity_id,
+                'ministry_id' => $request->ministry_id,
+                'ministry_name_en' => $request->ministry_name_en,
+                'ministry_name_bn' => $request->ministry_name_bn,
+                'entity_id' => $request->entity_id,
+                'entity_name_en' => $request->entity_name_en,
+                'entity_name_bn' => $request->entity_name_bn,
                 'air_description' => $request->air_description,
                 'type' => $request->type,
                 'status' => $request->status,
@@ -160,43 +169,43 @@ class AuditAIRReportService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            if ($request->air_description) {
+            if($request->air_description){
                 $airData['air_description'] = $request->air_description;
             }
 
-            if ($request->status) {
+            if($request->status){
                 $airData['status'] = $request->status;
             }
 
-            if ($request->approved_date) {
-                $airData['approved_date'] = date('Y-m-d', strtotime($request->approved_date));
+            if($request->approved_date){
+                $airData['approved_date'] = date('Y-m-d',strtotime($request->approved_date));
             }
 
-            if ($request->is_bg_press) {
+            if($request->is_bg_press){
                 $airData['is_bg_press'] = $request->is_bg_press;
             }
 
-            if ($request->is_printing_done) {
+            if($request->is_printing_done){
                 $airData['is_printing_done'] = $request->is_printing_done;
             }
 
-            if ($request->comment) {
+            if($request->comment){
                 $airData['comment'] = $request->comment;
             }
 
-            if ($request->approval_status) {
+            if($request->approval_status){
                 $airData['approval_status'] = $request->approval_status;
             }
 
-            if ($request->final_approval_status) {
+            if($request->final_approval_status){
                 $airData['final_approval_status'] = $request->final_approval_status;
             }
 
-            if ($request->qac_report_date) {
+            if($request->qac_report_date){
                 $airData['qac_report_date'] = $request->qac_report_date;
             }
 
-            RAir::where('id', $request->air_id)->update($airData);
+            RAir::where('id',$request->air_id)->update($airData);
 
             return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
@@ -255,19 +264,21 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence', 'air_generate_type')
-                ->where('fiscal_year_id', $request->fiscal_year_id)
-                ->where('audit_plan_id', $request->audit_plan_id);
+            $auditApottis = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->where('parent_office_id',$request->entity_id);
 
             if ($request->air_type == 'preliminary') {
                 $auditApottis = $auditApottis->whereNull('air_generate_type');
             }
-            $responseData['auditApottis'] = $auditApottis->get()->toArray();
 
+            $responseData['auditApottis'] = $auditApottis->orderBy('onucched_no')->get()->toArray();
 
             $responseData['auditMapApottis'] = ApottiRAirMap::with('apotti_map_data')
                 ->where('rairs_id', $request->air_id)
                 ->get()->toArray();
+
             return ['status' => 'success', 'data' => $responseData];
 
         } catch (\Exception $exception) {
@@ -285,7 +296,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child', 'r_air_child.latest_r_air_movement', 'ap_entities', 'qac_committee.committee.qac_committee_members'])->where('id', $request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities','qac_committee.committee.qac_committee_members','fiscal_year'])->where('id',$request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
             if ($request->qac_type == 'qac-1') {
@@ -511,6 +522,12 @@ class AuditAIRReportService
                     'annual_plan_id' => $rAirData['annual_plan_id'],
                     'audit_plan_id' => $rAirData['audit_plan_id'],
                     'activity_id' => $rAirData['activity_id'],
+                    'ministry_id' => $rAirData['ministry_id'],
+                    'ministry_name_en' => $rAirData['ministry_name_en'],
+                    'ministry_name_bn' => $rAirData['ministry_name_bn'],
+                    'entity_id' => $rAirData['entity_id'],
+                    'entity_name_en' => $rAirData['entity_name_en'],
+                    'entity_name_bn' => $rAirData['entity_name_bn'],
                     'air_description' => $rAirData['air_description'],
                     'type' => $newAirType,
                     'status' => 'draft',

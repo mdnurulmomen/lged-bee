@@ -85,7 +85,7 @@ class ApottiService
 
 
             $apotti_list = $query->with(['apotti_items','apotti_status'])
-                ->orderBy('apotti_sequence')
+                ->orderBy('onucched_no')
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $apotti_list];
@@ -362,12 +362,20 @@ class ApottiService
         }
         DB::beginTransaction();
         try {
-            $apotti_sequence = $request->apotti_sequence;
+//            $apotti_sequence = $request->apotti_sequence;
+//
+//            foreach ($apotti_sequence as $sequence){
+//               $apotti =  Apotti::find($sequence['apotti_id']);
+//               $apotti->apotti_sequence = $sequence['apotti_sequence'];
+//               $apotti->save();
+//            }
 
-            foreach ($apotti_sequence as $sequence){
-               $apotti =  Apotti::find($sequence['apotti_id']);
-               $apotti->apotti_sequence = $sequence['apotti_sequence'];
-               $apotti->save();
+            $onucched_list = $request->onucched_list;
+
+            foreach ($onucched_list as $onucched_no){
+                $apotti =  Apotti::find($onucched_no['apotti_id']);
+                $apotti->onucched_no = $onucched_no['onucched_no'];
+                $apotti->save();
             }
 
             DB::commit();
