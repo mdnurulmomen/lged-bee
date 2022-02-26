@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Apotti;
 use App\Models\ApottiItem;
+use App\Models\ApottiStatus;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -15,7 +16,8 @@ class ApottiService
     public function getApottiList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
@@ -462,6 +464,78 @@ class ApottiService
 
     }
 
+    public function getApottiOnucchedNo(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($request->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
 
+            $qac_type = $request->qac_type;
+
+            $apotti_list = Apotti::select('id','onucched_no')
+                                ->with('apotti_status', function ($q) use ($qac_type){
+                                    $q->select('id','apotti_id','apotti_type')->where('qac_type', $qac_type);
+                                    })
+                                ->where('audit_plan_id',$request->audit_plan_id)
+                                ->where('parent_office_id',$request->entity_id)
+                                ->get();
+
+            return ['status' => 'success', 'data' => $apotti_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getApottiRegisterlist(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $fiscal_year_id = $request->fiscal_year_id;
+            $apotti_type = $request->apotti_type;
+            $audit_plan_id = $request->audit_plan_id;
+            $activity_id = $request->activity_id;
+            $entity_id = $request->entity_id;
+//          $cost_center_id = $request->cost_center_id;
+
+            $query = Apotti::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
+
+            $query->when($entity_id, function ($q, $entity_id) {
+                return $q->where('parent_office_id', $entity_id);
+            });
+
+
+            $apotti_list = $query->whereHas('apotti_status', function ($q) use ($apotti_type){
+                $q->select('id','apotti_id','apotti_type')
+                    ->where('apotti_type', $apotti_type)
+                    ->where('qac_type', 'qac-1');
+            })->with('apotti_items')
+
+                ->orderBy('onucched_no')
+                ->paginate(config('bee_config.per_page_pagination'));
+
+            return ['status' => 'success', 'data' => $apotti_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
 
 }
