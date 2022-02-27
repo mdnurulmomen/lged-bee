@@ -166,6 +166,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airData = [
+                'report_type' => 'generated',
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
