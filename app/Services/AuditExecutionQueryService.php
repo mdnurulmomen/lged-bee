@@ -350,13 +350,45 @@ class AuditExecutionQueryService
     public function authorityQueryList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_db_con_response = $this->switchOffice($request->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $query_list = AcQuery::all();
+
+            $fiscal_year_id = $request->fiscal_year_id;
+            $cost_center_id = $request->cost_center_id;
+            $entity_id = $request->entity_id;
+            $activity_id = $request->activity_id;
+            $team_id = $request->team_id;
+
+            $query = AcQuery::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $query->when($entity_id, function ($q, $entity_id) {
+                return $q->where('entity_office_id', $entity_id);
+            });
+
+            $query->when($cost_center_id, function ($q, $cost_center_id) {
+                return $q->where('cost_center_id', $cost_center_id);
+            });
+
+            $query->when($team_id, function ($q, $team_id) {
+                return $q->where('team_id', $team_id);
+            });
+
+
+            $query_list = $query->get();
+
             return ['status' => 'success', 'data' => $query_list];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

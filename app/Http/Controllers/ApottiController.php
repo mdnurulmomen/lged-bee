@@ -95,4 +95,29 @@ class ApottiController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getApottiOnucchedNo(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_list = $apottiService->getApottiOnucchedNo($request);
+        if (isSuccessResponse($apotti_list)) {
+            $response = responseFormat('success', $apotti_list['data']);
+        } else {
+            $response = responseFormat('error', $apotti_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getApottiRegisterlist(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_list = $apottiService->getApottiRegisterlist($request);
+        if (isSuccessResponse($apotti_list)) {
+            $response = responseFormat('success', $apotti_list['data']);
+        } else {
+            $response = responseFormat('error', $apotti_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
 }

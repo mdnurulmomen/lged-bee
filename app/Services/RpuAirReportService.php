@@ -84,6 +84,7 @@ class RpuAirReportService
 
                     $tagidPotroSendingDays = XDefaultSetting::select('setting_value')
                         ->where('setting_key','tagid_potro_sending_days')
+                        ->where('is_active',1)
                         ->first()
                         ->toArray();
 
@@ -104,6 +105,7 @@ class RpuAirReportService
 
                     $doLetterSendingDays = XDefaultSetting::select('setting_value')
                         ->where('setting_key','do_letter_sending_days')
+                        ->where('is_active',1)
                         ->first()
                         ->toArray();
 

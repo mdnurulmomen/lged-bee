@@ -190,8 +190,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
         //broadsheet reply
         Route::group(['prefix' => 'broadsheet-reply/'], function () {
-            Route::post('get-apotti-item-list', [BroadsheetReplyController::class, 'getApottiItemList']);
+            Route::post('get-broad-sheet-list', [BroadsheetReplyController::class, 'getBroadSheetList']);
+            Route::post('get-broad-sheet-item', [BroadsheetReplyController::class, 'getBroadSheetItem']);
             Route::post('get-apotti-item-info', [BroadsheetReplyController::class, 'getApottiItemInfo']);
+            Route::post('broad-sheet-movement', [BroadsheetReplyController::class, 'broadSheetMovement']);
+            Route::post('broad-sheet-last-movement', [BroadsheetReplyController::class, 'broadSheetLastMovement']);
         });
     });
 
@@ -244,6 +247,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('apotti-wise-all-tiem', [ApottiController::class, 'apottiWiseAllItem']);
         Route::post('get-apotti-item-info', [ApottiController::class, 'getApottiItemInfo']);
         Route::post('update-apotti', [ApottiController::class, 'updateApotti']);
+        Route::post('get-apotti-onucched-no', [ApottiController::class, 'getApottiOnucchedNo']);
+        Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterlist']);
     });
 
     //audit template

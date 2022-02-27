@@ -105,6 +105,7 @@ class AuditAIRReportService
 //            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
 
             $airData = [
+                'report_type' => 'generated',
                 'report_name' => $request->entity_name_bn,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'activity_id' => $request->activity_id,
@@ -165,6 +166,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airData = [
+                'report_type' => 'generated',
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
@@ -516,6 +518,7 @@ class AuditAIRReportService
 
                 $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 $airData = [
+                    'report_type' => 'cloned',
                     'report_name' => $rAirData['report_name'],
                     'parent_id' => $rAirData['id'],
                     'fiscal_year_id' => $rAirData['fiscal_year_id'],
@@ -534,7 +537,7 @@ class AuditAIRReportService
                     'created_by' => $cdesk->officer_id,
                     'modified_by' => $cdesk->officer_id,
                 ];
-                $storeQAC01Air = RAir::create($airData);
+                $storeQACAir = RAir::create($airData);
 
                 //for map data
                 $apottiRAirMap = ApottiRAirMap::where('rairs_id', $request->r_air_id)->get()->toArray();
@@ -542,7 +545,7 @@ class AuditAIRReportService
                 foreach ($apottiRAirMap as $apotti) {
                     array_push($mappingData, [
                         'apotti_id' => $apotti['apotti_id'],
-                        'rairs_id' => $storeQAC01Air->id
+                        'rairs_id' => $storeQACAir->id
                     ]);
                 }
                 if (!empty($mappingData)) {
