@@ -15,6 +15,7 @@ class RAir extends Model
         'parent_id',
         'report_number',
         'report_name',
+        'report_type',
         'fiscal_year_id',
         'annual_plan_id',
         'audit_plan_id',
