@@ -22,44 +22,46 @@ class DashboardService
             $fromDate = date('Y-m-d', strtotime($toDate . ' -6 day'));
 
             //for total query
-            $acQuery = AcQuery::where('fiscal_year_id',$request->fiscal_year_id);
-            if (!empty($request->entity_id)){
-                $acQuery = $acQuery->where('entity_office_id',$request->entity_id);
+            $acQuery = AcQuery::where('fiscal_year_id', $request->fiscal_year_id);
+            if (!empty($request->entity_id)) {
+                $acQuery = $acQuery->where('entity_office_id', $request->entity_id);
             }
-            if (!empty($request->cost_center_id)){
-                $acQuery = $acQuery->where('cost_center_id',$request->cost_center_id);
+            if (!empty($request->cost_center_id)) {
+                $acQuery = $acQuery->where('cost_center_id', $request->cost_center_id);
             }
-            if (!empty($request->team_id)){
-                $acQuery = $acQuery->where('team_id',$request->team_id);
+            if (!empty($request->team_id)) {
+                $acQuery = $acQuery->where('team_id', $request->team_id);
             }
 
-            if ($request->scope_report_type == 'daily'){
+            if ($request->scope_report_type == 'daily') {
                 $getTotalQuery = $acQuery->whereDate('created_at', $toDate)->count();
-            }elseif ($request->scope_report_type == 'weekly'){
+            } elseif ($request->scope_report_type == 'weekly') {
                 $getTotalQuery = $acQuery->whereDate('created_at', '>=', $fromDate)
                     ->whereDate('created_at', '<=', $toDate)->count();
-            }else{
+            } elseif ($request->scope_report_type == 'yearly') {
+                $getTotalQuery = $acQuery->count();
+            } else {
                 $getTotalQuery = $acQuery->whereDate('created_at', $toDate)->count();
             }
 
 
             //for total memo
-            $acMemo = AcMemo::where('fiscal_year_id',$request->fiscal_year_id);
-            if (!empty($request->entity_id)){
-                $acMemo = $acMemo->where('parent_office_id',$request->entity_id);
+            $acMemo = AcMemo::where('fiscal_year_id', $request->fiscal_year_id);
+            if (!empty($request->entity_id)) {
+                $acMemo = $acMemo->where('parent_office_id', $request->entity_id);
             }
-            if (!empty($request->cost_center_id)){
-                $acMemo = $acMemo->where('cost_center_id',$request->cost_center_id);
+            if (!empty($request->cost_center_id)) {
+                $acMemo = $acMemo->where('cost_center_id', $request->cost_center_id);
             }
-            if (!empty($request->team_id)){
-                $acMemo = $acMemo->where('team_id',$request->team_id);
+            if (!empty($request->team_id)) {
+                $acMemo = $acMemo->where('team_id', $request->team_id);
             }
-            if ($request->scope_report_type == 'daily'){
+            if ($request->scope_report_type == 'daily') {
                 $getTotalMemo = $acMemo->whereDate('created_at', date('Y-m-d'))->count();
-            }elseif ($request->scope_report_type == 'weekly'){
+            } elseif ($request->scope_report_type == 'weekly') {
                 $getTotalMemo = $acMemo->whereDate('created_at', '>=', $fromDate)
                     ->whereDate('created_at', '<=', $toDate)->count();
-            }else{
+            } else {
                 $getTotalMemo = $acMemo->whereDate('created_at', date('Y-m-d'))->count();
             }
             $data['total_query'] = $getTotalQuery;
