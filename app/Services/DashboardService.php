@@ -61,6 +61,8 @@ class DashboardService
             } elseif ($request->scope_report_type == 'weekly') {
                 $getTotalMemo = $acMemo->whereDate('created_at', '>=', $fromDate)
                     ->whereDate('created_at', '<=', $toDate)->count();
+            } elseif ($request->scope_report_type == 'yearly') {
+                $getTotalMemo = $acMemo->count();
             } else {
                 $getTotalMemo = $acMemo->whereDate('created_at', date('Y-m-d'))->count();
             }
