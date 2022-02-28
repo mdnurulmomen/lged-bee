@@ -407,6 +407,10 @@ class AcMemoService
                 $apotti->parent_office_name_en = $memo['parent_office_name_en'];
                 $apotti->parent_office_name_bn = $memo['parent_office_name_bn'];
                 $apotti->fiscal_year_id = $memo['fiscal_year_id'];
+                $apotti->response_of_rpu = $memo['response_of_rpu'];
+                $apotti->irregularity_cause = $memo['irregularity_cause'];
+                $apotti->audit_conclusion = $memo['audit_conclusion'];
+                $apotti->audit_recommendation = $memo['audit_recommendation'];
                 $apotti->total_jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
                 $apotti->total_onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
                 $apotti->created_by = $cdesk->officer_id;
@@ -444,6 +448,10 @@ class AcMemoService
                 $apotti_item->memo_title_bn = $memo['memo_title_bn'];
                 $apotti_item->memo_type = $memo['memo_type'];
                 $apotti_item->memo_status = $memo['memo_status'];
+                $apotti_item->response_of_rpu = $memo['response_of_rpu'];
+                $apotti_item->irregularity_cause = $memo['irregularity_cause'];
+                $apotti_item->audit_conclusion = $memo['audit_conclusion'];
+                $apotti_item->audit_recommendation = $memo['audit_recommendation'];
                 $apotti_item->jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
                 $apotti_item->onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
                 $apotti_item->created_by = $cdesk->officer_id;
