@@ -149,6 +149,8 @@ class BroadsheetReplyService
             $data['collected_amount'] = $broad_sheet_list->collected_amount;
             $data['directorate_id'] = $cdesk->office_id;
 
+            return ['status' => 'success', 'data' => $data];
+
             $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_apotti_update'), $data)->json();
 
             if ($send_decision_to_rpu['status'] == 'success') {
