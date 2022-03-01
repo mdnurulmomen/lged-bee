@@ -124,7 +124,7 @@ class BroadsheetReplyService
         try {
 
             $broad_sheet_list = BroadSheetReplyItem::where('broad_sheet_reply_id', $request->broad_sheet_id)
-                ->where('memo_id', $request->memo_id)->first();
+                ->where('apotti_item_id', $request->apotti_item_id)->first();
 
             $broad_sheet_list->approval_status = $request->approval_status;
             $broad_sheet_list->approved_by = $cdesk->officer_id;
