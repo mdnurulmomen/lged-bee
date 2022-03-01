@@ -5,6 +5,8 @@ use App\Models\AnnualPlanEntitie;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\ApottiRAirMap;
+use App\Models\BroadSheetReply;
+use App\Models\BroadSheetReplyItem;
 use App\Models\RAir;
 use App\Models\XDefaultSetting;
 use App\Models\XFiscalYear;
@@ -154,18 +156,39 @@ class RpuAirReportService
 
     public function apottiItemResponseByRpu(Request $request): array
     {
-        $office_db_con_response = $this->switchOffice($request->office_id);
+        $office_db_con_response = $this->switchOffice($request->directorate_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
-            $apottiItem = ApottiItem::find($request->apotti_item_id);
-            $apottiItem->unit_response = $request->unit_response;
-            $apottiItem->entity_response = $request->entity_response;
-            $apottiItem->ministry_response = $request->ministry_response;
-            $apottiItem->save();
+            //for broadsheet reply
+            $broadSheetReply =  new BroadSheetReply();
+            $broadSheetReply->memorandum_no = $request->memorandum_no;
+            $broadSheetReply->memorandum_date = date('Y-m-d',strtotime($request->memorandum_date));
+            $broadSheetReply->sender_office_id = $request->sender_office_id;
+            $broadSheetReply->sender_office_name_bn = $request->sender_office_name_bn;
+            $broadSheetReply->sender_office_name_en = $request->sender_office_name_en;
+            $broadSheetReply->sender_name_bn = $request->sender_name_bn;
+            $broadSheetReply->sender_name_en = $request->sender_name_en;
+            $broadSheetReply->sender_designation_bn = $request->sender_designation_bn;
+            $broadSheetReply->sender_designation_en = $request->sender_designation_en;
+            $broadSheetReply->sender_type = $request->sender_type;
+            $broadSheetReply->save();
+
+            //broadsheet reply item
+            foreach ($request->apottiItems as $apottiItem){
+                $broadSheetReplyItem =  new BroadSheetReplyItem();
+                $broadSheetReplyItem->broad_sheet_reply_id = $broadSheetReply->id;
+                $broadSheetReplyItem->apotti_item_id = $apottiItem['apotti_item_id'];
+                $broadSheetReplyItem->memo_id = $apottiItem['memo_id'];
+                $broadSheetReplyItem->jorito_ortho_poriman = $apottiItem['jorito_ortho_poriman'];
+                $broadSheetReplyItem->save();
+            }
+            \DB::commit();
             return ['status' => 'success', 'data' => 'Response Received Successfully'];
         } catch (\Exception $exception) {
+            \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
