@@ -136,6 +136,16 @@ class BroadsheetReplyService
 
             $broad_sheet_list->save();
 
+            $apotti_item = ApottiItem::find($request->apotti_item_id);
+            $apotti_item->memo_status = $broad_sheet_list->status;
+            $apotti_item->onishponno_jorito_ortho_poriman = $broad_sheet_list->onishponno_jorito_ortho_poriman;
+            $apotti_item->adjustment_ortho_poriman = $broad_sheet_list->adjusted_amount;
+            $apotti_item->save();
+
+//            $apotti =  Apotti::find($apotti_item->apotti_id);
+//            $apotti->total_jorito_ortho_poriman =
+//            $apotti->save();
+
             return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
 
         } catch (\Exception $exception) {
