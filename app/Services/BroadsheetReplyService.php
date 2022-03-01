@@ -52,6 +52,44 @@ class BroadsheetReplyService
 
     }
 
+    public function updateBroadSheetItem(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $approval_status = $request->approval_status;
+
+            $broad_sheet_list = BroadSheetReplyItem::where('broad_sheet_reply_id',$request->broad_sheet_id)
+                                                    ->where('memo_id',$request->memo_id)->first();
+
+            $broad_sheet_list->status = $request->apotti_status ?: $broad_sheet_list->status;
+            $broad_sheet_list->jorito_ortho_poriman = $request->jorito_ortho ?: $broad_sheet_list->jorito_ortho_poriman;
+            $broad_sheet_list->collected_amount = $request->collected_amount ?: $broad_sheet_list->collected_amount;
+            $broad_sheet_list->adjusted_amount = $request->adjusted_amount ?: $broad_sheet_list->adjusted_amount;
+
+            if($approval_status){
+                $broad_sheet_list->approved_by = $request->approved_by;
+                $broad_sheet_list->approver_bn  = $request->approver_bn;
+                $broad_sheet_list->approver_en  = $request->approver_en;
+                $broad_sheet_list->approver_designation_id  = $request->approver_designation_id;
+                $broad_sheet_list->approver_designation_bn  = $request->approver_designation_bn;
+                $broad_sheet_list->approver_designation_en  = $request->approver_designation_en;
+            }
+
+            $broad_sheet_list->save();
+
+            return ['status' => 'success', 'data' => 'সিদ্ধান্ত দেয়া হয়েছে'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
     public function getApottiItemInfo(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
