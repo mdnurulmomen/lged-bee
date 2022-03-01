@@ -14,4 +14,9 @@ class BroadSheetReply extends Model
     {
         return $this->hasMany(BroadSheetReplyItem::class,'broad_sheet_reply_id','id');
     }
+
+    public function latest_broad_sheet_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(BroadSheetMovement::class,'broad_sheet_id','id')->latest();
+    }
 }

@@ -25,7 +25,7 @@ class BroadsheetReplyService
         }
         try {
 
-            $broad_sheet_list = BroadSheetReply::withCount('broad_sheet_items')->paginate(config('bee_config.per_page_pagination'));
+            $broad_sheet_list = BroadSheetReply::with('latest_broad_sheet_movement')->withCount('broad_sheet_items')->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $broad_sheet_list];
         } catch (\Exception $exception) {
@@ -142,11 +142,26 @@ class BroadsheetReplyService
             $apotti_item->adjustment_ortho_poriman = $broad_sheet_list->adjusted_amount;
             $apotti_item->save();
 
+            $data['apotti_item_id'] = $request->apotti_item_id;
+            $data['memo_status'] = $broad_sheet_list->status;
+            $data['onishponno_jorito_ortho_poriman'] = $broad_sheet_list->onishponno_jorito_ortho_poriman;
+            $data['adjustment_ortho_poriman'] = $broad_sheet_list->adjusted_amount;
+            $data['collected_amount'] = $broad_sheet_list->collected_amount;
+            $data['directorate_id'] = $cdesk->office_id;
+
+            $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_apotti_update'), $data)->json();
+
+            if ($send_decision_to_rpu['status'] == 'success') {
+                return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
+            }else{
+                return ['status' => 'error', 'data' => 'অনুমোদন করা হয়নি'];
+            }
+
 //            $apotti =  Apotti::find($apotti_item->apotti_id);
 //            $apotti->total_jorito_ortho_poriman =
 //            $apotti->save();
 
-            return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
+
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
