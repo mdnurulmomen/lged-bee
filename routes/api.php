@@ -191,8 +191,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         //broadsheet reply
         Route::group(['prefix' => 'broadsheet-reply/'], function () {
             Route::post('get-broad-sheet-list', [BroadsheetReplyController::class, 'getBroadSheetList']);
-            Route::post('get-broad-sheet-item', [BroadsheetReplyController::class, 'getBroadSheetItem']);
+            Route::post('get-broad-sheet-items', [BroadsheetReplyController::class, 'getBroadSheetItems']);
+            Route::post('get-broad-sheet-item-info', [BroadsheetReplyController::class, 'getBroadSheetItemInfo']);
             Route::post('update-broad-sheet-item', [BroadsheetReplyController::class, 'updateBroadSheetItem']);
+            Route::post('approve-broad-sheet-item', [BroadsheetReplyController::class, 'approveBroadSheetItem']);
             Route::post('get-apotti-item-info', [BroadsheetReplyController::class, 'getApottiItemInfo']);
             Route::post('broad-sheet-movement', [BroadsheetReplyController::class, 'broadSheetMovement']);
             Route::post('broad-sheet-last-movement', [BroadsheetReplyController::class, 'broadSheetLastMovement']);

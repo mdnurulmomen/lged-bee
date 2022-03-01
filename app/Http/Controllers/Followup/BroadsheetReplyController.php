@@ -21,9 +21,21 @@ class BroadsheetReplyController extends Controller
 
 
 
-    public function getBroadSheetItem(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    public function getBroadSheetItems(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
     {
-        $apotti_info = $broadsheetReplyService->getBroadSheetItem($request);
+        $apotti_info = $broadsheetReplyService->getBroadSheetItems($request);
+        if (isSuccessResponse($apotti_info)) {
+            $response = responseFormat('success', $apotti_info['data']);
+        } else {
+            $response = responseFormat('error', $apotti_info['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getBroadSheetItemInfo(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_info = $broadsheetReplyService->getBroadSheetItemInfo($request);
         if (isSuccessResponse($apotti_info)) {
             $response = responseFormat('success', $apotti_info['data']);
         } else {
@@ -36,6 +48,18 @@ class BroadsheetReplyController extends Controller
     public function updateBroadSheetItem(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
     {
         $apotti_info = $broadsheetReplyService->updateBroadSheetItem($request);
+        if (isSuccessResponse($apotti_info)) {
+            $response = responseFormat('success', $apotti_info['data']);
+        } else {
+            $response = responseFormat('error', $apotti_info['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function approveBroadSheetItem(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_info = $broadsheetReplyService->approveBroadSheetItem($request);
         if (isSuccessResponse($apotti_info)) {
             $response = responseFormat('success', $apotti_info['data']);
         } else {
