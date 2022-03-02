@@ -18,9 +18,9 @@ class XFiscalYearController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $fiscal_years = XFiscalYear::orderBy('start')->paginate($request->per_page);
+            $fiscal_years = XFiscalYear::orderBy('start', 'ASC')->paginate($request->per_page);
         } else {
-            $fiscal_years = XFiscalYear::orderBy('start')->all();
+            $fiscal_years = XFiscalYear::orderBy('start', 'ASC')->all();
         }
 
         if ($fiscal_years) {
