@@ -184,9 +184,18 @@ class RpuAirReportService
                 $broadSheetReplyItem->memo_id = $apottiItem['memo_id'];
                 $broadSheetReplyItem->jorito_ortho_poriman = $apottiItem['jorito_ortho_poriman'];
                 $broadSheetReplyItem->save();
+
+                //apotti item
+                ApottiItem::where('id',$apottiItem['apotti_item_id'])
+                    ->update([
+                        'unit_response' => $apottiItem['unit_response'],
+                        'entity_response' => $apottiItem['entity_response'],
+                        'ministry_response' => $apottiItem['ministry_response'],
+                    ]);
             }
+
             \DB::commit();
-            return ['status' => 'success', 'data' => 'Response Received Successfully'];
+            return ['status' => 'success', 'data' => 'সফলভাবে জবাব প্রেরণ করা হয়েছে'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
