@@ -20,7 +20,7 @@ class XFiscalYearController extends Controller
         if ($request->per_page && $request->page && !$request->all) {
             $fiscal_years = XFiscalYear::orderBy('start', 'DESC')->paginate($request->per_page);
         } else {
-            $fiscal_years = XFiscalYear::orderBy('start', 'DESC')->all();
+            $fiscal_years = XFiscalYear::orderBy('start', 'DESC')->get();
         }
 
         if ($fiscal_years) {
