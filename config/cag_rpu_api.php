@@ -14,6 +14,7 @@ return [
     'remove_query_to_rpu' => env('API_URL_RPU', '') . '/remove-query-from-rpu',
     'send_air_to_rpu' => env('API_URL_RPU', '') . '/send-air-to-rpu',
     'broad_sheet_apotti_update' => env('API_URL_RPU', '') . '/broad-sheet-apotti-update',
+    'broad_sheet_reply_from_directorate' => env('API_URL_RPU', '') . '/broad-sheet-reply-from-directorate',
 
     'get-offices-info' => env('API_URL_RPU', '') . '/get-offices-info',
 ];

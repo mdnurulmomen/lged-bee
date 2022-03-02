@@ -7,6 +7,7 @@ use App\Models\ApottiItem;
 use App\Models\BroadSheetMovement;
 use App\Models\BroadSheetReply;
 use App\Models\BroadSheetReplyItem;
+use App\Models\BroadsheetReplyToResponsibleParty;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -149,13 +150,15 @@ class BroadsheetReplyService
             $data['collected_amount'] = $broad_sheet_list->collected_amount;
             $data['directorate_id'] = $cdesk->office_id;
 
-            $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_apotti_update'), $data)->json();
+            return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
 
-            if ($send_decision_to_rpu['status'] == 'success') {
-                return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
-            }else{
-                return ['status' => 'error', 'data' => 'অনুমোদন করা হয়নি'];
-            }
+//            $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_apotti_update'), $data)->json();
+//
+//            if ($send_decision_to_rpu['status'] == 'success') {
+//                return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
+//            }else{
+//                return ['status' => 'error', 'data' => 'অনুমোদন করা হয়নি'];
+//            }
 
 //            $apotti =  Apotti::find($apotti_item->apotti_id);
 //            $apotti->total_jorito_ortho_poriman =
@@ -253,6 +256,76 @@ class BroadsheetReplyService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $lastMovementInfo];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function sendBroadSheetReplyToRpu(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+
+        try {
+
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $sent_to_rpu = new BroadsheetReplyToResponsibleParty;
+            $sent_to_rpu->broad_sheet_reply_id = $request->broad_sheet_id;
+            $sent_to_rpu->ref_memorandum_no = $request->ref_memorandum_no;
+            $sent_to_rpu->memorandum_no = $request->memorandum_no;
+            $sent_to_rpu->memorandum_date = $request->memorandum_date;
+            $sent_to_rpu->rpu_office_head_details = $request->rpu_office_head_details;
+            $sent_to_rpu->subject = $request->subject;
+            $sent_to_rpu->description = $request->description;
+            $sent_to_rpu->braod_sheet_cc = $request->braod_sheet_cc;
+            $sent_to_rpu->sender_id = $cdesk->officer_id;
+            $sent_to_rpu->sender_name_bn = $cdesk->officer_bn;
+            $sent_to_rpu->sender_name_en = $cdesk->officer_en;
+            $sent_to_rpu->sender_designation_id = $cdesk->designation_id;
+            $sent_to_rpu->sender_designation_bn = $cdesk->designation_bn;
+            $sent_to_rpu->sender_designation_en = $cdesk->designation_en;
+            $sent_to_rpu->sender_unit_id = $cdesk->office_unit_id;
+            $sent_to_rpu->sender_unit_bn = $cdesk->office_unit_bn;
+            $sent_to_rpu->sender_unit_en = $cdesk->office_unit_en;
+            $sent_to_rpu->save();
+
+            $broad_sheet_item_list = BroadSheetReplyItem::where('broad_sheet_reply_id', $request->broad_sheet_id)->get();
+
+
+            $apotti_item_data = [];
+            foreach ($broad_sheet_item_list as $item){
+                $data['apotti_item_id'] = $item->apotti_item_id;
+                $data['memo_status'] = $item->status;
+                $data['onishponno_jorito_ortho_poriman'] = $item->onishponno_jorito_ortho_poriman;
+                $data['adjustment_ortho_poriman'] = $item->adjusted_amount;
+                $data['collected_amount'] = $item->collected_amount;
+                $data['directorate_id'] = $cdesk->office_id;
+
+                $apotti_item_data[] = $data;
+
+            }
+
+            $sent_to_rpu->directorate_id = $cdesk->office_id;
+            $rpu_response_data['item_info'] =  $apotti_item_data;
+            $rpu_response_data['reply_info'] =  $sent_to_rpu;
+
+
+
+            $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_reply_from_directorate'), $rpu_response_data)->json();
+
+//            return ['status' => 'success', 'data' => $send_decision_to_rpu];
+
+            if ($send_decision_to_rpu['status'] == 'success') {
+                return ['status' => 'success', 'data' => 'সফলভাবে রেসপন্সিবল পার্টিতে প্রেরণ করা হয়েছে'];
+            }else{
+                return ['status' => 'error', 'data' => 'সফলভাবে রেসপন্সিবল পার্টিতে প্রেরণ করা হয়নি'];
+            }
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

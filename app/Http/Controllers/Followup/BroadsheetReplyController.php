@@ -95,4 +95,16 @@ class BroadsheetReplyController extends Controller
         return response()->json($response);
     }
 
+    public function sendBroadSheetReplyToRpu(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $broadsheetReplyService->sendBroadSheetReplyToRpu($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
 }
