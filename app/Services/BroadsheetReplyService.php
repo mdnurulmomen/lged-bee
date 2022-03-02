@@ -26,7 +26,10 @@ class BroadsheetReplyService
         }
         try {
 
-            $broad_sheet_list = BroadSheetReply::with('latest_broad_sheet_movement')->withCount('broad_sheet_items')->paginate(config('bee_config.per_page_pagination'));
+            $broad_sheet_list = BroadSheetReply::with('latest_broad_sheet_movement')
+                ->with('broad_sheet_reply')
+                ->withCount('broad_sheet_items')
+                ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $broad_sheet_list];
         } catch (\Exception $exception) {
