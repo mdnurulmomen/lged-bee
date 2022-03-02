@@ -164,6 +164,7 @@ class RpuAirReportService
         try {
             //for broadsheet reply
             $broadSheetReply =  new BroadSheetReply();
+            $broadSheetReply->id = $request->broadsheet_reply_id;
             $broadSheetReply->memorandum_no = $request->memorandum_no;
             $broadSheetReply->memorandum_date = date('Y-m-d',strtotime($request->memorandum_date));
             $broadSheetReply->sender_office_id = $request->sender_office_id;
@@ -174,12 +175,16 @@ class RpuAirReportService
             $broadSheetReply->sender_designation_bn = $request->sender_designation_bn;
             $broadSheetReply->sender_designation_en = $request->sender_designation_en;
             $broadSheetReply->sender_type = $request->sender_type;
+            $broadSheetReply->receiver_details = $request->receiver_details;
+            $broadSheetReply->subject = $request->subject;
+            $broadSheetReply->details = $request->details;
+            $broadSheetReply->cc_list = $request->cc_list;
             $broadSheetReply->save();
 
             //broadsheet reply item
             foreach ($request->apottiItems as $apottiItem){
                 $broadSheetReplyItem =  new BroadSheetReplyItem();
-                $broadSheetReplyItem->broad_sheet_reply_id = $broadSheetReply->id;
+                $broadSheetReplyItem->broad_sheet_reply_id = $request->broadsheet_reply_id;
                 $broadSheetReplyItem->apotti_item_id = $apottiItem['apotti_item_id'];
                 $broadSheetReplyItem->memo_id = $apottiItem['memo_id'];
                 $broadSheetReplyItem->jorito_ortho_poriman = $apottiItem['jorito_ortho_poriman'];
