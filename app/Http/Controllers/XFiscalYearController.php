@@ -18,9 +18,9 @@ class XFiscalYearController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         if ($request->per_page && $request->page && !$request->all) {
-            $fiscal_years = XFiscalYear::paginate($request->per_page);
+            $fiscal_years = XFiscalYear::orderBy('start')->paginate($request->per_page);
         } else {
-            $fiscal_years = XFiscalYear::all();
+            $fiscal_years = XFiscalYear::orderBy('start')->all();
         }
 
         if ($fiscal_years) {
@@ -105,7 +105,7 @@ class XFiscalYearController extends Controller
     public function currentFiscalYear(ShowOrDeleteRequest $request)
     {
         try {
-            $current_fiscal_year = XFiscalYear::where('start',date("Y"))->first();
+            $current_fiscal_year = XFiscalYear::where('start', date("Y"))->first();
             $response = responseFormat('success', $current_fiscal_year);
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
