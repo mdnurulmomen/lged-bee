@@ -19,6 +19,17 @@ class BroadsheetReplyController extends Controller
         return response()->json($response);
     }
 
+    public function getBroadSheetInfo(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_list = $broadsheetReplyService->getBroadSheetInfo($request);
+        if (isSuccessResponse($apotti_list)) {
+            $response = responseFormat('success', $apotti_list['data']);
+        } else {
+            $response = responseFormat('error', $apotti_list['data']);
+        }
+        return response()->json($response);
+    }
+
 
 
     public function getBroadSheetItems(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
