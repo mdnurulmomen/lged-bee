@@ -24,11 +24,26 @@ class ApDcOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $annualPlanList = AnnualPlan::with(['ap_entities','office_order.office_order_movement'])
-                ->where('fiscal_year_id', $request->fiscal_year_id)
+
+            $fiscal_year_id = $request->fiscal_year_id;
+            $activity_id = $request->activity_id;
+
+            $query = AnnualPlan::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                $q->whereHas('office_order', function ($q) use ($activity_id) {
+                    return $q->where('activity_id', $activity_id);
+                });
+            });
+
+            $annualPlanList = $query->with(['ap_entities','office_order.office_order_movement'])
                 ->where('has_dc_schedule', 1)
-//                ->where('status','approved')
                 ->paginate($request->per_page);
+
             $responseData = ['status' => 'success', 'data' => $annualPlanList];
 
         } catch (\Exception $exception) {
@@ -123,7 +138,7 @@ class ApDcOfficerOrderService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id],$data);
+            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id,'audit_plan_id' => $request->audit_plan_id],$data);
 
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
         } catch (\Exception $exception) {

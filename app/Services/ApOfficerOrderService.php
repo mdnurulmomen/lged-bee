@@ -26,20 +26,41 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            if ($request->per_page && $request->page && !$request->all) {
-                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
-                    ->where('fiscal_year_id', $request->fiscal_year_id)
-                    ->where('status','approved')
-                    ->paginate($request->per_page);
-            }
-            else{
-                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
-                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
-                    ->where('fiscal_year_id', $request->fiscal_year_id)
-                    ->where('status','approved')
-                    ->get();
-            }
+
+            $fiscal_year_id = $request->fiscal_year_id;
+            $activity_id = $request->activity_id;
+
+            $query = ApEntityIndividualAuditPlan::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                $q->whereHas('office_order', function ($q) use ($activity_id) {
+                    return $q->where('activity_id', $activity_id);
+                });
+            });
+
+            $auditPlanList =  $query->has('audit_teams')
+                ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
+                ->where('status','approved')
+                ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+
+//            if ($request->per_page && $request->page && !$request->all) {
+//                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
+//                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
+//                    ->where('fiscal_year_id', $request->fiscal_year_id)
+//                    ->where('status','approved')
+//                    ->paginate($request->per_page);
+//            }
+//            else{
+//                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
+//                    ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
+//                    ->where('fiscal_year_id', $request->fiscal_year_id)
+//                    ->where('status','approved')
+//                    ->get();
+//            }
 
             $responseData = ['status' => 'success', 'data' => $auditPlanList];
         } catch (\Exception $exception) {
