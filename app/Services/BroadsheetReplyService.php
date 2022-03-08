@@ -354,4 +354,23 @@ class BroadsheetReplyService
         }
     }
 
+    public function getSentBroadSheetInfo(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $broad_sheet_sent_info = BroadsheetReplyToResponsibleParty::where('broad_sheet_reply_id',$request->broad_sheet_id)->first();
+
+            return ['status' => 'success', 'data' => $broad_sheet_sent_info];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
 }
