@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AuditTemplate;
 use App\Models\PacMeeting;
 use App\Models\PacMeetingApotti;
 use App\Models\PacMeetingMember;
@@ -16,7 +17,6 @@ class PacService
 
     public function getPacMeetingList(Request $request): array
     {
-
         try {
             $meeting_list = PacMeeting::all();
             return ['status' => 'success', 'data' => $meeting_list];
@@ -24,7 +24,23 @@ class PacService
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
+    }
 
+    public function createPacReport(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $auditTemplate = AuditTemplate::where('template_type', $request->template_type)
+                ->where('lang', 'bn')->first()->toArray();
+            return ['status' => 'success', 'data' => $auditTemplate];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
     }
 
     public function pacMeetingStore(Request $request): array

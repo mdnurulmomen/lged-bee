@@ -317,6 +317,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'pac'], function () {
         Route::post('get-pac-meeting-list', [PacController::class, 'getPacMeetingList']);
         Route::post('pac-meeting-store', [PacController::class, 'pacMeetingStore']);
+        Route::post('create-pac-report', [PacController::class, 'createPacReport']);
     });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
 
