@@ -312,6 +312,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('edit', [FinalPlanController::class, 'edit']);
         Route::post('update', [FinalPlanController::class, 'update']);
     });
+
+    //pac
+    Route::group(['prefix' => 'pac'], function () {
+        Route::post('get-pac-meeting-list', [PacController::class, 'getPacMeetingList']);
+    });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);

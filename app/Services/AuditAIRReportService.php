@@ -370,8 +370,9 @@ class AuditAIRReportService
     public function getAirAndApottiTypeWiseQACApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
@@ -623,7 +624,20 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $airList = RAir::with('latest_r_air_movement')->where('activity_id', $request->activity_id)
+            $activity_id = $request->activity_id;
+            $is_printing_done = $request->is_printing_done;
+
+            $query = RAir::query();
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $query->when($is_printing_done, function ($q, $is_printing_done) {
+                return $q->where('is_printing_done', $is_printing_done);
+            });
+
+            $airList =  $query->with('latest_r_air_movement')
                 ->where('type', 'cqat')
                 ->where('status', 'approved')
                 ->get()
