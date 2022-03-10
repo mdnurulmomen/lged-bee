@@ -9,5 +9,4 @@ class PacMeeting extends Model
 {
     use HasFactory;
 
-
 }

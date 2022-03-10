@@ -17,4 +17,15 @@ class PacController extends Controller
         }
         return response()->json($response);
     }
+
+    public function pacMeetingStore(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $meeting_list = $pacService->pacMeetingStore($request);
+        if (isSuccessResponse($meeting_list)) {
+            $response = responseFormat('success', $meeting_list['data']);
+        } else {
+            $response = responseFormat('error', $meeting_list['data']);
+        }
+        return response()->json($response);
+    }
 }
