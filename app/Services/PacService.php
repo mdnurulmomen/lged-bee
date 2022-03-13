@@ -258,9 +258,9 @@ class PacService
                 $reports = $reports->where('ministry_id', $request->ministry_id);
             }
 
-            if ($request->report_type == 1){
+            if ($request->report_type == 'alochito'){
                 $reports = $reports->where('is_alochito', 1);
-            }elseif ($request->report_type == 0){
+            }elseif ($request->report_type == 'onalochito'){
                 $reports = $reports->where('is_alochito', 0);
             }
 
