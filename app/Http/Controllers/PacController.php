@@ -18,6 +18,17 @@ class PacController extends Controller
         return response()->json($response);
     }
 
+    public function getPacMeetingInfo(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $meeting_list = $pacService->getPacMeetingInfo($request);
+        if (isSuccessResponse($meeting_list)) {
+            $response = responseFormat('success', $meeting_list['data']);
+        } else {
+            $response = responseFormat('error', $meeting_list['data']);
+        }
+        return response()->json($response);
+    }
+
     public function pacMeetingStore(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
     {
         $meeting_list = $pacService->pacMeetingStore($request);
@@ -100,6 +111,29 @@ class PacController extends Controller
     public function showPACApotti(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
     {
         $responseData = $pacService->showPACApotti($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function pacMeetingApottiDecisionStore(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->pacMeetingApottiDecisionStore($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function sentToPac(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->sentToPac($request);
+
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
         } else {
