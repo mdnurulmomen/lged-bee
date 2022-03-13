@@ -253,13 +253,18 @@ class PacService
     public function getPACFinalReport(Request $request): array
     {
         try {
-            if ($request->report_type == 1){
-                $reports = PacMeeting::with(['fiscal_year'])->where('is_alochito', 1)->get();
-            }elseif ($request->report_type == 0){
-                $reports = PacMeeting::with(['fiscal_year'])->where('is_alochito', 0)->get();
-            }else{
-                $reports = PacMeeting::with(['fiscal_year'])->get();
+            $reports = PacMeeting::with(['fiscal_year']);
+            if (!empty($request->ministry_id)){
+                $reports = $reports->where('ministry_id', $request->ministry_id);
             }
+
+            if ($request->report_type == 1){
+                $reports = $reports->where('is_alochito', 1);
+            }elseif ($request->report_type == 0){
+                $reports = $reports->where('is_alochito', 0);
+            }
+
+            $reports = $reports->get();
             return ['status' => 'success', 'data' => $reports];
 
         } catch (\Exception $exception) {
@@ -345,4 +350,15 @@ class PacService
         }
     }
 
+    public function getPACMinistry(Request $request): array
+    {
+        try {
+            $ministries = PacMeeting::select('ministry_id','ministry_name_bn')->distinct()->get();
+            return ['status' => 'success', 'data' => $ministries];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
 }

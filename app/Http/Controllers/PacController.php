@@ -141,4 +141,16 @@ class PacController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getPACMinistry(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->getPACMinistry($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
 }
