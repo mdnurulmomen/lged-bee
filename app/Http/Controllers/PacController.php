@@ -29,9 +29,77 @@ class PacController extends Controller
         return response()->json($response);
     }
 
-    public function createPacReport(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    public function createPacWorksheetReport(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
     {
-        $responseData = $pacService->createPacReport($request);
+        $responseData = $pacService->createPacWorksheetReport($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function storePacWorksheetReport(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->storePacWorksheetReport($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getPACDashboardData(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->getPACDashboardData($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+
+    public function getPACFinalReport(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->getPACFinalReport($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+
+    public function showPACFinalReport(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->showPACFinalReport($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getPACApottiList(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->getPACApottiList($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function showPACApotti(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->showPACApotti($request);
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
         } else {

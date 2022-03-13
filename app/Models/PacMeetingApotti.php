@@ -9,4 +9,9 @@ class PacMeetingApotti extends Model
 {
     use HasFactory;
     public $timestamps = false;
+
+    public function pac_meeting(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PacMeeting::class, 'pac_meeting_id', 'id');
+    }
 }

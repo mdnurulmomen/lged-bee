@@ -317,7 +317,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'pac'], function () {
         Route::post('get-pac-meeting-list', [PacController::class, 'getPacMeetingList']);
         Route::post('pac-meeting-store', [PacController::class, 'pacMeetingStore']);
-        Route::post('create-pac-report', [PacController::class, 'createPacReport']);
+        Route::post('create-pac-worksheet-report', [PacController::class, 'createPacWorksheetReport']);
+        Route::post('get-pac-dashboard-data', [PacController::class, 'getPACDashboardData']);
+        Route::post('get-pac-final-report', [PacController::class, 'getPACFinalReport']);
+        Route::post('show-pac-final-report', [PacController::class, 'showPACFinalReport']);
+        Route::post('get-pac-apotti-list', [PacController::class, 'getPACApottiList']);
+        Route::post('show-pac-apotti', [PacController::class, 'showPACApotti']);
     });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
 

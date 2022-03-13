@@ -71,4 +71,9 @@ class RAir extends Model
 //                return $this->belongsToMany(QacCommittee::class, 'qac_commitee_air_map');
 
     }
+
+    public function reported_apotti_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReportedApottiAttachment::class, 'id', 'report_id');
+    }
 }
