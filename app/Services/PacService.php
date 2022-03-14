@@ -24,7 +24,7 @@ class PacService
     public function getPacMeetingList(Request $request): array
     {
         try {
-            $meeting_list = PacMeeting::all();
+            $meeting_list = PacMeeting::orderBy('id', 'DESC')->paginate(config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $meeting_list];
 
         } catch (\Exception $exception) {
