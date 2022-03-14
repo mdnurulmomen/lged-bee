@@ -74,6 +74,6 @@ class RAir extends Model
 
     public function reported_apotti_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ReportedApottiAttachment::class, 'id', 'report_id');
+        return $this->hasMany(ReportedApottiAttachment::class, 'report_id','id');
     }
 }
