@@ -153,4 +153,16 @@ class PacController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getPACDirectorate(Request $request, PacService $pacService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $pacService->getPACDirectorate($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
 }

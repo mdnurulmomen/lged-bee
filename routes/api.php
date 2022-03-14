@@ -328,6 +328,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('pac-meeting-decision-store', [PacController::class, 'pacMeetingApottiDecisionStore']);
         Route::post('sent-to-pac', [PacController::class, 'sentToPac']);
         Route::post('get-pac-ministry', [PacController::class, 'getPACMinistry']);
+        Route::post('get-pac-directorates', [PacController::class, 'getPACDirectorate']);
     });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
 

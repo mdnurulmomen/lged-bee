@@ -262,6 +262,9 @@ class PacService
     {
         try {
             $reports = PacMeeting::with(['fiscal_year']);
+            if (!empty($request->directorate_id)){
+                $reports = $reports->where('directorate_id', $request->directorate_id);
+            }
             if (!empty($request->ministry_id)){
                 $reports = $reports->where('ministry_id', $request->ministry_id);
             }
@@ -307,10 +310,17 @@ class PacService
             $dir = $request->dir;
             $search = $request->search;
 
-            $apottiList = PacMeetingApotti::with(['pac_meeting','pac_meeting.fiscal_year'])
-                ->whereHas('pac_meeting', function($q){
-                    $q->where('is_alochito',1);
-                })->where('is_alochito',$request->is_alochito);
+
+            if (!empty($request->pac_meeting_id)){
+                $apottiList = PacMeetingApotti::with(['pac_meeting','pac_meeting.fiscal_year'])
+                    ->where('pac_meeting_id',$request->pac_meeting_id);
+            }else{
+                $apottiList = PacMeetingApotti::with(['pac_meeting','pac_meeting.fiscal_year'])
+                    ->whereHas('pac_meeting', function($q){
+                        $q->where('is_alochito',1);
+                    })->where('is_alochito',$request->is_alochito);
+            }
+
 
             $apottiList = $apottiList->where(function ($query) use ($search){
                 $query->where('directorate_en',$search)
@@ -365,6 +375,18 @@ class PacService
         try {
             $ministries = PacMeeting::select('ministry_id','ministry_name_bn')->distinct()->get();
             return ['status' => 'success', 'data' => $ministries];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getPACDirectorate(Request $request): array
+    {
+        try {
+            $directorates = PacMeeting::select('directorate_id','directorate_bn')->distinct()->get();
+            return ['status' => 'success', 'data' => $directorates];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
