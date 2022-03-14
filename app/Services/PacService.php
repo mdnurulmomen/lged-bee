@@ -242,8 +242,16 @@ class PacService
             $data['total_report'] = PacMeeting::count();
             $data['total_alochito_report'] = PacMeeting::where('is_alochito', 1)->count();
             $data['total_onalochito_report'] = PacMeeting::where('is_alochito', 0)->count();
-            $data['total_alochito_apotti'] = PacMeetingApotti::where('is_alochito', 1)->count();
-            $data['total_onalochito_apotti'] = PacMeetingApotti::where('is_alochito', 0)->count();
+            $total_alochito_apotti = PacMeetingApotti::whereHas('pac_meeting', function($q){
+                $q->where('is_alochito',1);
+            })->where('is_alochito', 1)->count();
+            $data['total_alochito_apotti'] = $total_alochito_apotti;
+
+            $total_onalochito_apotti = PacMeetingApotti::whereHas('pac_meeting', function($q){
+                $q->where('is_alochito',1);
+            })->where('is_alochito', 0)->count();
+            $data['total_onalochito_apotti'] = $total_onalochito_apotti;
+
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -300,7 +308,9 @@ class PacService
             $search = $request->search;
 
             $apottiList = PacMeetingApotti::with(['pac_meeting','pac_meeting.fiscal_year'])
-                        ->where('is_alochito',$request->is_alochito);
+                ->whereHas('pac_meeting', function($q){
+                    $q->where('is_alochito',1);
+                })->where('is_alochito',$request->is_alochito);
 
             $apottiList = $apottiList->where(function ($query) use ($search){
                 $query->where('directorate_en',$search)
