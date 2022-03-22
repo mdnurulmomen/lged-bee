@@ -393,7 +393,7 @@ class AuditExecutionQueryService
                     $query->whereDate('created_at', date('Y-m-d'));
                 }
             }
-            
+
             $query_list = $query->get();
 
             return ['status' => 'success', 'data' => $query_list];
