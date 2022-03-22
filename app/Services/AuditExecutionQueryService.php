@@ -388,7 +388,12 @@ class AuditExecutionQueryService
                 return $q->where('team_id', $team_id);
             });
 
-
+            if ($request->has('status')) {
+                if ($request->status == 'daily') {
+                    $query->whereDate('created_at', date('Y-m-d'));
+                }
+            }
+            
             $query_list = $query->get();
 
             return ['status' => 'success', 'data' => $query_list];
