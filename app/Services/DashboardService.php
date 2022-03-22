@@ -59,6 +59,12 @@ class DashboardService
             if (!empty($request->team_id)) {
                 $acMemo = $acMemo->where('team_id', $request->team_id);
             }
+            if (!empty($request->activity_id)) {
+                $activity_id = $request->activity_id;
+                $acMemo = $acMemo->whereHas('audit_plan', function ($q) use ($activity_id) {
+                        return $q->where('activity_id', $activity_id);
+                    });
+            }
 
             if ($request->scope_report_type == 'daily') {
                 $getTotalMemo = $acMemo->whereDate('created_at', date('Y-m-d'))->count();
