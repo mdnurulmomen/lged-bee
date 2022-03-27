@@ -15,6 +15,7 @@ return [
     'send_air_to_rpu' => env('API_URL_RPU', '') . '/send-air-to-rpu',
     'broad_sheet_apotti_update' => env('API_URL_RPU', '') . '/broad-sheet-apotti-update',
     'broad_sheet_reply_from_directorate' => env('API_URL_RPU', '') . '/broad-sheet-reply-from-directorate',
-
+    'apotti_final_status_update_to_rpu' => env('API_URL_RPU', '') . '/apotti-final-status-update-to-rpu',
+    'send_meeting_apotti_to_rpu' => env('API_URL_RPU', '') . '/send-meeting-apotti-to-rpu',
     'get-offices-info' => env('API_URL_RPU', '') . '/get-offices-info',
 ];

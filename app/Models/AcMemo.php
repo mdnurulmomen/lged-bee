@@ -128,12 +128,21 @@ class AcMemo extends Model
 
     public function getMemoIrregularityTypeNameAttribute()
     {
-        return self::$memo_irregularity_types[$this->attributes['memo_irregularity_type']];
+        if($this->attributes['memo_irregularity_type']){
+            return self::$memo_irregularity_types[$this->attributes['memo_irregularity_type']];
+        }else{
+            return self::$memo_irregularity_types[0];
+        }
     }
 
     public function getMemoIrregularitySubTypeNameAttribute($value)
     {
-        return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
+        if($this->attributes['memo_irregularity_sub_type']){
+            return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
+        }else{
+            return self::$memo_irregularity_sub_types[0];
+        }
+
     }
 
     public function setJoritoOrthoPorimanAttribute($value)

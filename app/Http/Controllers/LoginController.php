@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\CagDoptorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -19,10 +18,15 @@ class LoginController extends Controller
             $data['device_id'] = $request->header('device-id');
             $data['device_type'] = $request->header('device-type');
 
-            $user_data = json_decode(gzuncompress(base64_decode($request->user_data)), true);
-            $data['user_data'] = $user_data['user_info'];
+            if ($data['device_type'] == 'mobile') {
+                $user_data = json_decode(base64_decode($request->user_data), true);
+                $data['user_data'] = $user_data['data'];
+            } else {
+                $user_data = json_decode(gzuncompress(base64_decode($request->user_data)), true);
+                $data['user_data'] = $user_data['user_info'];
+            }
 
-            if ($user_data['user_info']['user']['user_role_id'] == 1) {
+            if ($data['user_data']['user']['user_role_id'] == 1) {
                 $response['status'] = 'success';
                 $response['data'] = $data['user_data'];
             } else {

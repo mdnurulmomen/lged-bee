@@ -224,6 +224,8 @@ class AuditExecutionQueryService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
+        \DB::beginTransaction();
         try {
             $schedule = AuditVisitCalenderPlanMember::with('plan_team:id')
                 ->with('office_order:id,audit_plan_id')
@@ -279,8 +281,10 @@ class AuditExecutionQueryService
                 AcQueryItem::insert($acQueryItems);
             }
 
+            \DB::commit();
             return ['status' => 'success', 'data' => 'Query Saved Successfully'];
         } catch (\Exception $exception) {
+            \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }

@@ -287,11 +287,10 @@ class BroadsheetReplyService
     public function sendBroadSheetReplyToRpu(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-
         $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
 
+        DB::beginTransaction();
         try {
-
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
@@ -328,9 +327,10 @@ class BroadsheetReplyService
                 $data['adjustment_ortho_poriman'] = $item->adjusted_amount;
                 $data['collected_amount'] = $item->collected_amount;
                 $data['directorate_id'] = $cdesk->office_id;
-
+                $data['directorate_en'] = $cdesk->office_name_en;
+                $data['directorate_bn'] = $cdesk->office_name_bn;
+                $data['directorate_response'] = $item->comment;
                 $apotti_item_data[] = $data;
-
             }
 
             $sent_to_rpu->directorate_id = $cdesk->office_id;
@@ -344,12 +344,14 @@ class BroadsheetReplyService
 //            return ['status' => 'success', 'data' => $send_decision_to_rpu];
 
             if ($send_decision_to_rpu['status'] == 'success') {
+                DB::commit();
                 return ['status' => 'success', 'data' => 'সফলভাবে রেসপন্সিবল পার্টিতে প্রেরণ করা হয়েছে'];
             }else{
-                return ['status' => 'error', 'data' => 'সফলভাবে রেসপন্সিবল পার্টিতে প্রেরণ করা হয়নি'];
+                throw new \Exception(json_encode($send_decision_to_rpu));
             }
 
         } catch (\Exception $exception) {
+            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }

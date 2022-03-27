@@ -35,9 +35,10 @@ class ApDcOfficerOrderService
             });
 
             $query->when($activity_id, function ($q, $activity_id) {
-                $q->whereHas('office_order', function ($q) use ($activity_id) {
-                    return $q->where('activity_id', $activity_id);
-                });
+//                $q->whereHas('office_order', function ($q) use ($activity_id) {
+//                    return $q->where('activity_id', $activity_id);
+//                });
+                return $q->where('activity_id', $activity_id);
             });
 
             $annualPlanList = $query->with(['ap_entities','office_order.office_order_movement'])

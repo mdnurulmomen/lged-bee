@@ -166,7 +166,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airData = [
-                'report_type' => 'generated',
+//                'report_type' => 'generated',
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
             ];
@@ -189,6 +189,17 @@ class AuditAIRReportService
 
             if($request->is_printing_done){
                 $airData['is_printing_done'] = $request->is_printing_done;
+                $map_apottis = ApottiRAirMap::where('rairs_id',$request->air_id)->pluck('apotti_id');
+
+               $approved_apottis =  ApottiStatus::whereIn('apotti_id',$map_apottis)
+                    ->where('apotti_type','approved')
+                    ->where('qac_type','cqat')
+                    ->pluck('apotti_id');
+
+                $rpu_data['directorate_id'] = $office_id;
+                $rpu_data['approved_apottis'] = $approved_apottis;
+
+                $send_status_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.apotti_final_status_update_to_rpu'), $rpu_data)->json();
             }
 
             if($request->comment){
@@ -209,11 +220,29 @@ class AuditAIRReportService
 
             RAir::where('id',$request->air_id)->update($airData);
 
-            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
+//            $response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
+
+            return ['status' => 'success', 'data' => ['air_id' => $approved_apottis]];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+//    public function sendApottiStatusToRpu($air_id,$cdesk_info){
+//        try {
+//            $office_db_con_response = $this->switchOffice($cdesk_info->office_id);
+//            if (!isSuccessResponse($office_db_con_response)) {
+//                return ['status' => 'error', 'data' => $office_db_con_response];
+//            }
+//
+//            $auditTeamMembers = ApottiRAirMap::where('rairs_id',$air_id)->get()->toArray();
+//
+//            return $auditTeamMembers;
+//
+//        } catch (\Exception $exception) {
+//            return ['status' => 'error', 'data' => $exception->getMessage()];
+//        }
+//    }
 
     public function getAuditTeam(Request $request): array
     {
@@ -370,8 +399,9 @@ class AuditAIRReportService
     public function getAirAndApottiTypeWiseQACApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
@@ -463,7 +493,7 @@ class AuditAIRReportService
             ];
 
             RAirMovement::create($airMovementData);
-            if (!empty($request->receiver_user_id)) {
+            if (!empty($request->receiver_officer_id)) {
                 $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 //Create Task for Approval
                 $task_data = [
@@ -497,7 +527,7 @@ class AuditAIRReportService
                     ]]),
                 ];
 
-                $create_task = (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
                 //end task creation for approval
 
             }
@@ -623,7 +653,20 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $airList = RAir::with('latest_r_air_movement')->where('activity_id', $request->activity_id)
+            $activity_id = $request->activity_id;
+            $is_printing_done = $request->is_printing_done;
+
+            $query = RAir::query();
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $query->when($is_printing_done, function ($q, $is_printing_done) {
+                return $q->where('is_printing_done', $is_printing_done);
+            });
+
+            $airList =  $query->with('latest_r_air_movement')
                 ->where('type', 'cqat')
                 ->where('status', 'approved')
                 ->get()

@@ -254,7 +254,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('get-apotti-item-info', [ApottiController::class, 'getApottiItemInfo']);
         Route::post('update-apotti', [ApottiController::class, 'updateApotti']);
         Route::post('get-apotti-onucched-no', [ApottiController::class, 'getApottiOnucchedNo']);
-        Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterlist']);
+        Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterList']);
+        Route::post('update-apotti-register', [ApottiController::class, 'updateApottiRegister']);
+        Route::post('store-apotti-register-movement', [ApottiController::class, 'storeApottiRegisterMovement']);
     });
 
     //audit template
@@ -312,6 +314,24 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('edit', [FinalPlanController::class, 'edit']);
         Route::post('update', [FinalPlanController::class, 'update']);
     });
+
+    //pac
+    Route::group(['prefix' => 'pac'], function () {
+        Route::post('get-pac-meeting-list', [PacController::class, 'getPacMeetingList']);
+        Route::post('get-pac-meeting-info', [PacController::class, 'getPacMeetingInfo']);
+        Route::post('pac-meeting-store', [PacController::class, 'pacMeetingStore']);
+        Route::post('create-pac-worksheet-report', [PacController::class, 'createPacWorksheetReport']);
+        Route::post('get-pac-dashboard-data', [PacController::class, 'getPACDashboardData']);
+        Route::post('get-pac-final-report', [PacController::class, 'getPACFinalReport']);
+        Route::post('show-pac-final-report', [PacController::class, 'showPACFinalReport']);
+        Route::post('get-pac-apotti-list', [PacController::class, 'getPACApottiList']);
+        Route::post('show-pac-apotti', [PacController::class, 'showPACApotti']);
+        Route::post('create-pac-report', [PacController::class, 'createPacReport']);
+        Route::post('pac-meeting-decision-store', [PacController::class, 'pacMeetingApottiDecisionStore']);
+        Route::post('sent-to-pac', [PacController::class, 'sentToPac']);
+        Route::post('get-pac-ministry', [PacController::class, 'getPACMinistry']);
+        Route::post('get-pac-directorates', [PacController::class, 'getPACDirectorate']);
+    });
     Route::post('document-is-exist', [FinalPlanController::class, 'documentIsExist']);
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
@@ -332,6 +352,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('modules', [PermissionController::class, 'modules']);
         Route::post('modules/other', [PermissionController::class, 'otherModules']);
         Route::post('module/menus', [PermissionController::class, 'menus']);
+    });
+
+    Route::group(['prefix' => 'movement/'], function () {
+        Route::post('store', [PermissionController::class, 'store']);
     });
 
     Route::group(['prefix' => 'migration'], function () {

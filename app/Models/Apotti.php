@@ -57,6 +57,8 @@ class Apotti extends Model
         'air_generate_type',
         'is_delete',
         'final_status',
+        'air_issue_date',
+        'status_review_date',
     ];
 
     public function apotti_items(){
@@ -70,5 +72,10 @@ class Apotti extends Model
     public function apotti_airs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(RAir::class, 'apotti_rair_maps');
+    }
+
+    public function latest_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(XMovement::class, 'relational_id')->latest();
     }
 }

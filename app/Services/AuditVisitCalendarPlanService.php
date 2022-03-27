@@ -154,7 +154,11 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')->whereNotNull('entity_id')->get()->unique('entity_id');
+            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->whereNotNull('entity_id')
+                ->distinct('entity_id','entity_name_bn','entity_name_en')
+                ->get();
             return ['status' => 'success', 'data' => $entityList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
