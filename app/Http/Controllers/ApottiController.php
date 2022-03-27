@@ -108,9 +108,33 @@ class ApottiController extends Controller
         return response()->json($response);
     }
 
-    public function getApottiRegisterlist(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    public function getApottiRegisterList(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
     {
-        $apotti_list = $apottiService->getApottiRegisterlist($request);
+        $apotti_list = $apottiService->getApottiRegisterList($request);
+        if (isSuccessResponse($apotti_list)) {
+            $response = responseFormat('success', $apotti_list['data']);
+        } else {
+            $response = responseFormat('error', $apotti_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function updateApottiRegister(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_list = $apottiService->updateApottiRegister($request);
+        if (isSuccessResponse($apotti_list)) {
+            $response = responseFormat('success', $apotti_list['data']);
+        } else {
+            $response = responseFormat('error', $apotti_list['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function storeApottiRegisterMovement(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
+    {
+        $apotti_list = $apottiService->storeApottiRegisterMovement($request);
         if (isSuccessResponse($apotti_list)) {
             $response = responseFormat('success', $apotti_list['data']);
         } else {

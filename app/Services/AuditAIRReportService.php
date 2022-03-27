@@ -493,7 +493,7 @@ class AuditAIRReportService
             ];
 
             RAirMovement::create($airMovementData);
-            if (!empty($request->receiver_user_id)) {
+            if (!empty($request->receiver_officer_id)) {
                 $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 //Create Task for Approval
                 $task_data = [
@@ -527,7 +527,7 @@ class AuditAIRReportService
                     ]]),
                 ];
 
-                $create_task = (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
                 //end task creation for approval
 
             }

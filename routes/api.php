@@ -254,7 +254,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('get-apotti-item-info', [ApottiController::class, 'getApottiItemInfo']);
         Route::post('update-apotti', [ApottiController::class, 'updateApotti']);
         Route::post('get-apotti-onucched-no', [ApottiController::class, 'getApottiOnucchedNo']);
-        Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterlist']);
+        Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterList']);
+        Route::post('update-apotti-register', [ApottiController::class, 'updateApottiRegister']);
+        Route::post('store-apotti-register-movement', [ApottiController::class, 'storeApottiRegisterMovement']);
     });
 
     //audit template
@@ -350,6 +352,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('modules', [PermissionController::class, 'modules']);
         Route::post('modules/other', [PermissionController::class, 'otherModules']);
         Route::post('module/menus', [PermissionController::class, 'menus']);
+    });
+
+    Route::group(['prefix' => 'movement/'], function () {
+        Route::post('store', [PermissionController::class, 'store']);
     });
 
     Route::group(['prefix' => 'migration'], function () {

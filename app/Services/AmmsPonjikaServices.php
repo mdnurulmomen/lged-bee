@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class AmmsPonjikaServices
 {
@@ -51,8 +52,8 @@ class AmmsPonjikaServices
             \Log::error($storeTask['data']);
             return responseFormat('success', 'Successfully created task');
         } else {
-            \Log::error($storeTask['message']);
-            return responseFormat('error', $storeTask['message']);
+            \Log::error(json_encode($storeTask));
+            return responseFormat('error', $storeTask);
         }
     }
 }

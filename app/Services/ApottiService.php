@@ -5,10 +5,15 @@ namespace App\Services;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\ApottiStatus;
+use App\Models\XMovement;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 class ApottiService
 {
     use GenericData, ApiHeart;
@@ -466,7 +471,6 @@ class ApottiService
 
     public function getApottiOnucchedNo(Request $request): array
     {
-        $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($request->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
@@ -491,43 +495,37 @@ class ApottiService
 
     }
 
-    public function getApottiRegisterlist(Request $request): array
+    public function getApottiRegisterList(Request $request): array
     {
-        $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
-        $office_db_con_response = $this->switchOffice($office_id);
+        $office_db_con_response = $this->switchOffice($request->directorate_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
             $fiscal_year_id = $request->fiscal_year_id;
             $apotti_type = $request->apotti_type;
-            $audit_plan_id = $request->audit_plan_id;
-            $activity_id = $request->activity_id;
-            $entity_id = $request->entity_id;
-//          $cost_center_id = $request->cost_center_id;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
 
-            $query = Apotti::query();
+            $query = Apotti::whereNotNull('status_review_date');
+            if (!empty($fiscal_year_id)){
+                $query = $query->where('fiscal_year_id', $fiscal_year_id);
+            }
 
-            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
-                return $q->where('fiscal_year_id', $fiscal_year_id);
-            });
+            if (!empty($start_date) && !empty($end_date)){
+                $start_date = str_replace("/","-",$start_date);
+                $end_date = str_replace("/","-",$end_date);
+                $query = $query->whereDate('status_review_date','>=',date('Y-m-d',strtotime($start_date)))
+                    ->whereDate('status_review_date', '<=', date('Y-m-d',strtotime($end_date)));
+            }
 
-            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
-                return $q->where('audit_plan_id', $audit_plan_id);
-            });
-
-            $query->when($entity_id, function ($q, $entity_id) {
-                return $q->where('parent_office_id', $entity_id);
-            });
-
-
-            $apotti_list = $query->whereHas('apotti_status', function ($q) use ($apotti_type){
-                $q->select('id','apotti_id','apotti_type')
-                    ->where('apotti_type', $apotti_type)
-                    ->where('qac_type', 'qac-1');
-            })->with('apotti_items')
-
+            $apotti_list = $query->whereNotNull('status_review_date')
+                ->where('apotti_type', $apotti_type)
+                ->with(['apotti_items','latest_movement'])
+                ->with('apotti_status', function ($q){
+                    $q->select('id','apotti_id','apotti_type')
+                        ->where('qac_type', 'register');
+                })
                 ->orderBy('onucched_no')
                 ->paginate(config('bee_config.per_page_pagination'));
 
@@ -535,7 +533,139 @@ class ApottiService
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
+    }
 
+    public function updateApottiRegister(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $apottiStatus = new ApottiStatus();
+            $apottiStatus->apotti_id = $request->apotti_id;
+            $apottiStatus->apotti_type = $request->apotti_type;
+            $apottiStatus->qac_type = 'register';
+            $apottiStatus->comment = $request->comments;
+            $apottiStatus->created_by = $cdesk->officer_id;
+            $apottiStatus->created_by_name_en = $cdesk->office_name_en;
+            $apottiStatus->created_by_name_bn = $cdesk->office_name_bn;
+            $apottiStatus->save();
+            return ['status' => 'success', 'data' => 'Data save successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    //movement
+    public function storeApottiRegisterMovement(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            //movement data
+            $movement_data = [
+                'relational_id' => $request->apotti_id,
+                'receiver_officer_id' => $request->receiver_officer_id,
+                'receiver_office_id' => $request->receiver_office_id,
+                'receiver_unit_id' => $request->receiver_unit_id,
+                'receiver_unit_name_en' => $request->receiver_unit_name_en,
+                'receiver_unit_name_bn' => $request->receiver_unit_name_bn,
+                'receiver_employee_id' => $request->receiver_employee_id,
+                'receiver_employee_name_en' => $request->receiver_employee_name_en,
+                'receiver_employee_name_bn' => $request->receiver_employee_name_bn,
+                'receiver_employee_designation_id' => $request->receiver_employee_designation_id,
+                'receiver_employee_designation_en' => $request->receiver_employee_designation_en,
+                'receiver_employee_designation_bn' => $request->receiver_employee_designation_bn,
+                'receiver_officer_phone' => $request->receiver_officer_phone,
+                'receiver_officer_email' => $request->receiver_officer_email,
+                'sender_officer_id' => $cdesk->officer_id,
+                'sender_office_id' => $cdesk->office_id,
+                'sender_unit_id' => $cdesk->office_unit_id,
+                'sender_unit_name_en' => $cdesk->office_unit_en,
+                'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                'sender_employee_id' => $cdesk->officer_id,
+                'sender_employee_name_en' => $cdesk->officer_en,
+                'sender_employee_name_bn' => $cdesk->officer_bn,
+                'sender_employee_designation_id' => $cdesk->designation_id,
+                'sender_employee_designation_en' => $cdesk->designation_en,
+                'sender_employee_designation_bn' => $cdesk->designation_bn,
+                'sender_officer_phone' => $cdesk->phone,
+                'sender_officer_email' => $cdesk->email,
+                'status' => $request->status,
+                'comments' => $request->comments
+            ];
+
+            XMovement::create($movement_data);
+
+            if ($request->status == 'approved'){
+                $apotti_status = ApottiStatus::select('apotti_type')
+                    ->where('qac_type','register')
+                    ->where('apotti_id',$request->apotti_id)
+                    ->first();
+
+                Apotti::where('id',$request->apotti_id)->update([
+                    'apotti_type'=> $apotti_status->apotti_type
+                ]);
+
+                ApottiItem::where('apotti_id',$request->apotti_id)->update([
+                    'memo_type'=> $apotti_status->apotti_type
+                ]);
+            }
+
+            if ($request->receiver_officer_id) {
+                $apotti = Apotti::where('id', $request->apotti_id)->first()->toArray();
+
+                if ($request->status == 'pending'){
+                    $task_title = 'আপত্তি ('.$apotti['apotti_title'].')  রিভিউ করুন';
+                }elseif ($request->status == 'approved'){
+                    $task_title = 'আপত্তি ('.$apotti['apotti_title'].')  রিভিউ অনুমোদন করা হল';
+                }else{
+                    $task_title = 'আপত্তি ('.$apotti['apotti_title'].')  রিভিউ বাতিল করা হল';
+                }
+
+                //Create Task for Approval
+                $task_data = [
+                    'task_assignee' => [
+                        'user_email' => $request->receiver_officer_email,
+                        'user_phone' => $request->receiver_officer_phone,
+                        'user_name_en' => $request->receiver_officer_en,
+                        'user_name_bn' => $request->receiver_officer_bn,
+                        'user_officer_id' => $request->receiver_officer_id,
+                        'username' => $request->receiver_user_id,
+                        'user_office_id' => $request->receiver_office_id,
+                        'user_office_name_en' => $cdesk->office_name_en,
+                        'user_office_name_bn' => $cdesk->office_name_bn,
+                        'user_unit_id' => $request->receiver_unit_id,
+                        'user_office_unit_name_en' => $request->receiver_unit_name_en,
+                        'user_office_unit_name_bn' => $request->receiver_unit_name_bn,
+                        'user_designation_id' => $request->receiver_employee_designation_id,
+                        'user_designation_name_en' => $request->receiver_employee_designation_en,
+                        'user_designation_name_bn' => $request->receiver_employee_designation_bn,
+                        'user_type' => 'assigned',
+                    ],
+                    'task_title_en' => $task_title,
+                    'task_title_bn' => $task_title,
+                    'description' => $request->comments,
+                    'meta_data' => base64_encode(json_encode(['return_url' => ''])),
+                    'task_start_end_date_time' => Carbon::now()->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDay()->format('d/m/Y H:i A'),
+                    'notifications' => json_encode([[
+                        "medium" => "email",
+                        "interval" => "30",
+                        "unit" => "minutes",
+                    ]]),
+                ];
+
+                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+            }
+             return ['status' => 'success', 'data' => 'Data sent successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
     }
 
 }
