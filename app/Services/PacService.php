@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\AcMemoAttachment;
 use App\Models\Apotti;
 use App\Models\AuditTemplate;
@@ -47,7 +48,7 @@ class PacService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $meeting_apottis = Apotti::whereIn('id',$meeting_apottis)->get();
+            $meeting_apottis = Apotti::with('apotti_items')->whereIn('id',$meeting_apottis)->get();
 
             $meeting_list['meeting_apotti_details'] = $meeting_apottis;
 
@@ -150,8 +151,8 @@ class PacService
             $meeting_decison->rp_report  =$request->rp_report;
             $meeting_decison->cag_comment  =$request->cag_comment;
             $meeting_decison->apotti_status  =$request->apotti_status;
-            $meeting_decison->decision_last_date  =$request->decision_last_date;
-            $meeting_decison->follower_office  =$request->follower_office;
+//            $meeting_decison->decision_last_date  =$request->decision_last_date;
+//            $meeting_decison->follower_office  =$request->follower_office;
             $meeting_decison->created_by  = $cdesk->officer_id;
             $meeting_decison->created_bn  =$cdesk->officer_bn;
             $meeting_decison->created_en  =$cdesk->officer_en;
@@ -166,10 +167,16 @@ class PacService
                 ->where('apotti_id',$request->apotti_id)
                 ->update(['is_alochito' => 1]);
 
-            foreach ($request->pac_decision as $decision){
+
+            $decision_last_date = $request->decision_last_date;
+            $follower_office = $request->follower_office;
+
+            foreach ($request->pac_decision as $key => $decision){
                 $pac_decision = new PacApottiDecision();
                 $pac_decision->apotti_decision_id = $meeting_decison->id;
                 $pac_decision->pac_decision = $decision;
+                $pac_decision->decision_last_date = Carbon::parse($decision_last_date[$key])->format('Y-m-d');
+                $pac_decision->follower_office = $follower_office[$key];
                 $pac_decision->apotti_id = $request->apotti_id;
                 $pac_decision->final_report_id = $request->final_report_id;
                 $pac_decision->save();
@@ -192,7 +199,23 @@ class PacService
             $pac_meeting->is_sent_pac = 1;
             $pac_meeting->save();
 
-            return ['status' => 'success', 'data' => 'সফলভাবে প্রেরণ করা হয়েছে'];
+            $meeting_apottis = PacMeetingApotti::where('directorate_id',$pac_meeting->directorate_id)
+                ->where('pac_meeting_id',$request->pac_meeting_id)
+                ->pluck('apotti_id');
+
+            $rpu_data['directorate_id'] =  $pac_meeting->directorate_id;
+            $rpu_data['directorate_bn'] =  $pac_meeting->directorate_bn;
+            $rpu_data['directorate_en'] =  $pac_meeting->directorate_en;
+            $rpu_data['meeting_id'] =  $request->pac_meeting_id;
+            $rpu_data['meeting_apottis'] =  $meeting_apottis;
+
+            $send_meeting_apotti =  $this->initRPUHttp()->post(config('cag_rpu_api.send_meeting_apotti_to_rpu'), $rpu_data)->json();
+
+            if ($send_meeting_apotti['status'] == 'success') {
+                return ['status' => 'success', 'data' => $send_meeting_apotti];
+            } else {
+                throw new \Exception(json_encode($send_meeting_apotti));
+            }
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

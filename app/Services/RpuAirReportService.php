@@ -77,7 +77,7 @@ class RpuAirReportService
                 $send_air_data['directorate_id'] = $cdesk->office_id;
                 $send_air_data['directorate_en'] = $cdesk->office_name_en;
                 $send_air_data['directorate_bn'] = $cdesk->office_name_bn;
-
+                $send_air_data['fiscal_year'] = $fiscal_year->start.'-'.$fiscal_year->end;
                 $send_air_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_air_to_rpu'), $send_air_data)->json();
 
                 if ($send_air_to_rpu['status'] == 'success') {
