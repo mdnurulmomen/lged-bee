@@ -20,7 +20,10 @@ class BroadsheetReplyService
     public function getBroadSheetList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
+
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
@@ -41,14 +44,13 @@ class BroadsheetReplyService
     public function getBroadSheetInfo(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-
             $broad_sheet_info = BroadSheetReply::find($request->broad_sheet_id);
-
             return ['status' => 'success', 'data' => $broad_sheet_info];
 
         } catch (\Exception $exception) {
@@ -60,7 +62,8 @@ class BroadsheetReplyService
     public function getBroadSheetItems(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }

@@ -80,7 +80,12 @@ class AuditVisitCalendarPlanService
             $cost_center_id = $request->cost_center_id;
 
             if ($cdesk->is_office_admin === false && $cdesk->is_office_head === false) {
-                $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('team_member_designation_id', $cdesk->designation_id)->where('team_member_officer_id', $cdesk->officer_id)->where('team_member_office_id', $cdesk->office_id)->distinct('team_id')->pluck('team_id');
+                $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)
+                    ->where('team_member_designation_id', $cdesk->designation_id)
+                    ->where('team_member_officer_id', $cdesk->officer_id)
+                    ->where('team_member_office_id', $cdesk->office_id)
+                    ->distinct('team_id')
+                    ->pluck('team_id');
             }
 
 
@@ -88,7 +93,10 @@ class AuditVisitCalendarPlanService
                 $team_id = [$request->team_id];
             }
             else if($cost_center_id){
-                $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('cost_center_id',$cost_center_id)->distinct('team_id')->pluck('team_id');
+                $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)
+                    ->where('cost_center_id',$cost_center_id)
+                    ->distinct('team_id')
+                    ->pluck('team_id');
             }
 
 
@@ -99,6 +107,10 @@ class AuditVisitCalendarPlanService
                 $query->whereIn('id', $team_id);
             }else{
                 $query->where('team_schedules','!=', 'null');
+            }
+
+            if(!$request->team_id){
+                $query->where('team_parent_id' ,0);
             }
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
