@@ -524,7 +524,9 @@ class ApottiService
                 ->with(['apotti_items','latest_movement'])
                 ->with('apotti_status', function ($q){
                     $q->select('id','apotti_id','apotti_type')
-                        ->where('qac_type', 'register');
+                        ->where('qac_type', 'register')
+                        ->latest()
+                        ->take(1);
                 })
                 ->orderBy('onucched_no')
                 ->paginate(config('bee_config.per_page_pagination'));
@@ -563,7 +565,7 @@ class ApottiService
     {
         $cdesk = json_decode($request->cdesk, false);
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($request->office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
@@ -617,7 +619,8 @@ class ApottiService
                 ]);
             }
 
-            if ($request->receiver_officer_id) {
+            //todo
+            /*if ($request->receiver_officer_id) {
                 $apotti = Apotti::where('id', $request->apotti_id)->first()->toArray();
 
                 if ($request->status == 'pending'){
@@ -661,7 +664,7 @@ class ApottiService
                 ];
 
                 (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
-            }
+            }*/
              return ['status' => 'success', 'data' => 'Data sent successfully'];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
