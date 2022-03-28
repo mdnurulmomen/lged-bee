@@ -551,12 +551,6 @@ class AcMemoService
                 return $q->whereDate('memo_date','<=', $end_date);
             });
 
-            if ($request->has('status')) {
-                if ($request->status == 'daily') {
-                    $query->whereDate('created_at', date('Y-m-d'));
-                }
-            }
-
             $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             $memo_list['total_memo'] = AcMemo::count('id');
