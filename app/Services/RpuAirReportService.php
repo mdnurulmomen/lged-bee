@@ -220,9 +220,13 @@ class RpuAirReportService
             foreach ($request->apottiItems as $apottiItem){
                 $broadSheetReplyItem =  new BroadSheetReplyItem();
                 $broadSheetReplyItem->broad_sheet_reply_id = $request->broadsheet_reply_id;
+                $broadSheetReplyItem->apotti_id = $apottiItem['apotti_id'];
                 $broadSheetReplyItem->apotti_item_id = $apottiItem['apotti_item_id'];
                 $broadSheetReplyItem->memo_id = $apottiItem['memo_id'];
                 $broadSheetReplyItem->jorito_ortho_poriman = $apottiItem['jorito_ortho_poriman'];
+                $broadSheetReplyItem->unit_response = $apottiItem['unit_response'];
+                $broadSheetReplyItem->entity_response = $apottiItem['entity_response'];
+                $broadSheetReplyItem->ministry_response = $apottiItem['ministry_response'];
                 $broadSheetReplyItem->save();
 
                 //apotti item

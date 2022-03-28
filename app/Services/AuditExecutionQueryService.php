@@ -365,6 +365,8 @@ class AuditExecutionQueryService
             $entity_id = $request->entity_id;
             $activity_id = $request->activity_id;
             $team_id = $request->team_id;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
 
             $query = AcQuery::query();
 
@@ -386,6 +388,14 @@ class AuditExecutionQueryService
 
             $query->when($team_id, function ($q, $team_id) {
                 return $q->where('team_id', $team_id);
+            });
+
+            $query->when($start_date, function ($q, $start_date) {
+                return $q->whereDate('created_at','>=',$start_date);
+            });
+
+            $query->when($end_date, function ($q, $end_date) {
+                return $q->whereDate('created_at','<=', $end_date);
             });
 
 

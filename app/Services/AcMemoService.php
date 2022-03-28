@@ -470,6 +470,7 @@ class AcMemoService
 
     public function authorityMemoList(Request $request): array
     {
+
         $office_db_con_response = $this->switchOffice($request->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
@@ -487,6 +488,8 @@ class AcMemoService
             $jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $audit_year_start = $request->audit_year_start;
             $audit_year_end = $request->audit_year_end;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
 
             $query = AcMemo::query();
 
@@ -538,6 +541,14 @@ class AcMemoService
 
             $query->when($audit_year_end, function ($q, $audit_year_end) {
                 return $q->where('audit_year_end', $audit_year_end);
+            });
+
+            $query->when($start_date, function ($q, $start_date) {
+                return $q->whereDate('memo_date','>=',$start_date);
+            });
+
+            $query->when($end_date, function ($q, $end_date) {
+                return $q->whereDate('memo_date','<=', $end_date);
             });
 
             $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
