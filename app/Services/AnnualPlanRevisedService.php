@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApPsrSubjectMatter;
 use App\Models\ApPsrAduitObject;
 use App\Models\ApPsrLineOfEnquire;
@@ -579,6 +580,13 @@ class AnnualPlanRevisedService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
+
+            $has_audit_plan =  ApEntityIndividualAuditPlan::where('annual_plan_id',$request->annual_plan_id)->count();
+
+            if($has_audit_plan){
+                return ['status' => 'error', 'data' => 'Annual Plan Has Individual Audit Plan'];
+            }
+
             AnnualPlan::find($request->annual_plan_id)->delete();
             AnnualPlanEntitie::where('annual_plan_id',$request->annual_plan_id)->delete();
             ApMilestone::where('annual_plan_id',$request->annual_plan_id)->delete();
