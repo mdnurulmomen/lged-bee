@@ -222,7 +222,7 @@ class AuditAIRReportService
 
 //            $response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
 
-            return ['status' => 'success', 'data' => ['air_id' => $approved_apottis]];
+            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
