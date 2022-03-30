@@ -202,6 +202,7 @@ class RpuAirReportService
             $broadSheetReply->id = $request->broadsheet_reply_id;
             $broadSheetReply->memorandum_no = $request->memorandum_no;
             $broadSheetReply->memorandum_date = date('Y-m-d',strtotime($request->memorandum_date));
+            $broadSheetReply->broad_sheet_type = $request->broad_sheet_type;
             $broadSheetReply->sender_office_id = $request->sender_office_id;
             $broadSheetReply->sender_office_name_bn = $request->sender_office_name_bn;
             $broadSheetReply->sender_office_name_en = $request->sender_office_name_en;
