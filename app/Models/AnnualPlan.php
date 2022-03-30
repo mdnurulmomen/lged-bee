@@ -16,6 +16,7 @@ class AnnualPlan extends Model
         'op_audit_calendar_event_id',
         'schedule_id',
         'activity_id',
+        'activity_type',
         'milestone_id',
         'fiscal_year_id',
         'office_type',

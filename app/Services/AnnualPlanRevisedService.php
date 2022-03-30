@@ -200,6 +200,7 @@ class AnnualPlanRevisedService
                 'schedule_id' => 0,
                 'milestone_id' => 0,
                 'activity_id' => $request->activity_id,
+                'activity_type' => $request->activity_type,
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
                 'annual_plan_type' => $request->annual_plan_type,
