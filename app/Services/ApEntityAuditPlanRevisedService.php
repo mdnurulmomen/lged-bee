@@ -133,7 +133,7 @@ class ApEntityAuditPlanRevisedService
                 'device_id' => '',
             ];
 
-            \Log::info(json_encode($draft_plan_data));
+            /*\Log::info(json_encode($draft_plan_data));*/
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
                 $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id)
