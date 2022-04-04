@@ -31,7 +31,7 @@ class AcMemoService
         }
         \DB::beginTransaction();
         try {
-
+            $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
             $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
                 'office_order'])->where('id', $request->team_member_schedule_id)->first();
 
@@ -82,6 +82,7 @@ class AcMemoService
             $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
             $audit_memo->rpu_acceptor_designation_name_en = $request->rpu_acceptor_designation_name_bn;
+            $audit_memo->porisisto_details = $request->porisisto_details;
             $audit_memo->save();
 
             //for attachments
@@ -95,13 +96,13 @@ class AcMemoService
                     $fileSize = $file->getSize();
                     $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/'.$office_domain_prefix.'/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'porisishto',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/dicfia/' . $fileName),
+                            'file_path' => url('storage/memo/'.$office_domain_prefix.'/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -120,14 +121,14 @@ class AcMemoService
                     $fileSize = $file->getSize();
                     $fileName = 'pramanok_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/'.$office_domain_prefix.'/' . $fileName, File::get($file));
 
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'pramanok',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/dicfia/' . $fileName),
+                            'file_path' => url('storage/memo/'.$office_domain_prefix.'/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,

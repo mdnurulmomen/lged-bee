@@ -114,6 +114,7 @@ class AcMemo extends Model
         'rpu_acceptor_designation_name_en',
         'rpu_acceptor_signature',
         'memo_date',
+        'porisisto_details',
     ];
 
     public function getMemoTypeNameAttribute()
