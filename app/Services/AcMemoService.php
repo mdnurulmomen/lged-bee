@@ -32,6 +32,8 @@ class AcMemoService
         \DB::beginTransaction();
         try {
             $folder_name = $cdesk->office_id;
+            $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
+
             $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
                 'office_order'])->where('id', $request->team_member_schedule_id)->first();
 
@@ -94,7 +96,7 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix.'_porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
@@ -119,7 +121,7 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'pramanok_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix.'_pramanok_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
 
@@ -225,6 +227,9 @@ class AcMemoService
         }
         \DB::beginTransaction();
         try {
+            $folder_name = $cdesk->office_id;
+            $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
+
             $audit_memo = AcMemo::find($request->memo_id);
             $audit_memo->memo_title_bn = $request->memo_title_bn;
             $audit_memo->memo_description_bn = $request->memo_description_bn;
@@ -267,15 +272,15 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix.'_porisishto_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'porisishto',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/dicfia/' . $fileName),
+                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -292,16 +297,16 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = 'pramanok_' . uniqid() . '.' . $file->extension();
+                    $fileName = $office_domain_prefix.'_pramanok_' . uniqid() . '.' . $file->extension();
 
-                    Storage::disk('public')->put('memo/dicfia/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
 
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'pramanok',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/dicfia/' . $fileName),
+                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
