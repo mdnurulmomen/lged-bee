@@ -196,7 +196,8 @@ class AcMemoService
     public function singleAuditMemoInfo(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_id = $request->directorate_id ? $request->directorate_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
