@@ -109,9 +109,9 @@ class AuditVisitCalendarPlanService
                 $query->where('team_schedules','!=', 'null');
             }
 
-            if(!$request->team_id){
-                $query->where('team_parent_id' ,0);
-            }
+//            if(!$request->team_id){
+//                $query->where('team_parent_id' ,0);
+//            }
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
                 return $q->where('fiscal_year_id', $fiscal_year_id);
