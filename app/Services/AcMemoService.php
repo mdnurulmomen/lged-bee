@@ -32,6 +32,16 @@ class AcMemoService
         \DB::beginTransaction();
         try {
             $folder_name = $cdesk->office_id;
+
+            $path = public_path('/memo/' . $folder_name);
+
+            if (!Storage::exists($path)) {
+                $create_directorate_folder = Storage::makeDirectory($path, 0777, true, true);
+                if (!$create_directorate_folder) {
+                    throw new \Exception('Error creating memo folder');
+                }
+            }
+
             $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
 
             $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
@@ -96,15 +106,15 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix.'_porisishto_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'porisishto',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
+                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -121,16 +131,16 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix.'_pramanok_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix . '_pramanok_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'pramanok',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
+                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -272,15 +282,15 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix.'_porisishto_' . uniqid() . '.' . $fileExtension;
+                    $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'porisishto',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
+                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -297,16 +307,16 @@ class AcMemoService
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix.'_pramanok_' . uniqid() . '.' . $file->extension();
+                    $fileName = $office_domain_prefix . '_pramanok_' . uniqid() . '.' . $file->extension();
 
-                    Storage::disk('public')->put('memo/'.$folder_name.'/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
                     array_push($finalAttachments, array(
                             'ac_memo_id' => $audit_memo->id,
                             'file_type' => 'pramanok',
                             'file_user_define_name' => $userDefineFileName,
                             'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/'.$folder_name.'/' . $fileName),
+                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
                             'file_size' => $fileSize,
                             'file_extension' => $fileExtension,
                             'sequence' => $key + 1,
@@ -551,11 +561,11 @@ class AcMemoService
             });
 
             $query->when($start_date, function ($q, $start_date) {
-                return $q->whereDate('memo_date','>=',$start_date);
+                return $q->whereDate('memo_date', '>=', $start_date);
             });
 
             $query->when($end_date, function ($q, $end_date) {
-                return $q->whereDate('memo_date','<=', $end_date);
+                return $q->whereDate('memo_date', '<=', $end_date);
             });
 
             $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
