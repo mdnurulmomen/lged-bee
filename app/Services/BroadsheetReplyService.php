@@ -326,6 +326,7 @@ class BroadsheetReplyService
 
             $apotti_item_data = [];
             foreach ($broad_sheet_item_list as $item){
+                $data['apotti_id'] = $item->apotti_id;
                 $data['apotti_item_id'] = $item->apotti_item_id;
                 $data['memo_status'] = $item->status;
                 $data['onishponno_jorito_ortho_poriman'] = $item->onishponno_jorito_ortho_poriman;
