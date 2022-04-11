@@ -32,6 +32,11 @@ class BroadsheetReplyService
             $broad_sheet_list = BroadSheetReply::with('latest_broad_sheet_movement')
                 ->with('broad_sheet_reply')
                 ->withCount('broad_sheet_items')
+                ->withCount([
+                    'broad_sheet_items as broad_sheet_item_decision' => function ($query) {
+                        $query->whereNull('status')->where('approval_status','approved');
+                    },
+                ])
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $broad_sheet_list];
