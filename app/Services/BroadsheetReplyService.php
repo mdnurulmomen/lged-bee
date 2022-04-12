@@ -34,7 +34,7 @@ class BroadsheetReplyService
                 ->withCount('broad_sheet_items')
                 ->withCount([
                     'broad_sheet_items as broad_sheet_item_decision' => function ($query) {
-                        $query->whereNull('status')->where('approval_status','approved');
+                        $query->where('approval_status','approved');
                     },
                 ])
                 ->paginate(config('bee_config.per_page_pagination'));
