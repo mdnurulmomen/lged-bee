@@ -199,6 +199,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-apotti-item-info', [BroadsheetReplyController::class, 'getApottiItemInfo']);
             Route::post('broad-sheet-movement', [BroadsheetReplyController::class, 'broadSheetMovement']);
             Route::post('broad-sheet-last-movement', [BroadsheetReplyController::class, 'broadSheetLastMovement']);
+            Route::post('store-broad-sheet-reply', [BroadsheetReplyController::class, 'storeBroadSheetReply']);
             Route::post('send-broad-sheet-reply-to-rpu', [BroadsheetReplyController::class, 'sendBroadSheetReplyToRpu']);
             Route::post('get-sent-broad-sheet-info', [BroadsheetReplyController::class, 'getSentBroadSheetInfo']);
         });

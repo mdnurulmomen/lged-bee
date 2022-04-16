@@ -294,7 +294,7 @@ class BroadsheetReplyService
         }
     }
 
-    public function sendBroadSheetReplyToRpu(Request $request): array
+    public function storeBroadSheetReply(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
@@ -315,6 +315,7 @@ class BroadsheetReplyService
             $sent_to_rpu->subject = $request->subject;
             $sent_to_rpu->description = $request->description;
             $sent_to_rpu->braod_sheet_cc = $request->braod_sheet_cc;
+            $sent_to_rpu->is_sent_rpu = 0;
             $sent_to_rpu->sender_id = $cdesk->officer_id;
             $sent_to_rpu->sender_name_bn = $cdesk->officer_bn;
             $sent_to_rpu->sender_name_en = $cdesk->officer_en;
@@ -326,8 +327,32 @@ class BroadsheetReplyService
             $sent_to_rpu->sender_unit_en = $cdesk->office_unit_en;
             $sent_to_rpu->save();
 
-            $broad_sheet_item_list = BroadSheetReplyItem::where('broad_sheet_reply_id', $request->broad_sheet_id)->get();
+            DB::commit();
 
+            return ['status' => 'success', 'data' => 'সফলভাবে সংরক্ষণ করা হয়েছে'];
+
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function sendBroadSheetReplyToRpu(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+
+        DB::beginTransaction();
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $sent_to_rpu = BroadsheetReplyToResponsibleParty::where('broad_sheet_reply_id', $request->broad_sheet_id)->first();
+            $sent_to_rpu->is_sent_rpu = 1;
+            $sent_to_rpu->save();
+            $broad_sheet_item_list = BroadSheetReplyItem::where('broad_sheet_reply_id', $request->broad_sheet_id)->get();
 
             $apotti_item_data = [];
             foreach ($broad_sheet_item_list as $item){
@@ -348,11 +373,7 @@ class BroadsheetReplyService
             $rpu_response_data['item_info'] =  $apotti_item_data;
             $rpu_response_data['reply_info'] =  $sent_to_rpu;
 
-
-
             $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_reply_from_directorate'), $rpu_response_data)->json();
-
-//            return ['status' => 'success', 'data' => $send_decision_to_rpu];
 
             if ($send_decision_to_rpu['status'] == 'success') {
                 DB::commit();
