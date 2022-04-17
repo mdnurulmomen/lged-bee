@@ -37,6 +37,7 @@ class BroadsheetReplyService
                         $query->where('approval_status','approved');
                     },
                 ])
+                ->orderBy('id','DESC')
                 ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $broad_sheet_list];

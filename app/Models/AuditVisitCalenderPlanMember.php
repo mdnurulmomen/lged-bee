@@ -48,6 +48,7 @@ class AuditVisitCalenderPlanMember extends Model
         'activity_location',
         'comment',
         'mobile_no',
+        'employee_grade',
         'approve_status',
         'status',
         'schedule_type',

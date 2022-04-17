@@ -60,13 +60,6 @@ class ApEntityTeamService
                 $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
                 $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
                 $auditVisitCalendarPlanTeam->audit_plan_id = $request->audit_plan_id;
-//                $auditVisitCalendarPlanTeam->ministry_id = $annualPlan->ministry_id;
-//                $auditVisitCalendarPlanTeam->controlling_office_id = $annualPlan->controlling_office_id;
-//                $auditVisitCalendarPlanTeam->controlling_office_name_en = $annualPlan->controlling_office_en;
-//                $auditVisitCalendarPlanTeam->controlling_office_name_bn = $annualPlan->controlling_office_bn;
-//                $auditVisitCalendarPlanTeam->entity_id = $annualPlan->parent_office_id;
-//                $auditVisitCalendarPlanTeam->entity_name_en = $annualPlan->parent_office_name_en;
-//                $auditVisitCalendarPlanTeam->entity_name_bn = $annualPlan->parent_office_name_bn;
                 $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
                 $auditVisitCalendarPlanTeam->team_start_date = $teams['team_start_date'];
                 $auditVisitCalendarPlanTeam->team_end_date = $teams['team_end_date'];
@@ -83,8 +76,6 @@ class ApEntityTeamService
                 }
 
                 $auditVisitCalendarPlanTeam->activity_man_days = 0;
-                $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
-                $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
                 $auditVisitCalendarPlanTeam->approve_status = 1;
                 $auditVisitCalendarPlanTeam->save();
 
@@ -114,10 +105,50 @@ class ApEntityTeamService
         }
         $teams = json_decode($request->teams, true);
         $teams = $teams['teams'];
+//        return ['status' => 'success', 'data' => $request->deleted_team];
         try {
-            AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->delete();
-            $this->saveAuditTeam($teams, $annualPlan, $request);
-            $data = ['status' => 'success', 'data' => 'Successfully Saved Team!'];
+//            AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->delete();
+//            $this->saveAuditTeam($teams, $annualPlan, $request);
+
+            foreach ($teams['all_teams'] as $team) {
+                if (count($teams['all_teams']) == 1) {
+                    $members = json_encode($team['members'], JSON_UNESCAPED_UNICODE);
+                } else {
+                    $members = isset($team['team_parent_id']) && $team['team_parent_id'] == 0 ? json_encode($team['members'], JSON_UNESCAPED_UNICODE) : json_encode(['teamLeader' => [$teams['leader']['officer_id'] => $teams['leader']]] + $team['members'], JSON_UNESCAPED_UNICODE);
+                }
+                $id = isset($team['id']) &&  $team['id'] ? $team['id'] : null;
+                $data = [
+                    'team_parent_id' => isset($team['team_parent_id']) && $team['team_parent_id'] == 0 ?  0 : $teams['all_teams'][1]['id'],
+                    'fiscal_year_id' => $annualPlan->fiscal_year_id,
+                    'duration_id' => $annualPlan->activity->duration_id,
+                    'outcome_id' => $annualPlan->activity->outcome_id,
+                    'output_id' => $annualPlan->activity->output_id,
+                    'activity_id' => $annualPlan->activity_id,
+                    'milestone_id' => $annualPlan->milestone_id,
+                    'annual_plan_id' => $request->annual_plan_id,
+                    'audit_plan_id' => $request->audit_plan_id,
+                    'audit_year_start' => $request->audit_year_start,
+                    'audit_year_end' => $request->audit_year_end,
+                    'team_name' => $team['team_name'],
+                    'team_members' => $members,
+                    'leader_name_en' => $team['leader_name_en'],
+                    'leader_name_bn' => $team['leader_name_bn'],
+                    'leader_designation_id' => $team['leader_designation_id'],
+                    'leader_designation_name_en' => $team['leader_designation_en'],
+                    'leader_designation_name_bn' => $team['leader_designation_bn'],
+                    'team_start_date' => $teams['team_start_date'],
+                    'team_end_date' => $teams['team_end_date'],
+                    'approve_status' => 1,
+                ];
+                AuditVisitCalendarPlanTeam::updateOrCreate(['id' => $id],$data);
+            }
+
+            if($request->deleted_team){
+                AuditVisitCalendarPlanTeam::whereIn('id',$request->deleted_team)->delete();
+            }
+
+            $data = ['status' => 'success', 'data' => 'successfully updated'];
+
         } catch (\Exception $e) {
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
@@ -208,6 +239,7 @@ class ApEntityTeamService
                                 'team_member_end_date' => empty($schedule_datum['team_member_end_date']) ? null:$schedule_datum['team_member_end_date'],
                                 //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
                                 'mobile_no' => empty($member['officer_mobile']) ? null : $member['officer_mobile'],
+                                'employee_grade' => empty($member['employee_grade']) ? null : $member['employee_grade'],
                                 'activity_location' => empty($schedule_datum['activity_details']) ? null : $schedule_datum['activity_details'],
                                 'sequence_level' => $schedule_datum['sequence_level'],
                                 'schedule_type' => $schedule_datum['schedule_type'],
@@ -244,6 +276,7 @@ class ApEntityTeamService
         }
         $team_schedules = json_decode($request->team_schedules, true);
         $team_schedules = $team_schedules['schedule'];
+//        return ['status' => 'success', 'data' => $team_schedules];
         DB::beginTransaction();
         try {
             AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();

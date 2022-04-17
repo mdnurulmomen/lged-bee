@@ -185,7 +185,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         $add_audit_team = $apEntityTeamService->updateAuditTeam($request);
 
         if (isSuccessResponse($add_audit_team)) {
-            $response = responseFormat('success', 'Successfully Saved Team');
+            $response = responseFormat('success', $add_audit_team['data']);
         } else {
             $response = responseFormat('error', $add_audit_team['data']);
         }
@@ -194,7 +194,6 @@ class ApEntityAuditPlanRevisedController extends Controller
 
     public function storeTeamSchedule(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
-
         Validator::make($request->all(), [
             'audit_plan_id' => 'integer',
             'team_schedules' => 'required|json',
