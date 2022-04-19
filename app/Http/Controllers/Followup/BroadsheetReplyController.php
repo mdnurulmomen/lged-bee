@@ -141,4 +141,26 @@ class BroadsheetReplyController extends Controller
         return response()->json($response);
     }
 
+    public function getAllBroadSheetMinistry(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $ministry_list = $broadsheetReplyService->getAllBroadSheetMinistry($request);
+        if (isSuccessResponse($ministry_list)) {
+            $response = responseFormat('success', $ministry_list['data']);
+        } else {
+            $response = responseFormat('error', $ministry_list['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getAllBroadSheetMinistryWiseEntity(Request $request, BroadsheetReplyService $broadsheetReplyService): \Illuminate\Http\JsonResponse
+    {
+        $entity_list = $broadsheetReplyService->getAllBroadSheetMinistryWiseEntity($request);
+        if (isSuccessResponse($entity_list)) {
+            $response = responseFormat('success', $entity_list['data']);
+        } else {
+            $response = responseFormat('error', $entity_list['data']);
+        }
+        return response()->json($response);
+    }
+
 }

@@ -202,6 +202,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('store-broad-sheet-reply', [BroadsheetReplyController::class, 'storeBroadSheetReply']);
             Route::post('send-broad-sheet-reply-to-rpu', [BroadsheetReplyController::class, 'sendBroadSheetReplyToRpu']);
             Route::post('get-sent-broad-sheet-info', [BroadsheetReplyController::class, 'getSentBroadSheetInfo']);
+            Route::post('get-all-broad-sheet-ministry-list', [BroadsheetReplyController::class, 'getAllBroadSheetMinistry']);
+            Route::post('get-all-broad-sheet-ministry-wise-entity', [BroadsheetReplyController::class, 'getAllBroadSheetMinistryWiseEntity']);
         });
     });
 

@@ -29,16 +29,30 @@ class BroadsheetReplyService
         }
         try {
 
-            $broad_sheet_list = BroadSheetReply::with('latest_broad_sheet_movement')
-                ->with('broad_sheet_reply')
-                ->withCount('broad_sheet_items')
-                ->withCount([
-                    'broad_sheet_items as broad_sheet_item_decision' => function ($query) {
-                        $query->where('approval_status','approved');
-                    },
-                ])
-                ->orderBy('id','DESC')
-                ->paginate(config('bee_config.per_page_pagination'));
+            $ministry_id = $request->ministry_id;
+            $entity_id = $request->entity_id;
+
+            $query = BroadSheetReply::query();
+
+            if($ministry_id && $entity_id){
+                $query->where('ministry_id',$ministry_id);
+                $query->where('sender_office_id',$entity_id);
+                $query->where('sender_type','entity');
+            } elseif($ministry_id){
+                $query->where('ministry_id',$ministry_id);
+                $query->where('sender_type','!=','entity');
+            }
+
+            $broad_sheet_list =  $query->with('latest_broad_sheet_movement')
+                                 ->with('broad_sheet_reply')
+                                 ->withCount('broad_sheet_items')
+                                    ->withCount([
+                                        'broad_sheet_items as broad_sheet_item_decision' => function ($query) {
+                                            $query->where('approval_status','approved');
+                                        },
+                                    ])
+                                ->orderBy('id','DESC')
+                                ->paginate(config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $broad_sheet_list];
         } catch (\Exception $exception) {
@@ -388,7 +402,6 @@ class BroadsheetReplyService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
-
     public function getSentBroadSheetInfo(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -401,6 +414,51 @@ class BroadsheetReplyService
             $broad_sheet_sent_info = BroadsheetReplyToResponsibleParty::where('broad_sheet_reply_id',$request->broad_sheet_id)->first();
 
             return ['status' => 'success', 'data' => $broad_sheet_sent_info];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getAllBroadSheetMinistry(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $ministry_list = BroadSheetReply::select('ministry_id', 'ministry_name_en', 'ministry_name_bn')
+                ->distinct()
+                ->get();
+
+            return ['status' => 'success', 'data' => $ministry_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getAllBroadSheetMinistryWiseEntity(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $entity_list = BroadSheetReply::select('sender_office_id', 'sender_office_name_bn', 'sender_office_name_en')
+                ->where('ministry_id',$request->ministry_id)
+                ->where('sender_type','entity')
+                ->get();
+
+            return ['status' => 'success', 'data' => $entity_list];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
