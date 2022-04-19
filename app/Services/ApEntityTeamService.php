@@ -138,6 +138,7 @@ class ApEntityTeamService
                     'leader_designation_name_bn' => $team['leader_designation_bn'],
                     'team_start_date' => $teams['team_start_date'],
                     'team_end_date' => $teams['team_end_date'],
+                    'activity_man_days' => 0,
                     'approve_status' => 1,
                 ];
                 AuditVisitCalendarPlanTeam::updateOrCreate(['id' => $id],$data);
