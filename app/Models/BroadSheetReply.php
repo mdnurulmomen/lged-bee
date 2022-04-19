@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BroadSheetReply extends Model
 {
     use HasFactory;
+
     protected $connection = "OfficeDB";
 
     public function broad_sheet_items(): \Illuminate\Database\Eloquent\Relations\HasMany

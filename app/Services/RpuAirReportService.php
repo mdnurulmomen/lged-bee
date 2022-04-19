@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\AcMemoAttachment;
 use App\Models\AnnualPlanEntitie;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
@@ -218,6 +219,8 @@ class RpuAirReportService
             $broadSheetReply->save();
 
             //broadsheet reply item
+            $finalAttachments = [];
+            //return ['status' => 'success', 'data' => $request->apottiItems];
             foreach ($request->apottiItems as $apottiItem){
                 $broadSheetReplyItem =  new BroadSheetReplyItem();
                 $broadSheetReplyItem->broad_sheet_reply_id = $request->broadsheet_reply_id;
@@ -237,6 +240,30 @@ class RpuAirReportService
                         'entity_response' => $apottiItem['entity_response'],
                         'ministry_response' => $apottiItem['ministry_response'],
                     ]);
+
+                //return ['status' => 'success', 'data' => $apottiItem['apotti_attachements']];
+
+                if (!empty($apottiItem['apotti_attachements'])){
+                    foreach ($apottiItem['apotti_attachements'] as $attachment){
+                        array_push($finalAttachments, array(
+                                'ac_memo_id' => $attachment['ac_memo_id'],
+                                'file_type' => $attachment['file_type'],
+                                'file_user_define_name' => $attachment['file_user_define_name'],
+                                'file_custom_name' => $attachment['file_custom_name'],
+                                'file_path' => $attachment['file_path'],
+                                'file_size' => $attachment['file_size'],
+                                'file_extension' => $attachment['file_extension'],
+                                'sequence' => $attachment['sequence'],
+                                'created_by' => 1,
+                                'modified_by' => 1,
+                            )
+                        );
+                    }
+                }
+            }
+
+            if (!empty($finalAttachments)) {
+                AcMemoAttachment::insert($finalAttachments);
             }
 
             \DB::commit();
