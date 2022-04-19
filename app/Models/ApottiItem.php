@@ -29,4 +29,9 @@ class ApottiItem extends Model
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 
+    public function apotti_attachment(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'memo_id')->where('file_type','broadsheet');
+    }
+
 }

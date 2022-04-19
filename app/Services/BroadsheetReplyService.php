@@ -89,7 +89,7 @@ class BroadsheetReplyService
         }
         try {
 
-            $broad_sheet_list = BroadSheetReplyItem::with('apotti.fiscal_year')->where('broad_sheet_reply_id',$request->broad_sheet_id)->get();
+            $broad_sheet_list = BroadSheetReplyItem::with('apotti.fiscal_year')->with('apotti.apotti_attachment')->where('broad_sheet_reply_id',$request->broad_sheet_id)->get();
 
             return ['status' => 'success', 'data' => $broad_sheet_list];
         } catch (\Exception $exception) {
