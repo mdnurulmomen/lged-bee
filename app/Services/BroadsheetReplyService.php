@@ -334,6 +334,7 @@ class BroadsheetReplyService
             $sent_to_rpu->sender_id = $cdesk->officer_id;
             $sent_to_rpu->sender_name_bn = $cdesk->officer_bn;
             $sent_to_rpu->sender_name_en = $cdesk->officer_en;
+            $sent_to_rpu->sender_office_address  = $cdesk->address;
             $sent_to_rpu->sender_designation_id = $cdesk->designation_id;
             $sent_to_rpu->sender_designation_bn = $cdesk->designation_bn;
             $sent_to_rpu->sender_designation_en = $cdesk->designation_en;
