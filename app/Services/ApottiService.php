@@ -519,8 +519,7 @@ class ApottiService
                     ->whereDate('status_review_date', '<=', date('Y-m-d',strtotime($end_date)));
             }
 
-            $apotti_list = $query->whereNotNull('status_review_date')
-                ->where('apotti_type', $apotti_type)
+            $apotti_list = $query->where('apotti_type', $apotti_type)
                 ->with(['apotti_items','latest_movement'])
                 ->with('apotti_status', function ($q){
                     $q->select('id','apotti_id','apotti_type')
