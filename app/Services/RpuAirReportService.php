@@ -216,6 +216,9 @@ class RpuAirReportService
             $broadSheetReply->subject = $request->subject;
             $broadSheetReply->details = $request->details;
             $broadSheetReply->cc_list = $request->cc_list;
+            $broadSheetReply->ministry_id = $request->ministry_id;
+            $broadSheetReply->ministry_name_en = $request->ministry_name_en;
+            $broadSheetReply->ministry_name_bn = $request->ministry_name_bn;
             $broadSheetReply->save();
 
             //broadsheet reply item
