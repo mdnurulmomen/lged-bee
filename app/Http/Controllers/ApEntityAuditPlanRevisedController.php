@@ -141,6 +141,37 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+
+    public function getPlanWiseTeamMembers(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+        $team_info = $apEntityAuditPlanRevisedService->getPlanWiseTeamMembers($request);
+        if (isSuccessResponse($team_info)) {
+            $response = responseFormat('success', $team_info['data']);
+        } else {
+            $response = responseFormat('error', $team_info['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getPlanWiseTeamSchedules(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+        $team_info = $apEntityAuditPlanRevisedService->getPlanWiseTeamSchedules($request);
+        if (isSuccessResponse($team_info)) {
+            $response = responseFormat('success', $team_info['data']);
+        } else {
+            $response = responseFormat('error', $team_info['data']);
+        }
+        return response()->json($response);
+    }
+
     /**
      * Remove the specified resource from storage.
      *

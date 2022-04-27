@@ -83,7 +83,8 @@ class ApOfficerOrderService
         try {
             $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
-                ->first();
+                ->first()
+                ->toArray();
 
             $auditTeamAllMembers = AuditVisitCalenderPlanMember::distinct()
                 ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
@@ -96,7 +97,8 @@ class ApOfficerOrderService
 
             $auditTeamWiseSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
-                ->get();
+                ->get()
+                ->toArray();
 
             $officeOrderInfo = [
                 'office_order' => $officeOrder,

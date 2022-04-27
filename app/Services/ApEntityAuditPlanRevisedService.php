@@ -185,7 +185,47 @@ class ApEntityAuditPlanRevisedService
             $data = AuditVisitCalendarPlanTeam::with('child')->where('id', $request->team_id)->get()->toArray();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
-            $data = ['status' => 'error', 'data' => $exception->getMessage()];
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    //get annual/audit plan wise team members
+    public function getPlanWiseTeamMembers(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $teamMembers = AuditVisitCalenderPlanMember::distinct()
+                ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
+                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->orderBy('employee_grade','ASC')
+                ->get()
+                ->toArray();
+            return ['status' => 'success', 'data' => $teamMembers];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    //get annual/audit plan wise team schedules
+    public function getPlanWiseTeamSchedules(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $teamSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
+                ->get()
+                ->toArray();
+            return ['status' => 'success', 'data' => $teamSchedule];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
 }
