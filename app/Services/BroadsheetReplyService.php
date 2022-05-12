@@ -141,6 +141,7 @@ class BroadsheetReplyService
             $broad_sheet_list->adjusted_amount = $request->adjusted_amount ?: $broad_sheet_list->adjusted_amount;
             $broad_sheet_list->comment = $request->comment ?: $broad_sheet_list->comment;
             $broad_sheet_list->cag_comment = $request->cag_comment ?: $broad_sheet_list->cag_comment;
+            $broad_sheet_list->status_reason = $request->status_reason ?: $broad_sheet_list->status_reason;
 
             if($approval_status){
                 $broad_sheet_list->approval_status = $request->approval_status;
