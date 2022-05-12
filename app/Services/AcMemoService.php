@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AcMemo;
 use App\Models\AcMemoAttachment;
 use App\Models\AcMemoLog;
+use App\Models\AcMemoPorisishto;
 use App\Models\AcMemoRecommendation;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
@@ -24,6 +25,7 @@ class AcMemoService
 
     public function auditMemoStore(Request $request): array
     {
+
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -35,12 +37,12 @@ class AcMemoService
 
             $path = public_path('/memo/' . $folder_name);
 
-            if (!Storage::exists($path)) {
+            /*if (!Storage::exists($path)) {
                 $create_directorate_folder = Storage::makeDirectory($path, 0777, true, true);
                 if (!$create_directorate_folder) {
                     throw new \Exception('Error creating memo folder');
                 }
-            }
+            }*/
 
             $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
 
@@ -70,8 +72,8 @@ class AcMemoService
             $audit_memo->fiscal_year = $fiscal_year_info->start . '-' . $fiscal_year_info->end;
             $audit_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
             $audit_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
-            $audit_memo->audit_year_start = $request->audit_year_start;
-            $audit_memo->audit_year_end = $request->audit_year_end;
+            $audit_memo->audit_year_start = bnToen($request->audit_year_start);
+            $audit_memo->audit_year_end = bnToen($request->audit_year_end);
             $audit_memo->ac_query_potro_no = 1; //todo
             $audit_memo->audit_type = $plan_member_schedule->activity->activity_type;
             $audit_memo->team_id = $plan_member_schedule->team_id;
@@ -94,8 +96,22 @@ class AcMemoService
             $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
             $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
             $audit_memo->rpu_acceptor_designation_name_en = $request->rpu_acceptor_designation_name_bn;
-            $audit_memo->porisisto_details = $request->porisisto_details;
             $audit_memo->save();
+
+
+            $porisistos = [];
+            foreach ($request->porisisto_details as $key=>$porisisto){
+                array_push($porisistos, array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
+                    )
+                );
+            }
+            if (!empty($porisistos)) {
+                AcMemoPorisishto::insert($porisistos);
+            }
 
             //for attachments
             $finalAttachments = [];
@@ -216,7 +232,7 @@ class AcMemoService
         }
 
         try {
-            $data['memo'] = AcMemo::where('id', $request->memo_id)->first();
+            $data['memo'] = AcMemo::with(['ac_memo_porisishtos'])->where('id', $request->memo_id)->first();
             $data['porisishto_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
                 ->where('file_type', 'porisishto')->get();
             $data['pramanok_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
@@ -272,6 +288,23 @@ class AcMemoService
             $memo_log->save();
 
             $audit_memo->save();
+
+
+
+            $porisistos = [];
+            foreach ($request->porisisto_details as $key=>$porisisto){
+                array_push($porisistos, array(
+                        'ac_memo_id' => $request->memo_id,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
+                    )
+                );
+            }
+            if (!empty($porisistos)) {
+                AcMemoPorisishto::where('ac_memo_id',$request->memo_id)->delete();
+                AcMemoPorisishto::insert($porisistos);
+            }
 
             //for attachments
             $finalAttachments = [];

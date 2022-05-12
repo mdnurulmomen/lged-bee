@@ -264,6 +264,17 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store-apotti-register-movement', [ApottiController::class, 'storeApottiRegisterMovement']);
     });
 
+
+    //audit archive apotti
+    Route::group(['prefix' => 'audit-archive-apotti'], function () {
+        Route::post('get-oniyomer-category-list', [ArchiveApottiController::class, 'getOniyomerCategoryList']);
+        Route::post('get-parent-wise-oniyomer-category-list', [ArchiveApottiController::class, 'getParentWiseOniyomerCategory']);
+        Route::post('store', [ArchiveApottiController::class, 'store']);
+        Route::post('update', [ArchiveApottiController::class, 'update']);
+        Route::post('list', [ArchiveApottiController::class, 'list']);
+        Route::post('edit', [ArchiveApottiController::class, 'edit']);
+    });
+
     //audit template
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 
@@ -296,6 +307,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-air-and-apotti-type-wise-qac-apotti', [AuditAIRReportController::class, 'getAirAndApottiTypeWiseQACApotti']);
             Route::post('get-air-wise-audit-apotti-list', [AuditAIRReportController::class, 'getAirWiseAuditApottiList']);
             Route::post('get-audit-apotti', [AuditAIRReportController::class, 'getAuditApotti']);
+            Route::post('get-audit-apotti-wise-porisistos', [AuditAIRReportController::class, 'getAuditApottiWisePrisistos']);
             Route::post('store-air-movement', [AuditAIRReportController::class, 'storeAirMovement']);
             Route::post('get-air-last-movement', [AuditAIRReportController::class, 'getAirLastMovement']);
             Route::post('get-audit-plan-and-type-wise-air', [AuditAIRReportController::class, 'getAuditPlanAndTypeWiseAir']);

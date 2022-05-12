@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\AcMemoPorisishto;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\Apotti;
+use App\Models\ApottiItem;
 use App\Models\ApottiRAirMap;
 use App\Models\ApottiStatus;
 use App\Models\AuditTemplate;
@@ -431,10 +433,6 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            if (empty($request->apottis)) {
-                return ['status' => 'error', 'data' => []];
-            }
-
             $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence')
                 ->whereIn('id', $request->apottis)
                 ->get()
@@ -442,6 +440,22 @@ class AuditAIRReportService
 
             return ['status' => 'success', 'data' => $auditApottis];
 
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getAuditApottiWisePrisistos(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $audit_memo_ids = ApottiItem::whereIn('apotti_id', $request->apottis)->pluck('memo_id');
+            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get();
+            return ['status' => 'success', 'data' => $porisishtos];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

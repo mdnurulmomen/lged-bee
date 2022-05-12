@@ -156,6 +156,11 @@ class AcMemo extends Model
         $this->attributes['onishponno_jorito_ortho_poriman'] = str_replace(",","",$value);
     }
 
+    public function ac_memo_porisishtos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoPorisishto::class, 'ac_memo_id', 'id');
+    }
+
     public function ac_memo_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'id');
