@@ -6,6 +6,7 @@ use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalendarPlanTeamUpdate;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
 use App\Traits\GenericData;
@@ -160,12 +161,20 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $teams = AuditVisitCalendarPlanTeam::where('fiscal_year_id', $request->fiscal_year_id)
+
+            $team_log =  AuditVisitCalendarPlanTeamUpdate::where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('activity_id', $request->activity_id)
                 ->where('audit_plan_id', $request->audit_plan_id)
                 ->where('annual_plan_id', $request->annual_plan_id)
-                ->get()
-                ->toArray();
+                ->count();
+
+                $query = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::query() : AuditVisitCalendarPlanTeam::query();
+
+                $query = $query->where('fiscal_year_id', $request->fiscal_year_id);
+                $query = $query->where('activity_id', $request->activity_id);
+                $query = $query->where('audit_plan_id', $request->audit_plan_id);
+                $query = $query->where('annual_plan_id', $request->annual_plan_id);
+                $teams = $query->get()->toArray();
 
             $data = ['status' => 'success', 'data' => $teams];
         } catch (\Exception $exception) {

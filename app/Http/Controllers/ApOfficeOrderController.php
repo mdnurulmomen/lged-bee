@@ -37,6 +37,20 @@ class ApOfficeOrderController extends Controller
 
     }
 
+    public function showUpdateOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    {
+        $showOfficeOrderResponse = $apOfficerOrderService->showUpdateOfficeOrder($request);
+
+        if (isSuccessResponse($showOfficeOrderResponse)) {
+            $response = responseFormat('success', $showOfficeOrderResponse['data']);
+        } else {
+            $response = responseFormat('error', $showOfficeOrderResponse['data']);
+        }
+
+        return response()->json($response);
+
+    }
+
     public function generateOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -106,6 +120,27 @@ class ApOfficeOrderController extends Controller
 
         $responseData = $apOfficerOrderService->approveOfficeOrder($request);
         $misAndDashboardService->storeAuditPlanTeamInfo($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function storeOfficeOrderLog(Request $request, ApOfficerOrderService $apOfficerOrderService)
+    {
+        Validator::make($request->all(), [
+            'office_order_id' => 'required|integer',
+            'annual_plan_id' => 'required|integer',
+            'audit_plan_id' => 'required|integer',
+            'office_order_pdf_log' => 'nullable',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseData = $apOfficerOrderService->storeOfficeOrderLog($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

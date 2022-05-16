@@ -131,6 +131,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/get-team-info', [ApEntityAuditPlanRevisedController::class, 'getTeamInfo']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team-members', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamMembers']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team-schedules', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamSchedules']);
+            Route::post('entity-audit-plan/team-log-discard', [ApEntityAuditPlanRevisedController::class, 'teamLogDiscard']);
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanRevisedController::class);
 
             Route::post('entity-audit-plan/audit-team/store', [ApEntityAuditPlanRevisedController::class, 'storeAuditTeam']);
@@ -142,8 +143,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('office-order/audit-plan-list', [ApOfficeOrderController::class, 'auditPlanList']);
             Route::post('office-order/generate', [ApOfficeOrderController::class, 'generateOfficeOrder']);
             Route::post('office-order/show', [ApOfficeOrderController::class, 'showOfficeOrder']);
+            Route::post('office-order/show-update', [ApOfficeOrderController::class, 'showUpdateOfficeOrder']);
             Route::post('office-order/store-approval-authority', [ApOfficeOrderController::class, 'storeOfficeOrderApprovalAuthority']);
             Route::post('office-order/approve', [ApOfficeOrderController::class, 'approveOfficeOrder']);
+            Route::post('office-order/store-office-order-log', [ApOfficeOrderController::class, 'storeOfficeOrderLog']);
 
             //data collection office order
             Route::post('office-order-dc/annual-plan-list', [ApDcOfficeOrderController::class, 'annualPlanList']);

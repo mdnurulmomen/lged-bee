@@ -30,6 +30,7 @@ class ApEntityIndividualAuditPlan extends Model
         'draft_officer_name_bn',
         'status',
         'has_office_order',
+        'has_update_office_order',
         'created_by',
         'modified_by',
         'device_type',
@@ -58,6 +59,23 @@ class ApEntityIndividualAuditPlan extends Model
 
     public function office_order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id');
+        return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id')->where('approved_status','!=','log');
+    }
+
+    public function audit_team_update(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AuditVisitCalendarPlanTeamUpdate::class, 'audit_plan_id', 'id');
+    }
+
+    public function office_order_update(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id')
+            ->where('approved_status','draft');
+    }
+
+    public function office_order_log(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApOfficeOrder::class, 'audit_plan_id', 'id')
+            ->where('approved_status','log');
     }
 }

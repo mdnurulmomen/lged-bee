@@ -7,10 +7,13 @@ use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOfficeOrder;
 use App\Models\ApOfficeOrderMovement;
 use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalendarPlanTeamUpdate;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\GenericData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ApOfficerOrderService
 {
@@ -45,8 +48,12 @@ class ApOfficerOrderService
             });
 
             $auditPlanList =  $query->has('audit_teams')
-                ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement'])
+                ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement','office_order_log'])
+                ->with('office_order_update.office_order_movement',function($q) use($query) {
+                    $query->where('has_update_office_order',1);
+                })
                 ->where('status','approved')
+                ->withCount('audit_team_update')
                 ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
 //            if ($request->per_page && $request->page && !$request->all) {
@@ -81,7 +88,8 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('audit_plan_id',$request->audit_plan_id)
+            $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('id',$request->office_order_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
                 ->first()
                 ->toArray();
@@ -114,6 +122,85 @@ class ApOfficerOrderService
         return $responseData;
     }
 
+    public function showUpdateOfficeOrder(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+            $officeOrder = ApOfficeOrder::with(['office_order_movement'])->find($request->office_order_id);
+
+            $auditTeamWiseSchedule = AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->get();
+
+//            $responseData = ['status' => 'success', 'data' => $auditTeamWiseSchedule];
+//
+//
+            $all_schedule_members = [];
+
+            foreach ($auditTeamWiseSchedule as $schedule){
+//                return ['status' => 'success', 'data' => json_decode($schedule['team_members'],true)];
+
+                $all_members =  json_decode($schedule['team_members'],true);
+
+                foreach ($all_members['teamLeader'] as  $teamLeader ){
+                   $team_leader_temp['team_member_name_bn'] =  $teamLeader['officer_name_bn'];
+                   $team_leader_temp['team_member_name_en'] =  $teamLeader['officer_name_en'];
+                   $team_leader_temp['team_member_designation_bn'] =  $teamLeader['designation_bn'];
+                   $team_leader_temp['team_member_designation_en'] =  $teamLeader['designation_en'];
+                   $team_leader_temp['team_member_role_bn'] =  $teamLeader['team_member_role_bn'];
+                   $team_leader_temp['team_member_role_en'] =  $teamLeader['team_member_role_en'];
+                   $team_leader_temp['mobile_no'] =  $teamLeader['officer_mobile'];
+                   $team_leader_temp['email'] =  $teamLeader['officer_email'];
+                   $team_leader_temp['employee_grade'] =  $teamLeader['employee_grade'];
+                   $all_schedule_members[] = $team_leader_temp;
+                }
+
+                if(isset($all_members['subTeamLeader'])){
+                    foreach ($all_members['subTeamLeader'] as  $subTeamLeader ){
+                        $sub_leader_temp['team_member_name_bn'] =  $subTeamLeader['officer_name_bn'];
+                        $sub_leader_temp['team_member_name_en'] =  $subTeamLeader['officer_name_en'];
+                        $sub_leader_temp['team_member_designation_bn'] =  $subTeamLeader['designation_bn'];
+                        $sub_leader_temp['team_member_designation_en'] =  $subTeamLeader['designation_en'];
+                        $sub_leader_temp['team_member_role_bn'] =  $subTeamLeader['team_member_role_bn'];
+                        $sub_leader_temp['team_member_role_en'] =  $subTeamLeader['team_member_role_en'];
+                        $sub_leader_temp['mobile_no'] =  $subTeamLeader['officer_mobile'];
+                        $sub_leader_temp['email'] =  $subTeamLeader['officer_email'];
+                        $sub_leader_temp['employee_grade'] =  $subTeamLeader['employee_grade'];
+                        $all_schedule_members[] = $sub_leader_temp;
+                    }
+                }
+
+                foreach ($all_members['member'] as  $member ){
+                    $member_temp['team_member_name_bn'] =  $member['officer_name_bn'];
+                    $member_temp['team_member_name_en'] =  $member['officer_name_en'];
+                    $member_temp['team_member_designation_bn'] =  $member['designation_bn'];
+                    $member_temp['team_member_designation_en'] =  $member['designation_en'];
+                    $member_temp['team_member_role_bn'] =  $member['team_member_role_bn'];
+                    $member_temp['team_member_role_en'] =  $member['team_member_role_en'];
+                    $member_temp['mobile_no'] =  $member['officer_mobile'];
+                    $member_temp['email'] =  $member['officer_email'];
+                    $member_temp['employee_grade'] =  $member['employee_grade'];
+                    $all_schedule_members[] = $member_temp;
+                }
+            }
+
+            $officeOrderInfo = [
+                'office_order' => $officeOrder,
+                'audit_team_members' => $all_schedule_members,
+                'audit_team_schedules' => $auditTeamWiseSchedule,
+            ];
+
+            $responseData = ['status' => 'success', 'data' => $officeOrderInfo];
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $responseData;
+    }
 
     public function generateOfficeOrder(Request $request): array
     {
@@ -131,6 +218,7 @@ class ApOfficerOrderService
             //audit plan
             $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
             $auditPlan->has_office_order = 1;
+            $auditPlan->has_update_office_order = $auditPlan->has_update_office_order == 2 ? 1 : $auditPlan->has_update_office_order;
             $auditPlan->save();
 
             $data = [
@@ -165,7 +253,7 @@ class ApOfficerOrderService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            ApOfficeOrder::updateOrcreate(['annual_plan_id' => $request->annual_plan_id,
+            ApOfficeOrder::updateOrcreate(['id' => $request->id,'annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id],$data);
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
         } catch (\Exception $exception) {
@@ -227,14 +315,79 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
+
+            if($request->has_office_order_update == 1){
+
+                AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->delete();
+
+                ApOfficeOrder::where('annual_plan_id',$request->annual_plan_id)
+                    ->where('audit_plan_id',$request->audit_plan_id)
+                    ->update(['approved_status' => 'log']);
+
+                $team_log =  AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id',$request->audit_plan_id)->get()->makeHidden(['created_at','updated_at'])->toArray();
+
+                AuditVisitCalendarPlanTeam::insert($team_log);
+
+                AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
+
+                $apEntityTeamService =  New ApEntityTeamService();
+                foreach ($team_log as $schedule){
+
+                    $team_schedules = json_decode($schedule['team_schedules'], true);
+
+                    $team_deg_schedules[$schedule['leader_designation_id']] = $team_schedules;
+
+                    $apEntityTeamService->saveTeamSchedule($team_deg_schedules,$request->audit_plan_id);
+                }
+
+                ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->update(['has_update_office_order' => 0]);
+                AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id',$request->audit_plan_id)->delete();
+            }
+
             $apOfficeOrder = ApOfficeOrder::find($request->ap_office_order_id);
             $apOfficeOrder->approved_status = $request->approved_status;
             $apOfficeOrder->save();
-            $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
+
+            $responseData = ['status' => 'success', 'data' => 'Approved Successfully'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
         $this->emptyOfficeDBConnection();
         return $responseData;
+    }
+
+    public function storeOfficeOrderLog(Request $request)
+    {
+//        return ['status' => 'success', 'data' => $request->cdesk];
+
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $folder_name = $cdesk->office_id;
+            $file_name = 'office_order_'.$request->office_order_id.'.pdf';
+
+            Storage::disk('public')->put('office_order_log/' . $folder_name . '/' . $file_name, base64_url_decode($request->office_order_pdf_log));
+
+            $file_path = 'storage/office_order_log/' . $folder_name . '/' . $file_name;
+
+            ApOfficeOrder::where('id',$request->office_order_id)->update(['log_path' => $file_path]);
+
+//            $apOfficeOrder = ApOfficeOrder::find($request->ap_office_order_id);
+//            $apOfficeOrder->approved_status = $request->approved_status;
+//            $apOfficeOrder->save();
+
+            $responseData = ['status' => 'success', 'data' => $file_path];
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $responseData;
+
     }
 }

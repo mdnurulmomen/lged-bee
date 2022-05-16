@@ -3,7 +3,11 @@
 namespace App\Services;
 
 use App\Models\AnnualPlan;
+use App\Models\ApEntityIndividualAuditPlan;
+use App\Models\ApOfficeOrder;
 use App\Models\AuditVisitCalendarPlanTeam;
+use App\Models\AuditVisitCalendarPlanTeamLog;
+use App\Models\AuditVisitCalendarPlanTeamUpdate;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -105,10 +109,8 @@ class ApEntityTeamService
         }
         $teams = json_decode($request->teams, true);
         $teams = $teams['teams'];
-//        return ['status' => 'success', 'data' => $request->deleted_team];
         try {
-//            AuditVisitCalendarPlanTeam::where('audit_plan_id', $request->audit_plan_id)->delete();
-//            $this->saveAuditTeam($teams, $annualPlan, $request);
+            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->where('approved_status','approved')->count();
 
             foreach ($teams['all_teams'] as $team) {
                 if (count($teams['all_teams']) == 1) {
@@ -141,11 +143,29 @@ class ApEntityTeamService
                     'activity_man_days' => 0,
                     'approve_status' => 1,
                 ];
-                AuditVisitCalendarPlanTeam::updateOrCreate(['id' => $id],$data);
+
+                if($office_order){
+                    $team_log =  AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id',$request->audit_plan_id)->count();
+                    $data['id'] = $team['id'];
+
+                    $updateOrCreate = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::where('id',$id)->update($data) : AuditVisitCalendarPlanTeamUpdate::insert($data);
+
+                    if(!$team_log){
+                        ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->update(['has_update_office_order' => 2]);
+                    }
+
+                }else{
+                    AuditVisitCalendarPlanTeam::updateOrCreate(['id' => $id],$data);
+                }
             }
 
-            if($request->deleted_team){
-                AuditVisitCalendarPlanTeam::whereIn('id',$request->deleted_team)->delete();
+
+            if ($request->deleted_team) {
+                if ($office_order) {
+                    AuditVisitCalendarPlanTeamUpdate::whereIn('id', $request->deleted_team)->delete();
+                }else{
+                    AuditVisitCalendarPlanTeam::whereIn('id', $request->deleted_team)->delete();
+                }
             }
 
             $data = ['status' => 'success', 'data' => 'successfully updated'];
@@ -160,8 +180,6 @@ class ApEntityTeamService
 
     public function storeTeamSchedule(Request $request): array
     {
-//        return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -194,62 +212,76 @@ class ApEntityTeamService
     {
         try {
             DB::beginTransaction();
+
+            $office_order = ApOfficeOrder::where('audit_plan_id',$audit_plan_id)->where('approved_status','approved')->count();
+
             foreach ($team_schedules as $designation_id => $schedule_data) {
-                $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
-                    ->where('leader_designation_id', $designation_id)->first();
+
+                if($office_order){
+                    $team_data = AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id', $audit_plan_id)
+                        ->where('leader_designation_id', $designation_id)->first();
+                }else{
+                    $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
+                        ->where('leader_designation_id', $designation_id)->first();
+                }
+
                 if (!$team_data) {
                     throw new \Exception('Team is not formed');
                 }
+
                 $team_data->team_schedules = json_encode_unicode($schedule_data);
                 $team_data->activity_man_days = array_sum(array_column($schedule_data, 'activity_man_days'));
                 $team_data->save();
-                foreach ($schedule_data as $schedule_datum) {
-                    $team_member = json_decode($team_data->team_members, true);
-                    foreach ($team_member as $key => $member_info) {
-                        foreach ($member_info as $member) {
-                            $team_schedule = [
-                                'fiscal_year_id' => $team_data->fiscal_year_id,
-                                'team_id' => $team_data->id,
-                                'team_parent_id' => $team_data->team_parent_id ?: $team_data->id,
-                                'duration_id' => $team_data->duration_id,
-                                'outcome_id' => $team_data->outcome_id,
-                                'output_id' => $team_data->output_id,
-                                'activity_id' => $team_data->activity_id,
-                                'milestone_id' => $team_data->milestone_id,
-                                'annual_plan_id' => $team_data->annual_plan_id,
-                                'audit_plan_id' => $team_data->audit_plan_id,
-                                'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
-                                'ministry_name_bn' => empty($schedule_datum['ministry_name_bn']) ? null : $schedule_datum['ministry_name_bn'],
-                                'ministry_name_en' => empty($schedule_datum['ministry_name_en']) ? null : $schedule_datum['ministry_name_en'],
-                                'entity_id' => empty($schedule_datum['entity_id']) ? null : $schedule_datum['entity_id'],
-                                'entity_name_en' => empty($schedule_datum['entity_name_en']) ? null : $schedule_datum['entity_name_en'],
-                                'entity_name_bn' => empty($schedule_datum['entity_name_bn']) ? null : $schedule_datum['entity_name_bn'],
-                                'cost_center_id' => empty($schedule_datum['cost_center_id']) ? null : $schedule_datum['cost_center_id'],
-                                'cost_center_name_en' => empty($schedule_datum['cost_center_name_en']) ? null : $schedule_datum['cost_center_name_en'],
-                                'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn']) ? null : $schedule_datum['cost_center_name_bn'],
-                                'team_member_name_en' => $member['officer_name_en'],
-                                'team_member_name_bn' => $member['officer_name_bn'],
-                                'team_member_designation_id' => $member['designation_id'],
-                                'team_member_officer_id' => $member['officer_id'],
-                                'team_member_office_id' => $member['office_id'],
-                                'team_member_designation_en' => $member['designation_en'],
-                                'team_member_designation_bn' => $member['designation_bn'],
-                                'team_member_role_en' => $member['team_member_role_en'],
-                                'team_member_role_bn' => $member['team_member_role_bn'],
-                                'team_member_start_date' => empty($schedule_datum['team_member_start_date']) ? null:$schedule_datum['team_member_start_date'],
-                                'team_member_end_date' => empty($schedule_datum['team_member_end_date']) ? null:$schedule_datum['team_member_end_date'],
-                                //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
-                                'mobile_no' => empty($member['officer_mobile']) ? null : $member['officer_mobile'],
-                                'employee_grade' => empty($member['employee_grade']) ? null : $member['employee_grade'],
-                                'activity_location' => empty($schedule_datum['activity_details']) ? null : $schedule_datum['activity_details'],
-                                'sequence_level' => $schedule_datum['sequence_level'],
-                                'schedule_type' => $schedule_datum['schedule_type'],
-                                'status' => 'pending',
-                                'approve_status' => 'approved',
-                                'activity_man_days' => empty($schedule_datum['activity_man_days']) ? null : $schedule_datum['activity_man_days'],
-                            ];
-                            $schedule_create = AuditVisitCalenderPlanMember::create($team_schedule);
-                            \Log::info($schedule_create);
+
+                if(!$office_order){
+                    foreach ($schedule_data as $schedule_datum) {
+                        $team_member = json_decode($team_data->team_members, true);
+                        foreach ($team_member as $key => $member_info) {
+                            foreach ($member_info as $member) {
+                                $team_schedule = [
+                                    'fiscal_year_id' => $team_data->fiscal_year_id,
+                                    'team_id' => $team_data->id,
+                                    'team_parent_id' => $team_data->team_parent_id ?: $team_data->id,
+                                    'duration_id' => $team_data->duration_id,
+                                    'outcome_id' => $team_data->outcome_id,
+                                    'output_id' => $team_data->output_id,
+                                    'activity_id' => $team_data->activity_id,
+                                    'milestone_id' => $team_data->milestone_id,
+                                    'annual_plan_id' => $team_data->annual_plan_id,
+                                    'audit_plan_id' => $team_data->audit_plan_id,
+                                    'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
+                                    'ministry_name_bn' => empty($schedule_datum['ministry_name_bn']) ? null : $schedule_datum['ministry_name_bn'],
+                                    'ministry_name_en' => empty($schedule_datum['ministry_name_en']) ? null : $schedule_datum['ministry_name_en'],
+                                    'entity_id' => empty($schedule_datum['entity_id']) ? null : $schedule_datum['entity_id'],
+                                    'entity_name_en' => empty($schedule_datum['entity_name_en']) ? null : $schedule_datum['entity_name_en'],
+                                    'entity_name_bn' => empty($schedule_datum['entity_name_bn']) ? null : $schedule_datum['entity_name_bn'],
+                                    'cost_center_id' => empty($schedule_datum['cost_center_id']) ? null : $schedule_datum['cost_center_id'],
+                                    'cost_center_name_en' => empty($schedule_datum['cost_center_name_en']) ? null : $schedule_datum['cost_center_name_en'],
+                                    'cost_center_name_bn' => empty($schedule_datum['cost_center_name_bn']) ? null : $schedule_datum['cost_center_name_bn'],
+                                    'team_member_name_en' => $member['officer_name_en'],
+                                    'team_member_name_bn' => $member['officer_name_bn'],
+                                    'team_member_designation_id' => $member['designation_id'],
+                                    'team_member_officer_id' => $member['officer_id'],
+                                    'team_member_office_id' => $member['office_id'],
+                                    'team_member_designation_en' => $member['designation_en'],
+                                    'team_member_designation_bn' => $member['designation_bn'],
+                                    'team_member_role_en' => $member['team_member_role_en'],
+                                    'team_member_role_bn' => $member['team_member_role_bn'],
+                                    'team_member_start_date' => empty($schedule_datum['team_member_start_date']) ? null:$schedule_datum['team_member_start_date'],
+                                    'team_member_end_date' => empty($schedule_datum['team_member_end_date']) ? null:$schedule_datum['team_member_end_date'],
+                                    //'comment' => '',  //empty($member['comment'])?'':$member['comment'],
+                                    'mobile_no' => empty($member['officer_mobile']) ? null : $member['officer_mobile'],
+                                    'employee_grade' => empty($member['employee_grade']) ? null : $member['employee_grade'],
+                                    'activity_location' => empty($schedule_datum['activity_details']) ? null : $schedule_datum['activity_details'],
+                                    'sequence_level' => $schedule_datum['sequence_level'],
+                                    'schedule_type' => $schedule_datum['schedule_type'],
+                                    'status' => 'pending',
+                                    'approve_status' => 'approved',
+                                    'activity_man_days' => empty($schedule_datum['activity_man_days']) ? null : $schedule_datum['activity_man_days'],
+                                ];
+                                $schedule_create = AuditVisitCalenderPlanMember::create($team_schedule);
+                                \Log::info($schedule_create);
+                            }
                         }
                     }
                 }
@@ -266,10 +298,9 @@ class ApEntityTeamService
         return $data;
     }
 
+
     public function updateTeamSchedule(Request $request): array
     {
-        //return ['status' => 'error', 'data' => json_decode($request->team_schedules, true)];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -277,16 +308,46 @@ class ApEntityTeamService
         }
         $team_schedules = json_decode($request->team_schedules, true);
         $team_schedules = $team_schedules['schedule'];
-//        return ['status' => 'success', 'data' => $team_schedules];
         DB::beginTransaction();
         try {
-            AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
+
+            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->where('approved_status','approved')->count();
+
+            if (!$office_order) {
+                AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
+            }
+
             $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
             if (isSuccessResponse($saveSchedule)) {
                 $data = ['status' => 'success', 'data' => 'successfully saved'];
             } else {
                 throw new \Exception($saveSchedule['data']);
             }
+
+            DB::commit();
+            $this->emptyOfficeDBConnection();
+            return $data;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['status' => 'error', 'data' => $e->getMessage()];
+        } catch (\Error $e) {
+            DB::rollBack();
+            return ['status' => 'error', 'data' => $e->getMessage()];
+        }
+    }
+
+    public function teamLogDiscard(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        DB::beginTransaction();
+        try {
+            AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id', $request->audit_plan_id)->delete();
+            ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->update(['has_update_office_order' => 0]);
+            $data = ['status' => 'success', 'data' => 'Schedule Log Discard successfully'];
             DB::commit();
             $this->emptyOfficeDBConnection();
             return $data;

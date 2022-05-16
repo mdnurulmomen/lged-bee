@@ -257,4 +257,20 @@ class ApEntityAuditPlanRevisedController extends Controller
         }
         return response()->json($response);
     }
+
+    public function teamLogDiscard(Request $request, ApEntityTeamService $apEntityTeamService)
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+        ])->validate();
+
+        $teamLogDiscard = $apEntityTeamService->teamLogDiscard($request);
+
+        if (isSuccessResponse($teamLogDiscard)) {
+            $response = responseFormat('success', 'Schedule Discard Successfully');
+        } else {
+            $response = responseFormat('error', $teamLogDiscard['data']);
+        }
+        return response()->json($response);
+    }
 }
