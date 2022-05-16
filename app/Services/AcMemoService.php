@@ -119,7 +119,8 @@ class AcMemoService
             //for porisishtos
             if ($request->hasfile('porisishtos')) {
                 foreach ($request->porisishtos as $key => $file) {
-                    $userDefineFileName = $file->getClientOriginalName();
+                    $userDefineFile = $file->getClientOriginalName();
+                    $userDefineFileName = explode('.',$userDefineFile)[0];
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
                     $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
@@ -144,7 +145,8 @@ class AcMemoService
             //for pramanoks
             if ($request->hasfile('pramanoks')) {
                 foreach ($request->pramanoks as $key => $file) {
-                    $userDefineFileName = $file->getClientOriginalName();
+                    $userDefineFile = $file->getClientOriginalName();
+                    $userDefineFileName = explode('.',$userDefineFile)[0];
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
                     $fileName = $office_domain_prefix . '_pramanok_' . uniqid() . '.' . $fileExtension;
