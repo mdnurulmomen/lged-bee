@@ -334,6 +334,7 @@ class AuditAIRReportService
 
             if ($request->qac_type == 'qac-1') {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
+//                return ['status' => 'success', 'data' => $responseData['apottiList']];
             } elseif ($request->qac_type == 'qac-2') {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
                     ->whereHas('apotti_map_data.apotti_status', function ($q) {
@@ -357,8 +358,6 @@ class AuditAIRReportService
             } else {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
             }
-            //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
-            //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
 
         } catch (\Exception $exception) {
@@ -435,6 +434,7 @@ class AuditAIRReportService
 
             $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence')
                 ->whereIn('id', $request->apottis)
+                ->orderBy('onucched_no', 'ASC')
                 ->get()
                 ->toArray();
 
@@ -466,6 +466,9 @@ class AuditAIRReportService
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_id = $request->office_id ?: $cdesk->office_id;
+
+//        return ['status' => 'error', 'data' => $office_id];
+
         try {
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
@@ -541,7 +544,7 @@ class AuditAIRReportService
                     ]]),
                 ];
 
-                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+//                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
                 //end task creation for approval
 
             }

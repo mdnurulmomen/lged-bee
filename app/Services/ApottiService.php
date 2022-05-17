@@ -129,8 +129,6 @@ class ApottiService
         DB::beginTransaction();
         try {
 
-
-
 //            return ['status' => 'error', 'data' => $request->sequence];
 
             $apotti_list = Apotti::with(['apotti_items'])
@@ -255,14 +253,16 @@ class ApottiService
                    $apotti_item_save->save();
             }
 
-            $higher_sequence = Apotti::where('audit_plan_id',$audit_plan_id)->where('apotti_sequence','>',$request->sequence)->pluck('id');
+            $higher_sequence = Apotti::where('audit_plan_id',$audit_plan_id)
+                ->where('parent_office_id',$parent_office_id)
+                ->where('onucched_no','>',$request->onucched_no)
+                ->pluck('id');
 
-            $sequence = $request->sequence;
+            $sequence = $request->onucched_no;
 
             foreach ($higher_sequence as $sequence_apotti){
                 $sequence++;
-//                return ['status' => 'success', 'data' => $sequence];
-                Apotti::where('id',$sequence_apotti)->update(['apotti_sequence' => $sequence]);
+                Apotti::where('id',$sequence_apotti)->update(['apotti_sequence' => $sequence,'onucched_no' => $sequence]);
             }
 
             DB::commit();
