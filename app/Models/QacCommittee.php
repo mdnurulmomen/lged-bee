@@ -12,6 +12,7 @@ class QacCommittee extends Model
 
     public function qac_committee_members(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(QacCommitteeMember::class, 'qac_committee_id', 'id');
+        return $this->hasMany(QacCommitteeMember::class, 'qac_committee_id', 'id')
+            ->orderBy('officer_designation_grade','ASC');
     }
 }

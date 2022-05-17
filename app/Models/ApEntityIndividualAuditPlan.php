@@ -37,6 +37,11 @@ class ApEntityIndividualAuditPlan extends Model
         'device_id',
     ];
 
+    public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
     public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');

@@ -35,6 +35,7 @@ class AuditAIRReportService
             }
 
             $annualPlanQuery = ApEntityIndividualAuditPlan::with('annual_plan:id,office_type,total_unit_no,subject_matter')
+                ->with('fiscal_year:id,duration_id,start,end,description')
                 ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->with('office_order:id,audit_plan_id,memorandum_no,memorandum_date,approved_status')
                 ->with('air_reports', function ($query) use ($air_type) {
@@ -85,7 +86,7 @@ class AuditAIRReportService
             }
             $airReport = RAir::with('latest_r_air_movement')
                 ->with('annual_plan:id,office_type,total_unit_no,subject_matter')
-                ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_name_bn,ministry_name_en,entity_name_bn,entity_name_en')
+                ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->where('id', $request->air_report_id)
                 ->first()
                 ->toArray();
@@ -256,10 +257,11 @@ class AuditAIRReportService
             }
             $auditTeamMembers = AuditVisitCalenderPlanMember::distinct()
                 ->select('team_member_name_bn', 'team_member_name_en', 'team_member_designation_bn',
-                    'team_member_designation_en', 'team_member_role_bn', 'team_member_role_en', 'mobile_no')
+                    'team_member_designation_en', 'team_member_role_bn', 'team_member_role_en', 'mobile_no',
+                    'employee_grade')
                 ->where('audit_plan_id', $request->audit_plan_id)
                 ->where('annual_plan_id', $request->annual_plan_id)
-                ->orderBy('team_member_role_en', 'DESC')
+                ->orderBy('employee_grade', 'ASC')
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamMembers];
@@ -334,7 +336,6 @@ class AuditAIRReportService
 
             if ($request->qac_type == 'qac-1') {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
-//                return ['status' => 'success', 'data' => $responseData['apottiList']];
             } elseif ($request->qac_type == 'qac-2') {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
                     ->whereHas('apotti_map_data.apotti_status', function ($q) {
@@ -358,6 +359,8 @@ class AuditAIRReportService
             } else {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
             }
+            //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
+            //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
 
         } catch (\Exception $exception) {
@@ -466,9 +469,6 @@ class AuditAIRReportService
     {
         $cdesk = json_decode($request->cdesk, false);
         $office_id = $request->office_id ?: $cdesk->office_id;
-
-//        return ['status' => 'error', 'data' => $office_id];
-
         try {
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
@@ -544,7 +544,7 @@ class AuditAIRReportService
                     ]]),
                 ];
 
-//                (new AmmsPonjikaServices())->createTask($task_data, $cdesk);
+                //(new AmmsPonjikaServices())->createTask($task_data, $cdesk);
                 //end task creation for approval
 
             }
@@ -599,7 +599,6 @@ class AuditAIRReportService
                     ApottiRAirMap::insert($mappingData);
                 }
             }
-
             return ['status' => 'success', 'data' => ['apottis' => $request->apottis]];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

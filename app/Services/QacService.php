@@ -227,7 +227,8 @@ class QacService
         }
 
         try {
-            $qac_member_list =  QacCommitteeMember::where('qac_committee_id',$request->qac_committee_id)->get();
+            $qac_member_list =  QacCommitteeMember::where('qac_committee_id',$request->qac_committee_id)
+                ->orderBy('officer_designation_grade','ASC')->get();
             return ['status' => 'success', 'data' => $qac_member_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
