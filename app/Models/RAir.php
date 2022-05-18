@@ -31,6 +31,7 @@ class RAir extends Model
         'type',
         'is_sent',
         'status',
+        'issue_date',
         'created_by',
         'modified_by',
     ];

@@ -105,7 +105,7 @@ class RpuAirReportService
                             "unit" => "days",
                         ]]),
                     ];
-                    (new AmmsPonjikaServices())->createTask($tagid_potro_task_data, $cdesk);
+                    //(new AmmsPonjikaServices())->createTask($tagid_potro_task_data, $cdesk);
 
                     //do letter sent
                     $doLetterSendingDays = XDefaultSetting::select('setting_value')
@@ -127,7 +127,7 @@ class RpuAirReportService
                             "unit" => "days",
                         ]]),
                     ];
-                    (new AmmsPonjikaServices())->createTask($do_letter_task_data, $cdesk);
+                    //(new AmmsPonjikaServices())->createTask($do_letter_task_data, $cdesk);
 
 
                     //status review send
@@ -159,7 +159,7 @@ class RpuAirReportService
                                 "unit" => "days",
                             ]]),
                         ];
-                        (new AmmsPonjikaServices())->createTask($status_review_data, $cdesk);
+                        //(new AmmsPonjikaServices())->createTask($status_review_data, $cdesk);
                     }
 
                     return ['status' => 'success', 'data' => 'Air Send Successfully'];

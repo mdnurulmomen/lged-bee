@@ -85,6 +85,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $airReport = RAir::with('latest_r_air_movement')
+                ->with('fiscal_year:id,duration_id,start,end,description')
                 ->with('annual_plan:id,office_type,total_unit_no,subject_matter')
                 ->with('annual_plan.ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->where('id', $request->air_report_id)
@@ -457,8 +458,30 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $audit_memo_ids = ApottiItem::whereIn('apotti_id', $request->apottis)->pluck('memo_id');
-            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get();
+            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get()->toArray();
             return ['status' => 'success', 'data' => $porisishtos];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+
+    public function getAirWisePorisistos(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)->where('is_delete', 0)->pluck('apotti_id');
+            $audit_memo_ids = ApottiItem::whereIn('apotti_id', $qacApottis)->pluck('memo_id');
+            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get()->toArray();
+
+            return ['status' => 'success', 'data' => $porisishtos];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
