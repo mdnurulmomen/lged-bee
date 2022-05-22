@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ApottiItem extends Model
 {
     use HasFactory;
+
     protected $connection = 'OfficeDB';
 
     public static $memo_status_list = [
@@ -32,6 +33,11 @@ class ApottiItem extends Model
     public function apotti_attachment(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AcMemoAttachment::class, 'ac_memo_id', 'memo_id')->where('file_type','broadsheet');
+    }
+
+    public function porisishtos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoPorisishto::class, 'ac_memo_id', 'memo_id');
     }
 
 }

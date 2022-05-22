@@ -457,9 +457,8 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $audit_memo_ids = ApottiItem::whereIn('apotti_id', $request->apottis)->pluck('memo_id');
-            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get()->toArray();
-            return ['status' => 'success', 'data' => $porisishtos];
+            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $request->apottis)->get()->toArray();
+            return ['status' => 'success', 'data' => $apotti_items];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -475,13 +474,9 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-
             $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)->where('is_delete', 0)->pluck('apotti_id');
-            $audit_memo_ids = ApottiItem::whereIn('apotti_id', $qacApottis)->pluck('memo_id');
-            $porisishtos = AcMemoPorisishto::whereIn('ac_memo_id', $audit_memo_ids)->get()->toArray();
-
-            return ['status' => 'success', 'data' => $porisishtos];
-
+            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $qacApottis)->get()->toArray();
+            return ['status' => 'success', 'data' => $apotti_items];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
