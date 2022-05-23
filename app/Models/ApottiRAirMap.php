@@ -22,6 +22,6 @@ class ApottiRAirMap extends Model
 
     public function apotti_map_data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Apotti::class, 'apotti_id');
+        return $this->belongsTo(Apotti::class, 'apotti_id')->orderBy('onucched_no');
     }
 }

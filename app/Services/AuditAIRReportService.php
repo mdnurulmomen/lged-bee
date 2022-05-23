@@ -336,7 +336,10 @@ class AuditAIRReportService
             $responseData['rAirInfo'] = $preliminaryAir;
 
             if ($request->qac_type == 'qac-1') {
-                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])->where('rairs_id', $preliminaryAir['r_air_child']['id'])->get()->toArray();
+                $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
+                    ->where('rairs_id', $preliminaryAir['r_air_child']['id'])
+                    ->get()->sortBy('apotti_map_data.onucched_no')
+                    ->toArray();
             } elseif ($request->qac_type == 'qac-2') {
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
                     ->whereHas('apotti_map_data.apotti_status', function ($q) {

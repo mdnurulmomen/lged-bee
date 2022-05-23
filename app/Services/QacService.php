@@ -5,13 +5,11 @@ namespace App\Services;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\ApottiStatus;
-use App\Models\AuditPlanTeamInfo;
 use App\Models\QacCommittee;
 use App\Models\QacCommitteeAirMap;
 use App\Models\QacCommitteeMember;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use DB;
 
@@ -55,7 +53,19 @@ class QacService
             Apotti::where('id',$request->apotti_id)->update(['apotti_type' => $request->apotti_type]);
             ApottiItem::where('apotti_id',$request->apotti_id)->update(['memo_type' => $request->apotti_type]);
 
+            $entity_id = Apotti::find($request->apotti_id)->parent_office_id;
+
+            if($request->qac_type != 'cqat'){
+                $apotti_rearrange =  New ApottiRearrangeService();
+                $apotti_rearrange->draftSfiRearrange($request->apotti_id,$request->apotti_type,$request->audit_plan_id,$entity_id);
+                $apotti_rearrange->sfiRearrange($request->apotti_id,$request->apotti_type,$request->audit_plan_id,$entity_id);
+                $apotti_rearrange->nonSfiRearrange($request->apotti_id,$request->apotti_type,$request->audit_plan_id,$entity_id);
+                $apotti_rearrange->rejectSfiRearrange($request->apotti_id,$request->apotti_type,$request->audit_plan_id,$entity_id);
+                $apotti_rearrange->nullApottiRearrange($request->apotti_id,$request->apotti_type,$request->audit_plan_id,$entity_id);
+            }
+
             DB::commit();
+
             return ['status' => 'success', 'data' => 'Status Change Successfully'];
 
         } catch (\Exception $exception) {

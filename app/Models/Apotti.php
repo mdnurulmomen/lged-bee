@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 class Apotti extends Model
 {
@@ -60,6 +61,13 @@ class Apotti extends Model
         'air_issue_date',
         'status_review_date',
     ];
+
+//    protected static function boot() {
+//        parent::boot();
+//        static::addGlobalScope('order', function (Builder $builder) {
+//            $builder->orderBy('onucched_no', 'ASC');
+//        });
+//    }
 
     public function apotti_items(){
         return $this->hasMany(ApottiItem::class, 'apotti_id', 'id');
