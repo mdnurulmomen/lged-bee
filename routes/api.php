@@ -278,6 +278,14 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('edit', [ArchiveApottiController::class, 'edit']);
     });
 
+    //audit archive apotti report
+    Route::group(['prefix' => 'audit-archive-apotti-report'], function () {
+        Route::post('store', [ArchiveApottiReportController::class, 'store']);
+        Route::post('list', [ArchiveApottiReportController::class, 'list']);
+        Route::post('view', [ArchiveApottiReportController::class, 'view']);
+        Route::post('store-report-apotti', [ArchiveApottiReportController::class, 'storeReportApotii']);
+    });
+
     //audit template
     Route::post('audit-template/show', [AuditTemplateController::class, 'show']);
 

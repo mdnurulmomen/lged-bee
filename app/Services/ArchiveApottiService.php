@@ -143,8 +143,8 @@ class ArchiveApottiService
                         $fileName = 'cover_page_' . uniqid() . '.' . $fileExtension;
                         Storage::disk('public')->put('archive/apotti/'. $fileName, File::get($file));
                         $arc_apotti->cover_page = $fileName;
-                        $arc_apotti->cover_page_path  = url('storage/archive/apotti/');
-                        $arc_apotti->attachment_path  = url('storage/archive/apotti/');
+                        $arc_apotti->cover_page_path  = 'storage/archive/apotti/';
+                        $arc_apotti->attachment_path  = 'storage/archive/apotti/';
                     }
                 }
             }
@@ -194,7 +194,7 @@ class ArchiveApottiService
                             'attachment_type' => 'top_page',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
+                            'attachment_path' => 'storage/archive/apotti/',
                         )
                     );
                 }
@@ -214,7 +214,7 @@ class ArchiveApottiService
                             'attachment_type' => 'main',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
+                            'attachment_path' => 'storage/archive/apotti/',
                         )
                     );
                 }
@@ -234,7 +234,7 @@ class ArchiveApottiService
                             'attachment_type' => 'porisishto',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
+                            'attachment_path' => 'storage/archive/apotti/',
                         )
                     );
                 }
@@ -254,7 +254,7 @@ class ArchiveApottiService
                             'attachment_type' => 'promanok',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
+                            'attachment_path' => 'storage/archive/apotti/',
                         )
                     );
                 }
@@ -274,7 +274,7 @@ class ArchiveApottiService
                             'attachment_type' => 'other',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
+                            'attachment_path' => 'storage/archive/apotti/',
                         )
                     );
                 }
