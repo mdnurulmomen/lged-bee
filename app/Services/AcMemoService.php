@@ -214,7 +214,7 @@ class AcMemoService
         }
 
         try {
-            $memo = AcMemo::with(['ac_memo_attachments'])
+            $memo = AcMemo::with(['ac_memo_attachments','ac_memo_porisishtos'])
                 ->where('id', $request->memo_id)
                 ->first();
 
@@ -398,9 +398,7 @@ class AcMemoService
             $memo_send_date = str_replace('/', '-', $request->memo_send_date);
 
             //for memo info
-            $memo = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,file_size,file_extension,sequence')
-                ->where('id', $request->memo_id)
-                ->first();
+            $memo = AcMemo::with(['ac_memo_attachments'])->where('id', $request->memo_id)->first();
 
             //data ready for RP
             $data['memo'] = $memo;
@@ -424,7 +422,7 @@ class AcMemoService
             $data['sender_designation_bn'] = $cdesk->designation_bn;
 
             $send_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.send_memo_to_rpu'), $data)->json();
-
+            //return ['status' => 'error', 'data' => $send_audit_memo_to_rpu];
             if ($send_audit_memo_to_rpu['status'] == 'success') {
                 AcMemo::where('id', $request->memo_id)
                     ->update([
