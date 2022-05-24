@@ -391,6 +391,8 @@ class AcMemoService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
+        \DB::beginTransaction();
         try {
             //for memo send date
             $memo_send_date = str_replace('/', '-', $request->memo_send_date);
@@ -510,11 +512,13 @@ class AcMemoService
                 $apotti_item->status = 0;
                 $apotti_item->save();
 
+                \DB::commit();
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
                 throw new \Exception(json_encode($send_audit_memo_to_rpu));
             }
         } catch (\Exception $exception) {
+            \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
