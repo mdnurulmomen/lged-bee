@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ArchiveApottiService;
 use Illuminate\Http\Request;
+use Whoops\Run;
 
 class ArchiveApottiController extends Controller
 {
@@ -75,4 +76,9 @@ class ArchiveApottiController extends Controller
         return response()->json($response);
     }
 
+    public function migrateArchiveApottiToAmms(Request $request, ArchiveApottiService $archiveApottiService)
+    {
+        $apotti = $archiveApottiService->migrateArchiveApottiToAmms($request);
+        return response()->json($apotti);
+    }
 }

@@ -18,4 +18,5 @@ return [
     'apotti_final_status_update_to_rpu' => env('API_URL_RPU', '') . '/apotti-final-status-update-to-rpu',
     'send_meeting_apotti_to_rpu' => env('API_URL_RPU', '') . '/send-meeting-apotti-to-rpu',
     'get-offices-info' => env('API_URL_RPU', '') . '/get-offices-info',
+    'archive-migrate-to-rpu' => env('API_URL_RPU', '') . '/archive/migrate-to-rpu',
 ];
