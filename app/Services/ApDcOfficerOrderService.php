@@ -69,7 +69,7 @@ class ApDcOfficerOrderService
 
             $auditTeamAllMembers = AuditVisitCalenderPlanMember::distinct()
                 ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
-                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no')
+                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
                 ->where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
                 ->orderBy('team_member_role_en','DESC')
