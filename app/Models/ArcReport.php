@@ -26,4 +26,12 @@ class ArcReport extends Model
         'cover_page',
         'cover_page_path'
     ];
+
+    public function archive_apottis(){
+        return $this->hasMany(ArcReportApotti::class, 'report_id', 'id');
+    }
+
+    public function arc_report_attachment(){
+        return $this->hasMany(ArcReportAttachment::class, 'report_id', 'id');
+    }
 }

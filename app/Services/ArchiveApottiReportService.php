@@ -2,9 +2,19 @@
 
 namespace App\Services;
 
+use App\Models\AcMemo;
+use App\Models\Apotti;
+use App\Models\ApottiItem;
+use App\Models\ApottiRAirMap;
+use App\Models\ApottiStatus;
 use App\Models\ArcReport;
 use App\Models\ArcReportApotti;
 use App\Models\ArcReportAttachment;
+use App\Models\PacMeeting;
+use App\Models\PacMeetingApotti;
+use App\Models\RAir;
+use App\Models\ReportedApottiAttachment;
+use App\Models\XFiscalYear;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Database\Eloquent\Model;
@@ -174,6 +184,432 @@ class ArchiveApottiReportService
             $arc_report_apotti->created_by  = $cdesk->officer_id;
             $arc_report_apotti->save();
             return ['status' => 'success', 'data' => 'Apotti Saved Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function reportSync(Request $request): array
+    {
+        try {
+            $arc_report =  ArcReport::with('archive_apottis','arc_report_attachment')->find($request->report_id);
+
+            $office_db_con_response = $this->switchOffice($arc_report->directorate_id);
+
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $fiscal_year = XFiscalYear::where('start', $arc_report->year_from)->first();
+            if ($fiscal_year) {
+                $fiscal_year_id = $fiscal_year->id;
+                $fiscal_year_desc = $fiscal_year->start . ' - ' . $fiscal_year->end;
+            } else {
+                $fiscal_year_id = 56;
+                $fiscal_year_desc = 'Unidentified Fiscal Year';
+            }
+
+            $airData = [
+                'report_name' => $arc_report->audit_report_name,
+                'fiscal_year_id' => $fiscal_year_id,
+                'activity_id' => 0,
+                'annual_plan_id' => 0,
+                'audit_plan_id' => 0,
+                'air_description' => $fiscal_year_desc,
+                'type' => 'cqat',
+                'status' => 'approved',
+                'created_by' => 0,
+                'modified_by' => 0,
+                'is_printing_done' => 1,
+                'is_bg_press' => 1,
+                'is_alochito' => 1,
+                'final_approval_status' => 'approved',
+                'has_report_attachments' => 1,
+                'archived_report_id' => 0,
+            ];
+
+           $air_id =  RAir::create($airData);
+            $attachment_data_arr = [];
+            foreach ($arc_report['arc_report_attachment'] as $archived_reported_attachment) {
+                $attachment_data = [
+                    'report_id' => $air_id->id,
+                    'attachment_type' => $archived_reported_attachment['attachment_type'],
+                    'user_define_name' => $archived_reported_attachment['user_define_name'],
+                    'attachment_name' => $archived_reported_attachment['attachment_name'],
+                    'attachment_path' => $archived_reported_attachment['attachment_path'],
+                    'cover_page_name' => $archived_reported_attachment['cover_page_name'],
+                    'cover_page_path' => $archived_reported_attachment['cover_page_path'],
+                    'cover_page' => $archived_reported_attachment['cover_page'],
+                ];
+                $attachment_data_arr[] = $attachment_data;
+            }
+
+            ReportedApottiAttachment::insert($attachment_data_arr);
+
+//            return ['status' => 'success', 'data' => $arc_report['archive_apottis']];
+            $apotti_ids = [];
+            foreach ($arc_report['archive_apottis'] as $memo) {
+                if ($memo['cost_center_id']) {
+                    $fiscal_year = XFiscalYear::where('start', bnToen($memo['orthobosor_start']))->first();
+                    if ($fiscal_year) {
+                        $fiscal_year_id = $fiscal_year->id;
+                        $fiscal_year_desc = $fiscal_year->start . ' - ' . $fiscal_year->end;
+                    } else {
+                        $fiscal_year_id = 56;
+                        $fiscal_year_desc = 'Unidentified Fiscal Year';
+                    }
+
+                    if (!$fiscal_year_id) {
+                        $fiscal_year_id = 56;
+                        $fiscal_year_desc = 'Unidentified Fiscal Year';
+                    }
+
+                    $audit_type = [
+                        'কমপ্লায়েন্স অডিট' => 'compliance',
+                        'পারফরমেন্স অডিট' => 'performance',
+                        'ফাইন্যান্সিয়াল অডিট' => 'financial',
+                        'বিশেষ অডিট' => 'special',
+                        'ইস্যুভিত্তিক অডিট' => 'issue_based',
+                        'বার্ষিক অডিট' => 'yearly',
+                    ];
+
+                    $apotti_type = [
+                        'নন-এসএফআই' => 'non-sfi',
+                        'এসএফআই' => 'sfi',
+                        'ড্রাফ্ট প্যারা' => 'draft-para',
+                        'পাণ্ডুলিপি' => 'pandulipi',
+                    ];
+
+                    $memo_status_list = [
+                        'N/A' => '0',
+                        'নিস্পন্ন' => '1',
+                        'অনিস্পন্ন' => '2',
+                        'আংশিক নিস্পন্ন' => '3',
+                    ];
+
+                    if ($memo['orthobosor_start'] && $memo['orthobosor_end']) {
+                        $apotti_year_start = bnToen($memo['orthobosor_start']);
+                        $apotti_year_end = bnToen($memo['orthobosor_end']);
+                    } else {
+                        $apotti_year_start = 2090;
+                        $apotti_year_end = 2091;
+                    }
+
+                    if ($apotti_year_start < 1970 && $apotti_year_end > 2091) {
+                        $apotti_year_start = 2090;
+                        $apotti_year_end = 2091;
+                    }
+
+                    if (strlen($apotti_year_start) != 4) {
+                        $apotti_year_start = 2090;
+                    }
+                    if (strlen($apotti_year_end) != 4) {
+                        $apotti_year_end = 2091;
+                    }
+
+                    $apotti_year_end = preg_replace("/[^0-9]/", "", $apotti_year_end);
+                    $apotti_year_start = preg_replace("/[^0-9]/", "", $apotti_year_start);
+
+                    $onucched_no = 0;
+
+                    $cost_center_id = $memo['cost_center_id'];
+                    $cost_center_name_en = $memo['cost_center_name_en'];
+                    $cost_center_name_bn = $memo['cost_center_name_bn'];
+
+                    $memo_title = $memo['onucched_no_apotti_title'] ?: 'NULL TITLE';
+
+                    $office_ac_memo_data = [
+                        'onucched_no' => 0,
+                        'ac_query_potro_no' => 0,
+                        'team_id' => 0,
+
+                        'ministry_id' => $memo['ministry_id'] ?: 0,
+                        'ministry_name_en' => $memo['ministry_name_en'] ?: 'undefined ministry',
+                        'ministry_name_bn' => $memo['ministry_name_bn'] ?: 'undefined ministry',
+                        'parent_office_id' => $memo['parent_office_id'] ?: 0,
+                        'parent_office_name_en' => $memo['parent_office_name_en'] ?: 'undefined parent',
+                        'parent_office_name_bn' => $memo['parent_office_name_bn'] ?: 'undefined parent',
+                        'cost_center_id' => $cost_center_id,
+                        'cost_center_name_en' => $cost_center_name_en,
+                        'cost_center_name_bn' => $cost_center_name_bn,
+
+                        'report_type_id' => 0,
+                        'memo_date' => now()->format('Y-m-d'),
+
+                        'memo_irregularity_type' => 0,
+                        'memo_irregularity_sub_type' => 0,
+                        'fiscal_year_id' => $fiscal_year_id,
+                        'fiscal_year' => $fiscal_year_desc,
+                        'ap_office_order_id' => 0,
+                        'audit_plan_id' => 0,
+                        'audit_year_start' => $apotti_year_start,
+                        'audit_year_end' => $apotti_year_end,
+                        'audit_type' => $memo['nirikkha_dhoron'] ? $audit_type[$memo['nirikkha_dhoron']] : 'NULL TYPE',
+                        'memo_title_bn' => $memo_title,
+                        'irregularity_cause' => 0,
+                        'memo_type' => 0,
+                        'memo_status' => $memo['apotti_status'] ? $memo_status_list[$memo['apotti_status']] : '0',
+                        'jorito_ortho_poriman' => bnToen($memo['jorito_ortho_poriman']),
+                        'onishponno_jorito_ortho_poriman' => 0,
+                        'created_by' => 0,
+                        'created_at' => $memo['created_at'],
+                        'updated_at' => $memo['updated_at'],
+                        'approve_status' => 'draft',
+                        'status' => 'draft',
+                        'is_archived' => 1,
+                        'is_reported' => 1,
+                    ];
+
+                    $office_ac_memo = AcMemo::create($office_ac_memo_data);
+
+//                    $rp_ac_memo_data = [
+//                        'memo_id' => $office_ac_memo->id,
+//                        'onucched_no' => $onucched_no,
+//                        'ac_query_potro_no' => 0,
+//                        'team_id' => 0,
+//                        'directorate_id' => $directorate->id,
+//                        'directorate_bn' => $directorate->office_name_bng,
+//                        'directorate_en' => $directorate->office_name_eng,
+//                        'directorate_address' => $directorate->office_address,
+//                        'directorate_website' => $directorate->office_web,
+//                        'cost_center_id' => $cost_center_id,
+//                        'cost_center_name_en' => $cost_center_name_en,
+//                        'cost_center_name_bn' => $cost_center_name_bn,
+//                        'report_type_id' => 0,
+//                        'memo_irregularity_type' => 0,
+//                        'memo_irregularity_sub_type' => 0,
+//                        'fiscal_year_id' => $fiscal_year_id,
+//                        'fiscal_year' => $fiscal_year_desc,
+//                        'ap_office_order_id' => 0,
+//                        'audit_plan_id' => 0,
+//                        'audit_year_start' => $apotti_year_start,
+//                        'audit_year_end' => $apotti_year_end,
+//                        'audit_type' => $office_ac_memo->audit_type,
+//                        'memo_title_bn' => $memo_title,
+//                        'irregularity_cause' => $office_ac_memo->irregularity_cause,
+//                        'memo_type' => 0,
+//                        'memo_status' => $memo['apotti_status'] ? $memo_status_list[$memo['apotti_status']] : '0',
+//                        'status' => 'draft',
+//                        'jorito_ortho_poriman' => $office_ac_memo->jorito_ortho_poriman,
+//                        'onishponno_jorito_ortho_poriman' => $office_ac_memo->onishponno_jorito_ortho_poriman,
+//                        'created_at' => $memo['created_at'],
+//                        'updated_at' => $memo['updated_at'],
+//                        'is_archived' => 1,
+//                    ];
+//
+//                    RPAcMemo::create($rp_ac_memo_data);
+
+                    //Apottis
+                    $office_apottis = [
+                        'audit_plan_id' => 0,
+                        'onucched_no' => 0,
+                        'apotti_title' => $office_ac_memo->memo_title_bn,
+                        'apotti_description' => '',
+                        'ministry_id' => $memo['ministry_id'] ?: 0,
+                        'ministry_name_en' => $memo['ministry_name_en'] ?: 'undefined ministry',
+                        'ministry_name_bn' => $memo['ministry_name_bn'] ?: 'undefined ministry',
+                        'parent_office_id' => $memo['parent_office_id'] ?: 0,
+                        'parent_office_name_en' => $memo['parent_office_name_en'] ?: 'undefined parent',
+                        'parent_office_name_bn' => $memo['parent_office_name_bn'] ?: 'undefined parent',
+
+                        'fiscal_year_id' => $fiscal_year_id,
+                        'total_jorito_ortho_poriman' => $office_ac_memo->jorito_ortho_poriman,
+                        'total_onishponno_jorito_ortho_poriman' => $office_ac_memo->onishponno_jorito_ortho_poriman,
+                        'created_by' => 0,
+                        'approve_status' => 1,
+                        'status' => 0,
+                        'apotti_sequence' => 1,
+                        'is_combined' => 0,
+                        'created_at' => $memo['created_at'],
+                        'updated_at' => $memo['updated_at'],
+                        'is_reported' => 1,
+                    ];
+
+                    $apotti = Apotti::create($office_apottis);
+
+                    ApottiStatus::create(
+                        [
+                            'apotti_id' => $apotti->id,
+                            'apotti_type' => 'approved',
+                            'qac_type' => 'cqat',
+                            'is_same_porishisto' => 0,
+                            'is_rules_and_regulation' => 0,
+                            'is_imperfection' => 0,
+                            'is_risk_analysis' => 0,
+                            'is_broadsheet_response' => 0,
+                            'created_by' => 0,
+                            'created_by_name_en' => 'archive',
+                            'created_by_name_bn' => 'archive',
+                        ]
+                    );
+
+                    $office_apotti_items = [
+                        'apotti_id' => $apotti->id,
+                        'memo_id' => $office_ac_memo->id,
+                        'onucched_no' => 0,
+                        'memo_irregularity_type' => $office_ac_memo->memo_irregularity_type,
+                        'memo_irregularity_sub_type' => $office_ac_memo->memo_irregularity_sub_type,
+
+                        'ministry_id' => $memo['ministry_id'] ?: 0,
+                        'ministry_name_en' => $memo['ministry_name_en'] ?: 'undefined ministry',
+                        'ministry_name_bn' => $memo['ministry_name_bn'] ?: 'undefined ministry',
+                        'parent_office_id' => $memo['parent_office_id'] ?: 0,
+                        'parent_office_name_en' => $memo['parent_office_name_en'] ?: 'undefined parent',
+                        'parent_office_name_bn' => $memo['parent_office_name_bn'] ?: 'undefined parent',
+                        'cost_center_id' => $cost_center_id,
+                        'cost_center_name_en' => $cost_center_name_en,
+                        'cost_center_name_bn' => $cost_center_name_bn,
+
+                        'fiscal_year_id' => $fiscal_year_id,
+                        'audit_year_start' => $apotti_year_start,
+                        'audit_year_end' => $apotti_year_end,
+                        'ac_query_potro_no' => 0,
+                        'ap_office_order_id' => 0,
+                        'audit_plan_id' => 0,
+                        'audit_type' => $office_ac_memo->audit_type,
+                        'team_id' => 0,
+                        'memo_description_bn' => '',
+                        'memo_title_bn' => $memo_title,
+                        'memo_type' => $office_ac_memo->apottir_dhoron ?: 'NULL TYPE',
+                        'memo_status' => $office_ac_memo->memo_status,
+                        'jorito_ortho_poriman' => $office_ac_memo->jorito_ortho_poriman,
+                        'onishponno_jorito_ortho_poriman' => $office_ac_memo->onishponno_jorito_ortho_poriman,
+                        'created_by' => 0,
+                        'status' => 0,
+                        'created_at' => $memo['created_at'],
+                        'updated_at' => $memo['updated_at'],
+                    ];
+                    $apotti_item = ApottiItem::create($office_apotti_items);
+
+                    $apotti_ids[] = $apotti->id;
+
+//                    $rp_apotti = new RPApotti();
+//                    $rp_apotti->apotti_id = $apotti->id;
+//                    $rp_apotti->air_id = $air_created->id;
+//                    $rp_apotti->audit_plan_id = $apotti->audit_plan_id;
+//                    $rp_apotti->apotti_title = $apotti->apotti_title;
+//                    $rp_apotti->apotti_description = $apotti->apotti_description;
+//                    $rp_apotti->apotti_type = $apotti->apotti_type;
+//                    $rp_apotti->onucched_no = $apotti->onucched_no;
+//                    $rp_apotti->ministry_id = $apotti->ministry_id;
+//                    $rp_apotti->ministry_name_en = $apotti->ministry_name_en;
+//                    $rp_apotti->ministry_name_bn = $apotti->ministry_name_bn;
+//                    $rp_apotti->parent_office_id = $apotti->parent_office_id;
+//                    $rp_apotti->parent_office_name_en = $apotti->parent_office_name_en;
+//                    $rp_apotti->parent_office_name_bn = $apotti->parent_office_name_bn;
+//                    $rp_apotti->fiscal_year_id = $apotti->fiscal_year_id;
+//                    $rp_apotti->total_jorito_ortho_poriman = $apotti->total_jorito_ortho_poriman;
+//                    $rp_apotti->total_onishponno_jorito_ortho_poriman = $apotti->total_onishponno_jorito_ortho_poriman;
+//                    $rp_apotti->response_of_rpu = $apotti->response_of_rpu;
+//                    $rp_apotti->irregularity_cause = $apotti->irregularity_cause;
+//                    $rp_apotti->audit_conclusion = $apotti->audit_conclusion;
+//                    $rp_apotti->audit_recommendation = $apotti->audit_recommendation;
+//                    $rp_apotti->created_by = 0;
+//                    $rp_apotti->approve_status = $apotti->approve_status;
+//                    $rp_apotti->status = $apotti->status;
+//                    $rp_apotti->comment = $apotti->comment;
+//                    $rp_apotti->apotti_sequence = $apotti->apotti_sequence;
+//                    $rp_apotti->is_combined = $apotti->is_combined;
+//                    $rp_apotti->save();
+
+//                    $rp_apotti_item = new RPApottiItem();
+//                    $rp_apotti_item->apotti_id = $apotti->id;
+//                    $rp_apotti_item->apotti_item_id = $apotti_item->id;
+//                    $rp_apotti_item->memo_id = $apotti_item->memo_id;
+//                    $rp_apotti_item->onucched_no = $apotti_item->onucched_no;
+//                    $rp_apotti_item->memo_irregularity_type = $apotti_item->memo_irregularity_type;
+//                    $rp_apotti_item->memo_irregularity_sub_type = $apotti_item->memo_irregularity_sub_type;
+//                    $rp_apotti_item->ministry_id = $apotti_item->ministry_id;
+//                    $rp_apotti_item->ministry_name_en = $apotti_item->ministry_name_en;
+//                    $rp_apotti_item->ministry_name_bn = $apotti_item->ministry_name_bn;
+//                    $rp_apotti_item->parent_office_id = $apotti_item->parent_office_id;
+//                    $rp_apotti_item->parent_office_name_en = $apotti_item->parent_office_name_en;
+//                    $rp_apotti_item->parent_office_name_bn = $apotti_item->parent_office_name_bn;
+//                    $rp_apotti_item->cost_center_id = $apotti_item->cost_center_id;
+//                    $rp_apotti_item->cost_center_name_en = $apotti_item->cost_center_name_en;
+//                    $rp_apotti_item->cost_center_name_bn = $apotti_item->cost_center_name_bn;
+//                    $rp_apotti_item->fiscal_year_id = $apotti_item->fiscal_year_id;
+//                    $rp_apotti_item->audit_year_start = $apotti_item->audit_year_start;
+//                    $rp_apotti_item->audit_year_end = $apotti_item->audit_year_end;
+//                    $rp_apotti_item->ac_query_potro_no = $apotti_item->ac_query_potro_no;
+//                    $rp_apotti_item->ap_office_order_id = $apotti_item->ap_office_order_id;
+//                    $rp_apotti_item->audit_plan_id = $apotti_item->audit_plan_id;
+//                    $rp_apotti_item->audit_type = $apotti_item->audit_type;
+//                    $rp_apotti_item->team_id = $apotti_item->team_id;
+//                    $rp_apotti_item->memo_title_bn = $apotti_item->memo_title_bn;
+//                    $rp_apotti_item->memo_description_bn = $apotti_item->memo_description_bn;
+//                    $rp_apotti_item->memo_type = $apotti_item->memo_type;
+//                    $rp_apotti_item->memo_status = $apotti_item->memo_status;
+//                    $rp_apotti_item->jorito_ortho_poriman = $apotti_item->jorito_ortho_poriman;
+//                    $rp_apotti_item->onishponno_jorito_ortho_poriman = $apotti_item->onishponno_jorito_ortho_poriman;
+//                    $rp_apotti_item->response_of_rpu = $apotti_item->response_of_rpu;
+//                    $rp_apotti_item->irregularity_cause = $apotti_item->irregularity_cause;
+//                    $rp_apotti_item->audit_conclusion = $apotti_item->audit_conclusion;
+//                    $rp_apotti_item->audit_recommendation = $apotti_item->audit_recommendation;
+//                    $rp_apotti_item->created_by = 1;
+//                    $rp_apotti_item->status = $apotti_item->status;
+//                    $rp_apotti_item->directorate_id = $directorate->id;
+//                    $rp_apotti_item->directorate_en = $directorate->office_name_eng;
+//                    $rp_apotti_item->directorate_bn = $directorate->office_name_bng;
+//                    $rp_apotti_item->save();
+
+//                    $apotti_ids[] = $apotti->id;
+                }
+            }
+
+            if (count($apotti_ids) > 0) {
+                $apotti_air_map = [];
+                foreach ($apotti_ids as $apotti_id) {
+                    $apotti_air_map[] = [
+                        'apotti_id' => $apotti_id,
+                        'rairs_id' => $air_id->id,
+                    ];
+                }
+
+                ApottiRAirMap::insert($apotti_air_map);
+
+                //CORE DB
+                $meeting = new PacMeeting();
+                $meeting->directorate_id = $arc_report->directorate_id;
+                $meeting->directorate_bn = $arc_report->directorate_bn;
+                $meeting->directorate_en = $arc_report->directorate_en;
+                $meeting->fiscal_year_id = $fiscal_year_id;
+                $meeting->report_number = 0;
+                $meeting->report_name = $arc_report->report_name;
+                $meeting->ministry_id = $arc_report->ministry_id;
+                $meeting->ministry_name_bn = $arc_report->ministry_name_bn;
+                $meeting->ministry_name_en = $arc_report->ministry_name_en;
+                $meeting->meeting_no = 0;
+                $meeting->meeting_date = now()->format('Y-m-d');
+                $meeting->parliament_no = 0;
+                $meeting->final_report_id = $arc_report->id;
+                $meeting->is_alochito = $arc_report->is_alochito ? $arc_report->is_alochito : 0;
+                $meeting->meeting_place = 'undefined';
+                $meeting->created_by = 0;
+                $meeting->created_by_bn = 'archive';
+                $meeting->created_by_en = 'archive';
+                $meeting->save();
+
+                foreach ($apotti_ids as $apotti) {
+                    $apotti_info = Apotti::find($apotti);
+                    $meeting_apotti = new PacMeetingApotti();
+                    $meeting_apotti->directorate_id = $arc_report->directorate_id;
+                    $meeting_apotti->directorate_bn = $arc_report->directorate_bn;
+                    $meeting_apotti->directorate_en = $arc_report->directorate_en;
+                    $meeting_apotti->pac_meeting_id = $meeting->id;
+                    $meeting_apotti->final_report_id = $arc_report->id;
+                    $meeting_apotti->apotti_id = $apotti;
+                    $meeting_apotti->onucched_no = $apotti_info->onucched_no;
+                    $meeting_apotti->apotti_title = $apotti_info->apotti_title;
+                    $meeting_apotti->total_jorito_ortho_poriman = $apotti_info->total_onishponno_jorito_ortho_poriman;
+                    $meeting_apotti->total_onishponno_jorito_ortho_poriman = $apotti_info->total_onishponno_jorito_ortho_poriman;
+                    $meeting_apotti->total_adjustment_ortho_poriman = $apotti_info->total_adjustment_ortho_poriman;
+                    $meeting_apotti->save();
+                }
+            }
+
+            return ['status' => 'success', 'data' => 'office Db sync done'];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
