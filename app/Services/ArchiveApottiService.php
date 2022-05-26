@@ -550,6 +550,9 @@ class ArchiveApottiService
                 throw new Exception('RPU ERROR' . ' - ' . json_encode($rpu_migrate));
             }
 
+            ArcApotti::with(['attachments'])
+                ->where('id', $request->apotti_id)
+                ->delete();
 
             DB::commit();
             return ['status' => 'success', 'data' => $rpu_migrate];
