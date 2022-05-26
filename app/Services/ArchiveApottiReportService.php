@@ -27,38 +27,39 @@ class ArchiveApottiReportService
 {
     use GenericData, ApiHeart;
 
-    public function list(Request $request){
+    public function list(Request $request)
+    {
         try {
             $query = ArcReport::query();
 
             //directorate
             $directorate_id = $request->directorate_id;
-            $query->when($directorate_id, function ($query) use($directorate_id) {
+            $query->when($directorate_id, function ($query) use ($directorate_id) {
                 return $query->where('directorate_id', $directorate_id);
             });
 
             //ministry
             $ministry_id = $request->ministry_id;
-            $query->when($ministry_id, function ($query) use($ministry_id) {
+            $query->when($ministry_id, function ($query) use ($ministry_id) {
                 return $query->where('ministry_id', $ministry_id);
             });
 
 
             //year_from
             $year_from = $request->year_from;
-            $query->when($year_from, function ($query) use($year_from) {
+            $query->when($year_from, function ($query) use ($year_from) {
                 return $query->where('year_from', $year_from);
             });
 
             //year_to
             $year_to = $request->year_to;
-            $query->when($year_to, function ($query) use($year_to) {
+            $query->when($year_to, function ($query) use ($year_to) {
                 return $query->where('year_to', $year_to);
             });
 
-            $apotti_report_list = $query->orderBy('id','DESC')->get()->toArray();
+            $apotti_report_list = $query->orderBy('id', 'DESC')->get()->toArray();
             return ['status' => 'success', 'data' => $apotti_report_list];
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
@@ -86,10 +87,10 @@ class ArchiveApottiReportService
 
             if ($request->hasfile('cover_page')) {
                 foreach ($request->cover_page as $key => $file) {
-                    if ($key == 0){
+                    if ($key == 0) {
                         $fileExtension = $file->extension();
                         $fileName = 'cover_page_' . uniqid() . '.' . $fileExtension;
-                        Storage::disk('public')->put('archive/reports/'. $fileName, File::get($file));
+                        Storage::disk('public')->put('archive/reports/' . $fileName, File::get($file));
                         $arc_report->cover_page = $fileName;
                         $arc_report->cover_page_path  = url('storage/archive/reports/');
                     }
@@ -109,8 +110,10 @@ class ArchiveApottiReportService
                     $fileSize = $file->getSize();
                     $fileName = 'other_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('archive/apotti/'. $fileName, File::get($file));
-                    array_push($apotti_attachments, array(
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    array_push(
+                        $apotti_attachments,
+                        array(
                             'report_id' => $arc_report->id,
                             'attachment_type' => 'apotti',
                             'user_define_name' => $userDefineFileName,
@@ -131,10 +134,10 @@ class ArchiveApottiReportService
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 
-    public function view(Request $request){
+    public function view(Request $request)
+    {
         try {
             $report = ArcReport::where('id', $request->report_id)->first()->toArray();
             return ['status' => 'success', 'data' => $report];
@@ -192,7 +195,8 @@ class ArchiveApottiReportService
     public function reportSync(Request $request): array
     {
         try {
-            $arc_report =  ArcReport::with('archive_apottis','arc_report_attachment')->find($request->report_id);
+            $arc_report =  ArcReport::with('archive_apottis', 'arc_report_attachment')->find($request->report_id);
+            $cdesk = json_decode($request->cdesk, false);
 
             $office_db_con_response = $this->switchOffice($arc_report->directorate_id);
 
@@ -211,24 +215,33 @@ class ArchiveApottiReportService
 
             $airData = [
                 'report_name' => $arc_report->audit_report_name,
+                'ministry_id' => $arc_report->ministry_id,
+                'ministry_name_en' => $arc_report->ministry_name_en,
+                'ministry_name_bn' => $arc_report->ministry_name_bn,
+                'entity_id' => $arc_report->entity_id,
+                'entity_name_en' => $arc_report->entity_name_en,
+                'entity_name_bn' => $arc_report->entity_name_bn,
+                'air_description' => 'undefined',
                 'fiscal_year_id' => $fiscal_year_id,
                 'activity_id' => 0,
                 'annual_plan_id' => 0,
                 'audit_plan_id' => 0,
                 'air_description' => $fiscal_year_desc,
                 'type' => 'cqat',
+                'report_type' => 'generated',
                 'status' => 'approved',
                 'created_by' => 0,
                 'modified_by' => 0,
                 'is_printing_done' => 1,
                 'is_bg_press' => 1,
                 'is_alochito' => 1,
+                'is_sent' => 1,
                 'final_approval_status' => 'approved',
                 'has_report_attachments' => 1,
                 'archived_report_id' => 0,
             ];
 
-           $air_id =  RAir::create($airData);
+            $air_id =  RAir::create($airData);
             $attachment_data_arr = [];
             foreach ($arc_report['arc_report_attachment'] as $archived_reported_attachment) {
                 $attachment_data = [
@@ -246,8 +259,12 @@ class ArchiveApottiReportService
 
             ReportedApottiAttachment::insert($attachment_data_arr);
 
-//            return ['status' => 'success', 'data' => $arc_report['archive_apottis']];
+            //            return ['status' => 'success', 'data' => $arc_report['archive_apottis']];
             $apotti_ids = [];
+
+            $rp_ac_memo_data = [];
+            $rp_apotti_data = [];
+            $rp_apotti_item_data = [];
             foreach ($arc_report['archive_apottis'] as $memo) {
                 if ($memo['cost_center_id']) {
                     $fiscal_year = XFiscalYear::where('start', bnToen($memo['orthobosor_start']))->first();
@@ -310,8 +327,6 @@ class ArchiveApottiReportService
                     $apotti_year_end = preg_replace("/[^0-9]/", "", $apotti_year_end);
                     $apotti_year_start = preg_replace("/[^0-9]/", "", $apotti_year_start);
 
-                    $onucched_no = 0;
-
                     $cost_center_id = $memo['cost_center_id'];
                     $cost_center_name_en = $memo['cost_center_name_en'];
                     $cost_center_name_bn = $memo['cost_center_name_bn'];
@@ -319,7 +334,7 @@ class ArchiveApottiReportService
                     $memo_title = $memo['onucched_no_apotti_title'] ?: 'NULL TITLE';
 
                     $office_ac_memo_data = [
-                        'onucched_no' => 0,
+                        'onucched_no' => $memo['onucched_no'],
                         'ac_query_potro_no' => 0,
                         'team_id' => 0,
 
@@ -362,47 +377,13 @@ class ArchiveApottiReportService
 
                     $office_ac_memo = AcMemo::create($office_ac_memo_data);
 
-//                    $rp_ac_memo_data = [
-//                        'memo_id' => $office_ac_memo->id,
-//                        'onucched_no' => $onucched_no,
-//                        'ac_query_potro_no' => 0,
-//                        'team_id' => 0,
-//                        'directorate_id' => $directorate->id,
-//                        'directorate_bn' => $directorate->office_name_bng,
-//                        'directorate_en' => $directorate->office_name_eng,
-//                        'directorate_address' => $directorate->office_address,
-//                        'directorate_website' => $directorate->office_web,
-//                        'cost_center_id' => $cost_center_id,
-//                        'cost_center_name_en' => $cost_center_name_en,
-//                        'cost_center_name_bn' => $cost_center_name_bn,
-//                        'report_type_id' => 0,
-//                        'memo_irregularity_type' => 0,
-//                        'memo_irregularity_sub_type' => 0,
-//                        'fiscal_year_id' => $fiscal_year_id,
-//                        'fiscal_year' => $fiscal_year_desc,
-//                        'ap_office_order_id' => 0,
-//                        'audit_plan_id' => 0,
-//                        'audit_year_start' => $apotti_year_start,
-//                        'audit_year_end' => $apotti_year_end,
-//                        'audit_type' => $office_ac_memo->audit_type,
-//                        'memo_title_bn' => $memo_title,
-//                        'irregularity_cause' => $office_ac_memo->irregularity_cause,
-//                        'memo_type' => 0,
-//                        'memo_status' => $memo['apotti_status'] ? $memo_status_list[$memo['apotti_status']] : '0',
-//                        'status' => 'draft',
-//                        'jorito_ortho_poriman' => $office_ac_memo->jorito_ortho_poriman,
-//                        'onishponno_jorito_ortho_poriman' => $office_ac_memo->onishponno_jorito_ortho_poriman,
-//                        'created_at' => $memo['created_at'],
-//                        'updated_at' => $memo['updated_at'],
-//                        'is_archived' => 1,
-//                    ];
-//
-//                    RPAcMemo::create($rp_ac_memo_data);
+                    $rp_ac_memo_data[] = $office_ac_memo->toArray();
+
 
                     //Apottis
                     $office_apottis = [
                         'audit_plan_id' => 0,
-                        'onucched_no' => 0,
+                        'onucched_no' => $memo['onucched_no'],
                         'apotti_title' => $office_ac_memo->memo_title_bn,
                         'apotti_description' => '',
                         'ministry_id' => $memo['ministry_id'] ?: 0,
@@ -426,6 +407,7 @@ class ArchiveApottiReportService
                     ];
 
                     $apotti = Apotti::create($office_apottis);
+                    $rp_apotti_data[] = $apotti->toArray();
 
                     ApottiStatus::create(
                         [
@@ -480,80 +462,9 @@ class ArchiveApottiReportService
                         'updated_at' => $memo['updated_at'],
                     ];
                     $apotti_item = ApottiItem::create($office_apotti_items);
+                    $rp_apotti_item_data[] = $apotti_item->toArray();
 
                     $apotti_ids[] = $apotti->id;
-
-//                    $rp_apotti = new RPApotti();
-//                    $rp_apotti->apotti_id = $apotti->id;
-//                    $rp_apotti->air_id = $air_created->id;
-//                    $rp_apotti->audit_plan_id = $apotti->audit_plan_id;
-//                    $rp_apotti->apotti_title = $apotti->apotti_title;
-//                    $rp_apotti->apotti_description = $apotti->apotti_description;
-//                    $rp_apotti->apotti_type = $apotti->apotti_type;
-//                    $rp_apotti->onucched_no = $apotti->onucched_no;
-//                    $rp_apotti->ministry_id = $apotti->ministry_id;
-//                    $rp_apotti->ministry_name_en = $apotti->ministry_name_en;
-//                    $rp_apotti->ministry_name_bn = $apotti->ministry_name_bn;
-//                    $rp_apotti->parent_office_id = $apotti->parent_office_id;
-//                    $rp_apotti->parent_office_name_en = $apotti->parent_office_name_en;
-//                    $rp_apotti->parent_office_name_bn = $apotti->parent_office_name_bn;
-//                    $rp_apotti->fiscal_year_id = $apotti->fiscal_year_id;
-//                    $rp_apotti->total_jorito_ortho_poriman = $apotti->total_jorito_ortho_poriman;
-//                    $rp_apotti->total_onishponno_jorito_ortho_poriman = $apotti->total_onishponno_jorito_ortho_poriman;
-//                    $rp_apotti->response_of_rpu = $apotti->response_of_rpu;
-//                    $rp_apotti->irregularity_cause = $apotti->irregularity_cause;
-//                    $rp_apotti->audit_conclusion = $apotti->audit_conclusion;
-//                    $rp_apotti->audit_recommendation = $apotti->audit_recommendation;
-//                    $rp_apotti->created_by = 0;
-//                    $rp_apotti->approve_status = $apotti->approve_status;
-//                    $rp_apotti->status = $apotti->status;
-//                    $rp_apotti->comment = $apotti->comment;
-//                    $rp_apotti->apotti_sequence = $apotti->apotti_sequence;
-//                    $rp_apotti->is_combined = $apotti->is_combined;
-//                    $rp_apotti->save();
-
-//                    $rp_apotti_item = new RPApottiItem();
-//                    $rp_apotti_item->apotti_id = $apotti->id;
-//                    $rp_apotti_item->apotti_item_id = $apotti_item->id;
-//                    $rp_apotti_item->memo_id = $apotti_item->memo_id;
-//                    $rp_apotti_item->onucched_no = $apotti_item->onucched_no;
-//                    $rp_apotti_item->memo_irregularity_type = $apotti_item->memo_irregularity_type;
-//                    $rp_apotti_item->memo_irregularity_sub_type = $apotti_item->memo_irregularity_sub_type;
-//                    $rp_apotti_item->ministry_id = $apotti_item->ministry_id;
-//                    $rp_apotti_item->ministry_name_en = $apotti_item->ministry_name_en;
-//                    $rp_apotti_item->ministry_name_bn = $apotti_item->ministry_name_bn;
-//                    $rp_apotti_item->parent_office_id = $apotti_item->parent_office_id;
-//                    $rp_apotti_item->parent_office_name_en = $apotti_item->parent_office_name_en;
-//                    $rp_apotti_item->parent_office_name_bn = $apotti_item->parent_office_name_bn;
-//                    $rp_apotti_item->cost_center_id = $apotti_item->cost_center_id;
-//                    $rp_apotti_item->cost_center_name_en = $apotti_item->cost_center_name_en;
-//                    $rp_apotti_item->cost_center_name_bn = $apotti_item->cost_center_name_bn;
-//                    $rp_apotti_item->fiscal_year_id = $apotti_item->fiscal_year_id;
-//                    $rp_apotti_item->audit_year_start = $apotti_item->audit_year_start;
-//                    $rp_apotti_item->audit_year_end = $apotti_item->audit_year_end;
-//                    $rp_apotti_item->ac_query_potro_no = $apotti_item->ac_query_potro_no;
-//                    $rp_apotti_item->ap_office_order_id = $apotti_item->ap_office_order_id;
-//                    $rp_apotti_item->audit_plan_id = $apotti_item->audit_plan_id;
-//                    $rp_apotti_item->audit_type = $apotti_item->audit_type;
-//                    $rp_apotti_item->team_id = $apotti_item->team_id;
-//                    $rp_apotti_item->memo_title_bn = $apotti_item->memo_title_bn;
-//                    $rp_apotti_item->memo_description_bn = $apotti_item->memo_description_bn;
-//                    $rp_apotti_item->memo_type = $apotti_item->memo_type;
-//                    $rp_apotti_item->memo_status = $apotti_item->memo_status;
-//                    $rp_apotti_item->jorito_ortho_poriman = $apotti_item->jorito_ortho_poriman;
-//                    $rp_apotti_item->onishponno_jorito_ortho_poriman = $apotti_item->onishponno_jorito_ortho_poriman;
-//                    $rp_apotti_item->response_of_rpu = $apotti_item->response_of_rpu;
-//                    $rp_apotti_item->irregularity_cause = $apotti_item->irregularity_cause;
-//                    $rp_apotti_item->audit_conclusion = $apotti_item->audit_conclusion;
-//                    $rp_apotti_item->audit_recommendation = $apotti_item->audit_recommendation;
-//                    $rp_apotti_item->created_by = 1;
-//                    $rp_apotti_item->status = $apotti_item->status;
-//                    $rp_apotti_item->directorate_id = $directorate->id;
-//                    $rp_apotti_item->directorate_en = $directorate->office_name_eng;
-//                    $rp_apotti_item->directorate_bn = $directorate->office_name_bng;
-//                    $rp_apotti_item->save();
-
-//                    $apotti_ids[] = $apotti->id;
                 }
             }
 
@@ -608,11 +519,28 @@ class ArchiveApottiReportService
                 }
             }
 
-            return ['status' => 'success', 'data' => 'office Db sync done'];
+            $directorate = $this->initDoptorHttp($cdesk->user_primary_id)->post(config('cag_doptor_api.offices'), ['office_ids' => $arc_report->directorate_id])->json();
 
+            if (isSuccess($directorate)) {
+                $directorate = $directorate['data'][$memo->directorate_id];
+            } else {
+                $directorate = [];
+            }
+
+            $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-apotti-to-rpu'), [
+                'directorate' => json_encode($directorate),
+                'memo' => json_encode($rp_ac_memo_data),
+                'apotti' => json_encode($rp_apotti_data),
+                'apotti_items' => json_encode($rp_apotti_item_data),
+            ])->json();
+
+            if (isSuccess($rpu_migrate, 'status', 'error')) {
+                throw new Exception('RPU ERROR' . ' - ' . json_encode($rpu_migrate));
+            }
+
+            return ['status' => 'success', 'data' => 'office Db sync done'];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
-
 }

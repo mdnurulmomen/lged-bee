@@ -537,7 +537,7 @@ class ArchiveApottiService
                 $directorate = [];
             }
 
-            $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-to-rpu'), [
+            $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-apotti-to-rpu'), [
                 'memo' => json_encode($office_ac_memo_data),
                 'directorate' => json_encode($directorate),
                 'onucched_no' => $office_ac_memo_data['onucched_no'],
