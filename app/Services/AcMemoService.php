@@ -100,14 +100,16 @@ class AcMemoService
 
 
             $porisistos = [];
-            foreach ($request->porisisto_details as $key=>$porisisto){
-                array_push($porisistos, array(
-                        'ac_memo_id' => $audit_memo->id,
-                        'details' => $porisisto,
-                        'sequence' => $key + 1,
-                        'created_by' => $cdesk->officer_id
-                    )
-                );
+            foreach ($request->porisisto_details as $key => $porisisto){
+                if ($porisisto != null){
+                    array_push($porisistos, array(
+                            'ac_memo_id' => $audit_memo->id,
+                            'details' => $porisisto,
+                            'sequence' => $key + 1,
+                            'created_by' => $cdesk->officer_id
+                        )
+                    );
+                }
             }
             if (!empty($porisistos)) {
                 AcMemoPorisishto::insert($porisistos);
