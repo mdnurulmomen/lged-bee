@@ -44,6 +44,12 @@ class ArchiveApottiReportService
                 return $query->where('ministry_id', $ministry_id);
             });
 
+            //entity_id
+            $entity_id = $request->entity_id;
+            $query->when($entity_id, function ($query) use ($entity_id) {
+                return $query->where('entity_id', $entity_id);
+            });
+
 
             //year_from
             $year_from = $request->year_from;
@@ -83,6 +89,9 @@ class ArchiveApottiReportService
             $arc_report->ministry_id = $request->ministry_id;
             $arc_report->ministry_name_bn = $request->ministry_name;
             $arc_report->ministry_name_en = $request->ministry_name;
+            $arc_report->entity_id = $request->entity_id;
+            $arc_report->entity_name_bn = $request->entity_name;
+            $arc_report->entity_name_en = $request->entity_name;
             $arc_report->is_alochito = $request->is_alochito;
 
             if ($request->hasfile('cover_page')) {
