@@ -421,6 +421,7 @@ class AuditAIRReportService
                 ->where('apotti_type', $request->apotti_type)
                 ->where('qac_type', $request->qac_type)
                 ->get()
+                ->sortBy('apotti.onucched_no')
                 ->toArray();
 
             return ['status' => 'success', 'data' => $apottiList];
