@@ -93,7 +93,7 @@ class ApottiService
 
             $apotti_list = $query->with(['apotti_items','apotti_status'])
                 ->orderBy('onucched_no')
-                ->paginate(config('bee_config.per_page_pagination'));
+                ->get();
 
             return ['status' => 'success', 'data' => $apotti_list];
         } catch (\Exception $exception) {
