@@ -37,6 +37,9 @@ class AnnualPlan extends Model
         'nominated_man_power_counts',
         'comment',
         'status',
+        'project_id',
+        'project_name_bn',
+        'project_name_en',
     ];
 
     public function yearly_audit_calendar_event_schedule(): \Illuminate\Database\Eloquent\Relations\BelongsTo

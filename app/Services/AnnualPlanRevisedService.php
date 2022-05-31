@@ -220,6 +220,9 @@ class AnnualPlanRevisedService
                 'nominated_man_powers' => $request->nominated_man_powers,
                 'nominated_man_power_counts' => $request->nominated_man_power_counts,
                 'comment' => empty($request->comment) ? null : $request->comment,
+                'project_id' => empty($request->project_id) ? null : $request->project_id,
+                'project_name_bn' => empty($request->project_name_bn) ? null : $request->project_name_bn,
+                'project_name_en' => empty($request->project_name_en) ? null : $request->project_name_en,
             ];
 
             if($request->annual_plan_main_id){
