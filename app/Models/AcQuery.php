@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class AcQuery extends Model
 {
     use HasFactory;
+    use \Awobaz\Compoships\Compoships;
 
     protected $connection = 'OfficeDB';
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AuditVisitCalenderPlanMember extends Model
 {
     use HasFactory;
+    use \Awobaz\Compoships\Compoships;
 
     protected $connection = 'OfficeDB';
 
@@ -85,8 +86,13 @@ class AuditVisitCalenderPlanMember extends Model
         return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'audit_plan_id');
     }
 
+    public function queries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcQuery::class, ['audit_plan_id', 'team_id', 'cost_center_id'], ['audit_plan_id', 'team_id', 'cost_center_id']);
+    }
+
     public function memos(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ApOfficeOrder::class, 'audit_plan_id', 'audit_plan_id');
+        return $this->belongsTo(AcMemo::class, ['audit_plan_id', 'team_id', 'cost_center_id'], ['audit_plan_id', 'team_id', 'cost_center_id']);
     }
 }
