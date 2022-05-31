@@ -373,6 +373,7 @@ class BroadsheetReplyService
 
             $apotti_item_data = [];
             foreach ($broad_sheet_item_list as $item){
+                $data['broad_sheet_reply_id'] = $item->broad_sheet_reply_id;
                 $data['apotti_id'] = $item->apotti_id;
                 $data['apotti_item_id'] = $item->apotti_item_id;
                 $data['memo_status'] = $item->status;
@@ -383,6 +384,7 @@ class BroadsheetReplyService
                 $data['directorate_en'] = $cdesk->office_name_en;
                 $data['directorate_bn'] = $cdesk->office_name_bn;
                 $data['directorate_response'] = $item->comment;
+                $data['status_reason'] = $item->status_reason;
                 $apotti_item_data[] = $data;
             }
 

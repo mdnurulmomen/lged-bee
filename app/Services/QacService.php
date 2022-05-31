@@ -282,7 +282,9 @@ class QacService
 
         try {
 
-            $committee_info =  QacCommitteeAirMap::with('committee.qac_committee_members')->where('air_report_id',$request->air_id)->first();
+            $committee_info =  QacCommitteeAirMap::with('committee.qac_committee_members')
+                ->where('air_report_id',$request->air_id)
+                ->first();
             return ['status' => 'success', 'data' => $committee_info];
 
         } catch (\Exception $exception) {
