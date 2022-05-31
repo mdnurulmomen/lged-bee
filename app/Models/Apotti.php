@@ -69,6 +69,11 @@ class Apotti extends Model
 //        });
 //    }
 
+    public function fiscal_year(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
+    }
+
     public function apotti_items(){
         return $this->hasMany(ApottiItem::class, 'apotti_id', 'id');
     }

@@ -39,7 +39,7 @@ class ArchiveApottiService
             //ministry
             $ministry_id = $request->ministry_id;
             $query->when($ministry_id, function ($query) use ($ministry_id) {
-                return $query->where(' ', $ministry_id);
+                return $query->where('ministry_id', $ministry_id);
             });
 
             //entity
