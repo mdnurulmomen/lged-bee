@@ -814,4 +814,35 @@ class AuditAIRReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function getAuthorityAirReport(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $activity_id = $request->activity_id;
+
+            $query = RAir::query();
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $airList =  $query->with('latest_r_air_movement')
+                ->where('type', $request->qac_type)
+                ->where('status', 'approved')
+                ->get()
+                ->toArray();
+
+            return ['status' => 'success', 'data' => $airList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
 }
