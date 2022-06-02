@@ -451,6 +451,11 @@ class ApottiService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
+            //apotti item
+            ApottiItem::where('apotti_id',$request->apotti_id)
+                ->update(['jorito_ortho_poriman' => $request->total_jorito_ortho_poriman]);
+
+            //apotti
             $apotti = Apotti::find($request->apotti_id);
             $apotti->onucched_no = $request->onucched_no;
             $apotti->apotti_title = $request->apotti_title;
@@ -459,6 +464,7 @@ class ApottiService
             $apotti->response_of_rpu = $request->response_of_rpu;
             $apotti->audit_conclusion = $request->audit_conclusion;
             $apotti->audit_recommendation = $request->audit_recommendation;
+            $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->save();
 
             return ['status' => 'success', 'data' => 'Update Successfully'];
@@ -520,7 +526,7 @@ class ApottiService
             }
 
             /*where('apotti_type', $apotti_type)*/
-            $apotti_list = $query->with(['apotti_items','latest_movement'])
+            $apotti_list = $query->with(['fiscal_year','apotti_items','latest_movement'])
                 ->with('apotti_status', function ($q){
                     $q->select('id','apotti_id','apotti_type')
                         ->where('qac_type', 'register')

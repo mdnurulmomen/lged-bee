@@ -13,6 +13,7 @@ use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\RAir;
 use App\Models\RAirMovement;
+use App\Models\RTemplateContent;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Carbon\Carbon;
@@ -100,13 +101,15 @@ class AuditAIRReportService
     public function storeAirReport(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+
+        \DB::beginTransaction();
         try {
             $office_db_con_response = $this->switchOffice($cdesk->office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-//            return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
+            //return ['status' => 'success', 'data' => ['data' => $contents]];
 
             $airData = [
                 'report_type' => 'generated',
@@ -135,6 +138,26 @@ class AuditAIRReportService
                 $airId = $storeAirData->id;
             }
 
+            //delete template content
+            $air_type = $request->status.'_air';
+            RTemplateContent::where('relational_id',$airId)->where('template_type',$air_type)->delete();
+
+            //template content
+            $contents = [];
+            $content_list = gzuncompress(getDecryptedData(($request->air_description)));
+            foreach (json_decode($content_list,true) as $content){
+                if ($content['content_key'] != 'audit_porisisto_details'){
+                    array_push($contents,[
+                        'relational_id' => $airId,
+                        'template_type' => $air_type,
+                        'content_key' => $content['content_key'],
+                        'content_value' => base64_encode($content['content']),
+                    ]);
+                }
+            }
+            RTemplateContent::insert($contents);
+
+
             //for apotti
             if (!empty($request->apottis)) {
                 Apotti::whereIn('id', $request->all_apottis)->update(['air_generate_type' => null]);
@@ -153,9 +176,11 @@ class AuditAIRReportService
                     ApottiRAirMap::insert($mappingData);
                 }
             }
-
+            \DB::commit();
             return ['status' => 'success', 'data' => ['air_id' => $airId]];
+
         } catch (\Exception $exception) {
+            \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
