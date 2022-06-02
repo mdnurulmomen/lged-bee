@@ -452,8 +452,10 @@ class ApottiService
         }
         try {
             //apotti item
-            ApottiItem::where('apotti_id',$request->apotti_id)
-                ->update(['jorito_ortho_poriman' => $request->total_jorito_ortho_poriman]);
+            $jorito_ortho_porimans = $request->jorito_ortho_porimans;
+            foreach ($request->apotti_items as $key => $value){
+                ApottiItem::where('id',$value)->update(['jorito_ortho_poriman' => $jorito_ortho_porimans[$key]]);
+            }
 
             //apotti
             $apotti = Apotti::find($request->apotti_id);
