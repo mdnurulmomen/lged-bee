@@ -486,7 +486,8 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $request->apottis)->get()->toArray();
+            $apottis = json_decode($request->apottis);
+            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $apottis)->get()->toArray();
             return ['status' => 'success', 'data' => $apotti_items];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
