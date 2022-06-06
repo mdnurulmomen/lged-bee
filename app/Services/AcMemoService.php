@@ -293,22 +293,23 @@ class AcMemoService
 
             $audit_memo->save();
 
-
-
             $porisistos = [];
-            foreach ($request->porisisto_details as $key=>$porisisto){
-                array_push($porisistos, array(
-                        'ac_memo_id' => $request->memo_id,
-                        'details' => $porisisto,
-                        'sequence' => $key + 1,
-                        'created_by' => $cdesk->officer_id
-                    )
-                );
+            if (isset($request->porisisto_details)){
+                foreach ($request->porisisto_details as $key=>$porisisto){
+                    array_push($porisistos, array(
+                            'ac_memo_id' => $request->memo_id,
+                            'details' => $porisisto,
+                            'sequence' => $key + 1,
+                            'created_by' => $cdesk->officer_id
+                        )
+                    );
+                }
+                if (!empty($porisistos)) {
+                    AcMemoPorisishto::where('ac_memo_id',$request->memo_id)->delete();
+                    AcMemoPorisishto::insert($porisistos);
+                }
             }
-            if (!empty($porisistos)) {
-                AcMemoPorisishto::where('ac_memo_id',$request->memo_id)->delete();
-                AcMemoPorisishto::insert($porisistos);
-            }
+
 
             //for attachments
             $finalAttachments = [];
@@ -444,75 +445,6 @@ class AcMemoService
                         'memo_cc' => $request->memo_cc,
                         'issued_by' => $request->issued_by,
                     ]);
-
-                $apotti_sequence = Apotti::where('fiscal_year_id', $memo['fiscal_year_id'])
-                    ->where('parent_office_id', $memo['parent_office_id'])
-                    ->max('apotti_sequence');
-
-                $apotti = new Apotti();
-                $apotti->audit_plan_id = $memo['audit_plan_id'];
-                $apotti->onucched_no = $apotti_sequence + 1;
-                $apotti->apotti_title = $memo['memo_title_bn'];
-                $apotti->apotti_description = $memo['memo_description_bn'];
-                $apotti->ministry_id = $memo['ministry_id'];
-                $apotti->ministry_name_en = $memo['ministry_name_en'];
-                $apotti->ministry_name_bn = $memo['ministry_name_en'];
-                $apotti->parent_office_id = $memo['parent_office_id'];
-                $apotti->parent_office_name_en = $memo['parent_office_name_en'];
-                $apotti->parent_office_name_bn = $memo['parent_office_name_bn'];
-                $apotti->fiscal_year_id = $memo['fiscal_year_id'];
-                $apotti->response_of_rpu = $memo['response_of_rpu'];
-                $apotti->irregularity_cause = $memo['irregularity_cause'];
-                $apotti->audit_conclusion = $memo['audit_conclusion'];
-                $apotti->audit_recommendation = $memo['audit_recommendation'];
-                $apotti->total_jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
-                $apotti->total_onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
-                $apotti->created_by = $cdesk->officer_id;
-                $apotti->approve_status = 1;
-                $apotti->status = 0;
-                $apotti->apotti_sequence = $apotti_sequence + 1;
-                $apotti->is_combined = 0;
-                $apotti->save();
-
-                $apotti_item = new ApottiItem();
-                $apotti_item->apotti_id = $apotti->id;
-                $apotti_item->memo_id = $memo['id'];
-                $apotti_item->onucched_no = $apotti_sequence + 1;
-                $apotti_item->memo_irregularity_type = $memo['memo_irregularity_type'];
-                $apotti_item->memo_irregularity_sub_type = $memo['memo_irregularity_sub_type'];
-                $apotti_item->ministry_id = $memo['ministry_id'];
-                $apotti_item->ministry_name_en = $memo['ministry_name_en'];
-                $apotti_item->ministry_name_bn = $memo['ministry_name_en'];
-                $apotti_item->parent_office_id = $memo['parent_office_id'];
-                $apotti_item->parent_office_name_en = $memo['parent_office_name_en'];
-                $apotti_item->parent_office_name_bn = $memo['parent_office_name_bn'];
-                $apotti_item->cost_center_id = $memo['cost_center_id'];
-                $apotti_item->cost_center_name_en = $memo['cost_center_name_en'];
-                $apotti_item->cost_center_name_bn = $memo['cost_center_name_bn'];
-                $apotti_item->fiscal_year_id = $memo['fiscal_year_id'];
-                $apotti_item->audit_year_start = $memo['audit_year_start'];
-                $apotti_item->audit_year_end = $memo['audit_year_end'];
-                $apotti_item->ac_query_potro_no = $memo['ac_query_potro_no'];
-                $apotti_item->ap_office_order_id = $memo['ap_office_order_id'];
-                $apotti_item->audit_plan_id = $memo['audit_plan_id'];
-                $apotti_item->audit_type = $memo['audit_type'];
-                $apotti_item->team_id = $memo['team_id'];
-                $apotti_item->memo_title_bn = $memo['memo_title_bn'];
-                $apotti_item->memo_description_bn = $memo['memo_description_bn'];
-                $apotti_item->memo_title_bn = $memo['memo_title_bn'];
-                $apotti_item->memo_type = $memo['memo_type'];
-                $apotti_item->memo_status = $memo['memo_status'];
-                $apotti_item->response_of_rpu = $memo['response_of_rpu'];
-                $apotti_item->irregularity_cause = $memo['irregularity_cause'];
-                $apotti_item->audit_conclusion = $memo['audit_conclusion'];
-                $apotti_item->audit_recommendation = $memo['audit_recommendation'];
-                $apotti_item->jorito_ortho_poriman = $memo['jorito_ortho_poriman'];
-                $apotti_item->onishponno_jorito_ortho_poriman = $memo['onishponno_jorito_ortho_poriman'];
-                $apotti_item->created_by = $cdesk->officer_id;
-                $apotti_item->status = 0;
-                $apotti_item->save();
-
-                \DB::commit();
                 return ['status' => 'success', 'data' => 'Send Successfully'];
             } else {
                 throw new \Exception(json_encode($send_audit_memo_to_rpu));
