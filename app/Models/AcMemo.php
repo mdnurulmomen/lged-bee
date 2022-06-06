@@ -92,6 +92,7 @@ class AcMemo extends Model
         'memo_cc',
         'comment',
         'has_sent_to_rpu',
+        'has_convert_to_apotti',
         'sender_officer_id',
         'sender_officer_name_bn',
         'sender_officer_name_en',
