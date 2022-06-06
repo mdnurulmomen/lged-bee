@@ -70,7 +70,6 @@ class AuditAIRReportService
             $auditTemplate = AuditTemplate::where('template_type', $request->template_type)
                 ->where('lang', 'bn')->first()->toArray();
             return ['status' => 'success', 'data' => $auditTemplate];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -139,15 +138,15 @@ class AuditAIRReportService
             }
 
             //delete template content
-            $air_type = $request->status.'_air';
-            RTemplateContent::where('relational_id',$airId)->where('template_type',$air_type)->delete();
+            $air_type = $request->status . '_air';
+            RTemplateContent::where('relational_id', $airId)->where('template_type', $air_type)->delete();
 
             //template content
             $contents = [];
             $content_list = gzuncompress(getDecryptedData(($request->air_description)));
-            foreach (json_decode($content_list,true) as $content){
-                if ($content['content_key'] != 'audit_porisisto_details'){
-                    array_push($contents,[
+            foreach (json_decode($content_list, true) as $content) {
+                if ($content['content_key'] != 'audit_porisisto_details') {
+                    array_push($contents, [
                         'relational_id' => $airId,
                         'template_type' => $air_type,
                         'content_key' => $content['content_key'],
@@ -178,7 +177,6 @@ class AuditAIRReportService
             }
             \DB::commit();
             return ['status' => 'success', 'data' => ['air_id' => $airId]];
-
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -200,29 +198,29 @@ class AuditAIRReportService
                 'modified_by' => $cdesk->officer_id,
             ];
 
-            if($request->air_description){
+            if ($request->air_description) {
                 $airData['air_description'] = $request->air_description;
             }
 
-            if($request->status){
+            if ($request->status) {
                 $airData['status'] = $request->status;
             }
 
-            if($request->approved_date){
-                $airData['approved_date'] = date('Y-m-d',strtotime($request->approved_date));
+            if ($request->approved_date) {
+                $airData['approved_date'] = date('Y-m-d', strtotime($request->approved_date));
             }
 
-            if($request->is_bg_press){
+            if ($request->is_bg_press) {
                 $airData['is_bg_press'] = $request->is_bg_press;
             }
 
-            if($request->is_printing_done){
+            if ($request->is_printing_done) {
                 $airData['is_printing_done'] = $request->is_printing_done;
-                $map_apottis = ApottiRAirMap::where('rairs_id',$request->air_id)->pluck('apotti_id');
+                $map_apottis = ApottiRAirMap::where('rairs_id', $request->air_id)->pluck('apotti_id');
 
-               $approved_apottis =  ApottiStatus::whereIn('apotti_id',$map_apottis)
-                    ->where('apotti_type','approved')
-                    ->where('qac_type','cqat')
+                $approved_apottis =  ApottiStatus::whereIn('apotti_id', $map_apottis)
+                    ->where('apotti_type', 'approved')
+                    ->where('qac_type', 'cqat')
                     ->pluck('apotti_id');
 
                 $rpu_data['directorate_id'] = $office_id;
@@ -231,25 +229,25 @@ class AuditAIRReportService
                 $send_status_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.apotti_final_status_update_to_rpu'), $rpu_data)->json();
             }
 
-            if($request->comment){
+            if ($request->comment) {
                 $airData['comment'] = $request->comment;
             }
 
-            if($request->approval_status){
+            if ($request->approval_status) {
                 $airData['approval_status'] = $request->approval_status;
             }
 
-            if($request->final_approval_status){
+            if ($request->final_approval_status) {
                 $airData['final_approval_status'] = $request->final_approval_status;
             }
 
-            if($request->qac_report_date){
+            if ($request->qac_report_date) {
                 $airData['qac_report_date'] = $request->qac_report_date;
             }
 
-            RAir::where('id',$request->air_id)->update($airData);
+            RAir::where('id', $request->air_id)->update($airData);
 
-//            $response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
+            //            $response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
 
             return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
@@ -257,21 +255,21 @@ class AuditAIRReportService
         }
     }
 
-//    public function sendApottiStatusToRpu($air_id,$cdesk_info){
-//        try {
-//            $office_db_con_response = $this->switchOffice($cdesk_info->office_id);
-//            if (!isSuccessResponse($office_db_con_response)) {
-//                return ['status' => 'error', 'data' => $office_db_con_response];
-//            }
-//
-//            $auditTeamMembers = ApottiRAirMap::where('rairs_id',$air_id)->get()->toArray();
-//
-//            return $auditTeamMembers;
-//
-//        } catch (\Exception $exception) {
-//            return ['status' => 'error', 'data' => $exception->getMessage()];
-//        }
-//    }
+    //    public function sendApottiStatusToRpu($air_id,$cdesk_info){
+    //        try {
+    //            $office_db_con_response = $this->switchOffice($cdesk_info->office_id);
+    //            if (!isSuccessResponse($office_db_con_response)) {
+    //                return ['status' => 'error', 'data' => $office_db_con_response];
+    //            }
+    //
+    //            $auditTeamMembers = ApottiRAirMap::where('rairs_id',$air_id)->get()->toArray();
+    //
+    //            return $auditTeamMembers;
+    //
+    //        } catch (\Exception $exception) {
+    //            return ['status' => 'error', 'data' => $exception->getMessage()];
+    //        }
+    //    }
 
     public function getAuditTeam(Request $request): array
     {
@@ -282,16 +280,22 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $auditTeamMembers = AuditVisitCalenderPlanMember::distinct()
-                ->select('team_member_name_bn', 'team_member_name_en', 'team_member_designation_bn',
-                    'team_member_designation_en', 'team_member_role_bn', 'team_member_role_en', 'mobile_no',
-                    'employee_grade')
+                ->select(
+                    'team_member_name_bn',
+                    'team_member_name_en',
+                    'team_member_designation_bn',
+                    'team_member_designation_en',
+                    'team_member_role_bn',
+                    'team_member_role_en',
+                    'mobile_no',
+                    'employee_grade'
+                )
                 ->where('audit_plan_id', $request->audit_plan_id)
                 ->where('annual_plan_id', $request->annual_plan_id)
                 ->orderBy('employee_grade', 'ASC')
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamMembers];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -310,7 +314,6 @@ class AuditAIRReportService
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamSchedule];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -325,10 +328,10 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $auditApottis = Apotti::select('id','audit_plan_id','apotti_title','apotti_description','apotti_type','onucched_no','total_jorito_ortho_poriman','total_onishponno_jorito_ortho_poriman','response_of_rpu','irregularity_cause','audit_conclusion','audit_recommendation','apotti_sequence','air_generate_type')
-                ->where('fiscal_year_id',$request->fiscal_year_id)
-                ->where('audit_plan_id',$request->audit_plan_id)
-                ->where('parent_office_id',$request->entity_id);
+            $auditApottis = Apotti::select('id', 'audit_plan_id', 'apotti_title', 'apotti_description', 'apotti_type', 'onucched_no', 'total_jorito_ortho_poriman', 'total_onishponno_jorito_ortho_poriman', 'response_of_rpu', 'irregularity_cause', 'audit_conclusion', 'audit_recommendation', 'apotti_sequence', 'air_generate_type')
+                ->where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('audit_plan_id', $request->audit_plan_id)
+                ->where('parent_office_id', $request->entity_id);
 
             if ($request->air_type == 'preliminary') {
                 $auditApottis = $auditApottis->whereNull('air_generate_type');
@@ -341,7 +344,6 @@ class AuditAIRReportService
                 ->get()->toArray();
 
             return ['status' => 'success', 'data' => $responseData];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -357,7 +359,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $preliminaryAir = RAir::with(['r_air_child','r_air_child.latest_r_air_movement','ap_entities','qac_committee.committee.qac_committee_members','fiscal_year'])->where('id',$request->air_id)->first()->toArray();
+            $preliminaryAir = RAir::with(['r_air_child', 'r_air_child.latest_r_air_movement', 'ap_entities', 'qac_committee.committee.qac_committee_members', 'fiscal_year'])->where('id', $request->air_id)->first()->toArray();
             $responseData['rAirInfo'] = $preliminaryAir;
 
             if ($request->qac_type == 'qac-1') {
@@ -377,10 +379,10 @@ class AuditAIRReportService
                 $responseData['apottiList'] = ApottiRAirMap::with(['apotti_map_data', 'apotti_map_data.apotti_items', 'apotti_map_data.apotti_status'])
                     ->whereHas('apotti_map_data', function ($q) {
                         $q->where('apotti_type', 'draft')->orWhere('apotti_type', 'approved');
-//                            ->where(function($query){
-//                                $query->where('final_status','draft')
-//                                    ->orWhere('final_status','approved');
-//                            });
+                        //                            ->where(function($query){
+                        //                                $query->where('final_status','draft')
+                        //                                    ->orWhere('final_status','approved');
+                        //                            });
                     })
                     ->where('rairs_id', $preliminaryAir['r_air_child']['id'])
                     ->get()
@@ -391,7 +393,6 @@ class AuditAIRReportService
             //$qac01Apottis = ApottiRAirMap::where('rairs_id',$preliminaryAir['r_air_child']['id'])->pluck('apotti_id');
             //$responseData['apottiList'] = Apotti::with(['apotti_items','apotti_status'])->whereIn('id',$qac01Apottis)->get()->toArray();
             return ['status' => 'success', 'data' => $responseData];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -422,7 +423,6 @@ class AuditAIRReportService
             $apottiList = $apottiList->get()->toArray();
 
             return ['status' => 'success', 'data' => $apottiList];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -450,7 +450,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $apottiList];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -472,7 +471,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $auditApottis];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -487,7 +485,7 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $apottis = json_decode($request->apottis);
-            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $apottis)->get()->toArray();
+            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $apottis)->paginate(5);
             return ['status' => 'success', 'data' => $apotti_items];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -505,7 +503,14 @@ class AuditAIRReportService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
             $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)->where('is_delete', 0)->pluck('apotti_id');
-            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $qacApottis)->get()->toArray();
+            $apotti_items = ApottiItem::with(['porisishtos'])->whereIn('apotti_id', $qacApottis);
+            if ($request->all && $request->all == 1) {
+                $apotti_items = $apotti_items->get()->toArray();
+            } else {
+                $apotti_items = $apotti_items->paginate($request->per_page ?: 5);
+            }
+
+
             return ['status' => 'success', 'data' => $apotti_items];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -607,9 +612,9 @@ class AuditAIRReportService
                 } elseif ($request->air_type == 'qac-2') {
                     $newAirType = 'cqat';
                 }
-//                elseif ($request->air_type == 'cqat'){
-//                    $newAirType = 'final';
-//                }
+                //                elseif ($request->air_type == 'cqat'){
+                //                    $newAirType = 'final';
+                //                }
 
                 $rAirData = RAir::where('id', $request->r_air_id)->first()->toArray();
                 $airData = [
@@ -669,7 +674,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $lastAirMovementInfo];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -701,7 +705,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $airList];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -737,7 +740,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $airList];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -759,7 +761,6 @@ class AuditAIRReportService
                 ->update(['is_delete' => $request->is_delete]);
 
             return ['status' => 'success', 'data' => []];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -787,7 +788,6 @@ class AuditAIRReportService
             $apotti_status->save();
 
             return ['status' => 'success', 'data' => 'Approved For Final Report'];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -866,7 +866,6 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $airList];
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
