@@ -290,13 +290,18 @@ class ApottiService
 
             $apotti_item_info = ApottiItem::find($request->apotti_item_id);
 
+            $latest_onucched_no = Apotti::where('audit_plan_id',$apotti_item_info->audit_plan_id)
+                ->where('parent_office_id',$apotti_item_info->parent_office_id)
+                ->max('onucched_no');
+
             $amount_update = Apotti::find($apotti_item_info->apotti_id);
             $amount_update->total_jorito_ortho_poriman = $amount_update->total_jorito_ortho_poriman - $apotti_item_info->jorito_ortho_poriman;
             $amount_update->total_onishponno_jorito_ortho_poriman = $amount_update->total_onishponno_jorito_ortho_poriman - $apotti_item_info->onishponno_jorito_ortho_poriman;
             $amount_update->save();
 
             $apotti = new Apotti();
-            $apotti->onucched_no = 1;
+            $apotti->onucched_no = $latest_onucched_no + 1;
+            $apotti->audit_plan_id = $apotti_item_info->audit_plan_id;
             $apotti->apotti_title = $apotti_item_info->memo_title_bn;
             $apotti->apotti_description = $apotti_item_info->memo_description_bn;
             $apotti->ministry_id = $apotti_item_info->ministry_id;
@@ -311,7 +316,7 @@ class ApottiService
             $apotti->created_by = $cdesk->officer_id;
             $apotti->approve_status = 1;
             $apotti->status = 0;
-            $apotti->apotti_sequence = 0;
+            $apotti->apotti_sequence = $latest_onucched_no + 1;
             $apotti->is_combined = 0;
             $apotti->save();
 
