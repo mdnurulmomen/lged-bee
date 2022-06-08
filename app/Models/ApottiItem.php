@@ -72,4 +72,9 @@ class ApottiItem extends Model
     {
         return $this->hasMany(AcMemoPorisishto::class, 'ac_memo_id', 'memo_id');
     }
+
+    public function apotti(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Apotti::class, 'apotti_id', 'id');
+    }
 }
