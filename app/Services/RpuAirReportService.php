@@ -16,6 +16,8 @@ use App\Traits\GenericData;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class RpuAirReportService
 {
@@ -199,6 +201,18 @@ class RpuAirReportService
         \DB::beginTransaction();
         try {
             //for broadsheet reply
+//            return ['status' => 'success', 'data' => $request->all()];
+
+            if ($request->hasfile('broad_sheet_hard_copy')) {
+                $file = $request->broad_sheet_hard_copy;
+                $fileExtension = $file->extension();
+                $file_name = 'braod_sheet_heard_copy_' . uniqid() . '.' . $fileExtension;
+                $folder_name = $request->directorate_id;
+                Storage::disk('public')->put('broad_sheet_hard_copy/' . $folder_name . '/' . $file_name, File::get($file));
+
+                $file_path = 'storage/broad_sheet_hard_copy/' . $folder_name . '/' . $file_name;
+            }
+
             $broadSheetReply =  new BroadSheetReply();
             $broadSheetReply->id = $request->broadsheet_reply_id;
             $broadSheetReply->memorandum_no = $request->memorandum_no;
@@ -219,12 +233,13 @@ class RpuAirReportService
             $broadSheetReply->ministry_id = $request->ministry_id;
             $broadSheetReply->ministry_name_en = $request->ministry_name_en;
             $broadSheetReply->ministry_name_bn = $request->ministry_name_bn;
+            $broadSheetReply->broad_sheet_hard_copy = isset($file_path) ? $file_path : null;
             $broadSheetReply->save();
 
             //broadsheet reply item
             $finalAttachments = [];
             //return ['status' => 'success', 'data' => $request->apottiItems];
-            foreach ($request->apottiItems as $apottiItem){
+            foreach (json_decode($request->apottiItems,true) as $apottiItem){
                 $broadSheetReplyItem =  new BroadSheetReplyItem();
                 $broadSheetReplyItem->broad_sheet_reply_id = $request->broadsheet_reply_id;
                 $broadSheetReplyItem->apotti_id = $apottiItem['apotti_id'];
