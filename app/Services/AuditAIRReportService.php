@@ -247,7 +247,22 @@ class AuditAIRReportService
 
             RAir::where('id', $request->air_id)->update($airData);
 
-            //            $response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
+            //template content
+            /*$contents = [];
+            $content_list = gzuncompress(getDecryptedData(($request->air_description)));
+            foreach (json_decode($content_list, true) as $content) {
+                if ($content['content_key'] != 'audit_porisisto_details') {
+                    array_push($contents, [
+                        'relational_id' => $request->air_id,
+                        'template_type' => '',
+                        'content_key' => $content['content_key'],
+                        'content_value' => base64_encode($content['content']),
+                    ]);
+                }
+            }
+            RTemplateContent::insert($contents);*/
+
+            //$response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
 
             return ['status' => 'success', 'data' => ['air_id' => $request->all()]];
         } catch (\Exception $exception) {
@@ -314,6 +329,29 @@ class AuditAIRReportService
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $auditTeamSchedule];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getAirWiseContentKey(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $contents = RTemplateContent::where('relational_id', $request->relational_id)
+                ->where('template_type', $request->template_type)
+                ->get();
+
+            $result = [];
+            foreach ($contents as $content){
+                $result[$content['content_key']] = base64_decode($content['content_value']);
+            }
+
+            return ['status' => 'success', 'data' => $result];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
