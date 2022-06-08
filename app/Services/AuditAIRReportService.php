@@ -505,7 +505,9 @@ class AuditAIRReportService
             $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)->where('is_delete', 0)->pluck('apotti_id');
             $apotti_items = ApottiItem::with(['apotti:id,onucched_no','porisishtos'])
                 ->whereIn('apotti_id', $qacApottis)
-                ->orderBy('apotti.onucched_no', 'ASC');
+                ->orderBy(Apotti::select('onucched_no')
+                    ->whereColumn('apottis.id', 'apotti_items.apotti_id')
+                );
             if ($request->all && $request->all == 1) {
                 $apotti_items = $apotti_items->get()->toArray();
             } else {
