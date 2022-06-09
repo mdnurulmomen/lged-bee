@@ -148,7 +148,9 @@ class ArchiveApottiReportService
     public function view(Request $request)
     {
         try {
-            $report = ArcReport::where('id', $request->report_id)->first()->toArray();
+            $report = ArcReport::with('archive_apottis','arc_report_attachment')
+                ->find($request->report_id);
+
             return ['status' => 'success', 'data' => $report];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
