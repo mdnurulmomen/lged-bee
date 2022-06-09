@@ -62,4 +62,14 @@ class ArchiveApottiReportController extends Controller
         return response()->json($response);
     }
 
+    public function reportApottiDelete(Request $request, ArchiveApottiReportService $archiveApottiReportService): \Illuminate\Http\JsonResponse
+    {
+        $apotti = $archiveApottiReportService->reportApottiDelete($request);
+        if (isSuccessResponse($apotti)) {
+            $response = responseFormat('success', $apotti['data']);
+        } else {
+            $response = responseFormat('error', $apotti['data']);
+        }
+        return response()->json($response);
+    }
 }

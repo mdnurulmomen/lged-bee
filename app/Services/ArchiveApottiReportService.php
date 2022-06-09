@@ -554,4 +554,14 @@ class ArchiveApottiReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function reportApottiDelete(Request $request)
+    {
+        try {
+            ArcReportApotti::find($request->apotti_id)->delete();
+            return ['status' => 'success', 'data' => 'Apotti Delete Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
 }
