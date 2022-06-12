@@ -72,4 +72,15 @@ class ArchiveApottiReportController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getArcReportApottiInfo(Request $request, ArchiveApottiReportService $archiveApottiReportService): \Illuminate\Http\JsonResponse
+    {
+        $apotti = $archiveApottiReportService->getArcReportApottiInfo($request);
+        if (isSuccessResponse($apotti)) {
+            $response = responseFormat('success', $apotti['data']);
+        } else {
+            $response = responseFormat('error', $apotti['data']);
+        }
+        return response()->json($response);
+    }
 }

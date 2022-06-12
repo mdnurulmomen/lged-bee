@@ -290,6 +290,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store-report-apotti', [ArchiveApottiReportController::class, 'storeReportApotii']);
         Route::post('report-sync', [ArchiveApottiReportController::class, 'reportSync']);
         Route::post('report-apotti-delete', [ArchiveApottiReportController::class, 'reportApottiDelete']);
+        Route::post('get-arc-report-apotti-info', [ArchiveApottiReportController::class, 'getArcReportApottiInfo']);
     });
 
     //audit template

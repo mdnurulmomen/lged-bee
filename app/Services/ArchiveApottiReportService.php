@@ -163,7 +163,7 @@ class ArchiveApottiReportService
         try {
             $cdesk = json_decode($request->cdesk, false);
 
-            $arc_report_apotti = new ArcReportApotti();
+            $arc_report_apotti = $request->id ? ArcReportApotti::find($request->id) : new ArcReportApotti();
             $arc_report_apotti->report_id = $request->report_id;
             $arc_report_apotti->audit_report_name = $request->audit_report_name;
             $arc_report_apotti->directorate_id = $request->directorate_id;
@@ -564,4 +564,16 @@ class ArchiveApottiReportService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function getArcReportApottiInfo(Request $request)
+    {
+        try {
+            $apotti_info = ArcReportApotti::find($request->apotti_id);
+            return ['status' => 'success', 'data' => $apotti_info];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+
 }
