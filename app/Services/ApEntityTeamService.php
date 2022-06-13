@@ -189,7 +189,8 @@ class ApEntityTeamService
         $team_schedules = $team_schedules['schedule'];
         DB::beginTransaction();
         try {
-            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
+            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id, $request->annual_plan_id);
+            \Log::info($saveSchedule);
             if (isSuccessResponse($saveSchedule)) {
                 $data = ['status' => 'success', 'data' => 'successfully saved'];
             } else {
@@ -208,7 +209,7 @@ class ApEntityTeamService
 
     }
 
-    public function saveTeamSchedule($team_schedules, $audit_plan_id)
+    public function saveTeamSchedule($team_schedules, $audit_plan_id, $annual_plan_id)
     {
         try {
             DB::beginTransaction();
@@ -219,10 +220,14 @@ class ApEntityTeamService
 
                 if($office_order){
                     $team_data = AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id', $audit_plan_id)
-                        ->where('leader_designation_id', $designation_id)->first();
+                        ->where('annual_plan_id', $annual_plan_id)
+                        ->where('leader_designation_id', $designation_id)
+                        ->first();
                 }else{
                     $team_data = AuditVisitCalendarPlanTeam::where('audit_plan_id', $audit_plan_id)
-                        ->where('leader_designation_id', $designation_id)->first();
+                        ->where('annual_plan_id', $annual_plan_id)
+                        ->where('leader_designation_id', $designation_id)
+                        ->first();
                 }
 
                 if (!$team_data) {
@@ -311,13 +316,18 @@ class ApEntityTeamService
         DB::beginTransaction();
         try {
 
-            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->where('approved_status','approved')->count();
+            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)
+                ->where('annual_plan_id',$request->annual_plan_id)
+                ->where('approved_status','approved')
+                ->count();
 
             if (!$office_order) {
-                AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)->delete();
+                AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)
+                    ->where('annual_plan_id',$request->annual_plan_id)
+                    ->delete();
             }
 
-            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id);
+            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id, $request->annual_plan_id);
             if (isSuccessResponse($saveSchedule)) {
                 $data = ['status' => 'success', 'data' => 'successfully saved'];
             } else {
