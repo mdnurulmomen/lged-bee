@@ -88,13 +88,12 @@ class RpuAirReportService
                     $air_info->save();
 
                     //tagid potro send
-                    $tagidPotroSendingDays = XDefaultSetting::select('setting_value')
+                    /*$tagidPotroSendingDays = XDefaultSetting::select('setting_value')
                         ->where('setting_key','tagid_potro_sending_days')
                         ->where('is_active',1)
                         ->first()
                         ->toArray();
 
-                    //tagid potro
                     $tagid_potro_task_data = [
                         'task_title_en' => $air_info->report_name.' এ তাগিদ পত্র প্রেরণ করুন',
                         'task_title_bn' => $air_info->report_name.' এ তাগিদ পত্র প্রেরণ করুন',
@@ -107,16 +106,15 @@ class RpuAirReportService
                             "unit" => "days",
                         ]]),
                     ];
-                    //(new AmmsPonjikaServices())->createTask($tagid_potro_task_data, $cdesk);
+                    (new AmmsPonjikaServices())->createTask($tagid_potro_task_data, $cdesk);*/
 
                     //do letter sent
-                    $doLetterSendingDays = XDefaultSetting::select('setting_value')
+                    /*$doLetterSendingDays = XDefaultSetting::select('setting_value')
                         ->where('setting_key','do_letter_sending_days')
                         ->where('is_active',1)
                         ->first()
                         ->toArray();
 
-                    //do letter
                     $do_letter_task_data = [
                         'task_title_en' => $air_info->report_name.' এ ডিও লেটার প্রেরণ করুন',
                         'task_title_bn' => $air_info->report_name.' এ ডিও লেটার প্রেরণ করুন',
@@ -129,40 +127,40 @@ class RpuAirReportService
                             "unit" => "days",
                         ]]),
                     ];
-                    //(new AmmsPonjikaServices())->createTask($do_letter_task_data, $cdesk);
+                    (new AmmsPonjikaServices())->createTask($do_letter_task_data, $cdesk);*/
 
 
                     //status review send
                     $status_review_days = XDefaultSetting::select('setting_value')
                         ->where('setting_key','status_review_days')
                         ->where('is_active',1)
-                        ->first()
-                        ->toArray();
+                        ->first();
 
                     RAir::where('id',$request->air_id)->update([
                         'issue_date'=> Carbon::now()->format('Y-m-d')
                     ]);
 
                     Apotti::whereIn('id',$apotti_map_list)->update([
+                        'is_sent_rp'=> 1,
                         'air_issue_date'=> Carbon::now()->format('Y-m-d'),
-                        'status_review_date'=> Carbon::now()->addDays($status_review_days['setting_value'])->format('Y-m-d')
+                        'status_review_date'=> Carbon::now()->addDays($status_review_days->setting_value)->format('Y-m-d')
                     ]);
 
-                    foreach ($apotti_list as $apotti){
+                    /*foreach ($apotti_list as $apotti){
                         $status_review_data = [
                             'task_title_en' => 'আপত্তি পর্যালোচনা করুন ('.$apotti->apotti_title.')',
                             'task_title_bn' => 'আপত্তি পর্যালোচনা করুন ('.$apotti->apotti_title.')',
                             'description' => '',
                             'meta_data' => base64_encode(json_encode(['apotti_id' => $apotti->id, 'return_url' => ''])),
-                            'task_start_end_date_time' => Carbon::now()->addDays($status_review_days['setting_value'])->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDays($status_review_days['setting_value'])->format('d/m/Y H:i A'),
+                            'task_start_end_date_time' => Carbon::now()->addDays($status_review_days->setting_value)->format('d/m/Y H:i A') . ' - ' . Carbon::now()->addDays($status_review_days->setting_value)->format('d/m/Y H:i A'),
                             'notifications' => json_encode([[
                                 "medium" => "email",
                                 "interval" => "1",
                                 "unit" => "days",
                             ]]),
                         ];
-                        //(new AmmsPonjikaServices())->createTask($status_review_data, $cdesk);
-                    }
+                        (new AmmsPonjikaServices())->createTask($status_review_data, $cdesk);
+                    }*/
 
                     return ['status' => 'success', 'data' => 'Air Send Successfully'];
                 }

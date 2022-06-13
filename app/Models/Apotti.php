@@ -60,6 +60,7 @@ class Apotti extends Model
         'final_status',
         'air_issue_date',
         'status_review_date',
+        'is_sent_rp',
     ];
 
 //    protected static function boot() {
