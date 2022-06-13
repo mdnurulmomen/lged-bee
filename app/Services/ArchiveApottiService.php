@@ -138,7 +138,7 @@ class ArchiveApottiService
         try {
             $cdesk = json_decode($request->cdesk, false);
 
-            $arc_apotti = new ArcApotti();
+            $arc_apotti = $request->id ? ArcApotti::find($request->id) : new ArcApotti();
             $arc_apotti->onucched_no = $request->onucched_no;
             $arc_apotti->apotti_oniyomer_dhoron = $request->apotti_oniyomer_category_child_id;
             $arc_apotti->directorate_id  = $request->directorate_id;
