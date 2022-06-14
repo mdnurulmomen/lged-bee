@@ -61,6 +61,12 @@ class ApottiSearchService
                 return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
             });
 
+            //file_token_no
+            $file_token_no = $request->file_token_no;
+            $query->when($file_token_no, function ($query) use ($file_token_no) {
+                return $query->where('file_token_no', $file_token_no);
+            });
+
             $apotti_list = $query->where('is_sent_rp', 1)->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $apotti_list];
         } catch (\Exception $exception) {
