@@ -59,8 +59,7 @@ class ApottiSearchService
                 return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
             });
 
-            $query = $query->where('is_sent_rp', 1);
-            $apotti_list = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $apotti_list = $query->where('is_sent_rp', 1)->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $apotti_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
