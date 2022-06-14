@@ -59,8 +59,27 @@ class ApottiSearchService
                 return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
             });
 
+            $query = $query->where('is_sent_rp', 1);
             $apotti_list = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $apotti_list];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+
+    public function view(Request $request)
+    {
+        try {
+            $office_db_con_response = $this->switchOffice($request->directorate_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $apotti = Apotti::with(['fiscal_year:id,start,end'])
+                ->with(['apotti_items.apotti_attachment'])
+                ->where('id',$request->apotti_id)
+                ->first();
+            return ['status' => 'success', 'data' => $apotti];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
