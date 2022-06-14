@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\AcMemoAttachment;
 use App\Models\Apotti;
+use App\Models\ApottiItem;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
@@ -77,8 +79,15 @@ class ApottiSearchService
             $apotti = Apotti::with(['fiscal_year:id,start,end'])
                 ->with(['apotti_items.apotti_attachment'])
                 ->where('id',$request->apotti_id)
-                ->first();
-            return ['status' => 'success', 'data' => $apotti];
+                ->first()
+                ->toArray();
+
+            $memo_ids = ApottiItem::where('apotti_id',$apotti['id'])->pluck('memo_id');
+            $attachments = AcMemoAttachment::whereIn('ac_memo_id',$memo_ids)->get()->toArray();
+
+            $data['apotti'] = $apotti;
+            $data['attachments'] = $attachments;
+            return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
