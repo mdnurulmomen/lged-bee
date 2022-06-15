@@ -330,6 +330,9 @@ class ArchiveApottiService
             $data['porisishto_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
                 ->where('attachment_type','porisishto')->get()->toArray();
 
+            $data['other_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
+                ->where('attachment_type','other')->get()->toArray();
+
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
