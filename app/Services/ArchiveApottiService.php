@@ -318,11 +318,19 @@ class ArchiveApottiService
     public function edit(Request $request)
     {
         try {
-            $apotti = ArcApotti::with(['oniyomer_category', 'attachments'])
-                ->where('id', $request->apotti_id)
-                ->first()
-                ->toArray();
-            return ['status' => 'success', 'data' => $apotti];
+            $data['apotti']= ArcApotti::with(['oniyomer_category'])
+                ->where('id', $request->apotti_id)->first()->toArray();
+
+            $data['main_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
+                ->where('attachment_type','main')->get()->toArray();
+
+            $data['promanok_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
+                ->where('attachment_type','promanok')->get()->toArray();
+
+            $data['porisishto_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
+                ->where('attachment_type','porisishto')->get()->toArray();
+
+            return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
