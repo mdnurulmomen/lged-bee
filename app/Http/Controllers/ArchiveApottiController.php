@@ -43,6 +43,28 @@ class ArchiveApottiController extends Controller
         return response()->json($response);
     }
 
+    public function storeNewAttachment(Request $request, ArchiveApottiService $archiveApottiService): \Illuminate\Http\JsonResponse
+    {
+        $storeAttachment = $archiveApottiService->storeNewAttachment($request);
+        if (isSuccessResponse($storeAttachment)) {
+            $response = responseFormat('success', $storeAttachment['data']);
+        } else {
+            $response = responseFormat('error', $storeAttachment['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function deleteAttachment(Request $request, ArchiveApottiService $archiveApottiService): \Illuminate\Http\JsonResponse
+    {
+        $deleteAttachment = $archiveApottiService->deleteAttachment($request);
+        if (isSuccessResponse($deleteAttachment)) {
+            $response = responseFormat('success', $deleteAttachment['data']);
+        } else {
+            $response = responseFormat('error', $deleteAttachment['data']);
+        }
+        return response()->json($response);
+    }
+
     public function update(Request $request, ArchiveApottiService $archiveApottiService): \Illuminate\Http\JsonResponse
     {
         $updateApotti = $archiveApottiService->update($request);

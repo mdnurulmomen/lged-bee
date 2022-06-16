@@ -277,6 +277,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('get-oniyomer-category-list', [ArchiveApottiController::class, 'getOniyomerCategoryList']);
         Route::post('get-parent-wise-oniyomer-category-list', [ArchiveApottiController::class, 'getParentWiseOniyomerCategory']);
         Route::post('store', [ArchiveApottiController::class, 'store']);
+        Route::post('store-new-attachment', [ArchiveApottiController::class, 'storeNewAttachment']);
+        Route::post('delete-attachment', [ArchiveApottiController::class, 'deleteAttachment']);
         Route::post('update', [ArchiveApottiController::class, 'update']);
         Route::post('list', [ArchiveApottiController::class, 'list']);
         Route::post('edit', [ArchiveApottiController::class, 'edit']);

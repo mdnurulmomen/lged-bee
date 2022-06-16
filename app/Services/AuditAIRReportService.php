@@ -146,12 +146,12 @@ class AuditAIRReportService
             $content_list = gzuncompress(getDecryptedData(($request->air_description)));
             foreach (json_decode($content_list, true) as $content) {
                 if ($content['content_key'] != 'audit_porisisto_details') {
-                    array_push($contents, [
+                    $contents[] = [
                         'relational_id' => $airId,
                         'template_type' => $air_type,
                         'content_key' => $content['content_key'],
                         'content_value' => base64_encode($content['content']),
-                    ]);
+                    ];
                 }
             }
             RTemplateContent::insert($contents);
@@ -164,10 +164,10 @@ class AuditAIRReportService
 
                 $mappingData = [];
                 foreach ($request->apottis as $apotti) {
-                    array_push($mappingData, [
+                    $mappingData[] = [
                         'apotti_id' => $apotti,
                         'rairs_id' => $airId
-                    ]);
+                    ];
                 }
 
                 if (!empty($mappingData)) {

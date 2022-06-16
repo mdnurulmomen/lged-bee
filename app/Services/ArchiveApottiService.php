@@ -197,15 +197,12 @@ class ArchiveApottiService
                     $fileName = 'top_page_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $finalAttachments,
-                        array(
-                            'apotti_id' => $arc_apotti->id,
-                            'attachment_type' => 'top_page',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => 'storage/archive/apotti/',
-                        )
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'top_page',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
                     );
                 }
             }
@@ -219,15 +216,12 @@ class ArchiveApottiService
                     $fileName = 'main_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $finalAttachments,
-                        array(
-                            'apotti_id' => $arc_apotti->id,
-                            'attachment_type' => 'main',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => 'storage/archive/apotti/',
-                        )
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'main',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
                     );
                 }
             }
@@ -241,15 +235,12 @@ class ArchiveApottiService
                     $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $finalAttachments,
-                        array(
-                            'apotti_id' => $arc_apotti->id,
-                            'attachment_type' => 'porisishto',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => 'storage/archive/apotti/',
-                        )
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'porisishto',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
                     );
                 }
             }
@@ -263,15 +254,12 @@ class ArchiveApottiService
                     $fileName = 'promanok_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $finalAttachments,
-                        array(
-                            'apotti_id' => $arc_apotti->id,
-                            'attachment_type' => 'promanok',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => 'storage/archive/apotti/',
-                        )
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'promanok',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
                     );
                 }
             }
@@ -285,15 +273,12 @@ class ArchiveApottiService
                     $fileName = 'other_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $finalAttachments,
-                        array(
-                            'apotti_id' => $arc_apotti->id,
-                            'attachment_type' => 'other',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => 'storage/archive/apotti/',
-                        )
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'other',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
                     );
                 }
             }
@@ -306,6 +291,150 @@ class ArchiveApottiService
             return ['status' => 'success', 'data' => 'Apotti Saved Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function storeNewAttachment(Request $request): array
+    {
+        \DB::beginTransaction();
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+
+            $arc_apotti = $request->id ? ArcApotti::find($request->id) : new ArcApotti();
+
+            if ($request->hasfile('cover_page')) {
+                foreach ($request->cover_page as $key => $file) {
+                    if ($key == 0) {
+                        $fileExtension = $file->extension();
+                        $fileName = 'cover_page_' . uniqid() . '.' . $fileExtension;
+                        Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                        $arc_apotti->cover_page = $fileName;
+                        $arc_apotti->cover_page_path  = 'storage/archive/apotti/';
+                        $arc_apotti->attachment_path  = 'storage/archive/apotti/';
+                    }
+                }
+            }
+
+            $arc_apotti->updated_by  = $cdesk->officer_id;
+            $arc_apotti->save();
+
+            //for attachments
+            $finalAttachments = [];
+
+            //for top page
+            if ($request->hasfile('top_page')) {
+                foreach ($request->top_page as $key => $file) {
+                    $userDefineFileName = $file->getClientOriginalName();
+                    $fileExtension = $file->extension();
+                    $fileSize = $file->getSize();
+                    $fileName = 'top_page_' . uniqid() . '.' . $fileExtension;
+
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'top_page',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
+                    );
+                }
+            }
+
+            //for main apottis
+            if ($request->hasfile('main_apottis')) {
+                foreach ($request->main_apottis as $key => $file) {
+                    $userDefineFileName = $file->getClientOriginalName();
+                    $fileExtension = $file->extension();
+                    $fileSize = $file->getSize();
+                    $fileName = 'main_' . uniqid() . '.' . $fileExtension;
+
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'main',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
+                    );
+                }
+            }
+
+            //for porisishtos
+            if ($request->hasfile('porisishtos')) {
+                foreach ($request->porisishtos as $key => $file) {
+                    $userDefineFileName = $file->getClientOriginalName();
+                    $fileExtension = $file->extension();
+                    $fileSize = $file->getSize();
+                    $fileName = 'porisishto_' . uniqid() . '.' . $fileExtension;
+
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'porisishto',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
+                    );
+                }
+            }
+
+            //for pramanoks
+            if ($request->hasfile('promanoks')) {
+                foreach ($request->promanoks as $key => $file) {
+                    $userDefineFileName = $file->getClientOriginalName();
+                    $fileExtension = $file->extension();
+                    $fileSize = $file->getSize();
+                    $fileName = 'promanok_' . uniqid() . '.' . $fileExtension;
+
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'promanok',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
+                    );
+                }
+            }
+
+            //for others
+            if ($request->hasfile('others')) {
+                foreach ($request->others as $key => $file) {
+                    $userDefineFileName = $file->getClientOriginalName();
+                    $fileExtension = $file->extension();
+                    $fileSize = $file->getSize();
+                    $fileName = 'other_' . uniqid() . '.' . $fileExtension;
+
+                    Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
+                    $finalAttachments[] = array(
+                        'apotti_id' => $arc_apotti->id,
+                        'attachment_type' => 'other',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => 'storage/archive/apotti/',
+                    );
+                }
+            }
+
+            if (!empty($finalAttachments)) {
+                ArcApottiAttachment::insert($finalAttachments);
+            }
+
+            \DB::commit();
+            return ['status' => 'success', 'data' => 'Apotti Saved Successfully'];
+        } catch (\Exception $exception) {
+            \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function deleteAttachment(Request $request): array
+    {
+        try {
+            ArcApottiAttachment::where('id', $request->attachement_id)->delete();
+            return ['status' => 'success', 'data' => 'Deleted successfully'];
+        } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
