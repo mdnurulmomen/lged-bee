@@ -768,6 +768,7 @@ class AuditAIRReportService
             $is_printing_done = $request->is_printing_done;
 
             $query = RAir::query();
+            $query->with(['reported_apotti_attachments']);
 
             $query->when($activity_id, function ($q, $activity_id) {
                 return $q->where('activity_id', $activity_id);
@@ -804,6 +805,7 @@ class AuditAIRReportService
             $entity_id = $request->entity_id;
 
             $query = RAir::query();
+            $query->with(['reported_apotti_cover_page:id,report_id,cover_page_name,attachment_path']);
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
                 return $q->where('fiscal_year_id', $fiscal_year_id);
@@ -823,6 +825,37 @@ class AuditAIRReportService
                 ->toArray();
 
             return ['status' => 'success', 'data' => $airList];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getAuditFinalReportDetails(Request $request): array
+    {
+        $office_id = $request->office_id;
+
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)
+                ->where('is_delete', 0)->pluck('apotti_id');
+
+            $data['apotti_list'] = ApottiStatus::with('apotti')->whereIn('apotti_id', $qacApottis)
+                ->where('qac_type', 'cqat')
+                ->where('apotti_type', 'approved')
+                ->get()
+                ->toArray();
+
+            $data['r_air'] = RAir::with(['fiscal_year','reported_apotti_attachments'])
+                ->where('id', $request->air_id)
+                ->first()
+                ->toArray();
+
+            return ['status' => 'success', 'data' => $data];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

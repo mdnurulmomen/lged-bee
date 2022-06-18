@@ -73,8 +73,13 @@ class RAir extends Model
 
     }
 
+    public function reported_apotti_cover_page(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ReportedApottiAttachment::class, 'report_id','id')->whereNull('attachment_name')->whereNotNull('cover_page_name');
+    }
+
     public function reported_apotti_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ReportedApottiAttachment::class, 'report_id','id');
+        return $this->hasMany(ReportedApottiAttachment::class, 'report_id','id')->whereNotNull('attachment_name')->whereNull('cover_page_name');
     }
 }

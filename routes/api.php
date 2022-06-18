@@ -336,6 +336,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-audit-plan-and-type-wise-air', [AuditAIRReportController::class, 'getAuditPlanAndTypeWiseAir']);
             Route::post('get-audit-final-report', [AuditAIRReportController::class, 'getAuditFinalReport']);
             Route::post('get-audit-final-report-search', [AuditAIRReportController::class, 'getAuditFinalReportSearch']);
+            Route::post('get-audit-final-report-details', [AuditAIRReportController::class, 'getAuditFinalReportDetails']);
             Route::post('delete-air-report-wise-apotti', [AuditAIRReportController::class, 'deleteAirReportWiseApotti']);
             Route::post('apotti-final-approval', [AuditAIRReportController::class, 'apottiFinalApproval']);
             Route::post('air-send-to-rpu', [RpuAirReportController::class, 'airSendToRpu']);
