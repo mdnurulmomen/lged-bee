@@ -13,7 +13,6 @@ class ApottiStatus extends Model
         'apotti_id',
         'apotti_type',
         'qac_type',
-        'apotti_id',
         'is_audit_criteria',
         'is_5w_pera_model',
         'is_apotti_evidence',

@@ -282,6 +282,45 @@ class AuditAIRReportController extends Controller
         return response()->json($response);
     }
 
+    public function getArchiveFinalReport(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->getArchiveFinalReport($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getArchiveFinalReportApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->getArchiveFinalReportApotti($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function mapArchiveFinalReportApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $auditAIRReportService->mapArchiveFinalReportApotti($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function deleteAirReportWiseApotti(Request $request, AuditAIRReportService $auditAIRReportService): \Illuminate\Http\JsonResponse
     {
         $responseData = $auditAIRReportService->deleteAirReportWiseApotti($request);

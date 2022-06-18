@@ -862,6 +862,83 @@ class AuditAIRReportService
         }
     }
 
+    public function getArchiveFinalReport(Request $request): array
+    {
+        $office_id = $request->directorate_id;
+
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $reports = RAir::with(['fiscal_year','reported_apotti_attachments'])
+                ->where('has_report_attachments', 1)
+                ->get()
+                ->toArray();
+
+            return ['status' => 'success', 'data' => $reports];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function getArchiveFinalReportApotti(Request $request): array
+    {
+        $office_id = $request->directorate_id;
+
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $apottis = Apotti::where('is_archived_reported_apotti',1)->get()->toArray();
+            return ['status' => 'success', 'data' => $apottis];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function mapArchiveFinalReportApotti(Request $request): array
+    {
+        $office_id = $request->directorate_id;
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $cdesk = json_decode($request->cdesk, false);
+
+            $apotti_r_air_map = [];
+            $apotii_status = [];
+            foreach ($request->apottis as $apotti){
+                $apotti_r_air_map[] = [
+                    'apotti_id' => $apotti,
+                    'rairs_id' => $request->r_air_id,
+                    'created_by' => $cdesk->officer_id,
+                ];
+
+                $apotii_status[] = [
+                    'apotti_id' => $apotti,
+                    'apotti_type' => 'approved',
+                    'qac_type' => 'cqat',
+                    'created_by' => $cdesk->officer_id,
+                    'created_by_name_en' =>  $cdesk->officer_en,
+                    'created_by_name_bn' =>  $cdesk->officer_bn,
+                ];
+            }
+            ApottiRAirMap::insert($apotti_r_air_map);
+            ApottiStatus::insert($apotii_status);
+
+            return ['status' => 'success', 'data' => 'Stored successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function deleteAirReportWiseApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
