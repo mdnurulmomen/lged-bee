@@ -339,7 +339,7 @@ class ApOfficerOrderService
 
                     $team_deg_schedules[$schedule['leader_designation_id']] = $team_schedules;
 
-                    $apEntityTeamService->saveTeamSchedule($team_deg_schedules,$request->audit_plan_id);
+                    $apEntityTeamService->saveTeamSchedule($team_deg_schedules,$request->audit_plan_id,$request->annual_plan_id);
                 }
 
                 ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->update(['has_update_office_order' => 0]);
