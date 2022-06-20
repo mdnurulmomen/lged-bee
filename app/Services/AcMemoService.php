@@ -102,12 +102,11 @@ class AcMemoService
             $porisistos = [];
             foreach ($request->porisisto_details as $key => $porisisto){
                 if ($porisisto != null){
-                    array_push($porisistos, array(
-                            'ac_memo_id' => $audit_memo->id,
-                            'details' => $porisisto,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id
-                        )
+                    $porisistos[] = array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
                     );
                 }
             }
@@ -128,18 +127,17 @@ class AcMemoService
                     $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $audit_memo->id,
-                            'file_type' => 'porisishto',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'file_type' => 'porisishto',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }
@@ -155,18 +153,17 @@ class AcMemoService
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $audit_memo->id,
-                            'file_type' => 'pramanok',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'file_type' => 'pramanok',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }

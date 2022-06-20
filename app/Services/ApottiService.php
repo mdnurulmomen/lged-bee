@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Apotti;
 use App\Models\ApottiItem;
+use App\Models\ApottiPorisishto;
 use App\Models\ApottiStatus;
 use App\Models\XMovement;
 use App\Traits\ApiHeart;
@@ -111,7 +112,7 @@ class ApottiService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $apotti_info = Apotti::with(['apotti_items'])->find($request->apotti_id);
+            $apotti_info = Apotti::with(['apotti_items','apotti_porisishtos'])->find($request->apotti_id);
             return ['status' => 'success', 'data' => $apotti_info];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -455,6 +456,7 @@ class ApottiService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
             //apotti item
             $jorito_ortho_porimans = $request->jorito_ortho_porimans;
@@ -474,12 +476,49 @@ class ApottiService
             $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->save();
 
+            $porisistos = [];
+            foreach ($request->porisisto_details as $key => $porisisto){
+                if ($porisisto != null){
+                    $porisistos[] = array(
+                        'apotti_id' => $apotti->id,
+                        'memo_id' => 0,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
+                    );
+                }
+            }
+            if (!empty($porisistos)) {
+                ApottiPorisishto::where('apotti_id',$apotti->id)->delete();
+                ApottiPorisishto::insert($porisistos);
+            }
+
+            \DB::commit();
             return ['status' => 'success', 'data' => 'Update Successfully'];
+
+        } catch (\Exception $exception) {
+            \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function apottiPorisistoDelete(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        \DB::beginTransaction();
+        try {
+            //apotti porisishto
+            ApottiPorisishto::where('id',$request->apotti_porisishto_id)->delete();
+            return ['status' => 'success', 'data' => 'Delete Successfully'];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 
     public function getApottiOnucchedNo(Request $request): array

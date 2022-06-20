@@ -7,6 +7,7 @@ use App\Models\AcMemoAttachment;
 use App\Models\AcMemoPorisishto;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
+use App\Models\ApottiPorisishto;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Carbon\Carbon;
@@ -98,12 +99,11 @@ class ApottiMemoService
             $porisistos = [];
             if (isset($request->porisisto_details)){
                 foreach ($request->porisisto_details as $key=>$porisisto){
-                    array_push($porisistos, array(
-                            'ac_memo_id' => $request->memo_id,
-                            'details' => $porisisto,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id
-                        )
+                    $porisistos[] = array(
+                        'ac_memo_id' => $request->memo_id,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
                     );
                 }
                 if (!empty($porisistos)) {
@@ -125,18 +125,17 @@ class ApottiMemoService
                     $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $request->memo_id,
-                            'file_type' => 'porisishto',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $request->memo_id,
+                        'file_type' => 'porisishto',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }
@@ -151,18 +150,17 @@ class ApottiMemoService
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $request->memo_id,
-                            'file_type' => 'pramanok',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $request->memo_id,
+                        'file_type' => 'pramanok',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }
@@ -223,7 +221,6 @@ class ApottiMemoService
             $apotti_item->team_id = $acMemo->team_id;
             $apotti_item->memo_title_bn = $request->memo_title_bn;
             $apotti_item->memo_description_bn = $request->memo_description_bn;
-            $apotti_item->memo_title_bn = $request->memo_title_bn;
             $apotti_item->memo_type = $acMemo->memo_type;
             $apotti_item->memo_status = $acMemo->memo_status;
             $apotti_item->response_of_rpu = $request->response_of_rpu;
@@ -235,12 +232,30 @@ class ApottiMemoService
             $apotti_item->status = 0;
             $apotti_item->save();
 
+            //apotti porisisto
+            $memoPorisistos = AcMemoPorisishto::where('ac_memo_id',$request->memo_id)->get();
+
+            $apottiporisistos = [];
+            foreach ($memoPorisistos as $porisisto){
+                if ($porisisto != null){
+                    $apottiporisistos[] = array(
+                        'apotti_id' => $apotti->id,
+                        'memo_id' => $porisisto->ac_memo_id,
+                        'details' => $porisisto->details,
+                        'sequence' => $porisisto->sequence,
+                        'created_by' => $cdesk->officer_id
+                    );
+                }
+            }
+            if (!empty($apottiporisistos)) {
+                ApottiPorisishto::insert($apottiporisistos);
+            }
+
             \DB::commit();
             return ['status' => 'success', 'data' => 'Save Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 }

@@ -261,6 +261,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('apotti-wise-all-tiem', [ApottiController::class, 'apottiWiseAllItem']);
         Route::post('get-apotti-item-info', [ApottiController::class, 'getApottiItemInfo']);
         Route::post('update-apotti', [ApottiController::class, 'updateApotti']);
+        Route::post('delete-apotti-porisisto', [ApottiController::class, 'apottiPorisistoDelete']);
         Route::post('get-apotti-onucched-no', [ApottiController::class, 'getApottiOnucchedNo']);
         Route::post('get-apotti-register-list', [ApottiController::class, 'getApottiRegisterList']);
         Route::post('update-apotti-register', [ApottiController::class, 'updateApottiRegister']);

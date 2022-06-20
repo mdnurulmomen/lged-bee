@@ -6,6 +6,7 @@ use App\Models\AcMemoPorisishto;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
+use App\Models\ApottiPorisishto;
 use App\Models\ApottiRAirMap;
 use App\Models\ApottiStatus;
 use App\Models\AuditTemplate;
@@ -542,20 +543,26 @@ class AuditAIRReportService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)->where('is_delete', 0)->pluck('apotti_id');
-            $apotti_items = ApottiItem::with(['apotti:id,onucched_no','porisishtos'])
+            $qacApottis = ApottiRAirMap::where('rairs_id', $request->air_id)
+                ->where('is_delete', 0)
+                ->pluck('apotti_id');
+
+            /*$apotti_items = ApottiItem::with(['apotti:id,onucched_no','porisishtos'])
                 ->whereIn('apotti_id', $qacApottis)
                 ->orderBy(Apotti::select('onucched_no')
                     ->whereColumn('apottis.id', 'apotti_items.apotti_id')
-                );
+                );*/
+
+            $apottis = Apotti::with(['apotti_porisishtos'])
+                ->whereIn('id', $qacApottis)
+                ->orderBy('onucched_no','ASC');
+
             if ($request->all && $request->all == 1) {
-                $apotti_items = $apotti_items->get()->toArray();
+                $apottis = $apottis->get()->toArray();
             } else {
-                $apotti_items = $apotti_items->paginate($request->per_page ?: 5);
+                $apottis = $apottis->paginate($request->per_page ?: 5);
             }
-
-
-            return ['status' => 'success', 'data' => $apotti_items];
+            return ['status' => 'success', 'data' => $apottis];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

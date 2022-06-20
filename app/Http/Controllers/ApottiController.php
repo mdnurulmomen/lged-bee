@@ -96,6 +96,16 @@ class ApottiController extends Controller
         return response()->json($response);
     }
 
+    public function apottiPorisistoDelete(Request $request, ApottiService $apottiService){
+        $responseData = $apottiService->apottiPorisistoDelete($request);
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
+
     public function getApottiOnucchedNo(Request $request, ApottiService $apottiService): \Illuminate\Http\JsonResponse
     {
         $apotti_list = $apottiService->getApottiOnucchedNo($request);

@@ -75,11 +75,13 @@ class Apotti extends Model
         return $this->belongsTo(XFiscalYear::class, 'fiscal_year_id', 'id');
     }
 
-    public function apotti_items(){
+    public function apotti_items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(ApottiItem::class, 'apotti_id', 'id');
     }
 
-    public function apotti_status(){
+    public function apotti_status(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(ApottiStatus::class, 'apotti_id', 'id');
     }
 
@@ -91,5 +93,10 @@ class Apotti extends Model
     public function latest_movement(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(XMovement::class, 'relational_id')->latest();
+    }
+
+    public function apotti_porisishtos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApottiPorisishto::class, 'apotti_id', 'id');
     }
 }
