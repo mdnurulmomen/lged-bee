@@ -39,11 +39,17 @@ class RpuAirReportService
                 ->where('is_delete',0)->pluck('apotti_id');
 
             //get apotti list
-            $apotti_list = Apotti::with(['apotti_items'])->whereIn('id',$apotti_map_list)
-                ->where(function($query){
-                    $query->where('apotti_type','sfi')
+            $apotti_list = Apotti::with(['apotti_items','apotti_latest_status'])
+                ->whereIn('id',$apotti_map_list)
+                ->whereHas('apotti_latest_status', function ($q) {
+                    return $q->where('apotti_type','sfi')
                         ->orWhere('apotti_type','non-sfi');
                 })->get();
+
+            /*->where(function($query){
+                $query->where('apotti_type','sfi')
+                    ->orWhere('apotti_type','non-sfi');
+            })*/
 
             //get entity list
             $entity_list = AnnualPlanEntitie::where('annual_plan_id',$air_info->annual_plan_id)->get();

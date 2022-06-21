@@ -85,6 +85,12 @@ class Apotti extends Model
         return $this->hasMany(ApottiStatus::class, 'apotti_id', 'id');
     }
 
+    public function apotti_latest_status(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ApottiStatus::class, 'apotti_id', 'id')
+            ->orderBy('id','DESC');
+    }
+
     public function apotti_airs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(RAir::class, 'apotti_rair_maps');
