@@ -193,6 +193,7 @@ class ApottiService
             Apotti::whereIn('id',$request->apotti_id)->delete();
             ApottiItem::whereIn('apotti_id',$request->apotti_id)->delete();
 
+            //apotti add
             $apotti = new Apotti();
             $apotti->audit_plan_id = $audit_plan_id;
             $apotti->onucched_no = $request->onucched_no;
@@ -218,6 +219,7 @@ class ApottiService
             $apotti->is_combined = 1;
             $apotti->save();
 
+            //apotti items add
             foreach ($apotti_items as $apotti_item){
                    $apotti_item_save =  New ApottiItem();
                    $apotti_item_save->apotti_id = $apotti->id;
@@ -265,6 +267,11 @@ class ApottiService
                 $sequence++;
                 Apotti::where('id',$sequence_apotti)->update(['apotti_sequence' => $sequence,'onucched_no' => $sequence]);
             }
+
+            //apotti porisishto add
+            ApottiPorisishto::whereIn('apotti_id', $request->apotti_id)->update([
+                'apotti_id' => $apotti->id,
+            ]);
 
             DB::commit();
             return ['status' => 'success', 'data' => 'Merge Successfully'];
