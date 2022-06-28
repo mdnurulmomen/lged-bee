@@ -57,6 +57,7 @@ class ApottiMemoService
             });
 
             $query->when($jorito_ortho_poriman, function ($q, $jorito_ortho_poriman) {
+                $jorito_ortho_poriman = bnToen(str_replace(",","",$jorito_ortho_poriman));
                 return $q->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
