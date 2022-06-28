@@ -187,7 +187,7 @@ class ApottiMemoService
             $apotti->irregularity_cause = $request->irregularity_cause;
             $apotti->audit_conclusion = $request->audit_conclusion;
             $apotti->audit_recommendation = $request->audit_recommendation;
-            $apotti->total_jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $apotti->total_jorito_ortho_poriman = str_replace(",","",$request->jorito_ortho_poriman);
             $apotti->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
             $apotti->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
             $apotti->created_by = $cdesk->officer_id;
@@ -228,7 +228,7 @@ class ApottiMemoService
             $apotti_item->irregularity_cause = $request->irregularity_cause;
             $apotti_item->audit_conclusion = $request->audit_conclusion;
             $apotti_item->audit_recommendation = $request->audit_recommendation;
-            $apotti_item->jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $apotti_item->jorito_ortho_poriman = str_replace(",","",$request->jorito_ortho_poriman);
             $apotti_item->created_by = $cdesk->officer_id;
             $apotti_item->status = 0;
             $apotti_item->save();
