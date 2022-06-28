@@ -129,9 +129,6 @@ class ApottiService
         }
         DB::beginTransaction();
         try {
-
-//            return ['status' => 'error', 'data' => $request->sequence];
-
             $apotti_list = Apotti::with(['apotti_items'])
                 ->whereIn('id',$request->apotti_id)->get();
             $apotti_items = [];
@@ -224,7 +221,7 @@ class ApottiService
                    $apotti_item_save =  New ApottiItem();
                    $apotti_item_save->apotti_id = $apotti->id;
                    $apotti_item_save->memo_id = $apotti_item['memo_id'];
-                   $apotti_item_save->onucched_no = 1;
+                   $apotti_item_save->onucched_no = $request->onucched_no;
                    $apotti_item_save->memo_irregularity_type = $apotti_item['memo_irregularity_type'];
                    $apotti_item_save->memo_irregularity_sub_type = $apotti_item['memo_irregularity_sub_type'];
                    $apotti_item_save->ministry_id = $apotti_item['ministry_id'];
@@ -246,7 +243,6 @@ class ApottiService
                    $apotti_item_save->team_id = $apotti_item['team_id'];
                    $apotti_item_save->memo_title_bn = $apotti_item['memo_title_bn'];
                    $apotti_item_save->memo_description_bn = $apotti_item['memo_description_bn'];
-                   $apotti_item_save->memo_title_bn = $apotti_item['memo_title_bn'];
                    $apotti_item_save->memo_type = $apotti_item['memo_type'];
                    $apotti_item_save->memo_status = $apotti_item['memo_status'];
                    $apotti_item_save->jorito_ortho_poriman = $apotti_item['jorito_ortho_poriman'];
