@@ -626,6 +626,7 @@ class ArchiveApottiService
                 'total_onishponno_jorito_ortho_poriman' => Arr::has($office_ac_memo_data, 'onishponno_jorito_ortho_poriman') ? $office_ac_memo_data['onishponno_jorito_ortho_poriman'] : '',
                 'file_token_no' => Arr::has($office_ac_memo_data, 'file_token_no') ? $office_ac_memo_data['file_token_no'] : null,
                 'created_by' => Arr::has($office_ac_memo_data, 'created_by') ? $office_ac_memo_data['created_by'] : '',
+                'is_sent_rp' => 1,
                 'approve_status' => 1,
                 'status' => 0,
                 'apotti_sequence' => 1,

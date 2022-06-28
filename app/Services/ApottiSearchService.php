@@ -67,7 +67,7 @@ class ApottiSearchService
                 return $query->where('file_token_no', $file_token_no);
             });
 
-            $apotti_list = $query->where('is_sent_rp', 1)->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $apotti_list = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             return ['status' => 'success', 'data' => $apotti_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
