@@ -681,6 +681,7 @@ class ArchiveApottiService
             }
 
             $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-apotti-to-rpu'), [
+                'fiscal_year' => $fiscal_year_desc,
                 'memo' => json_encode($office_ac_memo_data),
                 'directorate' => json_encode($directorate),
                 'onucched_no' => $office_ac_memo_data['onucched_no'],
