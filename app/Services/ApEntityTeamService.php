@@ -214,7 +214,10 @@ class ApEntityTeamService
         try {
             DB::beginTransaction();
 
-            $office_order = ApOfficeOrder::where('audit_plan_id',$audit_plan_id)->where('approved_status','approved')->count();
+            $office_order = ApOfficeOrder::where('audit_plan_id',$audit_plan_id)
+                ->where('annual_plan_id', $annual_plan_id)
+                ->where('approved_status','approved')
+                ->count();
 
             foreach ($team_schedules as $designation_id => $schedule_data) {
 
