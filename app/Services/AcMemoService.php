@@ -82,7 +82,7 @@ class AcMemoService
             $audit_memo->irregularity_cause = $request->irregularity_cause;
             $audit_memo->memo_type = $request->memo_type;
             $audit_memo->memo_status = $request->memo_status;
-            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
+            $audit_memo->jorito_ortho_poriman = str_replace(",","",$request->jorito_ortho_poriman);
             $audit_memo->response_of_rpu = $request->response_of_rpu;
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
