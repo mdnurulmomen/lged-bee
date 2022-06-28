@@ -249,19 +249,22 @@ class AuditAIRReportService
             RAir::where('id', $request->air_id)->update($airData);
 
             //template content
-            /*$contents = [];
-            $content_list = gzuncompress(getDecryptedData(($request->air_description)));
-            foreach (json_decode($content_list, true) as $content) {
-                if ($content['content_key'] != 'audit_porisisto_details') {
-                    array_push($contents, [
-                        'relational_id' => $request->air_id,
-                        'template_type' => '',
-                        'content_key' => $content['content_key'],
-                        'content_value' => base64_encode($content['content']),
-                    ]);
+            if ($request->air_type){
+                $contents = [];
+                $content_list = gzuncompress(getDecryptedData(($request->air_description)));
+                foreach (json_decode($content_list, true) as $content) {
+                    if ($content['content_key'] != 'audit_porisisto_details') {
+                        $contents[] = [
+                            'relational_id' => $request->air_id,
+                            'template_type' => $request->air_type,
+                            'content_key' => $content['content_key'],
+                            'content_value' => base64_encode($content['content']),
+                        ];
+                    }
                 }
+                RTemplateContent::insert($contents);
             }
-            RTemplateContent::insert($contents);*/
+
 
             //$response_data = $this->sendApottiStatusToRpu($request->air_id,$cdesk);
 

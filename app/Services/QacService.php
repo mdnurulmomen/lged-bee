@@ -24,6 +24,7 @@ class QacService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
         DB::beginTransaction();
 
         try {
