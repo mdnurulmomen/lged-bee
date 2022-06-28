@@ -27,6 +27,7 @@ class Apotti extends Model
         'fiscal_year_id',
         'total_jorito_ortho_poriman',
         'total_onishponno_jorito_ortho_poriman',
+        'total_adjustment_ortho_poriman',
         'response_of_rpu',
         'irregularity_cause',
         'audit_conclusion',
@@ -35,6 +36,7 @@ class Apotti extends Model
         'updated_by',
         'approve_status',
         'status',
+        'is_alochito',
         'comment',
         'sender_officer_id',
         'sender_officer_name_bn',
@@ -60,7 +62,13 @@ class Apotti extends Model
         'final_status',
         'air_issue_date',
         'status_review_date',
+        'file_token_no',
+        'cover_page_path',
+        'cover_page',
+        'attachment_path',
+        'report_type_id',
         'is_sent_rp',
+        'is_archived_reported_apotti'
     ];
 
 //    protected static function boot() {

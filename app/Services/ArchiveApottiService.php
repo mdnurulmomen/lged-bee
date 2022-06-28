@@ -606,7 +606,8 @@ class ArchiveApottiService
                 ];
             }
 
-            $office_ac_memo_attachment_create = AcMemoAttachment::insert($office_ac_memo_attachment_data);
+            //memo attachment insert
+            AcMemoAttachment::insert($office_ac_memo_attachment_data);
 
             //Apottis
             $office_apottis = [
@@ -623,6 +624,7 @@ class ArchiveApottiService
                 'fiscal_year_id' => Arr::has($office_ac_memo_data, 'fiscal_year_id') ? $office_ac_memo_data['fiscal_year_id'] : '',
                 'total_jorito_ortho_poriman' => Arr::has($office_ac_memo_data, 'jorito_ortho_poriman') ? $office_ac_memo_data['jorito_ortho_poriman'] : '',
                 'total_onishponno_jorito_ortho_poriman' => Arr::has($office_ac_memo_data, 'onishponno_jorito_ortho_poriman') ? $office_ac_memo_data['onishponno_jorito_ortho_poriman'] : '',
+                'file_token_no' => Arr::has($office_ac_memo_data, 'file_token_no') ? $office_ac_memo_data['file_token_no'] : null,
                 'created_by' => Arr::has($office_ac_memo_data, 'created_by') ? $office_ac_memo_data['created_by'] : '',
                 'approve_status' => 1,
                 'status' => 0,
