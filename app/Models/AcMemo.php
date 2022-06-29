@@ -138,7 +138,7 @@ class AcMemo extends Model
         }
     }
 
-    public function getMemoIrregularitySubTypeNameAttribute($value)
+    public function getMemoIrregularitySubTypeNameAttribute()
     {
         if($this->attributes['memo_irregularity_sub_type']){
             return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];

@@ -58,6 +58,7 @@ class ApottiSearchService
             //jorito_ortho_poriman
             $total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
+                $total_jorito_ortho_poriman = bnToen(str_replace(",","",$total_jorito_ortho_poriman));
                 return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
             });
 
