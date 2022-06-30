@@ -23,15 +23,29 @@ class AuditExecutionQueryService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $schedule_list = AuditVisitCalenderPlanMember::with('plan_parent_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
+            $fiscal_year_id = $request->fiscal_year_id;
+            $activity_id = $request->activity_id;
+
+            $query = AuditVisitCalenderPlanMember::query();
+
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $schedule_list =  $query->with('plan_parent_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('plan_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('office_order:id,audit_plan_id,approved_status')
                 ->withCount(['queries','memos'])
-                ->where('audit_plan_id', '>', 0)
+                ->where('audit_plan_id', '!=', 0)
                 ->where('team_member_designation_id', $cdesk->designation_id)
                 ->whereNotNull('cost_center_id')
                 ->orderBy('team_member_start_date', 'ASC')
                 ->paginate(config('bee_config.per_page_pagination'));
+
 
             return ['status' => 'success', 'data' => $schedule_list];
 
