@@ -82,4 +82,10 @@ class RAir extends Model
     {
         return $this->hasMany(ReportedApottiAttachment::class, 'report_id','id')->whereNotNull('attachment_name')->whereNull('cover_page_name');
     }
+
+    public function report_apotti_map(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApottiRAirMap::class, 'rairs_id','id');
+
+    }
 }

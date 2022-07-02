@@ -816,6 +816,8 @@ class AuditAIRReportService
 
             $query = RAir::query();
             $query->with(['reported_apotti_cover_page:id,report_id,cover_page_name,attachment_path']);
+            $query->withCount('report_apotti_map');
+
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
                 return $q->where('fiscal_year_id', $fiscal_year_id);
@@ -829,12 +831,16 @@ class AuditAIRReportService
                 return $q->where('entity_id', $entity_id);
             });
 
-            $airList =  $query->where('type', 'cqat')
-                ->where('status', 'approved')
-                ->get()
-                ->toArray();
+            $airList =  $query->where('type', 'cqat')->where('status', 'approved');
+            $r_air_ids = $airList->pluck('id');
+            $airList = $airList->get()->toArray();
 
-            return ['status' => 'success', 'data' => $airList];
+            $reported_apotti = ApottiRAirMap::whereIn('rairs_id',$r_air_ids)->count();
+
+            $air_data['airList'] = $airList;
+            $air_data['totalApottiCount'] = $reported_apotti;
+
+            return ['status' => 'success', 'data' => $air_data];
 
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
