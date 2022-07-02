@@ -22,7 +22,7 @@ class UnsettledObservationReportService
 
             $query = ApottiItem::query();
             $query = $query->with(['fiscal_year']);
-            $query = $query->where('is_reported','!=', 1);
+            $query = $query->whereNull('is_reported');
 
             //ministry
             $ministry_id = $request->ministry_id;
