@@ -23,6 +23,7 @@ class UnsettledObservationReportService
             $query = ApottiItem::query();
             $query = $query->with(['fiscal_year']);
             $query = $query->whereNull('is_reported');
+            $query = $query->where('is_sent_rp',1);
 
             //ministry
             $ministry_id = $request->ministry_id;
