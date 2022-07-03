@@ -63,7 +63,7 @@ class UnsettledObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['apotti_list']  = $query->where('memo_status',2)->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $data['apotti_list']  = $query->where('memo_status','!=',1)->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
 
             return ['status' => 'success', 'data' => $data];
