@@ -476,7 +476,7 @@ class AuditAIRReportService
     public function getAirAndApottiTypeWiseQACApotti(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_id = $request->office_id ?: $cdesk->office_id;
         try {
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
@@ -540,7 +540,7 @@ class AuditAIRReportService
     public function getAirWisePorisistos(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_id = $request->office_id ?: $cdesk->office_id;
         try {
             $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
@@ -550,21 +550,20 @@ class AuditAIRReportService
                 ->where('is_delete', 0)
                 ->pluck('apotti_id');
 
-            /*$apotti_items = ApottiItem::with(['apotti:id,onucched_no','porisishtos'])
-                ->whereIn('apotti_id', $qacApottis)
-                ->orderBy(Apotti::select('onucched_no')
-                    ->whereColumn('apottis.id', 'apotti_items.apotti_id')
-                );*/
+            $apottis = Apotti::with(['apotti_porisishtos'])->whereIn('id', $qacApottis);
 
-            $apottis = Apotti::with(['apotti_porisishtos'])
-                ->whereIn('id', $qacApottis)
-                ->orderBy('onucched_no','ASC');
-
-            if ($request->all && $request->all == 1) {
-                $apottis = $apottis->get()->toArray();
-            } else {
-                $apottis = $apottis->paginate($request->per_page ?: 5);
+            if ($request->air_type == 'qac-1'){
+                $apottis = $apottis->where(function ($query) {
+                    $query->where('apotti_type', 'sfi')
+                        ->orWhere('apotti_type', 'non-sfi');
+                });
+            }elseif ($request->air_type == 'qac-2'){
+                $apottis = $apottis->where('apotti_type', 'draft');
+            }elseif ($request->air_type == 'cqat'){
+                $apottis = $apottis->where('apotti_type', 'approved');
             }
+
+            $apottis = $apottis->orderBy('onucched_no','ASC')->get()->toArray();
             return ['status' => 'success', 'data' => $apottis];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -697,10 +696,10 @@ class AuditAIRReportService
                 $apottiRAirMap = ApottiRAirMap::where('rairs_id', $request->r_air_id)->get()->toArray();
                 $mappingData = [];
                 foreach ($apottiRAirMap as $apotti) {
-                    array_push($mappingData, [
+                    $mappingData[] = [
                         'apotti_id' => $apotti['apotti_id'],
                         'rairs_id' => $storeQACAir->id
-                    ]);
+                    ];
                 }
                 if (!empty($mappingData)) {
                     ApottiRAirMap::insert($mappingData);
