@@ -23,7 +23,7 @@ class ApottiSearchService
             }
 
             $query = Apotti::query();
-            $query->with(['apotti_items:id,apotti_id,cost_center_id,cost_center_name_en,cost_center_name_bn']);
+            $query->with(['apotti_items']);
 
             //ministry
             $ministry_id = $request->ministry_id;
