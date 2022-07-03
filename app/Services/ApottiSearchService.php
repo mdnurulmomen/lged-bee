@@ -23,6 +23,7 @@ class ApottiSearchService
             }
 
             $query = Apotti::query();
+            $query->with(['apotti_items:id,apotti_id,cost_center_id,cost_center_name_en,cost_center_name_bn']);
 
             //ministry
             $ministry_id = $request->ministry_id;
@@ -35,6 +36,14 @@ class ApottiSearchService
             $query->when($entity_id, function ($query) use ($entity_id) {
                 return $query->where('parent_office_id', $entity_id);
             });
+
+            //cost_center_id
+            $cost_center_id = $request->cost_center_id;
+            if (!empty($cost_center_id)) {
+                $query->whereHas('apotti_items', function ($q) use ($cost_center_id) {
+                    return $q->where('cost_center_id', $cost_center_id);
+                });
+            }
 
             //onucched_no
             $onucched_no = $request->onucched_no;
