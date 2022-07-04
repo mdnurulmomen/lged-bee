@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OpActivity;
 use App\Models\OpActivityComment;
+use App\Models\OpActivityMilestone;
 use App\Models\OpYearlyAuditCalendarActivity;
 use App\Repository\OpYearlyAuditCalendarRepository;
 use Illuminate\Http\Request;
@@ -80,13 +81,28 @@ class OpYearlyAuditCalendarController extends Controller
         Validator::make($request->all(), [
             'milestone_id' => 'required|integer',
             'target_date' => 'required|date',
-            'yearly_audit_calendar_id' => 'required|integer',
+            'yearly_audit_calendar_id' => 'nullable|integer',
         ])->validate();
 
+        $milestone =  OpActivityMilestone::find($request->milestone_id);
+
         try {
-            $calendar = OpYearlyAuditCalendarActivity::find($request->yearly_audit_calendar_id);
-            $calendar->target_date = $request->target_date;
-            $calendar->save();
+            $calendar = OpYearlyAuditCalendarActivity::updateOrCreate(
+                ['id' => $request->yearly_audit_calendar_id],
+                [
+                    'duration_id' => $milestone->duration_id,
+                    'outcome_id' => $milestone->outcome_id,
+                    'output_id' => $milestone->output_id,
+                    'activity_id' => $milestone->activity_id,
+                    'fiscal_year_id' => $milestone->fiscal_year_id,
+                    'milestone_id' => $request->milestone_id,
+                    'op_yearly_audit_calendar_id' => 2,
+                    'target_date' => $request->target_date,
+                ]
+            );
+//            $calendar = OpYearlyAuditCalendarActivity::find($request->yearly_audit_calendar_id);
+//            $calendar->target_date = $request->target_date;
+//            $calendar->save();
             $response = responseFormat('success', 'Updated Successfully');
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

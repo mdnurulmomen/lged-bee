@@ -201,6 +201,7 @@ class OpActivityRepository implements OpActivityInterface
                 $validated_data['is_parent'] = 0;
             }
             $validated_data['duration_id'] = $this->durationIdFromFiscalYear($validated_data['fiscal_year_id']);
+            $validated_data['is_activity'] = 1;
             OpActivity::create($validated_data);
             $response = responseFormat('success', 'Successfully Created!', ['code' => 200]);
         } catch (\Exception $exception) {
