@@ -289,7 +289,7 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
                                         'activity_milestone_id' => $milestone['milestone_id'],
                                         'milestone_title_en' => $milestone['milestone_title_en'],
                                         'milestone_title_bn' => $milestone['milestone_title_bn'],
-                                        'milestone_target' => $milestone['target_date'],
+                                        'milestone_target' => date('Y-m-d',strtotime($milestone['target_date'])),
                                     ];
                                     $schedule_data = $common_data + $schedule_activity_data;
                                     $created_schedule = OpOrganizationYearlyAuditCalendarEventSchedule::create($schedule_data);
