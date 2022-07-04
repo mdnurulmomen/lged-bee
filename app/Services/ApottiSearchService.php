@@ -22,8 +22,9 @@ class ApottiSearchService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $query = Apotti::query();
-            $query->with(['apotti_items']);
+            $query = ApottiItem::query();
+            $query->whereNull('is_reported');
+            $query->where('is_sent_rp',1);
 
             //ministry
             $ministry_id = $request->ministry_id;
@@ -64,11 +65,23 @@ class ApottiSearchService
                 return $query->where('apotti_type', $apotti_type);
             });
 
+            //memo_status
+            $memo_status = $request->memo_status;
+            $query->when($memo_status, function ($query) use ($memo_status) {
+                return $query->where('memo_status', $memo_status);
+            });
+
             //jorito_ortho_poriman
-            $total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
+//            $total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
+//            $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
+//                $total_jorito_ortho_poriman = bnToen(str_replace(",","",$total_jorito_ortho_poriman));
+//                return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
+//            });
+
+            $total_jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
                 $total_jorito_ortho_poriman = bnToen(str_replace(",","",$total_jorito_ortho_poriman));
-                return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
+                return $query->where('jorito_ortho_poriman', $total_jorito_ortho_poriman);
             });
 
             //file_token_no
@@ -78,7 +91,7 @@ class ApottiSearchService
             });
 
             $data['apotti_list']  = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
-            $data['total_jorito_ortho_poriman'] = $query->sum('total_jorito_ortho_poriman');
+            $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

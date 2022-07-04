@@ -550,6 +550,49 @@ class ApottiService
 
     }
 
+    //active when work with marged apotii Todo
+
+//    public function getApottiRegisterList(Request $request): array
+//    {
+//        $office_db_con_response = $this->switchOffice($request->directorate_id);
+//        if (!isSuccessResponse($office_db_con_response)) {
+//            return ['status' => 'error', 'data' => $office_db_con_response];
+//        }
+//        try {
+//            $fiscal_year_id = $request->fiscal_year_id;
+//            $apotti_type = $request->apotti_type;
+//            $start_date = $request->start_date;
+//            $end_date = $request->end_date;
+//
+//            $query = Apotti::whereNotNull('status_review_date');
+//            if (!empty($fiscal_year_id)){
+//                $query = $query->where('fiscal_year_id', $fiscal_year_id);
+//            }
+//
+//            if (!empty($start_date) && !empty($end_date)){
+//                $start_date = str_replace("/","-",$start_date);
+//                $end_date = str_replace("/","-",$end_date);
+//                $query = $query->whereDate('status_review_date','>=',date('Y-m-d',strtotime($start_date)))
+//                    ->whereDate('status_review_date', '<=', date('Y-m-d',strtotime($end_date)));
+//            }
+//
+//            /*where('apotti_type', $apotti_type)*/
+//            $apotti_list = $query->with(['fiscal_year','apotti_items','latest_movement'])
+//                ->with('apotti_status', function ($q){
+//                    $q->select('id','apotti_id','apotti_type')
+//                        ->where('qac_type', 'register')
+//                        ->latest()
+//                        ->take(1);
+//                })
+//                ->orderBy('onucched_no')
+//                ->paginate(config('bee_config.per_page_pagination'));
+//
+//            return ['status' => 'success', 'data' => $apotti_list];
+//        } catch (\Exception $exception) {
+//            return ['status' => 'error', 'data' => $exception->getMessage()];
+//        }
+//    }
+
     public function getApottiRegisterList(Request $request): array
     {
         $office_db_con_response = $this->switchOffice($request->directorate_id);
@@ -562,7 +605,8 @@ class ApottiService
             $start_date = $request->start_date;
             $end_date = $request->end_date;
 
-            $query = Apotti::whereNotNull('status_review_date');
+            $query = ApottiItem::query();
+
             if (!empty($fiscal_year_id)){
                 $query = $query->where('fiscal_year_id', $fiscal_year_id);
             }
@@ -575,17 +619,18 @@ class ApottiService
             }
 
             /*where('apotti_type', $apotti_type)*/
-            $apotti_list = $query->with(['fiscal_year','apotti_items','latest_movement'])
-                ->with('apotti_status', function ($q){
-                    $q->select('id','apotti_id','apotti_type')
-                        ->where('qac_type', 'register')
-                        ->latest()
-                        ->take(1);
-                })
+            $data['apotti_list'] = $query->with(['fiscal_year'])
+                ->where('is_sent_rp',1)
+                ->where('memo_status','!=',1)
+                ->whereNull('is_reported')
+                ->where('memo_type',$apotti_type)
                 ->orderBy('onucched_no')
-                ->paginate(config('bee_config.per_page_pagination'));
+                ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
-            return ['status' => 'success', 'data' => $apotti_list];
+            $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+
+            return ['status' => 'success', 'data' => $data];
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
