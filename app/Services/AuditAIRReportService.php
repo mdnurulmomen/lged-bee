@@ -830,7 +830,8 @@ class AuditAIRReportService
                 return $q->where('entity_id', $entity_id);
             });
 
-            $airList =  $query->where('type', 'cqat')->where('status', 'approved');
+            $airList =  $query->where('type', 'cqat')
+                ->where('status', 'approved');
             $r_air_ids = $airList->pluck('id');
             $airList = $airList->get()->toArray();
 

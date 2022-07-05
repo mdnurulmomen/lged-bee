@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\Services\UnsettledObservationReportService;
+use App\Services\ObservationReportService;
 use Illuminate\Http\Request;
 
-class UnsettledObservationReportController extends Controller
+class ObservationReportController extends Controller
 {
-    public function list(Request $request, UnsettledObservationReportService $unsettledObservationReportService): \Illuminate\Http\JsonResponse
+    public function list(Request $request, ObservationReportService $observationReportService): \Illuminate\Http\JsonResponse
     {
-        $responseData = $unsettledObservationReportService->list($request);
+        $responseData = $observationReportService->list($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);
@@ -21,9 +21,9 @@ class UnsettledObservationReportController extends Controller
         return response()->json($response);
     }
 
-    public function download(Request $request, UnsettledObservationReportService $unsettledObservationReportService): \Illuminate\Http\JsonResponse
+    public function download(Request $request, ObservationReportService $observationReportService): \Illuminate\Http\JsonResponse
     {
-        $responseData = $unsettledObservationReportService->download($request);
+        $responseData = $observationReportService->download($request);
 
         if (isSuccessResponse($responseData)) {
             $response = responseFormat('success', $responseData['data']);

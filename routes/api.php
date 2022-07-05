@@ -6,7 +6,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Followup\BroadsheetReplyController;
 use App\Http\Controllers\Report\AuditAIRReportController;
 use App\Http\Controllers\Report\RpuAirReportController;
-use App\Http\Controllers\Report\UnsettledObservationReportController;
+use App\Http\Controllers\Report\ObservationReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -351,9 +351,12 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-authority-air-report', [AuditAIRReportController::class, 'getAuthorityAirReport']);
         });
 
-        Route::group(['prefix' => 'unsettled-observations'], function () {
-            Route::post('list', [UnsettledObservationReportController::class, 'list']);
-            Route::post('download', [UnsettledObservationReportController::class, 'download']);
+        Route::group(['prefix' => 'observations'], function () {
+            //নিস্পন্ন অনিস্পন্ন report
+            Route::group(['prefix' => 'get-status-wise'], function () {
+                Route::post('list', [ObservationReportController::class, 'list']);
+                Route::post('download', [ObservationReportController::class, 'download']);
+            });
         });
     });
 

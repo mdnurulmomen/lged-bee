@@ -8,7 +8,7 @@ use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
 
-class UnsettledObservationReportService
+class ObservationReportService
 {
     use GenericData, ApiHeart;
 
@@ -21,9 +21,10 @@ class UnsettledObservationReportService
             }
 
             $query = ApottiItem::query();
-            $query = $query->with(['fiscal_year']);
-            $query = $query->whereNull('is_reported');
-            $query = $query->where('is_sent_rp',1);
+            $query->with(['fiscal_year']);
+
+            $memo_status_condition = $request->memo_status == 'unsettled'?'!=':'=';
+            $query->where('memo_status',$memo_status_condition,1);
 
             //ministry
             $ministry_id = $request->ministry_id;
@@ -49,7 +50,6 @@ class UnsettledObservationReportService
                 return $query->where('fiscal_year_id', $fiscal_year_id);
             });
 
-
             //memo_type
             $memo_type = $request->memo_type;
             $query->when($memo_type, function ($query) use ($memo_type) {
@@ -63,7 +63,7 @@ class UnsettledObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['apotti_list']  = $query->where('memo_status','!=',1)->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $data['apotti_list']  = $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
 
             return ['status' => 'success', 'data' => $data];
@@ -81,7 +81,10 @@ class UnsettledObservationReportService
             }
 
             $query = ApottiItem::query();
-            $query = $query->with(['fiscal_year']);
+            $query->with(['fiscal_year']);
+
+            $memo_status_condition = $request->memo_status == 'unsettled'?'!=':'=';
+            $query->where('memo_status',$memo_status_condition,1);
 
             //ministry
             $ministry_id = $request->ministry_id;
@@ -107,7 +110,6 @@ class UnsettledObservationReportService
                 return $query->where('fiscal_year_id', $fiscal_year_id);
             });
 
-
             //memo_type
             $memo_type = $request->memo_type;
             $query->when($memo_type, function ($query) use ($memo_type) {
@@ -121,7 +123,7 @@ class UnsettledObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['apotti_list'] = $query->where('memo_status',2)->get()->toArray();
+            $data['apotti_list'] = $query->get()->toArray();
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
 
             return ['status' => 'success', 'data' => $data];

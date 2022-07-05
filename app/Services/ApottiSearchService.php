@@ -40,11 +40,9 @@ class ApottiSearchService
 
             //cost_center_id
             $cost_center_id = $request->cost_center_id;
-            if (!empty($cost_center_id)) {
-                $query->whereHas('apotti_items', function ($q) use ($cost_center_id) {
-                    return $q->where('cost_center_id', $cost_center_id);
-                });
-            }
+            $query->when($cost_center_id, function ($query) use ($cost_center_id) {
+                return $query->where('cost_center_id', $cost_center_id);
+            });
 
             //onucched_no
             $onucched_no = $request->onucched_no;
@@ -62,7 +60,7 @@ class ApottiSearchService
             //apotti_type
             $apotti_type = $request->apotti_type;
             $query->when($apotti_type, function ($query) use ($apotti_type) {
-                return $query->where('apotti_type', $apotti_type);
+                return $query->where('memo_type', $apotti_type);
             });
 
             //memo_status
@@ -72,12 +70,6 @@ class ApottiSearchService
             });
 
             //jorito_ortho_poriman
-//            $total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
-//            $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
-//                $total_jorito_ortho_poriman = bnToen(str_replace(",","",$total_jorito_ortho_poriman));
-//                return $query->where('total_jorito_ortho_poriman', $total_jorito_ortho_poriman);
-//            });
-
             $total_jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
                 $total_jorito_ortho_poriman = bnToen(str_replace(",","",$total_jorito_ortho_poriman));
