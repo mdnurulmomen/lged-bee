@@ -114,4 +114,10 @@ class Apotti extends Model
     {
         return $this->hasMany(ApottiPorisishto::class, 'apotti_id', 'id');
     }
+
+    public function apotti_porisishto_summary(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ApottiPorisishto::class, 'apotti_id', 'id')
+            ->where('porisishto_type','summary');
+    }
 }

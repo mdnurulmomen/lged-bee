@@ -50,6 +50,18 @@ class ObservationReportService
                 return $query->where('fiscal_year_id', $fiscal_year_id);
             });
 
+            //audit_year_start
+            $audit_year_start = $request->audit_year_start;
+            $query->when($audit_year_start, function ($query) use ($audit_year_start) {
+                return $query->where('audit_year_start', $audit_year_start);
+            });
+
+            //audit_year_end
+            $audit_year_end = $request->audit_year_end;
+            $query->when($audit_year_end, function ($query) use ($audit_year_end) {
+                return $query->where('audit_year_end', $audit_year_end);
+            });
+
             //memo_type
             $memo_type = $request->memo_type;
             $query->when($memo_type, function ($query) use ($memo_type) {
@@ -63,8 +75,8 @@ class ObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['apotti_list']  = $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+            $data['apotti_list']  = $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
@@ -102,6 +114,18 @@ class ObservationReportService
             $cost_center_id = $request->cost_center_id;
             $query->when($cost_center_id, function ($query) use ($cost_center_id) {
                 return $query->where('cost_center_id', $cost_center_id);
+            });
+
+            //audit_year_start
+            $audit_year_start = $request->audit_year_start;
+            $query->when($audit_year_start, function ($query) use ($audit_year_start) {
+                return $query->where('audit_year_start', $audit_year_start);
+            });
+
+            //audit_year_end
+            $audit_year_end = $request->audit_year_end;
+            $query->when($audit_year_end, function ($query) use ($audit_year_end) {
+                return $query->where('audit_year_end', $audit_year_end);
             });
 
             //fiscal_year_id

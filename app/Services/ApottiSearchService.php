@@ -23,8 +23,6 @@ class ApottiSearchService
             }
 
             $query = ApottiItem::query();
-            $query->whereNull('is_reported');
-            $query->where('is_sent_rp',1);
 
             //ministry
             $ministry_id = $request->ministry_id;
@@ -56,6 +54,17 @@ class ApottiSearchService
                 return $query->where('fiscal_year_id', $fiscal_year_id);
             });
 
+            //audit_year_start
+            $audit_year_start = $request->audit_year_start;
+            $query->when($audit_year_start, function ($query) use ($audit_year_start) {
+                return $query->where('audit_year_start', $audit_year_start);
+            });
+
+            //audit_year_end
+            $audit_year_end = $request->audit_year_end;
+            $query->when($audit_year_end, function ($query) use ($audit_year_end) {
+                return $query->where('audit_year_end', $audit_year_end);
+            });
 
             //apotti_type
             $apotti_type = $request->apotti_type;
@@ -82,8 +91,9 @@ class ApottiSearchService
                 return $query->where('file_token_no', $file_token_no);
             });
 
-            $data['apotti_list']  = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+            $data['apotti_list']  = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

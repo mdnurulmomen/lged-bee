@@ -106,13 +106,14 @@ class ApottiService
     public function getApottiInfo(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_id = $request->office_id ?: $cdesk->office_id;
         $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $apotti_info = Apotti::with(['apotti_items','apotti_porisishtos'])->find($request->apotti_id);
+            $apotti_info = Apotti::with(['apotti_items','apotti_porisishtos','apotti_porisishto_summary'])
+                ->find($request->apotti_id)->toArray();
             return ['status' => 'success', 'data' => $apotti_info];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -479,14 +480,29 @@ class ApottiService
             $apotti->total_jorito_ortho_poriman = $request->total_jorito_ortho_poriman;
             $apotti->save();
 
+
+            //porisistos
             $porisistos = [];
+            if ($request->porisisto_summary){
+                $porisistos[] = array(
+                    'apotti_id' => $apotti->id,
+                    'memo_id' => 0,
+                    'details' => $request->porisisto_summary,
+                    'porisishto_type' => 'summary',
+                    'sequence' => 1,
+                    'created_by' => $cdesk->officer_id
+                );
+            }
+
             foreach ($request->porisisto_details as $key => $porisisto){
                 if ($porisisto != null){
+                    $sequence = $request->porisisto_summary?$key + 2:$key + 1;
                     $porisistos[] = array(
                         'apotti_id' => $apotti->id,
                         'memo_id' => 0,
                         'details' => $porisisto,
-                        'sequence' => $key + 1,
+                        'porisishto_type' => null,
+                        'sequence' => $sequence,
                         'created_by' => $cdesk->officer_id
                     );
                 }

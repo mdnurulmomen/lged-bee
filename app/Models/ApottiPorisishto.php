@@ -17,6 +17,7 @@ class ApottiPorisishto extends Model
         'apotti_id',
         'memo_id',
         'details',
+        'porisishto_type',
         'sequence',
         'print_type',
         'created_by',
