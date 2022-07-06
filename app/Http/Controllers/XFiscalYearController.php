@@ -102,10 +102,10 @@ class XFiscalYearController extends Controller
     }
 
 
-    public function currentFiscalYear(ShowOrDeleteRequest $request)
+    public function currentFiscalYear()
     {
         try {
-            $current_fiscal_year = XFiscalYear::where('start', date("Y"))->first();
+            $current_fiscal_year = XFiscalYear::Select('id')->where('is_current',1)->first()->id;
             $response = responseFormat('success', $current_fiscal_year);
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

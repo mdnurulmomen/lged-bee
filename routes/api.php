@@ -16,6 +16,7 @@ Route::post('client-login', [LoginController::class, 'clientLogin']);
 Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::customApiResource('fiscal-year', XFiscalYearController::class);
+    Route::post('fiscal-year/get-current-fiscal-year', [XFiscalYearController::class, 'currentFiscalYear']);
     Route::customApiResource('audit-query', XAuditQueryController::class);
     Route::customApiResource('risk-assessment', XRiskAssessmentController::class);
     Route::post('cost-center-type-wise-query', [XAuditQueryController::class, 'costCenterTypeWiseQuery']);

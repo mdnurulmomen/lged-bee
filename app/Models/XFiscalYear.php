@@ -16,6 +16,7 @@ class XFiscalYear extends Model
         'start',
         'end',
         'description',
+        'is_current',
     ];
 
 }
