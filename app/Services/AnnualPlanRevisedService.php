@@ -105,10 +105,10 @@ class AnnualPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
+
             $activity_id = $request->activity_id;
             $activity_type = $request->activity_type;
             $query = AnnualPlanMain::query();
-
 
             $annualPlanList = $query->with('annual_plan_items.ap_entities')
                                     ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
@@ -460,6 +460,7 @@ class AnnualPlanRevisedService
                 ->where('activity_type', $request->activity_type)
                 ->where('id', $request->annual_plan_main_id)
                 ->first();
+
 //            return ['status' => 'success', 'data' => $plan_datas['annual_plan_items']];
 
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
@@ -470,13 +471,16 @@ class AnnualPlanRevisedService
                 $activity = $plan_data['activity'];
                 unset($plan_data['activity']);
                 $annual_plan[$plan_data['id']] = $plan_data;
-                foreach ($annual_plan as $plan) {
-                    if ($activity['id'] == $plan['activity_id']) {
+
+//                return ['status' => 'success', 'data' => $annual_plan];
+
+//                foreach ($annual_plan as $plan) {
+                    if ($activity['id'] == $plan_data['activity_id']) {
                         $annual_plan[$plan_data['id']] = $plan_data;
                     } else {
                         $annual_plan = [];
                     }
-                }
+//                }
 
                 $ministriesBn = [];
                 $ministriesEn = [];
