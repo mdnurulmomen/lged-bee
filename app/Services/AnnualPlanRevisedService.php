@@ -453,42 +453,33 @@ class AnnualPlanRevisedService
 
             $directorate = XResponsibleOffice::where('office_id', $office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
-            $plan_datas = AnnualPlanMain::with('annual_plan_items')
-                ->with('annual_plan_items.ap_entities')
-                ->with('annual_plan_items.activity.milestones.milestone_calendar')
+            $plan_datas = AnnualPlan::with('ap_entities')
+                ->with('activity.milestones.milestone_calendar')
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('activity_type', $request->activity_type)
-                ->where('id', $request->annual_plan_main_id)
-                ->first();
+                ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                ->get()
+                ->groupBy('activity_id');
 
-//            return ['status' => 'success', 'data' => $plan_datas['annual_plan_items']];
+//            return ['status' => 'success', 'data' => $plan_datas];
 
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
             $all_ministries = [];
             $annual_plan = [];
-            foreach ($plan_datas['annual_plan_items'] as $plan_data) {
-                $activity = $plan_data['activity'];
-                unset($plan_data['activity']);
-                $annual_plan[$plan_data['id']] = $plan_data;
-
-//                return ['status' => 'success', 'data' => $annual_plan];
-
-//                foreach ($annual_plan as $plan) {
-                    if ($activity['id'] == $plan_data['activity_id']) {
-                        $annual_plan[$plan_data['id']] = $plan_data;
-                    } else {
-                        $annual_plan = [];
-                    }
-//                }
+            foreach ($plan_datas as $activity_id => $plan_data) {
+//                return ['status' => 'success', 'data' => $plan_data];
+                $activity = $plan_data[0]['activity'];
 
                 $ministriesBn = [];
                 $ministriesEn = [];
-                foreach ($plan_data['ap_entities'] as $ap_entities) {
-                    $ministryBn = $ap_entities['ministry_name_bn'];
-                    $ministriesBn[] = $ministryBn;
-                    $ministryEn = $ap_entities['ministry_name_en'];
-                    $ministriesEn[] = $ministryEn;
+                foreach ($plan_data as $plan) {
+                    foreach ($plan['ap_entities'] as $ap_entities) {
+                        $ministryBn = $ap_entities['ministry_name_bn'];
+                        $ministriesBn[] = $ministryBn;
+                        $ministryEn = $ap_entities['ministry_name_en'];
+                        $ministriesEn[] = $ministryEn;
+                    }
                 }
 
                 $ministries = [
@@ -496,12 +487,12 @@ class AnnualPlanRevisedService
                     'ministry_name_bn' => implode(' , ', array_unique($ministriesBn)),
                 ];
 
-
-
-                $all_ministries[$plan_data['id']] = $ministries;
-//                return ['status' => 'success', 'data' => $activity];
-                $plan_data_final[$activity['id']] = ['activity' => $activity] + ['ministries' => $ministries] + ['annual_plans' => $annual_plan];
+                $all_ministries[$activity_id] = $ministries;
+//
+                $plan_data_final[$activity['id']] = ['activity' => $activity] + ['ministries' => $ministries] + ['annual_plans' => $plan_data];
             }
+
+
             $pdf_data = [
                 'office_info' => $directorate,
                 'plans' => $plan_data_final,
