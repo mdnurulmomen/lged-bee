@@ -489,7 +489,7 @@ class AnnualPlanRevisedService
 
                 $all_ministries[$activity_id] = $ministries;
 //
-                $plan_data_final[$activity['id']] = ['activity' => $activity] + ['ministries' => $ministries] + ['annual_plans' => $plan_data];
+                $plan_data_final[$activity_id] = ['activity' => $activity] + ['ministries' => $ministries] + ['annual_plans' => $plan_data];
             }
 
 
