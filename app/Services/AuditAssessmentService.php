@@ -28,7 +28,7 @@ class AuditAssessmentService
         \DB::beginTransaction();
 
         try {
-            foreach ($request->audit_assessment_score_ids as $key => $score_id){
+            foreach ($request->audit_assessment_score_ids as $key => $score_id) {
                 $auditAssessmentScore = AuditAssessmentScore::find($score_id);
                 $auditAssessmentScore->is_first_half = $request->first_half_data[$key];
                 $auditAssessmentScore->is_second_half = $request->second_half_data[$key];
@@ -41,7 +41,6 @@ class AuditAssessmentService
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 
 
@@ -60,13 +59,12 @@ class AuditAssessmentService
                         ->whereColumn('audit_assessment_score_id', 'audit_assessment_scores.id')
                         ->groupBy('audit_assessment_score_id');
                 }])
-                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->get();
             return ['status' => 'success', 'data' => $responseData];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 
     public function getAssessmentEntity(Request $request): array
@@ -90,13 +88,13 @@ class AuditAssessmentService
                 return $q->where('category_id', $office_category_id);
             });
 
-            if($activity_id == 7){
-                $query->where('is_first_half',1);
-            }else{
-                $query->where('is_second_half',1);
+            if ($activity_id == 7) {
+                $query->where('is_first_half', 1);
+            } else {
+                $query->where('is_second_half', 1);
             }
 
-            $responseData = $query->where('fiscal_year_id',$request->fiscal_year_id)->get();
+            $responseData = $query->where('fiscal_year_id', $request->fiscal_year_id)->get();
 
             return ['status' => 'success', 'data' => $responseData];
         } catch (\Exception $exception) {
@@ -116,9 +114,9 @@ class AuditAssessmentService
 
         try {
 
-//            return ['status' => 'error', 'data' => $request->all()];
-            $opActivity = OpActivity::where('fiscal_year_id',$request->fiscal_year_id)
-                ->where('activity_type',$request->compliance)
+            //            return ['status' => 'error', 'data' => $request->all()];
+            $opActivity = OpActivity::where('fiscal_year_id', $request->fiscal_year_id)
+                ->where('activity_type', $request->compliance)
                 ->get();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
@@ -129,11 +127,11 @@ class AuditAssessmentService
             ];
             //for items
             $annualPlanEntityList = [];
-//            return ['status' => 'success', 'data' => $annual_plan_main;
+            //            return ['status' => 'success', 'data' => $annual_plan_main;
 
-            foreach ($request->audit_assessment_score_ids as $key => $score_id){
+            foreach ($request->audit_assessment_score_ids as $key => $score_id) {
                 //for first half
-                if ($request->first_half_data[$key] == 1 && $request->has_first_half_annual_plans[$key]==0){
+                if ($request->first_half_data[$key] == 1 && $request->has_first_half_annual_plans[$key] == 0) {
                     $auditAssessmentScore = AuditAssessmentScore::find($score_id);
                     $auditAssessmentScore->is_first_half = $request->first_half_data[$key];
                     $auditAssessmentScore->has_first_half_annual_plan = 1;
@@ -150,16 +148,17 @@ class AuditAssessmentService
                         'office_type_id' => $request->category_ids[$key],
                         'office_type_en' => $request->en_category_titles[$key],
                         'nominated_man_powers' => json_encode($nominated_man_powers, JSON_UNESCAPED_UNICODE),
+                        'created_by' => $cdesk->officer_id,
                     ];
 
-                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
-                        ->where('op_audit_calendar_event_id',$op_audit_calendar_event_id)
+                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id', $request->fiscal_year_id)
+                        ->where('op_audit_calendar_event_id', $op_audit_calendar_event_id)
                         ->first();
 
-                    if($annual_plan_main){
-                        $annualPlanData ['annual_plan_main_id'] = $annual_plan_main->id;
-                    }else{
-                        $main_plan = New AnnualPlanMain();
+                    if ($annual_plan_main) {
+                        $annualPlanData['annual_plan_main_id'] = $annual_plan_main->id;
+                    } else {
+                        $main_plan = new AnnualPlanMain();
                         $main_plan->fiscal_year_id = $request->fiscal_year_id;
                         $main_plan->op_audit_calendar_event_id = $op_audit_calendar_event_id;
                         $main_plan->activity_type = 'compliance';
@@ -170,7 +169,9 @@ class AuditAssessmentService
 
                     $annualPlan = AnnualPlan::create($annualPlanData);
 
-                    array_push($annualPlanEntityList, array(
+                    array_push(
+                        $annualPlanEntityList,
+                        array(
                             'annual_plan_id' => $annualPlan->id,
                             'ministry_id' => $request->ministry_ids[$key],
                             'ministry_name_bn' => $request->bn_ministry_names[$key],
@@ -185,7 +186,7 @@ class AuditAssessmentService
                 }
 
                 //for second half
-                if ($request->second_half_data[$key] == 1 && $request->has_second_half_annual_plans[$key]==0){
+                if ($request->second_half_data[$key] == 1 && $request->has_second_half_annual_plans[$key] == 0) {
                     $auditAssessmentScore = AuditAssessmentScore::find($score_id);
                     $auditAssessmentScore->is_second_half = $request->second_half_data[$key];
                     $auditAssessmentScore->has_second_half_annual_plan = 1;
@@ -202,16 +203,17 @@ class AuditAssessmentService
                         'office_type_id' => $request->category_ids[$key],
                         'office_type_en' => $request->en_category_titles[$key],
                         'nominated_man_powers' => json_encode($nominated_man_powers, JSON_UNESCAPED_UNICODE),
+                        'created_by' => $cdesk->officer_id,
                     ];
 
-                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
-                        ->where('op_audit_calendar_event_id',$op_audit_calendar_event_id)
+                    $annual_plan_main = AnnualPlanMain::where('fiscal_year_id', $request->fiscal_year_id)
+                        ->where('op_audit_calendar_event_id', $op_audit_calendar_event_id)
                         ->first();
 
-                    if($annual_plan_main){
-                        $annualPlanData ['annual_plan_main_id'] = $annual_plan_main->id;
-                    }else{
-                        $main_plan = New AnnualPlanMain();
+                    if ($annual_plan_main) {
+                        $annualPlanData['annual_plan_main_id'] = $annual_plan_main->id;
+                    } else {
+                        $main_plan = new AnnualPlanMain();
                         $main_plan->fiscal_year_id = $request->fiscal_year_id;
                         $main_plan->op_audit_calendar_event_id = $op_audit_calendar_event_id;
                         $main_plan->activity_type = 'compliance';
@@ -222,7 +224,9 @@ class AuditAssessmentService
 
                     $annualPlan = AnnualPlan::create($annualPlanData);
 
-                    array_push($annualPlanEntityList, array(
+                    array_push(
+                        $annualPlanEntityList,
+                        array(
                             'annual_plan_id' => $annualPlan->id,
                             'ministry_id' => $request->ministry_ids[$key],
                             'ministry_name_bn' => $request->bn_ministry_names[$key],
@@ -236,7 +240,7 @@ class AuditAssessmentService
                 }
             }
 
-            if (!empty($annualPlanEntityList)){
+            if (!empty($annualPlanEntityList)) {
                 AnnualPlanEntitie::insert($annualPlanEntityList);
             }
 
@@ -246,6 +250,5 @@ class AuditAssessmentService
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
-
     }
 }

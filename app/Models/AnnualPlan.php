@@ -41,6 +41,8 @@ class AnnualPlan extends Model
         'project_id',
         'project_name_bn',
         'project_name_en',
+        'created_by',
+        'updated_by',
     ];
 
     public function yearly_audit_calendar_event_schedule(): \Illuminate\Database\Eloquent\Relations\BelongsTo
