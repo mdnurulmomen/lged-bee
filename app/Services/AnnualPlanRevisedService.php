@@ -200,7 +200,7 @@ class AnnualPlanRevisedService
                 'schedule_id' => 0,
                 'milestone_id' => 0,
                 'activity_id' => $request->activity_id,
-                'activity_type' => $request->activity_type,
+                'activity_type' => $request->activity_type ?: 'compliance',
                 'fiscal_year_id' => $request->fiscal_year_id,
                 'op_audit_calendar_event_id' => $request->audit_calendar_event_id,
                 'annual_plan_type' => $request->annual_plan_type,
@@ -231,7 +231,7 @@ class AnnualPlanRevisedService
                 $main_plan = New AnnualPlanMain();
                 $main_plan->fiscal_year_id = $request->fiscal_year_id;
                 $main_plan->op_audit_calendar_event_id = $request->audit_calendar_event_id;
-                $main_plan->activity_type = $request->activity_type;
+                $main_plan->activity_type = $request->activity_type ?: 'compliance';
                 $main_plan->approval_status = 'draft';
                 $main_plan->save();
                 $plan_data['annual_plan_main_id'] = $main_plan->id;
