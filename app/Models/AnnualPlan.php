@@ -26,6 +26,7 @@ class AnnualPlan extends Model
         'thematic_title',
         'budget',
         'cost_center_total_budget',
+        'total_expenditure',
         'total_unit_no',
         'nominated_office_counts',
         'subject_matter',
@@ -79,7 +80,6 @@ class AnnualPlan extends Model
 
     public function office_order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(ApOfficeOrder::class, 'annual_plan_id', 'id')->where('audit_plan_id',0);
+        return $this->hasOne(ApOfficeOrder::class, 'annual_plan_id', 'id')->where('audit_plan_id', 0);
     }
-
 }
