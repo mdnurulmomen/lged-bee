@@ -453,6 +453,7 @@ class AnnualPlanRevisedService
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('activity_type', $request->activity_type)
                 ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                ->orderBy('activity_id','ASC')
                 ->get()
                 ->groupBy('activity_id');
 
