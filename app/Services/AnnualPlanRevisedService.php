@@ -106,6 +106,7 @@ class AnnualPlanRevisedService
 
             $activity_id = $request->activity_id;
             $activity_type = $request->activity_type;
+            $office_ministry_id = $request->office_ministry_id;
             $query = AnnualPlanMain::query();
 
             $annualPlanList = $query->with('annual_plan_items.ap_entities')
@@ -114,7 +115,15 @@ class AnnualPlanRevisedService
                 ->where('activity_type', $activity_type)
                 ->with('annual_plan_items', function ($q) use ($activity_id) {
                     return $q->where('activity_id', $activity_id);
-                })->first();
+                });
+
+            if($office_ministry_id){
+                $annualPlanList = $annualPlanList->with('annual_plan_items.ap_entities', function($q) use ($office_ministry_id){
+                    return $q->where('ministry_id',$office_ministry_id);
+                });
+            }
+
+            $annualPlanList = $query->first();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
