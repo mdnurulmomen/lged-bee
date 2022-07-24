@@ -475,19 +475,27 @@ class AcMemoService
             $audit_year_end = $request->audit_year_end;
             $start_date = $request->start_date;
             $end_date = $request->end_date;
+            $memo_code = $request->memo_code;
 
             $query = AcMemo::query();
+
+            $query->when($memo_code, function ($q, $memo_code) {
+                return $q->where('id', $memo_code);
+            });
 
             $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
                 return $q->where('fiscal_year_id', $fiscal_year_id);
             });
 
-            $query->when($activity_id, function ($q, $activity_id) {
-                $q->whereHas('audit_plan', function ($q) use ($activity_id) {
-                    return $q->where('activity_id', $activity_id);
-                });
-            });
 
+            if(!$memo_code){
+                $query->when($activity_id, function ($q, $activity_id) {
+                    $q->whereHas('audit_plan', function ($q) use ($activity_id) {
+                        return $q->where('activity_id', $activity_id);
+                    });
+                });
+            }
+            
             $query->when($entity_id, function ($q, $entity_id) {
                 return $q->where('parent_office_id', $entity_id);
             });
