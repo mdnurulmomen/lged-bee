@@ -107,23 +107,48 @@ class AnnualPlanRevisedService
             $activity_id = $request->activity_id;
             $activity_type = $request->activity_type;
             $office_ministry_id = $request->office_ministry_id;
-            $query = AnnualPlanMain::query();
 
-            $annualPlanList = $query->with('annual_plan_items.ap_entities')
-                ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
-                ->where('fiscal_year_id', $request->fiscal_year_id)
+            $annualPlanList = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
                 ->where('activity_type', $activity_type)
-                ->with('annual_plan_items', function ($q) use ($activity_id) {
-                    return $q->where('activity_id', $activity_id);
-                });
+                ->first();
 
-            if($office_ministry_id){
-                $annualPlanList = $annualPlanList->with('annual_plan_items.ap_entities', function($q) use ($office_ministry_id){
-                    return $q->where('ministry_id',$office_ministry_id);
-                });
-            }
+            $query = AnnualPlan::query();
 
-            $annualPlanList = $query->first();
+            $query->with('activity:id,title_en,title_bn,activity_key')
+                  ->where('activity_id',$activity_id);
+
+
+           if($office_ministry_id){
+               $query->with('ap_entities', function($q) use ($office_ministry_id){
+                   return $q->where('ministry_id',$office_ministry_id);
+               });
+           } else{
+               $query->with('ap_entities');
+           }
+
+           $annual_plan_main_id = $annualPlanList ? $annualPlanList->id : '';
+           $query->where('annual_plan_main_id',$annual_plan_main_id);
+
+            $annualPlanItemList =  $query->get();
+
+            $annualPlanList['annual_plan_items'] = $annualPlanItemList;
+
+
+//            $annualPlanList = $query->with('annual_plan_items.ap_entities')
+//                ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
+//                ->where('fiscal_year_id', $request->fiscal_year_id)
+//                ->where('activity_type', $activity_type)
+//                ->with('annual_plan_items', function ($q) use ($activity_id) {
+//                    return $q->where('activity_id', $activity_id);
+//                });
+//
+//            if($office_ministry_id){
+//                $annualPlanList = $annualPlanList->with('annual_plan_items.ap_entities', function($q) use ($office_ministry_id){
+//                    return $q->where('ministry_id',$office_ministry_id);
+//                });
+//            }
+//
+//            $annualPlanList = $query->first();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
