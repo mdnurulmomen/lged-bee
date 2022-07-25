@@ -114,17 +114,17 @@ class AnnualPlanRevisedService
 
             $query = AnnualPlan::query();
 
+            if($office_ministry_id){
+                $query->with('ap_entities')->whereHas('ap_entities', function($q) use ($office_ministry_id){
+                    return $q->where('ministry_id',$office_ministry_id);
+                });
+            } else{
+                $query->with('ap_entities');
+            }
+
             $query->with('activity:id,title_en,title_bn,activity_key')
                   ->where('activity_id',$activity_id);
 
-
-           if($office_ministry_id){
-               $query->with('ap_entities', function($q) use ($office_ministry_id){
-                   return $q->where('ministry_id',$office_ministry_id);
-               });
-           } else{
-               $query->with('ap_entities');
-           }
 
            $annual_plan_main_id = $annualPlanList ? $annualPlanList->id : '';
            $query->where('annual_plan_main_id',$annual_plan_main_id);
