@@ -35,64 +35,64 @@ class AnnualPlanMovementRevisedService
                 ->where('activity_type', $request->activity_type)
                 ->exists();
 
-            if ($isExistApprovalAuthority == false){
-                $data = [
-                    'fiscal_year_id' => $request->fiscal_year_id,
-                    'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,
-                    'annual_plan_main_id' => $request->annual_plan_main_id,
-                    'activity_type' => $request->activity_type,
-                    'duration_id' => $xFiscalYear->duration_id,
-
-                    'sender_office_id' => $cdesk->office_id,
-                    'sender_office_name_en' => $cdesk->office_name_en,
-                    'sender_office_name_bn' => $cdesk->office_name_bn,
-                    'sender_unit_id' => $cdesk->office_unit_id,
-                    'sender_unit_name_en' => $cdesk->office_unit_en,
-                    'sender_unit_name_bn' => $cdesk->office_unit_bn,
-                    'sender_officer_id' => $cdesk->officer_id,
-                    'sender_name_en' => $cdesk->officer_en,
-                    'sender_name_bn' => $cdesk->officer_bn,
-                    'sender_designation_id' => $cdesk->designation_id,
-                    'sender_designation_en' => $cdesk->designation_en,
-                    'sender_designation_bn' => $cdesk->designation_bn,
-
-                    'receiver_type' => $request->receiver_type,
-                    'receiver_office_id' => $request->receiver_office_id,
-                    'receiver_office_name_en' => $request->receiver_office_name_en,
-                    'receiver_office_name_bn' => $request->receiver_office_name_bn,
-                    'receiver_unit_id' => $request->receiver_unit_id,
-                    'receiver_unit_name_en' => $request->receiver_unit_name_en,
-                    'receiver_unit_name_bn' => $request->receiver_unit_name_bn,
-                    'receiver_officer_id' => $request->receiver_officer_id,
-                    'receiver_name_en' => $request->receiver_name_en,
-                    'receiver_name_bn' => $request->receiver_name_bn,
-                    'receiver_designation_id' => $request->receiver_designation_id,
-                    'receiver_designation_en' => $request->receiver_designation_en,
-                    'receiver_designation_bn' => $request->receiver_designation_bn,
-
-                    'status' => $request->status,
-                    'comments' => $request->comments
-                ];
-                AnnualPlanMovement::create($data);
-                AnnualPlanMain::where('id',$request->annual_plan_main_id)->update(['approval_status' => 'pending']);
+            if ($isExistApprovalAuthority){
+                AnnualPlanApproval::where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
+                    ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                    ->update(["approval_status" => 'pending']);
             }
             else{
-                AnnualPlanMovement::where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
-                    ->where('annual_plan_main_id', $request->annual_plan_main_id)
-                    ->update(["status" => 'pending']);
+                $annual_plan_approval = New AnnualPlanApproval();
+                $annual_plan_approval->fiscal_year_id = $request->fiscal_year_id;
+                $annual_plan_approval->office_id = $cdesk->office_id;
+                $annual_plan_approval->office_en = $cdesk->office_name_en;
+                $annual_plan_approval->office_bn = $cdesk->office_name_bn;
+                $annual_plan_approval->op_audit_calendar_event_id = $request->op_audit_calendar_event_id;
+                $annual_plan_approval->annual_plan_main_id = $request->annual_plan_main_id;
+                $annual_plan_approval->activity_type = $request->activity_type;
+                $annual_plan_approval->approval_status = 'pending';
+                $annual_plan_approval->save();
             }
 
-            $annual_plan_approval = New AnnualPlanApproval();
-            $annual_plan_approval->fiscal_year_id = $request->fiscal_year_id;
-            $annual_plan_approval->office_id = $cdesk->office_id;
-            $annual_plan_approval->office_en = $cdesk->office_name_en;
-            $annual_plan_approval->office_bn = $cdesk->office_name_bn;
-            $annual_plan_approval->op_audit_calendar_event_id = $request->op_audit_calendar_event_id;
-            $annual_plan_approval->annual_plan_main_id = $request->annual_plan_main_id;
-            $annual_plan_approval->activity_type = $request->activity_type;
-            $annual_plan_approval->approval_status = 'pending';
-            $annual_plan_approval->save();
+            AnnualPlanMain::where('id',$request->annual_plan_main_id)->update(['approval_status' => 'pending']);
 
+            $data = [
+                'fiscal_year_id' => $request->fiscal_year_id,
+                'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,
+                'annual_plan_main_id' => $request->annual_plan_main_id,
+                'activity_type' => $request->activity_type,
+                'duration_id' => $xFiscalYear->duration_id,
+
+                'sender_office_id' => $cdesk->office_id,
+                'sender_office_name_en' => $cdesk->office_name_en,
+                'sender_office_name_bn' => $cdesk->office_name_bn,
+                'sender_unit_id' => $cdesk->office_unit_id,
+                'sender_unit_name_en' => $cdesk->office_unit_en,
+                'sender_unit_name_bn' => $cdesk->office_unit_bn,
+                'sender_officer_id' => $cdesk->officer_id,
+                'sender_name_en' => $cdesk->officer_en,
+                'sender_name_bn' => $cdesk->officer_bn,
+                'sender_designation_id' => $cdesk->designation_id,
+                'sender_designation_en' => $cdesk->designation_en,
+                'sender_designation_bn' => $cdesk->designation_bn,
+
+                'receiver_type' => $request->receiver_type,
+                'receiver_office_id' => $request->receiver_office_id,
+                'receiver_office_name_en' => $request->receiver_office_name_en,
+                'receiver_office_name_bn' => $request->receiver_office_name_bn,
+                'receiver_unit_id' => $request->receiver_unit_id,
+                'receiver_unit_name_en' => $request->receiver_unit_name_en,
+                'receiver_unit_name_bn' => $request->receiver_unit_name_bn,
+                'receiver_officer_id' => $request->receiver_officer_id,
+                'receiver_name_en' => $request->receiver_name_en,
+                'receiver_name_bn' => $request->receiver_name_bn,
+                'receiver_designation_id' => $request->receiver_designation_id,
+                'receiver_designation_en' => $request->receiver_designation_en,
+                'receiver_designation_bn' => $request->receiver_designation_bn,
+
+                'status' => $request->status,
+                'comments' => $request->comments
+            ];
+            AnnualPlanMovement::create($data);
             \DB::commit();
             $responseData = ['status' => 'success', 'data' => 'Successfully Sent'];
         } catch (\Exception $exception) {
