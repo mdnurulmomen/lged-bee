@@ -24,6 +24,8 @@ class AnnualPlanMovementRevisedService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
+        \DB::beginTransaction();
         try {
             $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
             $isExistApprovalAuthority = AnnualPlanMovement::where('fiscal_year_id', $request->fiscal_year_id)
@@ -71,36 +73,30 @@ class AnnualPlanMovementRevisedService
                     'status' => $request->status,
                     'comments' => $request->comments
                 ];
-
                 AnnualPlanMovement::create($data);
-
-                $annual_plan_approval = New AnnualPlanApproval();
-                $annual_plan_approval->fiscal_year_id = $request->fiscal_year_id;
-                $annual_plan_approval->office_id = $cdesk->office_id;
-                $annual_plan_approval->office_en = $cdesk->office_name_en;
-                $annual_plan_approval->office_bn = $cdesk->office_name_bn;
-                $annual_plan_approval->op_audit_calendar_event_id = $request->op_audit_calendar_event_id;
-                $annual_plan_approval->annual_plan_main_id = $request->annual_plan_main_id;
-                $annual_plan_approval->activity_type = $request->activity_type;
-                $annual_plan_approval->approval_status = 'pending';
-//                $annual_plan_approval->status = 'null';
-                $annual_plan_approval->save();
-
                 AnnualPlanMain::where('id',$request->annual_plan_main_id)->update(['approval_status' => 'pending']);
-
-
-
-                //update op organization yearly audit calendar event
-//                OpOrganizationYearlyAuditCalendarEvent::where("id", $request->op_audit_calendar_event_id)
-//                    ->update(["approval_status" => $request->status]);
-
-
-                $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
             }
             else{
-                $responseData = ['status' => 'error', 'data' => 'Data Exist'];
+                AnnualPlanMovement::where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
+                    ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                    ->update(["status" => 'pending']);
             }
+
+            $annual_plan_approval = New AnnualPlanApproval();
+            $annual_plan_approval->fiscal_year_id = $request->fiscal_year_id;
+            $annual_plan_approval->office_id = $cdesk->office_id;
+            $annual_plan_approval->office_en = $cdesk->office_name_en;
+            $annual_plan_approval->office_bn = $cdesk->office_name_bn;
+            $annual_plan_approval->op_audit_calendar_event_id = $request->op_audit_calendar_event_id;
+            $annual_plan_approval->annual_plan_main_id = $request->annual_plan_main_id;
+            $annual_plan_approval->activity_type = $request->activity_type;
+            $annual_plan_approval->approval_status = 'pending';
+            $annual_plan_approval->save();
+
+            \DB::commit();
+            $responseData = ['status' => 'success', 'data' => 'Successfully Sent'];
         } catch (\Exception $exception) {
+            \DB::rollback();
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
         $this->emptyOfficeDBConnection();
