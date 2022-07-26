@@ -45,6 +45,11 @@ class AnnualPlan extends Model
         'updated_by',
     ];
 
+    public function annual_plan_main(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AnnualPlanMain::class, 'annual_plan_main_id', 'id');
+    }
+
     public function yearly_audit_calendar_event_schedule(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OpOrganizationYearlyAuditCalendarEventSchedule::class, 'milestone_id', 'activity_milestone_id');
