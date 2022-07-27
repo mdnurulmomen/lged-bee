@@ -172,4 +172,16 @@ class AcMemoController extends Controller
 
         return response()->json($response);
     }
+
+    public function updateAllEntityTransaction(Request $request, AcMemoService $acMemoService): \Illuminate\Http\JsonResponse
+    {
+        $auditMemoRecommendationStore = $acMemoService->updateAllEntityTransaction($request);
+        if (isSuccessResponse($auditMemoRecommendationStore)) {
+            $response = responseFormat('success', $auditMemoRecommendationStore['data']);
+        } else {
+            $response = responseFormat('error', $auditMemoRecommendationStore['data']);
+        }
+
+        return response()->json($response);
+    }
 }

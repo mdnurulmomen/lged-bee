@@ -251,6 +251,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('audit-memo-response-of-rpu', [AcMemoController::class, 'responseOfRpuMemo']);
         Route::post('audit-memo-acknowledgment-of-rpu', [AcMemoController::class, 'acknowledgmentOfRpuMemo']);
         Route::post('audit-memo-attachment-delete', [AcMemoController::class, 'auditMemoAttachmentDelete']);
+        Route::post('update-all-entity-transaction', [AcMemoController::class, 'updateAllEntityTransaction']);
     });
 
     //audit conduct apotti

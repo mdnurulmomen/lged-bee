@@ -11,6 +11,7 @@ use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\XFiscalYear;
+use App\Models\XResponsibleOffice;
 use App\Traits\ApiHeart;
 use App\Traits\GenericData;
 use Carbon\Carbon;
@@ -495,7 +496,7 @@ class AcMemoService
                     });
                 });
             }
-            
+
             $query->when($entity_id, function ($q, $entity_id) {
                 return $q->where('parent_office_id', $entity_id);
             });
@@ -712,6 +713,49 @@ class AcMemoService
 
         } catch (\Exception $exception) {
             \DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function updateAllEntityTransaction(Request $request): array
+    {
+
+        try {
+            $directorates = XResponsibleOffice::pluck('id');
+
+            foreach ($directorates as $directorate_id){
+
+                $office_db_con_response = $this->switchOffice($directorate_id);
+                if (!isSuccessResponse($office_db_con_response)) {
+                    return ['status' => 'error', 'data' => $office_db_con_response];
+                }
+
+                AcMemo::where('parent_office_id',$request->parent_office_id)
+                    ->update([
+                        'parent_office_id' => $request->office_id,
+                        'parent_office_name_bn' => $request->office_name_bn,
+                        'parent_office_name_en' => $request->office_name_en,
+                    ]);
+
+                Apotti::where('parent_office_id',$request->parent_office_id)
+                    ->update([
+                        'parent_office_id' => $request->office_id,
+                        'parent_office_name_bn' => $request->office_name_bn,
+                        'parent_office_name_en' => $request->office_name_en,
+                    ]);
+
+                ApottiItem::where('parent_office_id',$request->parent_office_id)
+                    ->update([
+                        'parent_office_id' => $request->office_id,
+                        'parent_office_name_bn' => $request->office_name_bn,
+                        'parent_office_name_en' => $request->office_name_en,
+                    ]);
+            }
+
+            return ['status' => 'success', 'data' => 'Attachment Delete Successfully'];
+
+        } catch (\Exception $exception) {
+
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
