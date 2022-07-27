@@ -131,7 +131,9 @@ class AnnualPlanRevisedService
 
             $annualPlanItemList =  $query->get();
 
-            $annualPlanList['annual_plan_items'] = $annualPlanItemList;
+            if($annualPlanList){
+                $annualPlanList['annual_plan_items'] =  $annualPlanItemList;
+            }
 
 
 //            $annualPlanList = $query->with('annual_plan_items.ap_entities')
