@@ -32,7 +32,7 @@ class ApEntityAuditPlanRevisedService
                 ->with('ap_entities:id,annual_plan_id,ministry_id,ministry_name_bn,ministry_name_en,entity_id,entity_name_bn,entity_name_en')
                 ->with('audit_plans.office_order:id,audit_plan_id,approved_status')
                 ->select('id','annual_plan_main_id','activity_id','fiscal_year_id','office_type','total_unit_no',
-                    'subject_matter','has_dc_schedule','status','created_at')
+                    'subject_matter','has_dc_schedule','status','created_at','project_id','project_name_en','project_name_bn')
                 ->where('fiscal_year_id', $fiscal_year_id)
                 ->where('activity_id', $activity_id);
 
