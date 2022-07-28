@@ -115,14 +115,13 @@ class AnnualPlanMovementRevisedService
             $annualPlanMovement = AnnualPlanMovement::where('fiscal_year_id',$request->fiscal_year_id)
                 ->where('op_audit_calendar_event_id',$request->op_audit_calendar_event_id)
                 ->where('duration_id',$xFiscalYear->duration_id)
+                ->where('sender_office_id',$request->office_id)
                 ->where('receiver_office_id',$cdesk->office_id)
-                ->where('receiver_unit_id',$cdesk->office_unit_id)
-                ->where('receiver_officer_id',$cdesk->officer_id)
                 ->where('status','pending')
                 ->latest()
                 ->first();
 
-            if (!empty($annualPlanMovement)){
+            if ($annualPlanMovement){
                 $data = [
                     'fiscal_year_id' => $request->fiscal_year_id,
                     'op_audit_calendar_event_id' => $request->op_audit_calendar_event_id,

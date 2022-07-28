@@ -124,7 +124,7 @@ class ArchiveApottiReportService
                         $apotti_attachments,
                         array(
                             'report_id' => $arc_report->id,
-                            'attachment_type' => 'apotti',
+                            'attachment_type' => 'report',
                             'user_define_name' => $userDefineFileName,
                             'attachment_name' => $fileName,
                             'attachment_path' => url('storage/archive/apotti/'),
