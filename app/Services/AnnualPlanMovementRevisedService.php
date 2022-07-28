@@ -30,14 +30,15 @@ class AnnualPlanMovementRevisedService
             $xFiscalYear = XFiscalYear::where('id',$request->fiscal_year_id)->first();
             $isExistApprovalAuthority = AnnualPlanMovement::where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
-                ->where('receiver_officer_id', $request->receiver_officer_id)
                 ->where('annual_plan_main_id', $request->annual_plan_main_id)
                 ->where('activity_type', $request->activity_type)
+                ->where('office_id', $cdesk->office_id)
                 ->exists();
 
             if ($isExistApprovalAuthority){
                 AnnualPlanApproval::where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
                     ->where('annual_plan_main_id', $request->annual_plan_main_id)
+                    ->where('office_id', $cdesk->office_id)
                     ->update(["approval_status" => 'pending']);
             }
             else{
