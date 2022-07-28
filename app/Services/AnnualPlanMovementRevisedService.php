@@ -32,7 +32,7 @@ class AnnualPlanMovementRevisedService
                 ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
                 ->where('annual_plan_main_id', $request->annual_plan_main_id)
                 ->where('activity_type', $request->activity_type)
-                ->where('office_id', $cdesk->office_id)
+                ->where('sender_office_id', $cdesk->office_id)
                 ->exists();
 
             if ($isExistApprovalAuthority){
