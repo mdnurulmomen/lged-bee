@@ -166,6 +166,7 @@ class AnnualPlanMovementRevisedService
 //                    ->update(["approval_status" => $request->status]);
 
                 AnnualPlanApproval::where("annual_plan_main_id", $request->annual_plan_main_id)
+                    ->where('office_id',$request->office_id)
                     ->update(["approval_status" => $request->status]);
 
                 AnnualPlanMain::where("id", $request->annual_plan_main_id)
