@@ -200,6 +200,7 @@ class AnnualPlanMovementRevisedService
         try{
             $annualPlanMovementList = AnnualPlanMovement::where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('op_audit_calendar_event_id', $request->op_audit_calendar_event_id)
+                ->latest()
                 ->get();
             $responseData = ['status' => 'success', 'data' => $annualPlanMovementList];
         }catch (\Exception $exception) {
