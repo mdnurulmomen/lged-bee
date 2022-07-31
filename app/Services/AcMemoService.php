@@ -10,6 +10,7 @@ use App\Models\AcMemoRecommendation;
 use App\Models\Apotti;
 use App\Models\ApottiItem;
 use App\Models\AuditVisitCalenderPlanMember;
+use App\Models\OfficeDomain;
 use App\Models\XFiscalYear;
 use App\Models\XResponsibleOffice;
 use App\Traits\ApiHeart;
@@ -721,7 +722,10 @@ class AcMemoService
     {
 
         try {
-            $directorates = XResponsibleOffice::pluck('id');
+
+            $directorates = OfficeDomain::where('office_id','!=',1)
+                ->where('office_id','!=',36)
+                ->pluck('office_id');
 
             foreach ($directorates as $directorate_id){
 
@@ -730,29 +734,41 @@ class AcMemoService
                     return ['status' => 'error', 'data' => $office_db_con_response];
                 }
 
-                AcMemo::where('parent_office_id',$request->parent_office_id)
+                AcMemo::whereIn('cost_center_id', $request->cost_center_id)
+                    ->where('parent_office_id',$request->parent_office_id)
+                    ->where('ministry_id', $request->office_ministry_id)
                     ->update([
                         'parent_office_id' => $request->office_id,
                         'parent_office_name_bn' => $request->office_name_bn,
                         'parent_office_name_en' => $request->office_name_en,
                     ]);
 
-                Apotti::where('parent_office_id',$request->parent_office_id)
+//                return ['status' => 'success', 'data' => 1];
+
+                $apotti = ApottiItem::whereIn('cost_center_id', $request->cost_center_id)
+                    ->where('parent_office_id', $request->parent_office_id)
+                    ->where('ministry_id', $request->office_ministry_id);
+
+                $apotti_ids = $apotti->pluck('apotti_id');
+
+//                return ['status' => 'success', 'data' => 1];
+
+                Apotti::whereIn('id', $apotti_ids)
+                    ->where('parent_office_id',$request->parent_office_id)
                     ->update([
                         'parent_office_id' => $request->office_id,
                         'parent_office_name_bn' => $request->office_name_bn,
                         'parent_office_name_en' => $request->office_name_en,
                     ]);
 
-                ApottiItem::where('parent_office_id',$request->parent_office_id)
-                    ->update([
-                        'parent_office_id' => $request->office_id,
-                        'parent_office_name_bn' => $request->office_name_bn,
-                        'parent_office_name_en' => $request->office_name_en,
-                    ]);
+                $apotti->update([
+                    'parent_office_id' => $request->office_id,
+                    'parent_office_name_bn' => $request->office_name_bn,
+                    'parent_office_name_en' => $request->office_name_en,
+                ]);
             }
 
-            return ['status' => 'success', 'data' => 'Attachment Delete Successfully'];
+            return ['status' => 'success', 'data' => 'Update Successfully'];
 
         } catch (\Exception $exception) {
 
