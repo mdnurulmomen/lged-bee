@@ -722,11 +722,11 @@ class AcMemoService
     {
 
         try {
-//            $directorates = OfficeDomain::where('office_id',17)->pluck('office_id');
+            $directorates = OfficeDomain::where('office_id',4)->pluck('office_id');
 
-            $directorates = OfficeDomain::where('office_id','!=',1)
-                ->where('office_id','!=',36)
-                ->pluck('office_id');
+//            $directorates = OfficeDomain::where('office_id','!=',1)
+//                ->where('office_id','!=',36)
+//                ->pluck('office_id');
 
             foreach ($directorates as $directorate_id){
 
