@@ -120,15 +120,12 @@ class ArchiveApottiReportService
                     $fileName = 'other_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
-                    array_push(
-                        $apotti_attachments,
-                        array(
-                            'report_id' => $arc_report->id,
-                            'attachment_type' => 'report',
-                            'user_define_name' => $userDefineFileName,
-                            'attachment_name' => $fileName,
-                            'attachment_path' => url('storage/archive/apotti/'),
-                        )
+                    $apotti_attachments[] = array(
+                        'report_id' => $arc_report->id,
+                        'attachment_type' => 'report',
+                        'user_define_name' => $userDefineFileName,
+                        'attachment_name' => $fileName,
+                        'attachment_path' => url('storage/archive/apotti/'),
                     );
                 }
             }

@@ -124,6 +124,7 @@ class ApDcOfficerOrderService
                 'advices' => $request->advices,
                 'approved_status' => $request->approved_status,
                 'order_cc_list' => $request->order_cc_list,
+                'cc_sender_details' => $request->cc_sender_details,
                 'draft_officer_id' => $cdesk->officer_id,
                 'draft_officer_name_en' => $cdesk->officer_en,
                 'draft_officer_name_bn' => $cdesk->officer_bn,
