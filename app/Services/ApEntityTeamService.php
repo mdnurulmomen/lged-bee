@@ -144,7 +144,7 @@ class ApEntityTeamService
                     'approve_status' => 1,
                 ];
 
-                if($office_order){
+                if($office_order && $request->modal_type != 'data-collection'){
                     $team_log =  AuditVisitCalendarPlanTeamUpdate::where('audit_plan_id',$request->audit_plan_id)->count();
                     $data['id'] = $team['id'];
 
@@ -154,7 +154,7 @@ class ApEntityTeamService
                         ApEntityIndividualAuditPlan::where('id',$request->audit_plan_id)->update(['has_update_office_order' => 2]);
                     }
 
-                }else{
+                }else {
                     AuditVisitCalendarPlanTeam::updateOrCreate(['id' => $id],$data);
                 }
             }
