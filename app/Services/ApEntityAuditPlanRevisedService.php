@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
+use App\Models\ApEntityIndividualAuditPlanLock;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalendarPlanTeamUpdate;
@@ -234,6 +235,44 @@ class ApEntityAuditPlanRevisedService
                 ->get()
                 ->toArray();
             return ['status' => 'success', 'data' => $teamSchedule];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    public function auditPlanAuditEditLock(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $user_details = $cdesk->officer_bn.','.$cdesk->designation_bn.')';
+
+            $edit_lock = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+
+            if($edit_lock->edit_time_start){
+                $start = strtotime($edit_lock->edit_time_start);
+                $end = strtotime(now());
+                $mins = ($end - $start) / 60;
+                if($mins > 30){
+                    $edit_lock->edit_user_details = $user_details;
+                    $edit_lock->edit_time_start = now();
+                    $edit_lock->save();
+                    return ['status' => 'success', 'data' => true];
+                }else{
+                    return ['status' => 'success', 'data' => false];
+                }
+            }else{
+
+                $edit_lock->edit_user_details = $user_details;
+                $edit_lock->edit_time_start = now();
+                $edit_lock->save();
+                return ['status' => 'success', 'data' => true];
+            }
+
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

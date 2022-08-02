@@ -134,6 +134,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/get-audit-plan-wise-team-members', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamMembers']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team-schedules', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamSchedules']);
             Route::post('entity-audit-plan/team-log-discard', [ApEntityAuditPlanRevisedController::class, 'teamLogDiscard']);
+            Route::post('entity-audit-plan/lock', [ApEntityAuditPlanRevisedController::class, 'auditPlanAuditEditLock']);
             Route::customApiResource('entity-audit-plan', ApEntityAuditPlanRevisedController::class);
 
             Route::post('entity-audit-plan/audit-team/store', [ApEntityAuditPlanRevisedController::class, 'storeAuditTeam']);
@@ -141,6 +142,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/audit-team/store-team-schedule', [ApEntityAuditPlanRevisedController::class, 'storeTeamSchedule']);
             Route::post('entity-audit-plan/audit-team/update-team-schedule', [ApEntityAuditPlanRevisedController::class, 'updateTeamSchedule']);
             Route::post('entity-audit-plan/audit-team/previously-assigned-designations', [ApEntityAuditPlanRevisedController::class, 'previouslyAssignedDesignations']);
+
+
 
             Route::post('office-order/audit-plan-list', [ApOfficeOrderController::class, 'auditPlanList']);
             Route::post('office-order/generate', [ApOfficeOrderController::class, 'generateOfficeOrder']);

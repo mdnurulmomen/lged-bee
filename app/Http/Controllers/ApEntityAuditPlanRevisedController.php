@@ -275,4 +275,21 @@ class ApEntityAuditPlanRevisedController extends Controller
         }
         return response()->json($response);
     }
+
+    public function auditPlanAuditEditLock(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $team_info = $apEntityAuditPlanRevisedService->auditPlanAuditEditLock($request);
+
+        if (isSuccessResponse($team_info)) {
+            $response = responseFormat('success', $team_info['data']);
+        } else {
+            $response = responseFormat('error', $team_info['data']);
+        }
+        return response()->json($response);
+    }
 }
