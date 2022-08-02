@@ -158,6 +158,7 @@ class ApDcOfficerOrderService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+        \DB::beginTransaction();
         try {
             $data = [
                 'ap_office_order_id' => $request->ap_office_order_id,
@@ -182,13 +183,22 @@ class ApDcOfficerOrderService
                 'modified_by' => $cdesk->officer_id,
             ];
 
+            //ap office order movement
             ApOfficeOrderMovement::updateOrcreate(['ap_office_order_id' => $request->ap_office_order_id,
                 'annual_plan_id' => $request->annual_plan_id,
                 'audit_plan_id' => $request->audit_plan_id,
                 'officer_type' => $request->officer_type
             ],$data);
+
+            //ap office order
+            ApOfficeOrder::where('id', $request->ap_office_order_id)->update([
+                'approved_status' => 'pending'
+            ]);
+
+            \DB::commit();
             $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
         } catch (\Exception $exception) {
+            \DB::rollback();
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
         }
         $this->emptyOfficeDBConnection();
