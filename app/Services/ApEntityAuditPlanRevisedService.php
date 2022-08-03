@@ -249,7 +249,7 @@ class ApEntityAuditPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $user_details = $cdesk->officer_bn.','.$cdesk->designation_bn.')';
+            $user_details = $cdesk->officer_bn.','.$cdesk->designation_bn;
 
             $edit_lock = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
 
