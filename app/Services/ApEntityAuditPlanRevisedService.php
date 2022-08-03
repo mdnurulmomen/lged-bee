@@ -10,6 +10,7 @@ use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalendarPlanTeamUpdate;
 use App\Models\AuditVisitCalenderPlanMember;
 use App\Models\OpActivity;
+use App\Models\RTemplateContent;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
 
@@ -97,8 +98,8 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $audit_template = ApEntityIndividualAuditPlan::with(['office_order','annual_plan','annual_plan.ap_entities'])->find($request->audit_plan_id)->toArray();
-            return ['status' => 'success', 'data' => $audit_template];
+            $individual_audit_plan = ApEntityIndividualAuditPlan::with(['fiscal_year','office_order','annual_plan','annual_plan.ap_entities'])->find($request->audit_plan_id)->toArray();
+            return ['status' => 'success', 'data' => $individual_audit_plan];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -139,12 +140,31 @@ class ApEntityAuditPlanRevisedService
             /*\Log::info(json_encode($draft_plan_data));*/
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
-                $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id)
+                $audit_plan_id = $request->audit_plan_id;
+                $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id)
                     ->update($draft_plan_data);
-                $draft_plan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+                $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id);
+
+                //delete template content
+                $templated_type = 'individual_plan';
+                RTemplateContent::where('relational_id',$audit_plan_id)->where('template_type', $templated_type)->delete();
             } else {
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);
+                $audit_plan_id = $draft_plan->id;
             }
+
+            //template content
+            $contents = [];
+            $content_list = gzuncompress(getDecryptedData($request->plan_description));
+            foreach (json_decode($content_list, true) as $content) {
+                $contents[] = [
+                    'relational_id' => $audit_plan_id,
+                    'template_type' => 'individual_plan',
+                    'content_key' => $content['content_key'],
+                    'content_value' => base64_encode($content['content']),
+                ];
+            }
+            RTemplateContent::insert($contents);
 
             $data = ['status' => 'success', 'data' => $draft_plan];
         } catch (\Exception $e) {
@@ -170,13 +190,13 @@ class ApEntityAuditPlanRevisedService
                 ->where('annual_plan_id', $request->annual_plan_id)
                 ->count();
 
-                $query = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::query() : AuditVisitCalendarPlanTeam::query();
+            $query = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::query() : AuditVisitCalendarPlanTeam::query();
 
-                $query = $query->where('fiscal_year_id', $request->fiscal_year_id);
-                $query = $query->where('activity_id', $request->activity_id);
-                $query = $query->where('audit_plan_id', $request->audit_plan_id);
-                $query = $query->where('annual_plan_id', $request->annual_plan_id);
-                $teams = $query->get()->toArray();
+            $query->where('fiscal_year_id', $request->fiscal_year_id);
+            $query->where('activity_id', $request->activity_id);
+            $query->where('audit_plan_id', $request->audit_plan_id);
+            $query->where('annual_plan_id', $request->annual_plan_id);
+            $teams = $query->get()->toArray();
 
             $data = ['status' => 'success', 'data' => $teams];
         } catch (\Exception $exception) {
