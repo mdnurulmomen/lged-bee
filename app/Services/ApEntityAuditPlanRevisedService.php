@@ -98,7 +98,7 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $individual_audit_plan = ApEntityIndividualAuditPlan::with(['fiscal_year','office_order','annual_plan','annual_plan.ap_entities'])->find($request->audit_plan_id)->toArray();
+            $individual_audit_plan = ApEntityIndividualAuditPlan::with(['fiscal_year','office_order','annual_plan','annual_plan.ap_entities','audit_teams'])->find($request->audit_plan_id)->toArray();
             return ['status' => 'success', 'data' => $individual_audit_plan];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -111,6 +111,7 @@ class ApEntityAuditPlanRevisedService
 
         $this->switchOffice($cdesk->office_id);
 
+        \DB::beginTransaction();
         try {
             $annual_plan_data = AnnualPlan::where('id', $request->annual_plan_id)->select('schedule_id', 'milestone_id', 'fiscal_year_id')->first();
             $draft_plan_data = [
@@ -133,8 +134,8 @@ class ApEntityAuditPlanRevisedService
                 'status' => $request->status,
                 'created_by' => $cdesk->officer_id,
                 'modified_by' => $cdesk->officer_id,
-                'device_type' => '',
-                'device_id' => '',
+                'device_type' => null,
+                'device_id' => null,
             ];
 
             /*\Log::info(json_encode($draft_plan_data));*/
@@ -155,7 +156,8 @@ class ApEntityAuditPlanRevisedService
 
             //template content
             $contents = [];
-            $content_list = gzuncompress(getDecryptedData($request->plan_description));
+            $content_list = json_decode(gzuncompress(getDecryptedData($request->plan_description)),true);
+
             foreach (json_decode($content_list, true) as $content) {
                 $contents[] = [
                     'relational_id' => $audit_plan_id,
@@ -166,8 +168,10 @@ class ApEntityAuditPlanRevisedService
             }
             RTemplateContent::insert($contents);
 
+            \DB::commit();
             $data = ['status' => 'success', 'data' => $draft_plan];
         } catch (\Exception $e) {
+            \DB::rollback();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
         $this->emptyOfficeDBConnection();
