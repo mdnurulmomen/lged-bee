@@ -112,7 +112,8 @@ class Apotti extends Model
 
     public function apotti_porisishtos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ApottiPorisishto::class, 'apotti_id', 'id');
+        return $this->hasMany(ApottiPorisishto::class, 'apotti_id', 'id')
+            ->whereNull('porisishto_type');
     }
 
     public function apotti_porisishto_summary(): \Illuminate\Database\Eloquent\Relations\HasOne
