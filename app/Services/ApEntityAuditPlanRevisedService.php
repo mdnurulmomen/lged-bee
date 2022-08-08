@@ -24,10 +24,12 @@ class ApEntityAuditPlanRevisedService
         $activity_id = $request->activity_id;
         $cdesk = json_decode($request->cdesk, false);
 
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
+
         try {
             $annualPlanQuery = AnnualPlan::with('annual_plan_main')
                 ->with('audit_plans:id,annual_plan_id,fiscal_year_id')
@@ -93,8 +95,9 @@ class ApEntityAuditPlanRevisedService
     public function editAuditPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
         try {
-            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            $office_db_con_response = $this->switchOffice($office_id);
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
