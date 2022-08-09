@@ -165,7 +165,7 @@ class ApEntityAuditPlanRevisedService
                 $contents[] = [
                     'relational_id' => $audit_plan_id,
                     'template_type' => 'individual_plan',
-                    'content_key' => $content['content_key'],
+                    'content_key' => $content['content_key'] ?? 'old_plan',
                     'content_value' => base64_encode($content['content']),
                 ];
             }
