@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AnnualPlan extends Model
+class AnnualPlanUpdate extends Model
 {
     use HasFactory;
 
@@ -41,8 +41,6 @@ class AnnualPlan extends Model
         'project_id',
         'project_name_bn',
         'project_name_en',
-        'is_revised',
-        'is_revised_delete',
         'created_by',
         'updated_by',
     ];

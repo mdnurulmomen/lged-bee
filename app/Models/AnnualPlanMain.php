@@ -17,10 +17,16 @@ class AnnualPlanMain extends Model
         'activity_type',
         'status',
         'approval_status',
+        'has_update_request',
     ];
 
     public function annual_plan_items()
     {
         return $this->hasMany(AnnualPlan::class, 'annual_plan_main_id', 'id');
+    }
+
+    public function annual_plan_logs()
+    {
+        return $this->hasMany(AnnualPlanMainLog::class, 'annual_plan_main_id', 'id');
     }
 }

@@ -97,6 +97,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 //        });
 
         Route::group(['prefix' => 'annual-plan/'], function () {
+            Route::post('update-annual-plan-main', [AnnualPlanRevisedController::class, 'updateAnnualPlanMain']);
+
             Route::post('all', [AnnualPlanRevisedController::class, 'allAnnualPlan']);
 
             Route::post('create', [AnnualPlanRevisedController::class, 'storeAnnualPlan']);

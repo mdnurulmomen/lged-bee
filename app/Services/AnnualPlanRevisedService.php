@@ -94,6 +94,34 @@ class AnnualPlanRevisedService
         return $data;
     }
 
+    public function updateAnnualPlanMain(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+
+        try {
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+//            return ['status' => 'error', 'data' => $request->all()];
+
+            $annualPlanMain = AnnualPlanMain::find($request->annual_plan_main_id);
+            $annualPlanMain->op_audit_calendar_event_id = $request->op_audit_calendar_event_id ? $request->op_audit_calendar_event_id : $annualPlanMain->op_audit_calendar_event_id;
+            $annualPlanMain->fiscal_year_id = $request->fiscal_year_id ? $request->fiscal_year_id : $annualPlanMain->fiscal_year_id;
+            $annualPlanMain->activity_id = $request->activity_id ? $request->activity_id : $annualPlanMain->activity_id;
+            $annualPlanMain->activity_type = $request->activity_type ? $request->activity_type : $annualPlanMain->activity_type;
+            $annualPlanMain->status = $request->status ? $request->status : $annualPlanMain->status;
+            $annualPlanMain->approval_status = $request->approval_status ? $request->approval_status : $annualPlanMain->approval_status;
+            $annualPlanMain->has_update_request = $request->has_update_request ? $request->has_update_request : $annualPlanMain->has_update_request;
+            $annualPlanMain->save();
+
+            return ['status' => 'success', 'data' => 'Update Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function showAnnualPlanEntities(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
@@ -108,9 +136,11 @@ class AnnualPlanRevisedService
             $activity_type = $request->activity_type;
             $office_ministry_id = $request->office_ministry_id;
 
-            $annualPlanList = AnnualPlanMain::where('fiscal_year_id',$request->fiscal_year_id)
+            $annualPlanList = AnnualPlanMain::with('annual_plan_logs')->where('fiscal_year_id',$request->fiscal_year_id)
                 ->where('activity_type', $activity_type)
                 ->first();
+
+            $has_update_request = isset($annualPlanList->has_update_request) &&  $annualPlanList->has_update_request ? $annualPlanList->has_update_request : 0;
 
             $query = AnnualPlan::query();
 
@@ -129,28 +159,17 @@ class AnnualPlanRevisedService
            $annual_plan_main_id = $annualPlanList ? $annualPlanList->id : '';
            $query->where('annual_plan_main_id',$annual_plan_main_id);
 
+            $query->when($has_update_request, function ($q) {
+                return $q->where('is_revised','!=','delete')
+                    ->orWhereNull('is_revised');
+            });
+
             $annualPlanItemList =  $query->get();
 
             if($annualPlanList){
                 $annualPlanList['annual_plan_items'] =  $annualPlanItemList;
             }
 
-
-//            $annualPlanList = $query->with('annual_plan_items.ap_entities')
-//                ->with('annual_plan_items.activity:id,title_en,title_bn,activity_key')
-//                ->where('fiscal_year_id', $request->fiscal_year_id)
-//                ->where('activity_type', $activity_type)
-//                ->with('annual_plan_items', function ($q) use ($activity_id) {
-//                    return $q->where('activity_id', $activity_id);
-//                });
-//
-//            if($office_ministry_id){
-//                $annualPlanList = $annualPlanList->with('annual_plan_items.ap_entities', function($q) use ($office_ministry_id){
-//                    return $q->where('ministry_id',$office_ministry_id);
-//                });
-//            }
-//
-//            $annualPlanList = $query->first();
 
             $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
@@ -256,7 +275,15 @@ class AnnualPlanRevisedService
             ];
 
             if ($request->annual_plan_main_id) {
+
                 $plan_data['annual_plan_main_id'] = $request->annual_plan_main_id;
+
+                if($request->has_update_request){
+                    $plan_data['is_revised'] = 'add';
+                    AnnualPlanMain::where('id',$request->id)
+                        ->update(['has_update_request' => 2]);
+                }
+
             } else {
                 $main_plan = new AnnualPlanMain();
                 $main_plan->fiscal_year_id = $request->fiscal_year_id;
@@ -417,14 +444,6 @@ class AnnualPlanRevisedService
             ];
 
             AnnualPlan::where('id', $request->id)->update($plan_data);
-            //            $assigned_info = OpYearlyAuditCalendarResponsible::select('assigned_staffs','assigned_budget')->where('activity_id',$request->activity_id)
-            //                ->where('office_id',$cdesk->office_id)->first();
-            //
-            //            $assigned_staffs = $assigned_info->assigned_staffs + $request->nominated_man_power_counts;
-            //            $assigned_budget = $assigned_info->assigned_budget + $request->budget;
-            //
-            //            OpYearlyAuditCalendarResponsible::where('activity_id',$request->activity_id)
-            //                ->where('office_id',$cdesk->office_id)->update(['assigned_staffs'=> $assigned_staffs,'assigned_budget' => $assigned_budget]);
 
             ApMilestone::where('annual_plan_id', $request->id)->delete();
 
@@ -446,7 +465,6 @@ class AnnualPlanRevisedService
                 if ($key != 'undefined') {
                     $ap_entity = new AnnualPlanEntitie();
                     $ap_entity->annual_plan_id = $request->id;
-                    //                    $ap_entity->layer_id = $entity['layer_id'];
                     $ap_entity->layer_id = 0;
                     $ap_entity->ministry_id = $entity['ministry_id'];
                     $ap_entity->ministry_name_bn = $entity['ministry_name_bn'];
@@ -474,7 +492,9 @@ class AnnualPlanRevisedService
 
     public function exportAnnualPlanBook(Request $request): array
     {
+
         $office_id = $request->office_id;
+        $has_update_request = $request->has_update_request;
 
         try {
             $office_db_con_response = $this->switchOffice($office_id);
@@ -484,16 +504,28 @@ class AnnualPlanRevisedService
 
             $directorate = XResponsibleOffice::where('office_id', $office_id)->select('office_name_en', 'office_name_bn', 'short_name_en', 'short_name_bn')->first()->toArray();
 
-            $plan_datas = AnnualPlan::with('ap_entities')
+            $query =  AnnualPlan::query();
+
+            $query->with('ap_entities')
                 ->with('activity.milestones.milestone_calendar')
                 ->where('fiscal_year_id', $request->fiscal_year_id)
                 ->where('activity_type', $request->activity_type)
                 ->where('annual_plan_main_id', $request->annual_plan_main_id)
-                ->orderBy('activity_id','ASC')
-                ->get()
-                ->groupBy('activity_id');
+                ->orderBy('activity_id','ASC');
 
-            //            return ['status' => 'success', 'data' => $plan_datas];
+            $query->when(!$has_update_request, function ($q) {
+                return $q->where('is_revised','!=','add')
+                    ->orWhereNull('is_revised');
+            });
+
+            $query->when($has_update_request, function ($q) {
+               return $q->where('is_revised','!=','delete')
+                    ->orWhereNull('is_revised');
+            });
+
+            $plan_datas = $query->get()->groupBy('activity_id');
+
+//            return ['status' => 'success', 'data' => $plan_datas];
 
             $fiscal_year = XFiscalYear::findOrFail($request->fiscal_year_id, ['start', 'end', 'description'])->toArray();
             $plan_data_final = [];
@@ -612,17 +644,30 @@ class AnnualPlanRevisedService
         }
         try {
 
+//            return ['status' => 'success', 'data' => $request->has_update_request];
+
             $has_audit_plan =  ApEntityIndividualAuditPlan::where('annual_plan_id', $request->annual_plan_id)->count();
 
             if ($has_audit_plan) {
                 return ['status' => 'error', 'data' => 'Annual Plan Has Individual Audit Plan'];
             }
 
-            AnnualPlan::find($request->annual_plan_id)->delete();
-            AnnualPlanEntitie::where('annual_plan_id', $request->annual_plan_id)->delete();
-            ApMilestone::where('annual_plan_id', $request->annual_plan_id)->delete();
+            // if annual plan has revised request
+            if($request->has_update_request){
+                 $annual_plan =  AnnualPlan::find($request->annual_plan_id);
+                 $annual_plan->is_revised = 'delete';
+                 $annual_plan->save();
 
-            $data = ['status' => 'success', 'data' => 'Annual Plan Delete Successfully'];
+                 AnnualPlanMain::where('id',$annual_plan->annual_plan_main_id)
+                 ->update(['has_update_request' => 2]);
+
+            }else{
+                AnnualPlan::find($request->annual_plan_id)->delete();
+                AnnualPlanEntitie::where('annual_plan_id', $request->annual_plan_id)->delete();
+                ApMilestone::where('annual_plan_id', $request->annual_plan_id)->delete();
+            }
+
+            $data = ['status' => 'success', 'data' => 'সফলভাবে বাতিল করা হয়েছে'];
         } catch (\Exception $exception) {
             $data = ['status' => 'error', 'data' => $exception->getMessage()];
         }

@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\AnnualPlanApproval;
+use App\Models\AnnualPlanEntitie;
 use App\Models\AnnualPlanMain;
+use App\Models\AnnualPlanMainLog;
 use App\Models\AnnualPlanMovement;
+use App\Models\ApMilestone;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
 use App\Models\OpYearlyAuditCalendarResponsible;
@@ -13,6 +16,9 @@ use App\Models\XFiscalYear;
 use App\Traits\GenericData;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Storage;
+use phpDocumentor\Reflection\Types\Null_;
+
 class AnnualPlanMovementRevisedService
 {
     use GenericData;
@@ -54,7 +60,11 @@ class AnnualPlanMovementRevisedService
                 $annual_plan_approval->save();
             }
 
-            AnnualPlanMain::where('id',$request->annual_plan_main_id)->update(['approval_status' => 'pending']);
+            $update_data['approval_status'] = 'pending';
+            $update_data['has_update_request'] = $request->has_update_request ? 3 : null;
+
+            AnnualPlanMain::where('id',$request->annual_plan_main_id)
+                ->update($update_data);
 
             $data = [
                 'fiscal_year_id' => $request->fiscal_year_id,
@@ -170,18 +180,50 @@ class AnnualPlanMovementRevisedService
                     ->where('office_id',$request->office_id)
                     ->update(["approval_status" => $request->status]);
 
-                AnnualPlanMain::where("id", $request->annual_plan_main_id)
-                    ->update(["approval_status" => $request->status]);
+                $annual_plan_main['approval_status'] = $request->status;
 
                 if($request->status == 'approved'){
                     $activity_list = AnnualPlan::Where('fiscal_year_id',$request->fiscal_year_id)
                         ->select(['activity_id',DB::raw("COUNT(id) as total_plan"),DB::raw("SUM(nominated_man_power_counts) as staff_assign"), DB::raw("SUM(budget) as budget")])
                         ->groupBy('activity_id')
                         ->get();
+
                     foreach ($activity_list as $activity){
                         OpYearlyAuditCalendarResponsible::where('office_id',$request->office_id)->where('activity_id',$activity['activity_id'])->update(['assigned_staffs' => $activity['staff_assign'] ? $activity['staff_assign'] : 0,'assigned_budget' => $activity['budget'] ? $activity['budget'] : 0,'total_plan' => $activity['total_plan'] ? $activity['total_plan'] : 0]);
                     }
+
+                    if($request->has_update_request == 3){
+                        $annual_plan_main['has_update_request'] = Null;
+                        $annual_plan_ids =  AnnualPlan::where('annual_plan_main_id',$request->annual_plan_main_id)
+                            ->where('is_revised','delete')
+                            ->pluck('id');
+
+                        AnnualPlan::whereIn('id',$annual_plan_ids)->delete();
+                        ApMilestone::whereIn('annual_plan_id',$annual_plan_ids)->delete();
+                        AnnualPlanEntitie::whereIn('annual_plan_id',$annual_plan_ids)->delete();
+
+                        AnnualPlan::where('annual_plan_main_id',$request->annual_plan_main_id)
+                            ->where('is_revised','add')
+                            ->update(['is_revised' => Null]);
+
+                        $folder_name = $request->office_id;
+                        $file_name = 'annual_plan_pdf';
+
+                        Storage::disk('public')->put('annual_plan_log/' . $folder_name . '/' . $file_name, base64_url_decode($request->annual_plan_log_pdf));
+
+                        $file_path = 'storage/annual_plan_log/' . $folder_name . '/' . $file_name;
+
+                        $annual_plan_main_log =  new AnnualPlanMainLog();
+                        $annual_plan_main_log->annual_plan_main_id = $request->annual_plan_main_id;
+                        $annual_plan_main_log->log_path = $file_path;
+                        $annual_plan_main_log->save();
+                    }
+                }else{
+                    $annual_plan_main['has_update_request'] = 2;
                 }
+
+                AnnualPlanMain::where("id", $request->annual_plan_main_id)
+                    ->update($annual_plan_main);
 
                 $responseData = ['status' => 'success', 'data' => 'Successfully Saved!'];
             }
@@ -193,6 +235,10 @@ class AnnualPlanMovementRevisedService
         }
         $this->emptyOfficeDBConnection();
         return $responseData;
+    }
+
+    public function annualPlanLogPdf(){
+
     }
 
     public function getMovementHistories(Request $request): array
@@ -208,6 +254,7 @@ class AnnualPlanMovementRevisedService
         }
         return $responseData;
     }
+
     public function getScheduleInfo(Request $request): array
     {
 //        return ['status' => 'success', 'data' => $request->cdesk];

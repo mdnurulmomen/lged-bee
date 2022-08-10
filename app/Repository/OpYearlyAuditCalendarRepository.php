@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\AnnualPlanApproval;
+use App\Models\AnnualPlanMain;
 use App\Models\OpActivity;
 use App\Models\OpOrganizationYearlyAuditCalendarEvent;
 use App\Models\OpOrganizationYearlyAuditCalendarEventSchedule;
@@ -158,21 +159,29 @@ class OpYearlyAuditCalendarRepository implements OpYearlyAuditCalendarInterface
 
     public function yearlyAuditCalendarEventList(Request $request): array
     {
-        $calendar_id = OpYearlyAuditCalendar::where('fiscal_year_id',$request->fiscal_year_id)->first()->id;
+        $approval_annual_plan = AnnualPlanApproval::where('fiscal_year_id',$request->fiscal_year_id)
+            ->where('activity_type',$request->activity_type)->get();
 
-//        $calendar_events = OpOrganizationYearlyAuditCalendarEvent::select('id AS event_id', 'office_id', 'status',
-//            'approval_status', 'activity_count', 'milestone_count')
-//            ->where('op_yearly_audit_calendar_id', $calendar_id)
-//            ->where('approval_status','!=','draft')
-//            ->with('office')
-//            ->get()
-//            ->toArray();
-        $calendar_events = AnnualPlanApproval::where('fiscal_year_id',$request->fiscal_year_id)->where('activity_type',$request->activity_type)->get();
+        $approval_plan = [];
 
-        if ($calendar_events) {
-            return responseFormat('success', $calendar_events);
+        foreach ($approval_annual_plan as $approval){
+
+            $office_db_con_response = $this->switchOffice($approval->office_id);
+
+            if (isSuccessResponse($office_db_con_response)) {
+                $annual_plan_main =  AnnualPlanMain::with('annual_plan_logs')->where('fiscal_year_id',$request->fiscal_year_id)
+                    ->where('activity_type',$request->activity_type)->first();
+
+                $approval_plan[$approval->office_id] = $approval;
+                $approval_plan[$approval->office_id]['annual_plan_main'] = $annual_plan_main;
+
+            }
+        }
+
+        if ($approval_annual_plan) {
+            return responseFormat('success', $approval_plan);
         } else {
-            return responseFormat('error', $calendar_events);
+            return responseFormat('error', $approval_plan);
         }
     }
 

@@ -48,6 +48,24 @@ class AnnualPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function updateAnnualPlanMain(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'annual_plan_main_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $update_annual_plan_main = $annualPlanRevisedService->updateAnnualPlanMain($request);
+
+        if (isSuccessResponse($update_annual_plan_main)) {
+            $response = responseFormat('success', $update_annual_plan_main['data']);
+        } else {
+            $response = responseFormat('error', $update_annual_plan_main['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function showAnnualPlanEntities(Request $request, AnnualPlanRevisedService $annualPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
@@ -248,7 +266,7 @@ class AnnualPlanRevisedController extends Controller
         ])->validate();
 
         $responseStore = $annualPlanMovementRevisedService->sendAnnualPlanReceiverToSender($request);
-
+//        dd($responseStore);
         if (isSuccessResponse($responseStore)) {
             $response = responseFormat('success', $responseStore['data']);
         } else {
