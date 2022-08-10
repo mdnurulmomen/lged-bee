@@ -38,7 +38,8 @@ class ApEntityAuditPlanRevisedService
                 ->select('id','annual_plan_main_id','activity_id','fiscal_year_id','office_type','total_unit_no',
                     'subject_matter','has_dc_schedule','status','created_at','project_id','project_name_en','project_name_bn')
                 ->where('fiscal_year_id', $fiscal_year_id)
-                ->where('activity_id', $activity_id);
+                ->where('activity_id', $activity_id)
+                ->whereNull('is_revised');
 
             if ($request->per_page && $request->page && !$request->all) {
                 $annualPlanQuery = $annualPlanQuery->paginate($request->per_page);
@@ -278,6 +279,8 @@ class ApEntityAuditPlanRevisedService
 
             $user_details = $cdesk->officer_bn.','.$cdesk->designation_bn;
 
+//            return ['status' => 'error', 'data' => $cdesk->officer_id];
+
             $edit_lock = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
 
             if($edit_lock->edit_time_start){
@@ -285,15 +288,20 @@ class ApEntityAuditPlanRevisedService
                 $end = strtotime(now());
                 $mins = ($end - $start) / 60;
                 if($mins > 30){
+                    $edit_lock->edit_employee_id = $cdesk->officer_id;
                     $edit_lock->edit_user_details = $user_details;
                     $edit_lock->edit_time_start = now();
                     $edit_lock->save();
                     return ['status' => 'success', 'data' => true];
                 }else{
-                    return ['status' => 'success', 'data' => false];
+                    if($cdesk->officer_id == $edit_lock->edit_employee_id){
+                        return ['status' => 'success', 'data' => true];
+                    }else{
+                        return ['status' => 'success', 'data' => false];
+                    }
                 }
             }else{
-
+                $edit_lock->edit_employee_id = $cdesk->officer_id;
                 $edit_lock->edit_user_details = $user_details;
                 $edit_lock->edit_time_start = now();
                 $edit_lock->save();
