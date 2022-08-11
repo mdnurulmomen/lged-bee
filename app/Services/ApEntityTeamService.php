@@ -161,7 +161,7 @@ class ApEntityTeamService
 
 
             if ($request->deleted_team) {
-                if ($office_order) {
+                if ($office_order && $request->modal_type != 'data-collection') {
                     AuditVisitCalendarPlanTeamUpdate::whereIn('id', $request->deleted_team)->delete();
                 }else{
                     AuditVisitCalendarPlanTeam::whereIn('id', $request->deleted_team)->delete();
