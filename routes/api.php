@@ -166,6 +166,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('risk-assessment/store', [ApRiskAssessmentController::class, 'store']);
             Route::post('risk-assessment/update', [ApRiskAssessmentController::class, 'update']);
             Route::post('risk-assessment/ap-risk-assessment-list', [ApRiskAssessmentController::class, 'apRiskAssessmentList']);
+            Route::post('risk-assessment/ap-risk-assessment-plan-wise', [ApRiskAssessmentController::class, 'apRiskAssessmentPlanWise']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {

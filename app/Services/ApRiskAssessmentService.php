@@ -139,6 +139,45 @@ class ApRiskAssessmentService
 
     }
 
+    public function apRiskAssessmentPlanWise(Request $request): array
+    {
+
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            $data['inherent_risk'] = ApRiskAssessment::with(['risk_assessment_items'])
+                ->select('id','total_risk_value','risk_rate','risk')
+                ->where('risk_assessment_type','inherent')
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->first();
+
+            $data['control_risk'] = ApRiskAssessment::with(['risk_assessment_items'])
+                ->select('id','total_risk_value','risk_rate','risk')
+                ->where('risk_assessment_type','control')
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->first();
+
+            $data['detection_risk'] = ApRiskAssessment::with(['risk_assessment_items'])
+                ->select('id','total_risk_value','risk_rate','risk')
+                ->where('risk_assessment_type','detection')
+                ->where('fiscal_year_id',$request->fiscal_year_id)
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->first();
+
+            return ['status' => 'success', 'data' => $data];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+
+        }
+    }
+
     public function riskAssessmentTypeWiseItemList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);

@@ -66,6 +66,19 @@ class ApRiskAssessmentController extends Controller
         return response()->json($response);
     }
 
+    public function apRiskAssessmentPlanWise(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
+    {
+        $responseData = $apRiskAssessmentService->apRiskAssessmentPlanWise($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function riskAssessmentTypeWiseItemList(Request $request, ApRiskAssessmentService $apRiskAssessmentService): \Illuminate\Http\JsonResponse
     {
         $responseData = $apRiskAssessmentService->riskAssessmentTypeWiseItemList($request);
