@@ -362,7 +362,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             //নিস্পন্ন অনিস্পন্ন report
             Route::group(['prefix' => 'get-status-wise'], function () {
                 Route::post('list', [ObservationReportController::class, 'list']);
-                Route::post('download', [ObservationReportController::class, 'download']);
             });
         });
     });
