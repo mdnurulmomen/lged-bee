@@ -400,6 +400,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
 
+    //vacation date
+    Route::group(['prefix' => 'vacation-date'], function () {
+        Route::post('year-wise-vacation-list', [XCalendarVacationController::class, 'yearWiseVacationList']);
+    });
+
     //Menu Action
     Route::customApiResource('menu-actions', PMenuActionController::class);
     Route::post('roles/assign-master-designations-to-role', [PRoleController::class, 'assignMasterDesignationsToRole']);
