@@ -222,40 +222,40 @@ class ApOfficerOrderService
             $auditPlan->has_update_office_order = $auditPlan->has_update_office_order == 2 ? 1 : $auditPlan->has_update_office_order;
             $auditPlan->save();
 
-            $data = [
-                'annual_plan_id' => $request->annual_plan_id,
-                'schedule_id' => $auditPlan->schedule_id,
-                'activity_id' => $auditPlan->activity_id,
-                'milestone_id' => $auditPlan->milestone_id,
-                'fiscal_year_id' => $auditPlan->fiscal_year_id,
-                'audit_plan_id' => $request->audit_plan_id,
-                'duration_id' => $annualPlan->activity->duration_id,
-                'outcome_id' => $annualPlan->activity->outcome_id,
-                'output_id' => $annualPlan->activity->output_id,
-                'memorandum_no' => $request->memorandum_no,
-                'memorandum_date' => $request->memorandum_date,
-                'heading_details' => $request->heading_details,
-                'advices' => $request->advices,
-                'approved_status' => $request->approved_status,
-                'order_cc_list' => $request->order_cc_list,
-                'cc_sender_details' => $request->cc_sender_details,
-                'draft_officer_id' => $cdesk->officer_id,
-                'draft_officer_name_en' => $cdesk->officer_en,
-                'draft_officer_name_bn' => $cdesk->officer_bn,
-                'draft_designation_id' => $cdesk->designation_id,
-                'draft_designation_name_en' => $cdesk->designation_en,
-                'draft_designation_name_bn' => $cdesk->designation_bn,
-                'draft_office_unit_id' => $cdesk->office_unit_id,
-                'draft_office_unit_en' => $cdesk->office_unit_en,
-                'draft_office_unit_bn' => $cdesk->office_unit_bn,
-                'draft_officer_phone' => $cdesk->phone,
-                'draft_officer_email' => $cdesk->email,
-                'created_by' => $cdesk->officer_id,
-                'modified_by' => $cdesk->officer_id,
-            ];
+            //ap office order
+            $apOfficeOrder = empty($request->id) ? new ApOfficeOrder() : ApOfficeOrder::find($request->id);
+            $apOfficeOrder->annual_plan_id = $request->annual_plan_id;
+            $apOfficeOrder->schedule_id = $auditPlan->schedule_id;
+            $apOfficeOrder->activity_id = $auditPlan->activity_id;
+            $apOfficeOrder->milestone_id = $auditPlan->milestone_id;
+            $apOfficeOrder->fiscal_year_id = $auditPlan->fiscal_year_id;
+            $apOfficeOrder->audit_plan_id = $request->audit_plan_id;
+            $apOfficeOrder->duration_id = $annualPlan->activity->duration_id;
+            $apOfficeOrder->outcome_id = $annualPlan->activity->outcome_id;
+            $apOfficeOrder->output_id = $annualPlan->activity->output_id;
+            $apOfficeOrder->memorandum_no = $request->memorandum_no;
+            $apOfficeOrder->memorandum_date = $request->memorandum_date;
+            $apOfficeOrder->heading_details = $request->heading_details;
+            $apOfficeOrder->advices = $request->advices;
+            $apOfficeOrder->approved_status = $request->approved_status;
+            $apOfficeOrder->order_cc_list = $request->order_cc_list;
+            $apOfficeOrder->cc_sender_details = $request->cc_sender_details;
+            $apOfficeOrder->issuer_details = $request->issuer_details;
+            $apOfficeOrder->draft_officer_id = $cdesk->officer_id;
+            $apOfficeOrder->draft_officer_name_en = $cdesk->officer_en;
+            $apOfficeOrder->draft_officer_name_bn = $cdesk->officer_bn;
+            $apOfficeOrder->draft_designation_id = $cdesk->designation_id;
+            $apOfficeOrder->draft_designation_name_en = $cdesk->designation_en;
+            $apOfficeOrder->draft_designation_name_bn = $cdesk->designation_bn;
+            $apOfficeOrder->draft_office_unit_id = $cdesk->office_unit_id;
+            $apOfficeOrder->draft_office_unit_en = $cdesk->office_unit_en;
+            $apOfficeOrder->draft_office_unit_bn = $cdesk->office_unit_bn;
+            $apOfficeOrder->draft_officer_phone = $cdesk->phone;
+            $apOfficeOrder->draft_officer_email = $cdesk->email;
+            $apOfficeOrder->created_by = $cdesk->officer_id;
+            $apOfficeOrder->modified_by = $cdesk->officer_id;
+            $apOfficeOrder->save();
 
-            ApOfficeOrder::updateOrcreate(['id' => $request->id,'annual_plan_id' => $request->annual_plan_id,
-                'audit_plan_id' => $request->audit_plan_id],$data);
             $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Generated!'];
         } catch (\Exception $exception) {
             $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
