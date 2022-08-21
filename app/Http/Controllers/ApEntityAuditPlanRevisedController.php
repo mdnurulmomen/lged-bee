@@ -47,6 +47,24 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
+    public function viewAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+            'fiscal_year_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $edit_plan = $apEntityAuditPlanRevisedService->viewAuditPlan($request);
+
+        if (isSuccessResponse($edit_plan)) {
+            $response = responseFormat('success', $edit_plan['data']);
+        } else {
+            $response = responseFormat('error', $edit_plan['data']);
+        }
+        return response()->json($response);
+    }
+
     public function editAuditPlan(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [

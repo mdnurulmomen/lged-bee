@@ -93,6 +93,30 @@ class ApEntityAuditPlanRevisedService
         }
     }
 
+    public function viewAuditPlan(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_id = $request->office_id ?: $cdesk->office_id;
+        try {
+            $office_db_con_response = $this->switchOffice($office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+
+            $data['individual_plan'] = ApEntityIndividualAuditPlan::with(['fiscal_year','office_order','annual_plan','annual_plan.ap_entities','audit_teams'])->find($request->audit_plan_id)->toArray();
+
+            $team_members = $this->getPlanWiseTeamMembers($request);
+            $data['team_members'] = $team_members['status'] == 'success'?$team_members['data']:[];
+
+            $risk_assessments = (new ApRiskAssessmentService())->apRiskAssessmentPlanWise($request);
+            $data['risk_assessments'] = $risk_assessments['status'] == 'success'?$risk_assessments['data']:[];
+
+            return ['status' => 'success', 'data' => $data];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
     public function editAuditPlan(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
