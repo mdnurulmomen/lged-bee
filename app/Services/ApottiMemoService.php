@@ -67,8 +67,8 @@ class ApottiMemoService
                 });
             });
 
+            $memo_list['total_memo'] = $query->count('id');
             $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])->orderBy('id','DESC')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
-            $memo_list['total_memo'] = AcMemo::count('id');
 
             return ['status' => 'success', 'data' => $memo_list];
 
