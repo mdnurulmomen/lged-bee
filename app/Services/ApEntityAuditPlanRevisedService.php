@@ -166,12 +166,21 @@ class ApEntityAuditPlanRevisedService
                 'device_id' => null,
             ];
 
+            if($request->is_continue){
+                $draft_plan_data['edit_time_start'] = now();
+            }else{
+                $draft_plan_data['edit_employee_id'] = Null;
+                $draft_plan_data['edit_user_details'] = Null;
+                $draft_plan_data['edit_time_start'] = Null;
+            }
+
             /*\Log::info(json_encode($draft_plan_data));*/
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
                 $audit_plan_id = $request->audit_plan_id;
                 $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id)
                     ->update($draft_plan_data);
+
                 $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id);
 
                 //delete template content
