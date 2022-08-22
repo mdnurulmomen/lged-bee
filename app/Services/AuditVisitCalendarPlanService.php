@@ -166,11 +166,25 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $entityList = AuditVisitCalenderPlanMember::select('entity_id','entity_name_bn','entity_name_en')
-                ->where('fiscal_year_id',$request->fiscal_year_id)
-                ->whereNotNull('entity_id')
-                ->distinct('entity_id','entity_name_bn','entity_name_en')
+            $query = AuditVisitCalenderPlanMember::query();
+            $query->select('entity_id','entity_name_bn','entity_name_en');
+
+            //fiscal_year_id
+            $fiscal_year_id = $request->fiscal_year_id;
+            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+                return $q->where('fiscal_year_id', $fiscal_year_id);
+            });
+
+            //activity_id
+            $activity_id = $request->activity_id ?? '';
+            $query->when($activity_id, function ($q, $activity_id) {
+                return $q->where('activity_id', $activity_id);
+            });
+
+            $entityList = $query->whereNotNull('entity_id')
+                ->distinct('entity_id')
                 ->get();
+
             return ['status' => 'success', 'data' => $entityList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
