@@ -89,11 +89,9 @@ class AcMemoService
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
             $audit_memo->status = 'draft';
-
             $audit_memo->finder_officer_id = $request->finder_officer_id;
             $audit_memo->finder_office_id = $request->finder_office_id;
             $audit_memo->finder_details = $request->finder_details;
-
             $audit_memo->team_leader_name = $request->team_leader_name;
             $audit_memo->team_leader_designation = $request->team_leader_designation;
             $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
@@ -276,6 +274,9 @@ class AcMemoService
             $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
             $audit_memo->memo_type = $request->memo_type;
             $audit_memo->memo_status = $request->memo_status;
+            $audit_memo->finder_officer_id = $request->finder_officer_id;
+            $audit_memo->finder_office_id = $request->finder_office_id;
+            $audit_memo->finder_details = $request->finder_details;
             $audit_memo->updated_by = $cdesk->officer_id;
 
             $changes = array();
@@ -300,12 +301,11 @@ class AcMemoService
             $porisistos = [];
             if (isset($request->porisisto_details)){
                 foreach ($request->porisisto_details as $key=>$porisisto){
-                    array_push($porisistos, array(
-                            'ac_memo_id' => $request->memo_id,
-                            'details' => $porisisto,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id
-                        )
+                    $porisistos[] = array(
+                        'ac_memo_id' => $request->memo_id,
+                        'details' => $porisisto,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id
                     );
                 }
                 if (!empty($porisistos)) {
@@ -327,18 +327,17 @@ class AcMemoService
                     $fileName = $office_domain_prefix . '_porisishto_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $audit_memo->id,
-                            'file_type' => 'porisishto',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'file_type' => 'porisishto',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }
@@ -353,18 +352,17 @@ class AcMemoService
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
-                    array_push($finalAttachments, array(
-                            'ac_memo_id' => $audit_memo->id,
-                            'file_type' => 'pramanok',
-                            'file_user_define_name' => $userDefineFileName,
-                            'file_custom_name' => $fileName,
-                            'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                            'file_size' => $fileSize,
-                            'file_extension' => $fileExtension,
-                            'sequence' => $key + 1,
-                            'created_by' => $cdesk->officer_id,
-                            'modified_by' => $cdesk->officer_id,
-                        )
+                    $finalAttachments[] = array(
+                        'ac_memo_id' => $audit_memo->id,
+                        'file_type' => 'pramanok',
+                        'file_user_define_name' => $userDefineFileName,
+                        'file_custom_name' => $fileName,
+                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_size' => $fileSize,
+                        'file_extension' => $fileExtension,
+                        'sequence' => $key + 1,
+                        'created_by' => $cdesk->officer_id,
+                        'modified_by' => $cdesk->officer_id,
                     );
                 }
             }
