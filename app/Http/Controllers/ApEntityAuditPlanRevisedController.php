@@ -162,15 +162,22 @@ class ApEntityAuditPlanRevisedController extends Controller
 
     public function getPlanWiseTeamMembers(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
-        Validator::make($request->all(), [
-            'audit_plan_id' => 'required|integer',
-            'cdesk' => 'required|json',
-        ])->validate();
-        $team_info = $apEntityAuditPlanRevisedService->getPlanWiseTeamMembers($request);
-        if (isSuccessResponse($team_info)) {
-            $response = responseFormat('success', $team_info['data']);
+        $members = $apEntityAuditPlanRevisedService->getPlanWiseTeamMembers($request);
+        if (isSuccessResponse($members)) {
+            $response = responseFormat('success', $members['data']);
         } else {
-            $response = responseFormat('error', $team_info['data']);
+            $response = responseFormat('error', $members['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getPlanAndTeamWiseTeamMembers(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
+    {
+        $members = $apEntityAuditPlanRevisedService->getPlanAndTeamWiseTeamMembers($request);
+        if (isSuccessResponse($members)) {
+            $response = responseFormat('success', $members['data']);
+        } else {
+            $response = responseFormat('error', $members['data']);
         }
         return response()->json($response);
     }

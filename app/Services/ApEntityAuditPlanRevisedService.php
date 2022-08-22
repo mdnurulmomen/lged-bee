@@ -261,7 +261,7 @@ class ApEntityAuditPlanRevisedService
         }
     }
 
-    //get annual/audit plan wise team members
+    //get audit plan wise team members
     public function getPlanWiseTeamMembers(Request $request): array
     {
         try {
@@ -274,6 +274,29 @@ class ApEntityAuditPlanRevisedService
                 ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
                     'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
                 ->where('audit_plan_id',$request->audit_plan_id)
+                ->orderBy('employee_grade','ASC')
+                ->get()
+                ->toArray();
+            return ['status' => 'success', 'data' => $teamMembers];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
+    //get audit plan and team wise team members
+    public function getPlanAndTeamWiseTeamMembers(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $teamMembers = AuditVisitCalenderPlanMember::distinct()
+                ->select('team_member_office_id','team_member_officer_id','team_member_name_bn','team_member_name_en','team_member_designation_bn',
+                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
+                ->where('audit_plan_id',$request->audit_plan_id)
+                ->where('team_id',$request->team_id)
                 ->orderBy('employee_grade','ASC')
                 ->get()
                 ->toArray();

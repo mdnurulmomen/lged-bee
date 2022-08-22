@@ -41,7 +41,7 @@ class AuditExecutionQueryService
                 ->with('office_order:id,audit_plan_id,approved_status')
                 ->withCount(['queries','memos'])
                 ->where('audit_plan_id', '!=', 0)
-                ->where('team_member_designation_id', $cdesk->designation_id)
+                ->where('team_member_officer_id', $cdesk->officer_id)
                 ->whereNotNull('cost_center_id')
                 ->orderBy('team_member_start_date', 'ASC')
                 ->paginate(config('bee_config.per_page_pagination'));

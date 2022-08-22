@@ -89,6 +89,11 @@ class AcMemoService
             $audit_memo->created_by = $cdesk->officer_id;
             $audit_memo->approve_status = 'draft';
             $audit_memo->status = 'draft';
+
+            $audit_memo->finder_officer_id = $request->finder_officer_id;
+            $audit_memo->finder_office_id = $request->finder_office_id;
+            $audit_memo->finder_details = $request->finder_details;
+
             $audit_memo->team_leader_name = $request->team_leader_name;
             $audit_memo->team_leader_designation = $request->team_leader_designation;
             $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
@@ -731,7 +736,7 @@ class AcMemoService
             foreach ($directorates as $directorate_id){
 
                 $office_db_con_response = $this->switchOffice($directorate_id);
-                
+
                 if (isSuccessResponse($office_db_con_response)) {
                     AcMemo::whereIn('cost_center_id', $request->cost_center_id)
                         ->where('parent_office_id',$request->parent_office_id)

@@ -135,6 +135,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('entity-audit-plan/get-audit-plan-wise-team', [ApEntityAuditPlanRevisedController::class, 'getAuditPlanWiseTeam']);
             Route::post('entity-audit-plan/get-team-info', [ApEntityAuditPlanRevisedController::class, 'getTeamInfo']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team-members', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamMembers']);
+            Route::post('entity-audit-plan/get-audit-plan-and-team-wise-team-members', [ApEntityAuditPlanRevisedController::class, 'getPlanAndTeamWiseTeamMembers']);
             Route::post('entity-audit-plan/get-audit-plan-wise-team-schedules', [ApEntityAuditPlanRevisedController::class, 'getPlanWiseTeamSchedules']);
             Route::post('entity-audit-plan/team-log-discard', [ApEntityAuditPlanRevisedController::class, 'teamLogDiscard']);
             Route::post('entity-audit-plan/lock', [ApEntityAuditPlanRevisedController::class, 'auditPlanAuditEditLock']);
