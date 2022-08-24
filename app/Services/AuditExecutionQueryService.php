@@ -276,6 +276,7 @@ class AuditExecutionQueryService
             $ac_query->description = $request->description;
             $ac_query->cc = $request->cc;
             $ac_query->status = 'pending';
+            $ac_query->created_by = $cdesk->officer_id;
             $ac_query->save();
 
 
@@ -359,7 +360,7 @@ class AuditExecutionQueryService
         }
         try {
             $ac_query = AcQuery::with('query_items')
-                ->with('plan_team:id,team_name,team_parent_id')
+                ->with('plan_team:id,team_name,team_parent_id,leader_name_bn,leader_name_en,leader_designation_name_bn,leader_designation_name_en')
                 ->where('id', $request->ac_query_id)
                 ->first();
             return ['status' => 'success', 'data' => $ac_query];
