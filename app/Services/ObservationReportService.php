@@ -77,9 +77,7 @@ class ObservationReportService
 
             $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
             if ($request->scope == 'download'){
-
                 $data['apotti_list'] = $query->get()->toArray();
-
             }else{
                 $data['apotti_list']  = $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             }
