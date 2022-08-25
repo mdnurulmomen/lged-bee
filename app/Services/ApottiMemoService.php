@@ -223,7 +223,7 @@ class ApottiMemoService
             $apotti_item->memo_title_bn = $request->memo_title_bn;
             $apotti_item->memo_description_bn = $request->memo_description_bn;
             $apotti_item->memo_type = $acMemo->memo_type;
-            $apotti_item->memo_status = $acMemo->memo_status;
+            $apotti_item->memo_status = 2;
             $apotti_item->response_of_rpu = $request->response_of_rpu;
             $apotti_item->irregularity_cause = $request->irregularity_cause;
             $apotti_item->audit_conclusion = $request->audit_conclusion;
