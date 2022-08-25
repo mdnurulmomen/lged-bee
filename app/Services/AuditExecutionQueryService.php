@@ -272,6 +272,7 @@ class AuditExecutionQueryService
             $ac_query->rpu_office_head_details = $request->rpu_office_head_details;
             $ac_query->memorandum_no = $request->memorandum_no;
             $ac_query->memorandum_date = $request->memorandum_date;
+            $ac_query->suthro = $request->suthro;
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
             $ac_query->cc = $request->cc;
@@ -316,6 +317,7 @@ class AuditExecutionQueryService
             $ac_query->rpu_office_head_details = $request->rpu_office_head_details;
             $ac_query->memorandum_no = $request->memorandum_no;
             $ac_query->memorandum_date = $request->memorandum_date;
+            $ac_query->suthro = $request->suthro;
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
             $ac_query->cc = $request->cc;

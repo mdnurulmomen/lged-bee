@@ -37,6 +37,7 @@ class AcQuery extends Model
         'rpu_office_head_details',
         'memorandum_no',
         'memorandum_date',
+        'suthro',
         'subject',
         'description',
         'cc',
