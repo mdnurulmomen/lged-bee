@@ -213,7 +213,7 @@ class ApEntityTeamService
     public function saveTeamSchedule($team_schedules, $audit_plan_id, $annual_plan_id)
     {
         try {
-            /*DB::beginTransaction();*/
+            DB::beginTransaction();
 
             $office_order = ApOfficeOrder::where('audit_plan_id',$audit_plan_id)
                 ->where('annual_plan_id', $annual_plan_id)
@@ -289,19 +289,19 @@ class ApEntityTeamService
                                     'activity_man_days' => empty($schedule_datum['activity_man_days']) ? null : $schedule_datum['activity_man_days'],
                                 ];
                                 $schedule_create = AuditVisitCalenderPlanMember::create($team_schedule);
-                                \Log::info($schedule_create);
+                                /*\Log::info($schedule_create);*/
                             }
                         }
                     }
                 }
             }
-            /*DB::commit();*/
+            DB::commit();
             $data = ['status' => 'success', 'data' => 'Saved'];
         } catch (\Exception $e) {
-            /*DB::rollBack();*/
+            DB::rollBack();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         } catch (\Error $e) {
-            /*DB::rollBack();*/
+            DB::rollBack();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
         }
         return $data;
@@ -318,7 +318,7 @@ class ApEntityTeamService
         $team_schedules = json_decode($request->team_schedules, true);
         $team_schedules = $team_schedules['schedule'];
 
-        /*DB::beginTransaction();*/
+        DB::beginTransaction();
         try {
 
             $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)
@@ -339,14 +339,14 @@ class ApEntityTeamService
                 throw new \Exception($saveSchedule['data']);
             }
 
-            /*DB::commit();*/
+            DB::commit();
             $this->emptyOfficeDBConnection();
             return $data;
         } catch (\Exception $e) {
-            /*DB::rollBack();*/
+            DB::rollBack();
             return ['status' => 'error', 'data' => $e->getMessage()];
         } catch (\Error $e) {
-            /*DB::rollBack();*/
+            DB::rollBack();
             return ['status' => 'error', 'data' => $e->getMessage()];
         }
     }
