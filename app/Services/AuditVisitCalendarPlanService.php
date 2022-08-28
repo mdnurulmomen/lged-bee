@@ -72,7 +72,10 @@ class AuditVisitCalendarPlanService
 //            $team_id = [$request->team_id];
 
             if($team_id){
-                $team_id = [$request->team_id];
+                 $child_team =  AuditVisitCalendarPlanTeam::where('team_parent_id',$request->team_id)
+                    ->pluck('id');
+                 $team_id[] = $child_team;
+                 $team_id[] = $request->team_id;
             }else{
                 $team_id = 0;
             }
