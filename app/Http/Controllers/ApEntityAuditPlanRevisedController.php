@@ -101,7 +101,7 @@ class ApEntityAuditPlanRevisedController extends Controller
         $add_plan = $apEntityAuditPlanRevisedService->update($request);
 
         if (isSuccessResponse($add_plan)) {
-            $add_plan = $add_plan['data']['id'];
+            $add_plan = $add_plan['data'];
             $response = responseFormat('success', $add_plan);
         } else {
             $response = responseFormat('error', $add_plan['data']);

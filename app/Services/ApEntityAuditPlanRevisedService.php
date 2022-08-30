@@ -177,16 +177,30 @@ class ApEntityAuditPlanRevisedService
             /*\Log::info(json_encode($draft_plan_data));*/
 
             if ($request->has('audit_plan_id') && $request->audit_plan_id > 0) {
+                $draft_plan_data['plan_no'] = $request->plan_no;
                 $audit_plan_id = $request->audit_plan_id;
-                $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id)
-                    ->update($draft_plan_data);
 
-                $draft_plan = ApEntityIndividualAuditPlan::find($audit_plan_id);
+                $plan_count =  ApEntityIndividualAuditPlan::where('plan_no',$request->plan_no)
+                    ->where('fiscal_year_id',$annual_plan_data->fiscal_year_id)
+                    ->where('id','!=',$audit_plan_id)
+                    ->count();
+
+                if($plan_count > 0){
+                    return ['status' => 'error', 'data' => 'exist'];
+                }else{
+                    ApEntityIndividualAuditPlan::find($audit_plan_id)->update($draft_plan_data);
+                }
 
                 //delete template content
                 $templated_type = 'individual_plan';
                 RTemplateContent::where('relational_id',$audit_plan_id)->where('template_type', $templated_type)->delete();
             } else {
+                $max_plan = ApEntityIndividualAuditPlan::where('fiscal_year_id',$annual_plan_data->fiscal_year_id)->max('id');
+
+                $plan_no = $max_plan ? $max_plan : 0;
+                $plan_no = $plan_no + 1;
+                $draft_plan_data['plan_no'] = $plan_no;
+
                 $draft_plan = ApEntityIndividualAuditPlan::create($draft_plan_data);
                 $audit_plan_id = $draft_plan->id;
             }
@@ -205,8 +219,10 @@ class ApEntityAuditPlanRevisedService
             }
             RTemplateContent::insert($contents);
 
+            $plan_data = ApEntityIndividualAuditPlan::select('id','plan_no')->find($audit_plan_id);
+
             \DB::commit();
-            $data = ['status' => 'success', 'data' => $draft_plan];
+            $data = ['status' => 'success', 'data' => $plan_data];
         } catch (\Exception $e) {
             \DB::rollback();
             $data = ['status' => 'error', 'data' => $e->getMessage()];
