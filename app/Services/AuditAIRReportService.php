@@ -43,7 +43,7 @@ class AuditAIRReportService
                 ->with('air_reports', function ($query) use ($air_type) {
                     return $query->with(['latest_r_air_movement'])->select('id', 'audit_plan_id', 'status')->where('type', $air_type);
                 })
-                ->select('id', 'annual_plan_id', 'schedule_id', 'activity_id', 'fiscal_year_id', 'created_at')
+                ->select('id','plan_no','annual_plan_id', 'schedule_id', 'activity_id', 'fiscal_year_id', 'created_at')
                 ->whereHas('office_order', function ($query) {
                     $query->where('approved_status', 'approved');
                 })
