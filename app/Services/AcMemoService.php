@@ -123,7 +123,7 @@ class AcMemoService
             $finalAttachments = [];
 
             //for porisishtos
-            if ($request->hasfile('porisishtos')) {
+            /*if ($request->hasfile('porisishtos')) {
                 foreach ($request->porisishtos as $key => $file) {
                     $userDefineFile = $file->getClientOriginalName();
                     $userDefineFileName = explode('.',$userDefineFile)[0];
@@ -145,7 +145,7 @@ class AcMemoService
                         'modified_by' => $cdesk->officer_id,
                     );
                 }
-            }
+            }*/
 
             //for pramanoks
             if ($request->hasfile('pramanoks')) {
@@ -319,7 +319,7 @@ class AcMemoService
             $finalAttachments = [];
 
             //for porisishtos
-            if ($request->hasfile('porisishtos')) {
+            /*if ($request->hasfile('porisishtos')) {
                 foreach ($request->porisishtos as $key => $file) {
                     $userDefineFileName = $file->getClientOriginalName();
                     $fileExtension = $file->extension();
@@ -340,7 +340,7 @@ class AcMemoService
                         'modified_by' => $cdesk->officer_id,
                     );
                 }
-            }
+            }*/
 
             //for pramanoks
             if ($request->hasfile('pramanoks')) {
