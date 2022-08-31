@@ -195,7 +195,7 @@ class ApEntityAuditPlanRevisedService
                 $templated_type = 'individual_plan';
                 RTemplateContent::where('relational_id',$audit_plan_id)->where('template_type', $templated_type)->delete();
             } else {
-                $max_plan = ApEntityIndividualAuditPlan::where('fiscal_year_id',$annual_plan_data->fiscal_year_id)->max('id');
+                $max_plan = ApEntityIndividualAuditPlan::where('fiscal_year_id',$annual_plan_data->fiscal_year_id)->max('plan_no');
 
                 $plan_no = $max_plan ? $max_plan : 0;
                 $plan_no = $plan_no + 1;
