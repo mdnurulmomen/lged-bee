@@ -66,7 +66,7 @@ class AuditExecutionQueryService
         try {
             //todo
             $acQuery = AcQuery::where('id', $request->ac_query_id)
-                ->with('plan_team:id,team_name,team_parent_id,leader_name_en,leader_name_bn')
+                ->with('plan_team:id,team_name,team_parent_id,leader_name_en,leader_name_bn,leader_designation_id,leader_designation_name_en,leader_designation_name_bn')
                 ->first();
 
             $fiscal_year_info = XFiscalYear::select('start', 'end')->find($acQuery->fiscal_year_id);
@@ -270,6 +270,9 @@ class AuditExecutionQueryService
             $ac_query->querier_designation_bn = $cdesk->designation_bn;
             $ac_query->querier_designation_en = $cdesk->designation_en;
 
+            $ac_query->team_leader_name = $request->issued_by == 'team_leader' ? $request->team_leader_name : $request->sub_team_leader_name;
+            $ac_query->team_leader_designation = $request->issued_by == 'team_leader' ? $request->team_leader_designation : $request->sub_team_leader_designation;
+
             $ac_query->rpu_office_head_details = $request->rpu_office_head_details;
             $ac_query->memorandum_no = $request->memorandum_no;
             $ac_query->memorandum_date = $request->memorandum_date;
@@ -277,6 +280,7 @@ class AuditExecutionQueryService
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
             $ac_query->cc = $request->cc;
+            $ac_query->responsible_person_details = $request->responsible_person_details;
             $ac_query->status = 'pending';
             $ac_query->created_by = $cdesk->officer_id;
             $ac_query->save();
