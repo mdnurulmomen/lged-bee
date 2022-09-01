@@ -270,6 +270,7 @@ class AuditExecutionQueryService
             $ac_query->querier_designation_bn = $cdesk->designation_bn;
             $ac_query->querier_designation_en = $cdesk->designation_en;
 
+            $ac_query->issued_by = $request->issued_by;
             $ac_query->team_leader_name = $request->issued_by == 'team_leader' ? $request->team_leader_name : $request->sub_team_leader_name;
             $ac_query->team_leader_designation = $request->issued_by == 'team_leader' ? $request->team_leader_designation : $request->sub_team_leader_designation;
 
@@ -326,6 +327,12 @@ class AuditExecutionQueryService
             $ac_query->subject = $request->subject;
             $ac_query->description = $request->description;
             $ac_query->cc = $request->cc;
+
+            $ac_query->issued_by = $request->issued_by;
+            $ac_query->team_leader_name = $request->issued_by == 'team_leader' ? $request->team_leader_name : $request->sub_team_leader_name;
+            $ac_query->team_leader_designation = $request->issued_by == 'team_leader' ? $request->team_leader_designation : $request->sub_team_leader_designation;
+            $ac_query->responsible_person_details = $request->responsible_person_details;
+
             $ac_query->status = 'pending';
             $ac_query->updated_by = $cdesk->officer_id;
             $ac_query->save();

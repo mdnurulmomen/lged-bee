@@ -46,6 +46,7 @@ class AcQuery extends Model
         'responsible_person_details',
         'comment',
         'has_sent_to_rpu',
+        'issued_by',
         'status',
         'created_by',
         'updated_by'
