@@ -308,28 +308,29 @@ class BroadsheetReplyService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
-            $sent_to_rpu = new BroadsheetReplyToResponsibleParty;
-            $sent_to_rpu->broad_sheet_reply_id = $request->broad_sheet_id;
-            $sent_to_rpu->ref_memorandum_no = $request->ref_memorandum_no;
-            $sent_to_rpu->memorandum_no = $request->memorandum_no;
-            $sent_to_rpu->memorandum_date = $request->memorandum_date;
-            $sent_to_rpu->rpu_office_head_details = $request->rpu_office_head_details;
-            $sent_to_rpu->subject = $request->subject;
-            $sent_to_rpu->description = $request->description;
-            $sent_to_rpu->braod_sheet_cc = $request->braod_sheet_cc;
-            $sent_to_rpu->is_sent_rpu = 0;
-            $sent_to_rpu->sender_id = $cdesk->officer_id;
-            $sent_to_rpu->sender_name_bn = $cdesk->officer_bn;
-            $sent_to_rpu->sender_name_en = $cdesk->officer_en;
-            $sent_to_rpu->sender_office_address  = $cdesk->address;
-            $sent_to_rpu->sender_designation_id = $cdesk->designation_id;
-            $sent_to_rpu->sender_designation_bn = $cdesk->designation_bn;
-            $sent_to_rpu->sender_designation_en = $cdesk->designation_en;
-            $sent_to_rpu->sender_unit_id = $cdesk->office_unit_id;
-            $sent_to_rpu->sender_unit_bn = $cdesk->office_unit_bn;
-            $sent_to_rpu->sender_unit_en = $cdesk->office_unit_en;
-            $sent_to_rpu->save();
-
+            BroadsheetReplyToResponsibleParty::updateOrCreate(
+                ['broad_sheet_reply_id' => $request->broad_sheet_id],
+                [
+                    'ref_memorandum_no' => $request->ref_memorandum_no,
+                    'memorandum_no' => $request->memorandum_no,
+                    'memorandum_date' => $request->memorandum_date,
+                    'rpu_office_head_details' => $request->rpu_office_head_details,
+                    'subject' => $request->subject,
+                    'description' => $request->description,
+                    'braod_sheet_cc' => $request->braod_sheet_cc,
+                    'is_sent_rpu' => 0,
+                    'sender_id' => $cdesk->officer_id,
+                    'sender_name_bn' => $cdesk->officer_bn,
+                    'sender_name_en' => $cdesk->officer_en,
+                    'sender_office_address' => $cdesk->address,
+                    'sender_designation_id' => $cdesk->designation_id,
+                    'sender_designation_bn' => $cdesk->designation_bn,
+                    'sender_designation_en' => $cdesk->designation_en,
+                    'sender_unit_id' => $cdesk->office_unit_id,
+                    'sender_unit_bn' => $cdesk->office_unit_bn,
+                    'sender_unit_en' => $cdesk->office_unit_en,
+                ]
+            );
             DB::commit();
 
             return ['status' => 'success', 'data' => 'সফলভাবে সংরক্ষণ করা হয়েছে'];
