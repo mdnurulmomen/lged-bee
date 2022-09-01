@@ -56,7 +56,8 @@
                     {{enTobn($loop->iteration)}}
                 </td>
                 <td class="text-left">
-                    প্ল্যান-{{enTobn($plan->id)}}
+{{--                    প্ল্যান-{{enTobn($plan->id)}}--}}
+                    প্ল্যান-{{enTobn($plan->plan_no)}}
                     @if($office_order_info)
                         <span class="label  @if($office_order_info && $office_order_info[1] == 'approved') label-success @else label-warning @endif">{{$office_order_info[1]}}</span>
                     @else

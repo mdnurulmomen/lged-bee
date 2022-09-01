@@ -200,20 +200,6 @@ class BroadsheetReplyService
 
             return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
 
-//            $send_decision_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.broad_sheet_apotti_update'), $data)->json();
-//
-//            if ($send_decision_to_rpu['status'] == 'success') {
-//                return ['status' => 'success', 'data' => 'অনুমোদন দেয়া হয়েছে'];
-//            }else{
-//                return ['status' => 'error', 'data' => 'অনুমোদন করা হয়নি'];
-//            }
-
-//            $apotti =  Apotti::find($apotti_item->apotti_id);
-//            $apotti->total_jorito_ortho_poriman =
-//            $apotti->save();
-
-
-
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

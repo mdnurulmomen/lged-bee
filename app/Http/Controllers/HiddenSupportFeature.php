@@ -50,7 +50,7 @@ class HiddenSupportFeature extends Controller
             ->where('activity_type','compliance')
             ->first();
 
-        $audit_plans = ApEntityIndividualAuditPlan::select('id','edit_user_details','edit_time_start')
+        $audit_plans = ApEntityIndividualAuditPlan::select('id','plan_no','edit_user_details','edit_time_start')
             ->where('fiscal_year_id',$fiscal_year_id)
             ->where('activity_id',$activity_id)
             ->get();
