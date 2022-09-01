@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
-use App\Models\ApEntityIndividualAuditPlanLock;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalendarPlanTeamUpdate;
@@ -270,7 +269,7 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $data = AuditVisitCalendarPlanTeam::with('child')->where('id', $request->team_id)->get()->toArray();
+            $data = AuditVisitCalendarPlanTeam::with('child')->where('id', $request->team_id)->first()->toArray();
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
