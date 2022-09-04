@@ -148,7 +148,7 @@ class ApEntityAuditPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'team_id' => 'required|integer',
-            'cdesk' => 'required|json',
+            'cdesk' => 'nullable|json',
         ])->validate();
         $team_info = $apEntityAuditPlanRevisedService->getTeamInfo($request);
         if (isSuccessResponse($team_info)) {
