@@ -277,6 +277,11 @@ class AcMemoService
             $audit_memo->finder_officer_id = $request->finder_officer_id;
             $audit_memo->finder_office_id = $request->finder_office_id;
             $audit_memo->finder_details = $request->finder_details;
+            $audit_memo->team_leader_name = $request->team_leader_name;
+            $audit_memo->team_leader_designation = $request->team_leader_designation;
+            $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
+            $audit_memo->sub_team_leader_designation = $request->sub_team_leader_designation;
+            $audit_memo->issued_by = $request->issued_by;
             $audit_memo->updated_by = $cdesk->officer_id;
 
             $changes = array();
