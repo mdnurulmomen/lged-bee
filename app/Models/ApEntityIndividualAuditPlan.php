@@ -87,4 +87,14 @@ class ApEntityIndividualAuditPlan extends Model
         return $this->hasMany(ApOfficeOrder::class, 'audit_plan_id', 'id')
             ->where('approved_status','log');
     }
+
+    public function memos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Apotti::class, 'audit_plan_id', 'id');
+    }
+
+    public function apottis(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Apotti::class, 'audit_plan_id', 'id');
+    }
 }

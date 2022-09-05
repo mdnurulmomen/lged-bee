@@ -124,7 +124,7 @@ class AuditVisitCalendarPlanService
 
             $query->where('approve_status', 1);
 
-            $calendar = $query->get();
+            $calendar = $query->with('annual_plan')->get();
 
             return ['status' => 'success', 'data' => $calendar];
 
