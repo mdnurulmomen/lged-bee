@@ -91,7 +91,7 @@ class ApottiSearchService
                 return $query->where('file_token_no', $file_token_no);
             });
 
-            $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+            $data['total_jorito_ortho_poriman'] = number_format($query->sum('jorito_ortho_poriman'),4, '.', '');
             $data['apotti_list']  = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $data];
