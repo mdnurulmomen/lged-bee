@@ -474,6 +474,7 @@ class AcMemoService
             $fiscal_year_id = $request->fiscal_year_id;
             $cost_center_id = $request->cost_center_id;
             $entity_id = $request->entity_id;
+            $audit_plan_id = $request->audit_plan_id;
             $activity_id = $request->activity_id;
             $team_id = $request->team_id;
             $memo_irregularity_type = $request->memo_irregularity_type;
@@ -508,6 +509,10 @@ class AcMemoService
 
             $query->when($entity_id, function ($q, $entity_id) {
                 return $q->where('parent_office_id', $entity_id);
+            });
+
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
             });
 
             $query->when($cost_center_id, function ($q, $cost_center_id) {
@@ -554,7 +559,7 @@ class AcMemoService
                 return $q->whereDate('memo_date', '<=', $end_date);
             });
 
-            $memo_list['memo_list'] = $query->with(['ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $memo_list['memo_list'] = $query->with(['audit_plan','audit_plan.annual_plan','ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             $memo_list['total_memo'] = AcMemo::count('id');
 
