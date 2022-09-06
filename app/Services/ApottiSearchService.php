@@ -81,8 +81,14 @@ class ApottiSearchService
             //memo_status
             $project_id = $request->project_id;
             $query->when($project_id, function ($query) use ($project_id) {
-                return $query->where('project_id', $project_id);
+                return $query->whereIn('project_id', $project_id);
             });
+
+
+            if($request->doner_id && !$project_id){
+                 $query->where('project_id', '-1');
+            }
+
 
             //jorito_ortho_poriman
             $total_jorito_ortho_poriman = $request->jorito_ortho_poriman;

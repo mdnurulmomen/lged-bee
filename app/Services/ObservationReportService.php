@@ -68,11 +68,16 @@ class ObservationReportService
                 return $query->where('memo_type', $memo_type);
             });
 
-            //memo_type
+            //project
             $project_id = $request->project_id;
+//            return ['status' => 'success', 'data' => $project_id];
             $query->when($project_id, function ($query) use ($project_id) {
-                return $query->where('project_id', $project_id);
+                return $query->whereIn('project_id', $project_id);
             });
+
+            if($request->doner_id && !$project_id){
+                 $query->where('project_id', '-1');
+            }
 
             //jorito_ortho_poriman
             $jorito_ortho_poriman = $request->jorito_ortho_poriman;
