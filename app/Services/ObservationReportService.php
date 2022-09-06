@@ -68,6 +68,12 @@ class ObservationReportService
                 return $query->where('memo_type', $memo_type);
             });
 
+            //memo_type
+            $project_id = $request->project_id;
+            $query->when($project_id, function ($query) use ($project_id) {
+                return $query->where('project_id', $project_id);
+            });
+
             //jorito_ortho_poriman
             $jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $query->when($jorito_ortho_poriman, function ($query) use ($jorito_ortho_poriman) {
@@ -75,7 +81,7 @@ class ObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+            $data['total_jorito_ortho_poriman'] = number_format($query->sum('jorito_ortho_poriman'));
             if ($request->scope == 'download'){
                 $data['apotti_list'] = $query->get()->toArray();
             }else{
