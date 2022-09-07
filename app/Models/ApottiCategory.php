@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApottiCategory extends Model
 {
-    use HasFactory;
+    protected $connection = 'BeeCoreDB';
 
     protected $fillable = [
         'name_bn',

@@ -99,18 +99,24 @@ class ApottiItem extends Model
 
     public function getMemoIrregularityTypeNameAttribute()
     {
-        if($this->attributes['memo_irregularity_type']){
+        if ($this->attributes['memo_irregularity_type']) {
             return self::$memo_irregularity_types[$this->attributes['memo_irregularity_type']];
-        }else{
+        } else {
             return self::$memo_irregularity_types[0];
         }
     }
 
+    public function oniyomer_category()
+    {
+        return $this->belongsTo(ApottiCategory::class, 'apotti_category_id', 'id');
+    }
+
+
     public function getMemoIrregularitySubTypeNameAttribute()
     {
-        if($this->attributes['memo_irregularity_sub_type']){
+        if ($this->attributes['memo_irregularity_sub_type']) {
             return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
-        }else{
+        } else {
             return self::$memo_irregularity_sub_types[0];
         }
 

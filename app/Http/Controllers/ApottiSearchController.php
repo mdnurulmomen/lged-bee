@@ -30,6 +30,28 @@ class ApottiSearchController extends Controller
         return response()->json($response);
     }
 
+    public function edit(Request $request, ApottiSearchService $apottiSearchService): \Illuminate\Http\JsonResponse
+    {
+        $apotti = $apottiSearchService->edit($request);
+        if (isSuccessResponse($apotti)) {
+            $response = responseFormat('success', $apotti['data']);
+        } else {
+            $response = responseFormat('error', $apotti['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function storeEditedApotti(Request $request, ApottiSearchService $apottiSearchService): \Illuminate\Http\JsonResponse
+    {
+        $apotti = $apottiSearchService->storeEditedApotti($request);
+        if (isSuccessResponse($apotti)) {
+            $response = responseFormat('success', $apotti['data']);
+        } else {
+            $response = responseFormat('error', $apotti['data']);
+        }
+        return response()->json($response);
+    }
+
     public function getMinistryWiseProject(Request $request, ApottiSearchService $apottiSearchService): \Illuminate\Http\JsonResponse
     {
         $apotti = $apottiSearchService->getMinistryWiseProject($request);
