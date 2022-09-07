@@ -25,6 +25,7 @@ class AuditExecutionQueryService
         try {
             $fiscal_year_id = $request->fiscal_year_id;
             $activity_id = $request->activity_id;
+            $audit_plan_id = $request->audit_plan_id;
 
             $query = AuditVisitCalenderPlanMember::query();
 
@@ -36,6 +37,10 @@ class AuditExecutionQueryService
                 return $q->where('activity_id', $activity_id);
             });
 
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
+
             $schedule_list =  $query->with('annual_plan:id,project_id,project_name_bn,project_name_en')
                 ->with('plan_parent_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end')
                 ->with('plan_team:id,team_parent_id,team_name,team_start_date,team_end_date,leader_name_en,leader_name_bn,leader_designation_name_en,leader_designation_name_bn,audit_year_start,audit_year_end,team_members')
@@ -45,8 +50,7 @@ class AuditExecutionQueryService
                 ->where('team_member_officer_id', $cdesk->officer_id)
                 ->whereNotNull('cost_center_id')
                 ->orderBy('team_member_start_date', 'ASC')
-                ->paginate(config('bee_config.per_page_pagination'));
-
+                ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $schedule_list];
 

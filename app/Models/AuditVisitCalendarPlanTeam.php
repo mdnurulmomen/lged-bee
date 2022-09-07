@@ -63,4 +63,9 @@ class AuditVisitCalendarPlanTeam extends Model
     {
         return $this->hasMany(AcMemo::class, 'team_id', 'id');
     }
+
+    public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
+    }
 }

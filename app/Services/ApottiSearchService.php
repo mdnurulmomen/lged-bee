@@ -78,6 +78,18 @@ class ApottiSearchService
                 return $query->where('memo_status', $memo_status);
             });
 
+            //memo_status
+            $project_id = $request->project_id;
+            $query->when($project_id, function ($query) use ($project_id) {
+                return $query->whereIn('project_id', $project_id);
+            });
+
+
+            if($request->doner_id && !$project_id){
+                 $query->where('project_id', '-1');
+            }
+
+
             //jorito_ortho_poriman
             $total_jorito_ortho_poriman = $request->jorito_ortho_poriman;
             $query->when($total_jorito_ortho_poriman, function ($query) use ($total_jorito_ortho_poriman) {
@@ -91,7 +103,7 @@ class ApottiSearchService
                 return $query->where('file_token_no', $file_token_no);
             });
 
-            $data['total_jorito_ortho_poriman'] = $query->sum('jorito_ortho_poriman');
+            $data['total_jorito_ortho_poriman'] = number_format($query->sum('jorito_ortho_poriman'),4, '.', '');
             $data['apotti_list']  = $query->with(['fiscal_year'])->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             return ['status' => 'success', 'data' => $data];
