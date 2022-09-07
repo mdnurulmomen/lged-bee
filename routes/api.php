@@ -128,7 +128,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         });
 
         Route::group(['prefix' => 'audit-plan'], function () {
-//            Route::customApiResource('entity-audit-plan', ApEntityAuditPlanController::class);
             Route::post('entity-audit-plan/new', [ApEntityAuditPlanRevisedController::class, 'createNewAuditPlan']);
             Route::post('entity-audit-plan/view', [ApEntityAuditPlanRevisedController::class, 'viewAuditPlan']);
             Route::post('entity-audit-plan/edit', [ApEntityAuditPlanRevisedController::class, 'editAuditPlan']);
@@ -168,6 +167,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('risk-assessment/update', [ApRiskAssessmentController::class, 'update']);
             Route::post('risk-assessment/ap-risk-assessment-list', [ApRiskAssessmentController::class, 'apRiskAssessmentList']);
             Route::post('risk-assessment/ap-risk-assessment-plan-wise', [ApRiskAssessmentController::class, 'apRiskAssessmentPlanWise']);
+        });
+
+        Route::group(['prefix' => 'psr-plan'], function () {
+            Route::post('store', [ApAnnualPlanPSRController::class, 'store']);
+            Route::post('view', [ApAnnualPlanPSRController::class, 'view']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {

@@ -20,4 +20,5 @@ return [
     'get-offices-info' => env('API_URL_RPU', '') . '/get-offices-info',
     'archive-migrate-apotti-to-rpu' => env('API_URL_RPU', '') . '/archive/migrate-apotti-to-rpu',
     'archive-migrate-report-to-rpu' => env('API_URL_RPU', '') . '/archive/migrate-report-to-rpu',
+    'store-edited-apotti' => env('API_URL_RPU', '') . '/apotti/store-edited-apotti',
 ];
