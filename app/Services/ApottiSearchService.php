@@ -144,8 +144,8 @@ class ApottiSearchService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $query = ApottiItem::select('id','memo_irregularity_type','memo_irregularity_sub_type','memo_status','project_id','project_name_en','project_name_bn')->query();
-
+            $query = ApottiItem::query();
+            $query = $query->select('id','memo_irregularity_type','memo_irregularity_sub_type','memo_status','project_id','project_name_en','project_name_bn');
             if($request->ministry_id){
                 $query = $query->where('ministry_id',$request->ministry_id);
             }
@@ -154,8 +154,9 @@ class ApottiSearchService
                 $project_list = $query->distinct()->pluck('project_id');
 
             }else if($request->type == 'by_project_ids'){
-                $project_list = $query->whereIn('project_id',$request->project_ids)->distinct('project_id')
-                    ->get();
+                $project_list = $query->whereIn('project_id',$request->project_ids)
+                    ->get()
+                    ->unique('project_id');
             }
             else{
                 $project_list = $query->distinct('project_id')
