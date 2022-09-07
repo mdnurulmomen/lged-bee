@@ -207,7 +207,7 @@ class RpuAirReportService
             if ($request->hasfile('broad_sheet_hard_copy')) {
                 $file = $request->broad_sheet_hard_copy;
                 $fileExtension = $file->extension();
-                $file_name = 'braod_sheet_heard_copy_' . uniqid() . '.' . $fileExtension;
+                $file_name = 'braod_sheet_heard_copy_' . $request->broadsheet_reply_id . '.' . $fileExtension;
                 $folder_name = $request->directorate_id;
                 Storage::disk('public')->put('broad_sheet_hard_copy/' . $folder_name . '/' . $file_name, File::get($file));
 
