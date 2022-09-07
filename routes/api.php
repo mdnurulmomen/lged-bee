@@ -281,6 +281,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('search-view', [ApottiSearchController::class, 'view']);
         Route::post('convert-memo-to-apotti', [ApottiMemoController::class, 'convertMemoToApotti']);
         Route::post('apotti-memo-list', [ApottiMemoController::class, 'memoList']);
+        Route::post('get-ministry-wise-project', [ApottiSearchController::class, 'getMinistryWiseProject']);
     });
 
 
