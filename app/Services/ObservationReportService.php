@@ -86,7 +86,7 @@ class ObservationReportService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
-            $data['total_jorito_ortho_poriman'] = number_format($query->sum('jorito_ortho_poriman'));
+            $data['total_jorito_ortho_poriman'] =  number_format($query->sum('jorito_ortho_poriman'),4, '.', '');
             if ($request->scope == 'download'){
                 $data['apotti_list'] = $query->get()->toArray();
             }else{
