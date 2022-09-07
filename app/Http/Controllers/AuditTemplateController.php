@@ -9,6 +9,7 @@ class AuditTemplateController extends Controller
 {
     public function show(Request $request): \Illuminate\Http\JsonResponse
     {
+        //return response()->json(responseFormat('error', $request->template_type));
         try {
             $template = AuditTemplate::select('content')
                 ->where('lang', $request->language)

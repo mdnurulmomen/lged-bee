@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+use App\Services\ApPSRAnnualPlanService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class ApAnnualPlanPSRController extends Controller
+{
+    public function store(Request $request, ApPSRAnnualPlanService $apEntityTeamService): \Illuminate\Http\JsonResponse
+    {
+        $psrResponse = $apEntityTeamService->store($request);
+
+        if (isSuccessResponse($psrResponse)) {
+            $response = responseFormat('success', $psrResponse['data']);
+        } else {
+            $response = responseFormat('error', $psrResponse['data']);
+        }
+        return response()->json($response);
+    }
+    public function view(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        // Validator::make($request->all(), [
+        //     'audit_plan_id' => 'required|integer',
+        //     'fiscal_year_id' => 'required|integer',
+        //     'cdesk' => 'required|json',
+        // ])->validate();
+
+        $edit_plan = $ApPSRAnnualPlanService->view($request);
+
+        if (isSuccessResponse($edit_plan)) {
+            $response = responseFormat('success', $edit_plan['data']);
+        } else {
+            $response = responseFormat('error', $edit_plan['data']);
+        }
+        return response()->json($response);
+    }
+}
