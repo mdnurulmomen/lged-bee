@@ -559,7 +559,7 @@ class AcMemoService
                 return $q->whereDate('memo_date', '<=', $end_date);
             });
 
-            $memo_list['memo_list'] = $query->with(['audit_plan','audit_plan.annual_plan','ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $memo_list['memo_list'] = $query->with(['audit_plan:id,plan_no,annual_plan_id','audit_plan.annual_plan:id,project_id,project_name_bn,project_name_en,subject_matter','ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             $memo_list['total_memo'] = AcMemo::count('id');
 
