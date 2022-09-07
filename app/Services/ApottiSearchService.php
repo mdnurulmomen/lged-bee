@@ -159,8 +159,7 @@ class ApottiSearchService
                     ->unique('project_id');
             }
             else{
-                $project_list = $query->distinct('project_id')
-                    ->get();
+                $project_list = $query->get()->unique('project_id');
             }
 
             return ['status' => 'success', 'data' => $project_list];
