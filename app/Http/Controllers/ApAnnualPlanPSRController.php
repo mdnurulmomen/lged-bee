@@ -20,12 +20,6 @@ class ApAnnualPlanPSRController extends Controller
     }
     public function view(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
     {
-        // Validator::make($request->all(), [
-        //     'audit_plan_id' => 'required|integer',
-        //     'fiscal_year_id' => 'required|integer',
-        //     'cdesk' => 'required|json',
-        // ])->validate();
-
         $edit_plan = $ApPSRAnnualPlanService->view($request);
 
         if (isSuccessResponse($edit_plan)) {

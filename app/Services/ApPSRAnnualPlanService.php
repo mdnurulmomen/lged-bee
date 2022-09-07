@@ -18,16 +18,17 @@ class ApPSRAnnualPlanService
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
-        $plan_no = 1;
-        try {
-            $annualPlanPSR = new AnnualPlanPSR();
-            // $annualPlanPSR->psr_plan_id = $request->psr_plan_id;
-            $annualPlanPSR->plan_no = $request->plan_no + 1;
-            $annualPlanPSR->annual_plan_id = $request->annual_plan_id;
-            $annualPlanPSR->plan_description = $request->plan_description;
-            $annualPlanPSR->save();
-            return ['status' => 'success', 'data' => 'Save successfully'];
 
+        try {
+            $annualPlanPSR = empty($request->psr_plan_id) ? new AnnualPlanPSR() : AnnualPlanPSR::find($request->psr_plan_id);
+            $annualPlanPSR->annual_plan_id = $request->annual_plan_id;
+            $annualPlanPSR->activity_id = $request->activity_id;
+            $annualPlanPSR->fiscal_year_id = $request->fiscal_year_id;
+            $annualPlanPSR->status = $request->status;
+            $annualPlanPSR->plan_description = $request->plan_description;
+            $annualPlanPSR->created_by = $cdesk->officer_id;
+            $annualPlanPSR->save();
+            return ['status' => 'success', 'data' => $annualPlanPSR->id];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
@@ -35,8 +36,6 @@ class ApPSRAnnualPlanService
 
     public function view(Request $request): array
     {
-        // return ['status' => 'error', 'data' => $request->psr_plan_id];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_id = $request->office_id ?: $cdesk->office_id;
         try {
@@ -44,9 +43,7 @@ class ApPSRAnnualPlanService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-
-            $psr = AnnualPlanPSR::where('id',$request->psr_plan_id)
-            ->first()->toArray();
+            $psr = AnnualPlanPSR::where('id',$request->psr_plan_id)->first()->toArray();
             return ['status' => 'success', 'data' => $psr];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
