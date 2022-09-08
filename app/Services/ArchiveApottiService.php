@@ -141,7 +141,7 @@ class ArchiveApottiService
             $arc_apotti = $request->id ? ArcApotti::find($request->id) : new ArcApotti();
             $arc_apotti->onucched_no = $request->onucched_no;
             $arc_apotti->apotti_oniyomer_dhoron = $request->apotti_oniyomer_category_child_id;
-            $arc_apotti->directorate_id  = $request->directorate_id;
+            $arc_apotti->directorate_id = $request->directorate_id;
             $arc_apotti->office_ministry_id = $request->ministry_id;
 
             if ($request->hasfile('cover_page')) {
@@ -151,15 +151,15 @@ class ArchiveApottiService
                         $fileName = 'cover_page_' . uniqid() . '.' . $fileExtension;
                         Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
                         $arc_apotti->cover_page = $fileName;
-                        $arc_apotti->cover_page_path  = 'storage/archive/apotti/';
-                        $arc_apotti->attachment_path  = 'storage/archive/apotti/';
+                        $arc_apotti->cover_page_path = 'storage/archive/apotti/';
+                        $arc_apotti->attachment_path = 'storage/archive/apotti/';
                     }
                 }
             }
 
-            $arc_apotti->cost_center_id  = $request->cost_center_id;
-            $arc_apotti->cost_center_name_en  = $request->cost_center_name_bn;
-            $arc_apotti->cost_center_name_bn  = $request->cost_center_name_bn;
+            $arc_apotti->cost_center_id = $request->cost_center_id;
+            $arc_apotti->cost_center_name_en = $request->cost_center_name_en;
+            $arc_apotti->cost_center_name_bn = $request->cost_center_name_bn;
             $arc_apotti->apotti_year = $request->audit_year_start . '-' . $request->audit_year_end;
             $arc_apotti->apotti_title = $request->apotti_title;
             $arc_apotti->jorito_ortho_poriman = $request->jorito_ortho_poriman;
@@ -168,21 +168,22 @@ class ArchiveApottiService
             $arc_apotti->apottir_dhoron = $request->apottir_dhoron;
             $arc_apotti->apotti_status = 'অনিস্পন্ন';
             $arc_apotti->entity_info_id = $request->entity_id;
-            $arc_apotti->entity_name = $request->entity_name;
-            $arc_apotti->created_by  = $cdesk->officer_id;
+            $arc_apotti->entity_name_en = $request->entity_name_en;
+            $arc_apotti->entity_name_bn = $request->entity_name_bn;
+            $arc_apotti->created_by = $cdesk->officer_id;
 
-            $arc_apotti->apotti_category_id  = $request->apotti_oniyomer_category_id;
-            $arc_apotti->apotti_sub_category_id  = $request->apotti_oniyomer_category_child_id;
+            $arc_apotti->apotti_category_id = $request->apotti_oniyomer_category_id;
+            $arc_apotti->apotti_sub_category_id = $request->apotti_oniyomer_category_child_id;
             $arc_apotti->year_start = $request->audit_year_start;
             $arc_apotti->year_end = $request->audit_year_end;
-            $arc_apotti->file_token_no  = $request->file_no;
+            $arc_apotti->file_token_no = $request->file_no;
             $arc_apotti->nirikkhar_shal = $request->audit_year_start . '-' . $request->audit_year_end;
             $arc_apotti->parent_office_id = $request->unit_group_office_id;
-            $arc_apotti->parent_office_name_en = $request->parent_office_name_bn;
+            $arc_apotti->parent_office_name_en = $request->parent_office_name_en;
             $arc_apotti->parent_office_name_bn = $request->parent_office_name_bn;
             $arc_apotti->ministry_id = $request->ministry_id;
-            $arc_apotti->ministry_name_en = $request->ministry_name;
-            $arc_apotti->ministry_name_bn = $request->ministry_name;
+            $arc_apotti->ministry_name_en = $request->ministry_name_en;
+            $arc_apotti->ministry_name_bn = $request->ministry_name_bn;
             $arc_apotti->save();
 
             //for attachments
@@ -310,13 +311,13 @@ class ArchiveApottiService
                         $fileName = 'cover_page_' . uniqid() . '.' . $fileExtension;
                         Storage::disk('public')->put('archive/apotti/' . $fileName, File::get($file));
                         $arc_apotti->cover_page = $fileName;
-                        $arc_apotti->cover_page_path  = 'storage/archive/apotti/';
-                        $arc_apotti->attachment_path  = 'storage/archive/apotti/';
+                        $arc_apotti->cover_page_path = 'storage/archive/apotti/';
+                        $arc_apotti->attachment_path = 'storage/archive/apotti/';
                     }
                 }
             }
 
-            $arc_apotti->updated_by  = $cdesk->officer_id;
+            $arc_apotti->updated_by = $cdesk->officer_id;
             $arc_apotti->save();
 
             //for attachments
@@ -447,20 +448,20 @@ class ArchiveApottiService
     public function edit(Request $request)
     {
         try {
-            $data['apotti']= ArcApotti::with(['oniyomer_category'])
+            $data['apotti'] = ArcApotti::with(['oniyomer_category'])
                 ->where('id', $request->apotti_id)->first()->toArray();
 
-            $data['main_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
-                ->where('attachment_type','main')->get()->toArray();
+            $data['main_attachments'] = ArcApottiAttachment::where('apotti_id', $request->apotti_id)
+                ->where('attachment_type', 'main')->get()->toArray();
 
-            $data['promanok_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
-                ->where('attachment_type','promanok')->get()->toArray();
+            $data['promanok_attachments'] = ArcApottiAttachment::where('apotti_id', $request->apotti_id)
+                ->where('attachment_type', 'promanok')->get()->toArray();
 
-            $data['porisishto_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
-                ->where('attachment_type','porisishto')->get()->toArray();
+            $data['porisishto_attachments'] = ArcApottiAttachment::where('apotti_id', $request->apotti_id)
+                ->where('attachment_type', 'porisishto')->get()->toArray();
 
-            $data['other_attachments'] = ArcApottiAttachment::where('apotti_id',$request->apotti_id)
-                ->where('attachment_type','other')->get()->toArray();
+            $data['other_attachments'] = ArcApottiAttachment::where('apotti_id', $request->apotti_id)
+                ->where('attachment_type', 'other')->get()->toArray();
 
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
