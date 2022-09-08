@@ -83,7 +83,7 @@ class ApOfficerOrderService
     public function showOfficeOrder(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_id = $request->office_id ? $request->office_id : $cdesk->office_id;
+        $office_id = $request->office_id ?: $cdesk->office_id;
         $office_db_con_response = $this->switchOffice($office_id);
         if (!isSuccessResponse($office_db_con_response)) {
             return ['status' => 'error', 'data' => $office_db_con_response];
@@ -205,9 +205,6 @@ class ApOfficerOrderService
 
     public function generateOfficeOrder(Request $request): array
     {
-
-       //return ['status' => 'error', 'data' =>date('Y/m/d',strtotime($request->memorandum_date))];
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -234,7 +231,9 @@ class ApOfficerOrderService
             $apOfficeOrder->outcome_id = $annualPlan->activity->outcome_id;
             $apOfficeOrder->output_id = $annualPlan->activity->output_id;
             $apOfficeOrder->memorandum_no = $request->memorandum_no;
+            $apOfficeOrder->memorandum_no_2 = $request->memorandum_no_2;
             $apOfficeOrder->memorandum_date = $request->memorandum_date;
+            $apOfficeOrder->memorandum_date_2 = $request->memorandum_date_2;
             $apOfficeOrder->heading_details = $request->heading_details;
             $apOfficeOrder->advices = $request->advices;
             $apOfficeOrder->approved_status = $request->approved_status;

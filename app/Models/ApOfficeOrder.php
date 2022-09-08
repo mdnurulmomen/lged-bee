@@ -23,7 +23,9 @@ class ApOfficeOrder extends Model
         'outcome_id',
         'output_id',
         'memorandum_no',
+        'memorandum_no_2',
         'memorandum_date',
+        'memorandum_date_2',
         'heading_details',
         'advices',
         'approved_status',
@@ -63,5 +65,13 @@ class ApOfficeOrder extends Model
             $value = str_replace('/','-',$value);
         }
         $this->attributes['memorandum_date'] = Carbon::parse($value)->format('Y-m-d');
+    }
+
+    public function setMemorandumDate2Attribute($value)
+    {
+        if (strstr($value, '/')){
+            $value = str_replace('/','-',$value);
+        }
+        $this->attributes['memorandum_date_2'] = Carbon::parse($value)->format('Y-m-d');
     }
 }
