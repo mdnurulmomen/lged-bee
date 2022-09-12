@@ -185,11 +185,9 @@ class ArchiveApottiService
             $arc_apotti->ministry_name_en = $request->ministry_name_en;
             $arc_apotti->ministry_name_bn = $request->ministry_name_bn;
 
-            if ($request->project_id) {
-                $arc_apotti->project_id = $request->project_id;
-                $arc_apotti->project_name_en = $request->project_name_en;
-                $arc_apotti->project_name_bn = $request->project_name_bn;
-            }
+            $arc_apotti->project_id = $request->project_id;
+            $arc_apotti->project_name_en = $request->project_id ? $request->project_name_en : null;
+            $arc_apotti->project_name_bn = $request->project_id ? $request->project_name_bn : null;
 
             $arc_apotti->save();
 
