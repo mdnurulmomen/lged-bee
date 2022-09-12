@@ -685,6 +685,8 @@ class ArchiveApottiService
                 'project_id' => $memo->project_id,
                 'project_name_en' => $memo->project_name_en,
                 'project_name_bn' => $memo->project_name_bn,
+                'is_sent_rp' => 1,
+
 
             ];
 
@@ -698,7 +700,7 @@ class ArchiveApottiService
                 $directorate = [];
             }
 
-            $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-apotti-to-rpu'), [
+            $rpu_migrate_data = [
                 'fiscal_year' => $fiscal_year_desc,
                 'memo' => json_encode($office_ac_memo_data),
                 'directorate' => json_encode($directorate),
@@ -706,7 +708,9 @@ class ArchiveApottiService
                 'attachments' => json_encode($archived_memo_attachments),
                 'apotti' => json_encode($office_apottis_create->toArray()),
                 'apotti_item' => json_encode($office_apotti_item_create),
-            ])->json();
+            ];
+
+            $rpu_migrate = $this->initRPUHttp()->post(config('cag_rpu_api.archive-migrate-apotti-to-rpu'), $rpu_migrate_data)->json();
 
             if (isSuccess($rpu_migrate, 'status', 'error')) {
                 throw new Exception('RPU ERROR' . ' - ' . json_encode($rpu_migrate));

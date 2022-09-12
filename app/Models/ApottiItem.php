@@ -60,7 +60,11 @@ class ApottiItem extends Model
         'cover_page',
         'attachment_path',
         'report_type_id',
-        'deleted_by'
+        'deleted_by',
+        'project_id',
+        'project_name_en',
+        'project_name_bn',
+
     ];
 
     public static $memo_status_list = [

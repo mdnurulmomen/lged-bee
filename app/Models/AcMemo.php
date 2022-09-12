@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AcMemo extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     use \Awobaz\Compoships\Compoships;
 
     protected $connection = 'OfficeDB';
@@ -121,6 +121,9 @@ class AcMemo extends Model
         'rpu_acceptor_signature',
         'memo_date',
         'porisisto_details',
+        'project_id',
+        'project_name_en',
+        'project_name_bn',
     ];
 
     public function getMemoTypeNameAttribute()
@@ -135,18 +138,18 @@ class AcMemo extends Model
 
     public function getMemoIrregularityTypeNameAttribute()
     {
-        if($this->attributes['memo_irregularity_type']){
+        if ($this->attributes['memo_irregularity_type']) {
             return self::$memo_irregularity_types[$this->attributes['memo_irregularity_type']];
-        }else{
+        } else {
             return self::$memo_irregularity_types[0];
         }
     }
 
     public function getMemoIrregularitySubTypeNameAttribute()
     {
-        if($this->attributes['memo_irregularity_sub_type']){
+        if ($this->attributes['memo_irregularity_sub_type']) {
             return self::$memo_irregularity_sub_types[$this->attributes['memo_irregularity_sub_type']];
-        }else{
+        } else {
             return self::$memo_irregularity_sub_types[0];
         }
 
@@ -154,12 +157,12 @@ class AcMemo extends Model
 
     public function setJoritoOrthoPorimanAttribute($value)
     {
-        $this->attributes['jorito_ortho_poriman'] = str_replace(",","",$value);
+        $this->attributes['jorito_ortho_poriman'] = str_replace(",", "", $value);
     }
 
     public function setOnishponnoJoritoOrthoPorimanAttribute($value)
     {
-        $this->attributes['onishponno_jorito_ortho_poriman'] = str_replace(",","",$value);
+        $this->attributes['onishponno_jorito_ortho_poriman'] = str_replace(",", "", $value);
     }
 
     public function ac_memo_porisishtos(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -9,7 +9,7 @@ use Illuminate\Database\Query\Builder;
 
 class Apotti extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $connection = 'OfficeDB';
 
@@ -69,7 +69,10 @@ class Apotti extends Model
         'attachment_path',
         'report_type_id',
         'is_sent_rp',
-        'is_archived_reported_apotti'
+        'is_archived_reported_apotti',
+        'project_id',
+        'project_name_en',
+        'project_name_bn',
     ];
 
 //    protected static function boot() {
@@ -97,7 +100,7 @@ class Apotti extends Model
     public function apotti_latest_status(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ApottiStatus::class, 'apotti_id', 'id')
-            ->orderBy('id','DESC');
+            ->orderBy('id', 'DESC');
     }
 
     public function apotti_airs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -119,6 +122,6 @@ class Apotti extends Model
     public function apotti_porisishto_summary(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ApottiPorisishto::class, 'apotti_id', 'id')
-            ->where('porisishto_type','summary');
+            ->where('porisishto_type', 'summary');
     }
 }
