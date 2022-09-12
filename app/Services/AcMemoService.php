@@ -487,6 +487,7 @@ class AcMemoService
             $start_date = $request->start_date;
             $end_date = $request->end_date;
             $memo_code = $request->memo_code;
+            $finder_officer_id = $request->finder_officer_id;
 
             $query = AcMemo::query();
 
@@ -521,6 +522,10 @@ class AcMemoService
 
             $query->when($team_id, function ($q, $team_id) {
                 return $q->where('team_id', $team_id);
+            });
+
+            $query->when($finder_officer_id, function ($q, $finder_officer_id) {
+                return $q->where('finder_officer_id', $finder_officer_id);
             });
 
             $query->when($memo_irregularity_type, function ($q, $memo_irregularity_type) {
@@ -559,7 +564,11 @@ class AcMemoService
                 return $q->whereDate('memo_date', '<=', $end_date);
             });
 
-            $memo_list['memo_list'] = $query->with(['audit_plan:id,plan_no,annual_plan_id','audit_plan.annual_plan:id,project_id,project_name_bn,project_name_en,subject_matter','ac_memo_attachments'])->orderBy('parent_office_name_en')->orderBy('cost_center_name_en')->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            $memo_list['memo_list'] = $query->with(['audit_plan:id,plan_no,annual_plan_id','audit_plan.annual_plan:id,project_id,project_name_bn,project_name_en,subject_matter','ac_memo_attachments'])
+                ->withCount('memo_logs')
+                ->orderBy('parent_office_name_en')
+                ->orderBy('cost_center_name_en')
+                ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
             $memo_list['total_memo'] = AcMemo::count('id');
 

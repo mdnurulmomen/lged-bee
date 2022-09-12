@@ -182,4 +182,8 @@ class AcMemo extends Model
         return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
     }
 
+    public function memo_logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcMemoLog::class, 'memo_id', 'id');
+    }
 }

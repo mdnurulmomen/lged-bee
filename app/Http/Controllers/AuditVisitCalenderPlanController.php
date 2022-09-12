@@ -61,7 +61,7 @@ class AuditVisitCalenderPlanController extends Controller
     public function fiscalYearCostCenterWiseTeams(Request $request, AuditVisitCalendarPlanService $auditVisitCalendarPlanService)
     {
 
-        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required','cost_center_id' => 'integer|required'])->validate();
+        \Validator::make($request->all(), ['fiscal_year_id' => 'integer|required', 'office_id' => 'integer|required','cost_center_id' => 'integer|nullable'])->validate();
 
         $all_teams = $auditVisitCalendarPlanService->fiscalYearCostCenterWiseTeams($request);
 

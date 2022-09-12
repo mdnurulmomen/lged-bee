@@ -155,8 +155,30 @@ class AuditVisitCalendarPlanService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $team_id = AuditVisitCalenderPlanMember::where('fiscal_year_id', $request->fiscal_year_id)->where('cost_center_id', $request->cost_center_id)->get()->unique('team_parent_id')->pluck('team_parent_id');
-            $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)->whereIn('id', $team_id)->get();
+            $cost_center_id = $request->cost_center_id;
+            $audit_plan_id = $request->audit_plan_id;
+
+            $team_query =  AuditVisitCalenderPlanMember::query();
+
+            $team_query->when($cost_center_id, function ($q, $cost_center_id) {
+                return $q->where('cost_center_id', $cost_center_id);
+            });
+
+            $team_query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
+
+            $team_query->when(!$audit_plan_id, function ($q) {
+                return $q->where('audit_plan_id','!=',0);
+            });
+
+            $team_id =  $team_query->get()->unique('team_parent_id')->pluck('team_parent_id');
+
+
+            $auditPlanTeamList = AuditVisitCalendarPlanTeam::with('child')->where('fiscal_year_id', $request->fiscal_year_id)
+                ->whereIn('id', $team_id)
+                ->get();
+
             return ['status' => 'success', 'data' => $auditPlanTeamList];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
