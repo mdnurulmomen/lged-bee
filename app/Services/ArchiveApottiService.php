@@ -184,6 +184,13 @@ class ArchiveApottiService
             $arc_apotti->ministry_id = $request->ministry_id;
             $arc_apotti->ministry_name_en = $request->ministry_name_en;
             $arc_apotti->ministry_name_bn = $request->ministry_name_bn;
+
+            if ($request->project_id) {
+                $arc_apotti->project_id = $request->project_id;
+                $arc_apotti->project_name_en = $request->project_name_en;
+                $arc_apotti->project_name_bn = $request->project_name_bn;
+            }
+
             $arc_apotti->save();
 
             //for attachments
@@ -578,6 +585,9 @@ class ArchiveApottiService
                 'approve_status' => 'draft',
                 'status' => 'draft',
                 'is_archived' => 1,
+                'project_id' => $memo->project_id,
+                'project_name_en' => $memo->project_name_en,
+                'project_name_bn' => $memo->project_name_bn,
             ];
 
             $office_ac_memo_create = AcMemo::create($office_ac_memo_data);
@@ -632,6 +642,10 @@ class ArchiveApottiService
                 'status' => 0,
                 'apotti_sequence' => 1,
                 'is_combined' => 0,
+                'project_id' => $memo->project_id,
+                'project_name_en' => $memo->project_name_en,
+                'project_name_bn' => $memo->project_name_bn,
+
                 'created_at' => $memo->created_at,
                 'updated_at' => $memo->updated_at,
             ];
@@ -670,6 +684,10 @@ class ArchiveApottiService
                 'onishponno_jorito_ortho_poriman' => Arr::has($office_ac_memo_data, 'onishponno_jorito_ortho_poriman') ? $office_ac_memo_data['onishponno_jorito_ortho_poriman'] : '',
                 'created_by' => Arr::has($office_ac_memo_data, 'created_by') ? $office_ac_memo_data['created_by'] : '',
                 'status' => 0,
+                'project_id' => $memo->project_id,
+                'project_name_en' => $memo->project_name_en,
+                'project_name_bn' => $memo->project_name_bn,
+
             ];
 
             $office_apotti_item_create = ApottiItem::create($office_apotti_items);
