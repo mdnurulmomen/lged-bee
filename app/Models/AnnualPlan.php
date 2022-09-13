@@ -91,4 +91,8 @@ class AnnualPlan extends Model
     {
         return $this->hasOne(ApOfficeOrder::class, 'annual_plan_id', 'id')->where('audit_plan_id', 0);
     }
+     public function annual_plan_psr(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AnnualPlanPSR::class, 'id', 'annual_plan_id');
+    }
 }

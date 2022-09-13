@@ -153,7 +153,8 @@ class AnnualPlanRevisedService
             }
 
             $query->with('activity:id,title_en,title_bn,activity_key')
-                  ->where('activity_id',$activity_id);
+                ->with('annual_plan_psr')
+                ->where('activity_id',$activity_id);
 
 
            $annual_plan_main_id = $annualPlanList ? $annualPlanList->id : '';

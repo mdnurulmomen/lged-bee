@@ -172,6 +172,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::group(['prefix' => 'psr-plan'], function () {
             Route::post('store', [ApAnnualPlanPSRController::class, 'store']);
             Route::post('view', [ApAnnualPlanPSRController::class, 'view']);
+            Route::post('edit', [ApAnnualPlanPSRController::class, 'edit']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {

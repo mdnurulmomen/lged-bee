@@ -29,4 +29,16 @@ class ApAnnualPlanPSRController extends Controller
         }
         return response()->json($response);
     }
+
+    public function edit(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $psr_plan = $ApPSRAnnualPlanService->editpsrplan($request);
+
+        if (isSuccessResponse($psr_plan)) {
+            $response = responseFormat('success', $psr_plan['data']);
+        } else {
+            $response = responseFormat('error', $psr_plan['data']);
+        }
+        return response()->json($response);
+    }
 }

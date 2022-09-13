@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\AnnualPlan;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,4 +23,5 @@ class AnnualPlanPSR extends Model
         'created_by',
         'modified_by',
     ];
+   
 }
