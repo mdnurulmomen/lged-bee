@@ -63,7 +63,7 @@ class ApPSRAnnualPlanService
 //            return ['status' => 'error', 'data' => $cdesk->officer_id];
 
             $edit_psr = AnnualPlanPSR::find($request->annual_plan_id);
-dd($edit_psr);
+// dd($edit_psr);
             if($edit_psr){
             $annualPlanPSR->psr_plan_id = $request->psr_plan_id;
             $annualPlanPSR->activity_id = $request->activity_id;

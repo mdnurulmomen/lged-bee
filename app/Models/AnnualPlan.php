@@ -93,6 +93,6 @@ class AnnualPlan extends Model
     }
      public function annual_plan_psr(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(AnnualPlanPSR::class, 'id', 'annual_plan_id');
+        return $this->belongsTo(AnnualPlanPSR::class, 'id', 'annual_plan_id','status');
     }
 }
