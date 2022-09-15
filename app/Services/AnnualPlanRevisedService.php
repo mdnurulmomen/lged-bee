@@ -264,6 +264,7 @@ class AnnualPlanRevisedService
                 'subject_matter' => $request->subject_matter,
                 'sub_subject_matter' => $request->sub_subject_matter,
                 'vumika' => $request->vumika,
+                'status' => 'draft',
                 'audit_objective' => $request->audit_objective,
                 'audit_approach' => $request->audit_approach,
                 'nominated_man_powers' => $request->nominated_man_powers,
