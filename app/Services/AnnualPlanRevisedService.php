@@ -297,69 +297,69 @@ class AnnualPlanRevisedService
 
             $plan = AnnualPlan::create($plan_data);
 
-            if ($request->activity_type == 'performance') {
-                $subject_matter_data = [
-                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
-                    'annual_plan_id' => $plan->id,
-                    'vumika' => $request->vumika,
-                    'subject_matter_en' => $request->subject_matter,
-                    'subject_matter_bn' => '',
-                    'parent_id' => 0,
-                ];
-
-                $subject_matter = ApPsrSubjectMatter::create($subject_matter_data);
-
-                if ($subject_matter->id) {
-                    foreach ($request->sub_subject_list as $key => $sub_m) {
-                        if ($key != 'undefined') {
-                            $ap_sub = new ApPsrSubjectMatter();
-                            $ap_sub->parent_id = $subject_matter->id;
-                            $ap_sub->annual_plan_main_id = $plan_data['annual_plan_main_id'];
-                            $ap_sub->annual_plan_id = $plan->id;
-                            $ap_sub->vumika = '';
-                            $ap_sub->subject_matter_en = $sub_m['sub_subject_matter'];
-                            $ap_sub->subject_matter_bn = '';
-                            $log = $ap_sub->save();
-                        }
-                    }
-                }
-
-                $audit_object_data = [
-                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
-                    'annual_plan_id' => $plan->id,
-                    'audit_objective_en' => $request->audit_objective,
-                    'audit_objective_bn' => $plan->id,
-                    'parent_id' => 0,
-                ];
-
-                $audit_object = ApPsrAduitObject::create($audit_object_data);
-
-                if ($audit_object->id) {
-                    foreach ($request->sub_objective_list as $key => $sub_o) {
-                        if ($key != 'undefined') {
-                            $sub_object_data = [
-                                'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
-                                'annual_plan_id' => $plan->id,
-                                'audit_objective_en' => $sub_o['sub_objective'],
-                                'audit_objective_bn' => '',
-                                'parent_id' => $audit_object->id,
-                            ];
-
-                            $sub_object = ApPsrAduitObject::create($sub_object_data);
-                            if ($sub_object->id) {
-                                foreach ($sub_o['line_of_enquires'] as $val) {
-
-                                    $ap_sub = new ApPsrLineOfEnquire();
-                                    $ap_sub->sub_objective_id = $sub_object->id;
-                                    $ap_sub->line_of_enquire_en = $val;
-                                    $ap_sub->line_of_enquire_bn = '';
-                                    $ap_sub->save();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+//            if ($request->activity_type == 'performance') {
+//                $subject_matter_data = [
+//                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+//                    'annual_plan_id' => $plan->id,
+//                    'vumika' => $request->vumika,
+//                    'subject_matter_en' => $request->subject_matter,
+//                    'subject_matter_bn' => '',
+//                    'parent_id' => 0,
+//                ];
+//
+//                $subject_matter = ApPsrSubjectMatter::create($subject_matter_data);
+//
+//                if ($subject_matter->id) {
+//                    foreach ($request->sub_subject_list as $key => $sub_m) {
+//                        if ($key != 'undefined') {
+//                            $ap_sub = new ApPsrSubjectMatter();
+//                            $ap_sub->parent_id = $subject_matter->id;
+//                            $ap_sub->annual_plan_main_id = $plan_data['annual_plan_main_id'];
+//                            $ap_sub->annual_plan_id = $plan->id;
+//                            $ap_sub->vumika = '';
+//                            $ap_sub->subject_matter_en = $sub_m['sub_subject_matter'];
+//                            $ap_sub->subject_matter_bn = '';
+//                            $log = $ap_sub->save();
+//                        }
+//                    }
+//                }
+//
+//                $audit_object_data = [
+//                    'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+//                    'annual_plan_id' => $plan->id,
+//                    'audit_objective_en' => $request->audit_objective,
+//                    'audit_objective_bn' => $plan->id,
+//                    'parent_id' => 0,
+//                ];
+//
+//                $audit_object = ApPsrAduitObject::create($audit_object_data);
+//
+//                if ($audit_object->id) {
+//                    foreach ($request->sub_objective_list as $key => $sub_o) {
+//                        if ($key != 'undefined') {
+//                            $sub_object_data = [
+//                                'annual_plan_main_id' => $plan_data['annual_plan_main_id'],
+//                                'annual_plan_id' => $plan->id,
+//                                'audit_objective_en' => $sub_o['sub_objective'],
+//                                'audit_objective_bn' => '',
+//                                'parent_id' => $audit_object->id,
+//                            ];
+//
+//                            $sub_object = ApPsrAduitObject::create($sub_object_data);
+//                            if ($sub_object->id) {
+//                                foreach ($sub_o['line_of_enquires'] as $val) {
+//
+//                                    $ap_sub = new ApPsrLineOfEnquire();
+//                                    $ap_sub->sub_objective_id = $sub_object->id;
+//                                    $ap_sub->line_of_enquire_en = $val;
+//                                    $ap_sub->line_of_enquire_bn = '';
+//                                    $ap_sub->save();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
 
             foreach ($request->milestone_list as $milestone) {

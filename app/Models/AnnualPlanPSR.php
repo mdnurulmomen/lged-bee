@@ -23,5 +23,10 @@ class AnnualPlanPSR extends Model
         'created_by',
         'modified_by',
     ];
-   
+
+    public function annual_plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
+    }
+
 }

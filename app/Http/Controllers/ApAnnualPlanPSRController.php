@@ -30,9 +30,9 @@ class ApAnnualPlanPSRController extends Controller
         return response()->json($response);
     }
 
-    public function edit(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    public function update(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
     {
-        $psr_plan = $ApPSRAnnualPlanService->editpsrplan($request);
+        $psr_plan = $ApPSRAnnualPlanService->update($request);
 
         if (isSuccessResponse($psr_plan)) {
             $response = responseFormat('success', $psr_plan['data']);
@@ -40,5 +40,57 @@ class ApAnnualPlanPSRController extends Controller
             $response = responseFormat('error', $psr_plan['data']);
         }
         return response()->json($response);
+    }
+
+    public function sendToOcag(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $psr_plan = $ApPSRAnnualPlanService->sendToOcag($request);
+
+        if (isSuccessResponse($psr_plan)) {
+            $response = responseFormat('success', $psr_plan['data']);
+        } else {
+            $response = responseFormat('error', $psr_plan['data']);
+        }
+        return response()->json($response);
+
+    }
+
+    public function getPsrApprovalList(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $psr_plan = $ApPSRAnnualPlanService->getPsrApprovalList($request);
+
+        if (isSuccessResponse($psr_plan)) {
+            $response = responseFormat('success', $psr_plan['data']);
+        } else {
+            $response = responseFormat('error', $psr_plan['data']);
+        }
+        return response()->json($response);
+
+    }
+
+    public function approvePsrTopic(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $psr_plan = $ApPSRAnnualPlanService->approvePsrTopic($request);
+
+        if (isSuccessResponse($psr_plan)) {
+            $response = responseFormat('success', $psr_plan['data']);
+        } else {
+            $response = responseFormat('error', $psr_plan['data']);
+        }
+        return response()->json($response);
+
+    }
+
+    public function getPsrReportApprovalList(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $psr_plan = $ApPSRAnnualPlanService->getPsrReportApprovalList($request);
+
+        if (isSuccessResponse($psr_plan)) {
+            $response = responseFormat('success', $psr_plan['data']);
+        } else {
+            $response = responseFormat('error', $psr_plan['data']);
+        }
+        return response()->json($response);
+
     }
 }
