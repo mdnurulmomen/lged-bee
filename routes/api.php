@@ -178,6 +178,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('approve-psr-topic', [ApAnnualPlanPSRController::class, 'approvePsrTopic']);
 
             Route::post('get-psr-report-approval-list', [ApAnnualPlanPSRController::class, 'getPsrReportApprovalList']);
+
+            Route::post('send-psr-sender-to-receiver', [ApAnnualPlanPSRController::class, 'sendPsrSenderToReceiver']);
+            Route::post('send-psr-receiver-to-sender', [ApAnnualPlanPSRController::class, 'sendPsrReceiverToSender']);
+            Route::post('get-psr-movement-histories', [ApAnnualPlanPSRController::class, 'getPsrMovementHistories']);
         });
 
         Route::group(['prefix' => 'strategic-plan'], function () {

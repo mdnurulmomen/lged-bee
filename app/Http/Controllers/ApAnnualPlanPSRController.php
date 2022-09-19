@@ -93,4 +93,75 @@ class ApAnnualPlanPSRController extends Controller
         return response()->json($response);
 
     }
+
+    public function sendPsrSenderToReceiver(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'psr_approval_type' => 'required|string',
+            'fiscal_year_id' => 'required|integer',
+            'receiver_type' => 'required',
+            'receiver_office_id' => 'required',
+            'receiver_office_name_en' => 'required',
+            'receiver_office_name_bn' => 'required',
+            'receiver_unit_id' => 'required',
+            'receiver_unit_name_en' => 'required',
+            'receiver_unit_name_bn' => 'required',
+            'receiver_officer_id' => 'required',
+            'receiver_name_en' => 'required',
+            'receiver_name_bn' => 'required',
+            'receiver_designation_id' => 'required',
+            'receiver_designation_en' => 'required',
+            'receiver_designation_bn' => 'required',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseStore = $ApPSRAnnualPlanService->sendPsrSenderToReceiver($request);
+
+        if (isSuccessResponse($responseStore)) {
+            $response = responseFormat('success', $responseStore['data']);
+        } else {
+            $response = responseFormat('error', $responseStore['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function sendPsrReceiverToSender(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'office_id' => 'required|integer',
+            'psr_approval_type' => 'required|string',
+            'receiver_type' => 'required',
+            'status' => 'required',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseStore = $ApPSRAnnualPlanService->sendPsrReceiverToSender($request);
+//        dd($responseStore);
+        if (isSuccessResponse($responseStore)) {
+            $response = responseFormat('success', $responseStore['data']);
+        } else {
+            $response = responseFormat('error', $responseStore['data']);
+        }
+        return response()->json($response);
+    }
+
+    public function getPsrMovementHistories(Request $request, ApPSRAnnualPlanService $ApPSRAnnualPlanService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'fiscal_year_id' => 'required|integer',
+            'op_audit_calendar_event_id' => 'required|integer',
+        ])->validate();
+
+        $responseData = $ApPSRAnnualPlanService->getPsrMovementHistories($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+        return response()->json($response);
+    }
 }

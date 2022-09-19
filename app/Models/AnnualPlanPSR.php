@@ -19,6 +19,7 @@ class AnnualPlanPSR extends Model
         'activity_id',
         'fiscal_year_id',
         'plan_description',
+        'office_approval_status',
         'status',
         'created_by',
         'modified_by',
