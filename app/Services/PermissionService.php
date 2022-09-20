@@ -184,15 +184,18 @@ class PermissionService
             $menu_actions = json_decode($request->menu_actions) ?: [];
             $designation_id = $request->designation_id;
             $master_designation_id = $request->master_designation_id;
-            PIndividualActionPermissionMap::where('designation_id', $designation_id)->delete();
+//            PIndividualActionPermissionMap::where('designation_id', $designation_id)->delete();
             foreach ($menu_actions as $action) {
-                PIndividualActionPermissionMap::create([
-                    'designation_id' => $designation_id,
-                    'p_menu_action_id' => $action,
-                    'created_by' => $cdesk->officer_id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ]);
+                PIndividualActionPermissionMap::updateOrCreate(
+                    ['designation_id' => $designation_id,'p_menu_action_id' => $action],
+                    [
+                        'designation_id' => $designation_id,
+                        'p_menu_action_id' => $action,
+                        'created_by' => $cdesk->officer_id,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]
+                );
             }
             $this->emptyOfficeDBConnection();
             return ['status' => 'success', 'data' => 'success'];
