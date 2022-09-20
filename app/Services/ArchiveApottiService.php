@@ -102,6 +102,13 @@ class ArchiveApottiService
                 return $query->where('jorito_ortho_poriman', $jorito_ortho_poriman);
             });
 
+            //file_no
+            $file_no = $request->file_no;
+            $query->when($file_no, function ($query) use ($file_no) {
+                return $query->where('file_token_no', $file_no);
+            });
+
+
             $apotti_list = $query->with(['oniyomer_category'])->get()->toArray();
             return ['status' => 'success', 'data' => $apotti_list];
         } catch (\Exception $exception) {
