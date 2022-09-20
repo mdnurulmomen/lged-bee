@@ -94,10 +94,16 @@ class PermissionService
             $individualPermittedMap = PIndividualActionPermissionMap::where('designation_id', $cdesk->designation_id)->pluck('p_menu_action_id');
             $menu_ids = $menu_ids->merge($individualPermittedMap);
             $menu_ids = $menu_ids->unique();
-            $menus = PMenuAction::where('menu_module_id', $module->id)->whereIn('id', $menu_ids)->where('type', 'menu')->with([
-                'menu_childrens' => function ($query) use ($menu_ids) {
-                    $query->whereIn('id', $menu_ids)->where('type', 'menu');
-                }])->where('parent_id', null)->get();
+
+            $menus = PMenuAction::where('menu_module_id', $module->id)
+                    ->whereIn('id', $menu_ids)
+                    ->where('type', 'menu')
+                    ->whereIn('activity_type',[$request->activity_type,'all'])
+                    ->with(['menu_childrens' => function ($query) use ($menu_ids) {
+                        $query->whereIn('id', $menu_ids)
+                            ->where('type', 'menu');
+                    }])->where('parent_id', null)->get();
+
             $data = [
                 'module' => $module,
                 'menus' => $menus,

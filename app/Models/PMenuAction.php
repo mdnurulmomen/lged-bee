@@ -13,6 +13,7 @@ class PMenuAction extends Model
         'title_en',
         'title_bn',
         'link',
+        'activity_type',
         'class',
         'controller',
         'method',
