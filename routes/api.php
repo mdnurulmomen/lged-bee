@@ -310,6 +310,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('update', [ArchiveApottiController::class, 'update']);
         Route::post('list', [ArchiveApottiController::class, 'list']);
         Route::post('edit', [ArchiveApottiController::class, 'edit']);
+        Route::post('delete', [ArchiveApottiController::class, 'destory']);
         Route::post('migrate-to-amms', [ArchiveApottiController::class, 'migrateArchiveApottiToAmms']);
     });
 

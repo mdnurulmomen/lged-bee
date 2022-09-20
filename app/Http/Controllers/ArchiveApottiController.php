@@ -103,4 +103,10 @@ class ArchiveApottiController extends Controller
         $apotti = $archiveApottiService->migrateArchiveApottiToAmms($request);
         return response()->json($apotti);
     }
+
+    public function destroy(Request $request, ArchiveApottiService $archiveApottiService)
+    {
+        $apotti = $archiveApottiService->destroyArchiveApotti($request);
+        return response()->json($apotti);
+    }
 }

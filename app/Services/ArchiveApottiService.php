@@ -735,4 +735,14 @@ class ArchiveApottiService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function destroyArchiveApotti(Request $request): array
+    {
+        try {
+            ArcApotti::where('id', $request->apotti_id)->delete();
+            return ['status' => 'success', 'data' => 'Successfully Deleted'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
 }
