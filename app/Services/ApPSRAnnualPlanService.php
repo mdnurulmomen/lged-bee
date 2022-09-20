@@ -28,6 +28,7 @@ class ApPSRAnnualPlanService
             $annualPlanPSR->activity_id = $request->activity_id;
             $annualPlanPSR->fiscal_year_id = $request->fiscal_year_id;
             $annualPlanPSR->status = $request->status;
+            $annualPlanPSR->office_approval_status = empty($request->psr_plan_id) ? 'draft': $annualPlanPSR->office_approval_status;
             $annualPlanPSR->plan_description = $request->plan_description;
             $annualPlanPSR->created_by = $cdesk->officer_id;
             $annualPlanPSR->save();
