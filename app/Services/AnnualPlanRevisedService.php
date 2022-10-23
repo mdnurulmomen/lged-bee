@@ -132,6 +132,8 @@ class AnnualPlanRevisedService
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
 
+//            return ['status' => 'status', 'data' => $request->all()];
+
             $activity_id = $request->activity_id;
             $activity_type = $request->activity_type;
             $office_ministry_id = $request->office_ministry_id;
@@ -172,11 +174,11 @@ class AnnualPlanRevisedService
             }
 
 
-            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
+//            $op_audit_calendar_event_id = OpOrganizationYearlyAuditCalendarEventSchedule::select('op_audit_calendar_event_id')->where('fiscal_year_id', $request->fiscal_year_id)->first()->op_audit_calendar_event_id;
 
             $annualPlan['annual_plan_list'] = $annualPlanList;
             $annualPlan['approval_status'] = '';
-            $annualPlan['op_audit_calendar_event_id'] = $op_audit_calendar_event_id;
+            $annualPlan['op_audit_calendar_event_id'] = 0;
 
             $data = ['status' => 'success', 'data' => $annualPlan];
         } catch (\Exception $exception) {

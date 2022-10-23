@@ -7,6 +7,7 @@ use App\Http\Controllers\Followup\BroadsheetReplyController;
 use App\Http\Controllers\Report\AuditAIRReportController;
 use App\Http\Controllers\Report\RpuAirReportController;
 use App\Http\Controllers\Report\ObservationReportController;
+use App\Services\StrategicPlanService;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login-in-amms', [LoginController::class, 'loginInAmms'])->middleware('header.api.version');
@@ -50,6 +51,29 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store', [AuditAssessmentController::class, 'store']);
         Route::post('get-assessment-entity', [AuditAssessmentController::class, 'getAssessmentEntity']);
         Route::post('store-annual-plan', [AuditAssessmentController::class, 'storeAnnualPlan']);
+    });
+
+    //IA audit strategic plan
+    Route::group(['prefix' => 'x-risk-factor'], function () {
+        Route::post('list', [XRiskFactorController::class, 'list']);
+        Route::post('store', [XRiskFactorController::class, 'store']);
+    });
+
+    Route::group(['prefix' => 'risk-assessment-factor'], function () {
+        Route::post('list', [RiskAssessmentFactorController::class, 'list']);
+        Route::post('store', [RiskAssessmentFactorController::class, 'store']);
+    });
+
+    Route::group(['prefix' => 'strategic-plan'], function () {
+        Route::post('list', [StrategicPlanController::class, 'list']);
+        Route::post('store', [StrategicPlanController::class, 'store']);
+        Route::post('get-individual-strategic-plan', [StrategicPlanController::class, 'getIndividualStrategicPlan']);
+        Route::post('get-individual-strategic-plan-year', [StrategicPlanController::class, 'getIndividualStrategicPlanYear']);
+    });
+
+    Route::group(['prefix' => 'yearly-plan'], function () {
+        Route::post('list', [YearlyPlanController::class, 'list']);
+        Route::post('store', [YearlyPlanController::class, 'store']);
     });
 
     Route::group(['prefix' => 'planning/'], function () {
@@ -418,6 +442,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::post('sp-setting-list', [StrategicSettingPlanController::class, 'list']);
     Route::post('sp-setting-store', [StrategicSettingPlanController::class, 'store']);
+
 
     //vacation date
     Route::group(['prefix' => 'vacation-date'], function () {
