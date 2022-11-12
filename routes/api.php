@@ -54,9 +54,11 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     });
 
     //IA audit strategic plan
-    Route::group(['prefix' => 'x-risk-factor'], function () {
-        Route::post('list', [XRiskFactorController::class, 'list']);
-        Route::post('store', [XRiskFactorController::class, 'store']);
+    Route::group(['prefix' => 'x-risk-factors'], function () {
+        Route::get('/', [XRiskFactorController::class, 'index']);
+        Route::post('/', [XRiskFactorController::class, 'store']);
+        Route::put('/{id}', [XRiskFactorController::class, 'update']);
+        Route::delete('/{id}', [XRiskFactorController::class, 'delete']);
     });
 
     Route::group(['prefix' => 'risk-assessment-factor'], function () {

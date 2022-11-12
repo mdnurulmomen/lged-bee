@@ -8,14 +8,12 @@ use DB;
 class XRiskFactorService
 {
 
-    public function list(Request $request): array
+    public function list(): array
     {
         try {
             $list =  XRiskFactor::select('id','title_bn','title_en','risk_weight')
-                ->with([
-                    'risk_factor_criterias:id,x_risk_factor_id,title_bn,title_en',
-                    'risk_factor_ratings:id,x_risk_factor_id,title_bn,title_en,rating_value'
-                ])->get();
+                ->with(['riskFactorCriteria', 'riskFactorRatings'])
+                ->get();
 
             return ['status' => 'success', 'data' => $list];
 
@@ -27,25 +25,49 @@ class XRiskFactorService
 
     public function store(Request $request): array
     {
-        DB::beginTransaction();
-
         try {
 
-            $strategic_plan = new YearlyPlan();
-            $strategic_plan->strategic_plan_id = $request->strategic_plan_id;
-            $strategic_plan->strategic_plan_year = $request->strategic_plan_year;
-            $strategic_plan->created_by = 1;
-            $strategic_plan->save();
+            $xRiskFactor = new XRiskFactor();
+            $xRiskFactor->title_bn = $request->title_bn;
+            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->risk_weight = $request->risk_weight;
+            $xRiskFactor->save();
 
-            foreach($request->strategic_info as $strategic){
-                YearlyPlanLocation::insert($strategic);
-            }
-
-            DB::commit();
             return ['status' => 'success', 'data' => 'Save Successfully'];
 
         } catch (\Exception $exception) {
-            DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function update(Request $request, $id): array
+    {
+        try {
+
+            $xRiskFactor = XRiskFactor::find($id);
+            $xRiskFactor->title_bn = $request->title_bn;
+            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->risk_weight = $request->risk_weight;
+            $xRiskFactor->save();
+
+            return ['status' => 'success', 'data' => 'Updated Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function delete($id): array
+    {
+        try {
+
+            $xRiskFactor = XRiskFactor::find($id)->delete();
+
+            return ['status' => 'success', 'data' => 'Deleted Successfully'];
+
+        } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
