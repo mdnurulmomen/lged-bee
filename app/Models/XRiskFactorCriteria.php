@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class XRiskFactorCriteria extends Model
 {
     use HasFactory;
+
+    public function xRiskFactor()
+    {
+        return $this->belongsTo(XRiskFactor::class, 'x_risk_factor_id', 'id');
+    }
 }

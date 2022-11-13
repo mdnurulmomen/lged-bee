@@ -7,13 +7,10 @@ use DB;
 
 class XRiskFactorService
 {
-
     public function list(): array
     {
         try {
-            $list =  XRiskFactor::select('id','title_bn','title_en','risk_weight')
-                ->with(['riskFactorCriteria', 'riskFactorRatings'])
-                ->get();
+            $list =  XRiskFactor::all();
 
             return ['status' => 'success', 'data' => $list];
 
