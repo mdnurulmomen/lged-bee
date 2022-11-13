@@ -69,6 +69,14 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [XRiskCriterionController::class, 'delete']);
     });
 
+    //IA audit strategic plan
+    Route::group(['prefix' => 'x-risk-ratings'], function () {
+        Route::get('/', [XRiskRatingController::class, 'index']);
+        Route::post('/', [XRiskRatingController::class, 'store']);
+        Route::put('/{id}', [XRiskRatingController::class, 'update']);
+        Route::delete('/{id}', [XRiskRatingController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'risk-assessment-factor'], function () {
         Route::post('list', [RiskAssessmentFactorController::class, 'list']);
         Route::post('store', [RiskAssessmentFactorController::class, 'store']);
