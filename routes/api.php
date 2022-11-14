@@ -70,6 +70,14 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     });
 
     //IA audit strategic plan
+    Route::group(['prefix' => 'x-risk-levels'], function () {
+        Route::get('/', [XRiskLevelController::class, 'index']);
+        Route::post('/', [XRiskLevelController::class, 'store']);
+        Route::put('/{id}', [XRiskLevelController::class, 'update']);
+        Route::delete('/{id}', [XRiskLevelController::class, 'delete']);
+    });
+
+    //IA audit strategic plan
     Route::group(['prefix' => 'x-risk-ratings'], function () {
         Route::get('/', [XRiskRatingController::class, 'index']);
         Route::post('/', [XRiskRatingController::class, 'store']);
