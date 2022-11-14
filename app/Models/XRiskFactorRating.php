@@ -11,6 +11,8 @@ class XRiskFactorRating extends Model
 
     public function xRiskFactor()
     {
-        return $this->belongsTo(XRiskFactor::class, 'x_risk_factor_id', 'id');
+        return $this->belongsTo(XRiskFactor::class, 'x_risk_factor_id', 'id')->withDefault([
+            'title_en' => '--',
+        ]);
     }
 }

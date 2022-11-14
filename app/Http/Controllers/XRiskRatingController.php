@@ -41,6 +41,22 @@ class XRiskRatingController extends Controller
         return response()->json($response);
     }
 
+    /*
+    public function show($id)
+    {
+        try {
+
+            $xRiskFactorRating = XRiskFactorRating::find($id);
+            $response = responseFormat('success', $xRiskFactorRating);
+
+        }catch () {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
+    */
+
     public function update(Request $request, $id)
     {
         try {

@@ -73,6 +73,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'x-risk-ratings'], function () {
         Route::get('/', [XRiskRatingController::class, 'index']);
         Route::post('/', [XRiskRatingController::class, 'store']);
+        // Route::get('/{id}', [XRiskRatingController::class, 'show']);
         Route::put('/{id}', [XRiskRatingController::class, 'update']);
         Route::delete('/{id}', [XRiskRatingController::class, 'delete']);
     });
