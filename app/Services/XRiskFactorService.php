@@ -10,7 +10,7 @@ class XRiskFactorService
     public function list(): array
     {
         try {
-            $list =  XRiskFactor::all();
+            $list =  XRiskFactor::with(['riskFactorCriteria', 'riskFactorRatings'])->get();
 
             return ['status' => 'success', 'data' => $list];
 
