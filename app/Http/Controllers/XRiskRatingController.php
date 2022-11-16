@@ -26,8 +26,8 @@ class XRiskRatingController extends Controller
         try {
 
             $xRiskFactorRating = new XRiskFactorRating();
-            $xRiskFactorRating->title_bn = $request->title_bn;
-            $xRiskFactorRating->title_en = $request->title_en;
+            $xRiskFactorRating->title_bn = strtolower($request->title_bn);
+            $xRiskFactorRating->title_en = strtolower($request->title_en);
             $xRiskFactorRating->rating_value = $request->rating_value;
             $xRiskFactorRating->x_risk_factor_id = $request->x_risk_factor_id;
             $xRiskFactorRating->save();
@@ -62,8 +62,8 @@ class XRiskRatingController extends Controller
         try {
 
             $xRiskFactorRating = XRiskFactorRating::find($id);
-            $xRiskFactorRating->title_bn = $request->title_bn;
-            $xRiskFactorRating->title_en = $request->title_en;
+            $xRiskFactorRating->title_bn = strtolower($request->title_bn);
+            $xRiskFactorRating->title_en = strtolower($request->title_en);
             $xRiskFactorRating->rating_value = $request->rating_value;
             $xRiskFactorRating->x_risk_factor_id = $request->x_risk_factor_id;
             $xRiskFactorRating->save();

@@ -26,8 +26,8 @@ class XRiskCriterionController extends Controller
         try {
 
             $xRiskFactor = new XRiskFactorCriteria();
-            $xRiskFactor->title_bn = $request->title_bn;
-            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->title_bn = strtolower($request->title_bn);
+            $xRiskFactor->title_en = strtolower($request->title_en);
             $xRiskFactor->x_risk_factor_id = $request->x_risk_factor_id;
             $xRiskFactor->created_by = $request->created_by;
             $xRiskFactor->updated_by = $request->updated_by;
@@ -47,8 +47,8 @@ class XRiskCriterionController extends Controller
         try {
 
             $xRiskFactor = XRiskFactorCriteria::find($id);
-            $xRiskFactor->title_bn = $request->title_bn;
-            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->title_bn = strtolower($request->title_bn);
+            $xRiskFactor->title_en = strtolower($request->title_en);
             $xRiskFactor->x_risk_factor_id = $request->x_risk_factor_id;
             $xRiskFactor->updated_by = $request->updated_by;
             $xRiskFactor->save();

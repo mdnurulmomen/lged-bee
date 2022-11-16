@@ -25,8 +25,8 @@ class XRiskFactorService
         try {
 
             $xRiskFactor = new XRiskFactor();
-            $xRiskFactor->title_bn = $request->title_bn;
-            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->title_bn = strtolower($request->title_bn);
+            $xRiskFactor->title_en = strtolower($request->title_en);
             $xRiskFactor->risk_weight = $request->risk_weight;
             $xRiskFactor->save();
 
@@ -43,8 +43,8 @@ class XRiskFactorService
         try {
 
             $xRiskFactor = XRiskFactor::find($id);
-            $xRiskFactor->title_bn = $request->title_bn;
-            $xRiskFactor->title_en = $request->title_en;
+            $xRiskFactor->title_bn = strtolower($request->title_bn);
+            $xRiskFactor->title_en = strtolower($request->title_en);
             $xRiskFactor->risk_weight = $request->risk_weight;
             $xRiskFactor->save();
 

@@ -7,6 +7,7 @@ use App\Models\RiskAssessmentFactorItem;
 use App\Models\XRiskFactor;
 use Illuminate\Http\Request;
 use DB;
+use App\Models\XRiskLevel;
 
 class RiskAssessmentFactorService
 {
@@ -82,14 +83,14 @@ class RiskAssessmentFactorService
 
             $query->update(['is_latest'=> 0]);
 
-            $risk_factor_info['total_risk_score'] = 1.75;
-            $risk_factor_info['risk_score_key'] = 'Low';
+            $risk_factor_info['total_risk_score'] = $this->calculateRiskScore($request->risk_factor_items);
+            $risk_factor_info['risk_score_key'] = $this->getRiskLevel($this->calculateRiskScore($request->risk_factor_items));
             $risk_factor_info['is_latest'] = 1;
             $risk_factor_info['created_by'] = $cdesk->officer_id;
 
             $risk_assessment_id =  RiskAssessmentFactor::insertGetId($risk_factor_info);
 
-            foreach($request->risk_factor_item as $factor){
+            foreach($request->risk_factor_items as $factor){
                 $factor['risk_assessment_factor_id'] = $risk_assessment_id;
                 $factor['created_by'] = $cdesk->officer_id;
                 RiskAssessmentFactorItem::insert($factor);
@@ -103,5 +104,23 @@ class RiskAssessmentFactorService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 
+    }
+
+    private function calculateRiskScore($risk_factor_items)
+    {
+        $sum = 0;
+
+        foreach (json_decode(json_encode($risk_factor_items)) as $factorItem) {
+
+            $sum += (($factorItem->factor_weight * $factorItem->factor_rating) / 100);
+
+        }
+
+        return $sum;
+    }
+
+    private function getRiskLevel($score)
+    {
+        return XRiskLevel::where('level_from', '<=', $score)->where('level_to', '>=', $score)->first()->title_en ?? '--';
     }
 }

@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class RiskAssessmentFactorItem extends Model
 {
     use HasFactory;
+
     protected $connection = 'OfficeDB';
+
     protected $fillable = [
         'risk_assessment_factor_id',
         'x_risk_factor_id',
