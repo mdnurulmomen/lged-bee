@@ -93,6 +93,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [XRiskImpactController::class, 'delete']);
     });
 
+    Route::group(['prefix' => 'x-risk-likelihoods'], function () {
+        Route::get('/', [XRiskLikelihoodController::class, 'index']);
+        Route::post('/', [XRiskLikelihoodController::class, 'store']);
+        Route::put('/{id}', [XRiskLikelihoodController::class, 'update']);
+        Route::delete('/{id}', [XRiskLikelihoodController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'risk-assessment-factor'], function () {
         Route::post('list', [RiskAssessmentFactorController::class, 'list']);
         Route::post('store', [RiskAssessmentFactorController::class, 'store']);
