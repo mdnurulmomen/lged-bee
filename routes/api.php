@@ -86,6 +86,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [XRiskRatingController::class, 'delete']);
     });
 
+    Route::group(['prefix' => 'x-risk-impacts'], function () {
+        Route::get('/', [XRiskImpactController::class, 'index']);
+        Route::post('/', [XRiskImpactController::class, 'store']);
+        Route::put('/{id}', [XRiskImpactController::class, 'update']);
+        Route::delete('/{id}', [XRiskImpactController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'risk-assessment-factor'], function () {
         Route::post('list', [RiskAssessmentFactorController::class, 'list']);
         Route::post('store', [RiskAssessmentFactorController::class, 'store']);
