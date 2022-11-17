@@ -105,6 +105,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store', [RiskAssessmentFactorController::class, 'store']);
     });
 
+    Route::group(['prefix' => 'x-audit-areas'], function () {
+        Route::get('/', [XAuditAreaController::class, 'index']);
+        Route::post('/', [XAuditAreaController::class, 'store']);
+        Route::put('/{id}', [XAuditAreaController::class, 'update']);
+        Route::delete('/{id}', [XAuditAreaController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'strategic-plan'], function () {
         Route::post('list', [StrategicPlanController::class, 'list']);
         Route::post('store', [StrategicPlanController::class, 'store']);
