@@ -112,6 +112,13 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [XAuditAreaController::class, 'delete']);
     });
 
+    Route::group(['prefix' => 'risk-matrixes'], function () {
+        Route::get('/', [RiskMatrixController::class, 'index']);
+        Route::post('/', [RiskMatrixController::class, 'store']);
+        Route::put('/{id}', [RiskMatrixController::class, 'update']);
+        Route::delete('/{id}', [RiskMatrixController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'strategic-plan'], function () {
         Route::post('list', [StrategicPlanController::class, 'list']);
         Route::post('store', [StrategicPlanController::class, 'store']);

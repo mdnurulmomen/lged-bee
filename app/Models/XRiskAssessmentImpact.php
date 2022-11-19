@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class XRiskAssessmentImpact extends Model
 {
     use HasFactory;
+
+    protected $connection = 'BeeCoreDB';
 }
