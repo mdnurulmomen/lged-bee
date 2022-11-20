@@ -10,7 +10,7 @@ class RiskMatrixController extends Controller
     public function index()
     {
         try {
-            $list =  RiskMatrix::with(['riskAssessmentLivelihood', 'riskAssessmentImpact', 'riskLevel'])->get();
+            $list =  RiskMatrix::with(['riskAssessmentLikelihood', 'riskAssessmentImpact', 'riskLevel'])->get();
 
             $response = responseFormat('success', $list);
 

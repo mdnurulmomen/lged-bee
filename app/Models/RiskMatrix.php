@@ -15,7 +15,7 @@ class RiskMatrix extends Model
 
     protected $guarded = ['id'];
 
-    public function riskAssessmentLivelihood()
+    public function riskAssessmentLikelihood()
     {
         return $this->belongsTo(XRiskAssessmentLikelihood::class, 'x_risk_assessment_likelihood_id', 'id');
     }
