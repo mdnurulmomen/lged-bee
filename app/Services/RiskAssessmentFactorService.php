@@ -7,10 +7,12 @@ use App\Models\RiskAssessmentFactorItem;
 use App\Models\XRiskFactor;
 use Illuminate\Http\Request;
 use DB;
+use App\Traits\ApiHeart;
 use App\Models\XRiskLevel;
 
 class RiskAssessmentFactorService
 {
+    use ApiHeart;
 
     public function list(Request $request): array
     {
@@ -97,7 +99,10 @@ class RiskAssessmentFactorService
             }
 
             DB::commit();
-            return ['status' => 'success', 'data' => 'Save Successfully'];
+
+            $data = ['id' => $risk_factor_info['project_id'], 'total_risk_score' => $risk_factor_info['total_risk_score'], 'risk_score_key' => $risk_factor_info['risk_score_key']];
+
+            return ['status' => 'success', 'data' => $data];
 
         } catch (\Exception $exception) {
             DB::rollback();
