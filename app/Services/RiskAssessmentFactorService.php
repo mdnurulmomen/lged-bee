@@ -22,33 +22,25 @@ class RiskAssessmentFactorService
             $query = RiskAssessmentFactor::query();
 
             if($type == 'project'){
-                $query->whereNotNull('project_id');
+                $query->where('item_type', 'project');
             }
 
             if($type == 'function'){
-                $query->whereNotNull('function_id');
+                $query->where('item_type', 'function');
             }
 
             if($type == 'cost_center'){
-                $query->whereNotNull('cost_center_id');
+                $query->where('item_type', 'cost_center');
             }
 
             $risk_assessment_factor = $query->where('is_latest',1)->get();
             $risk_assessment = [];
 
             foreach($risk_assessment_factor as $assessment){
-                $data['project_id'] = $assessment->project_id;
-                $data['project_name_en'] = $assessment->project_name_en;
-                $data['project_name_bn'] = $assessment->project_name_bn;
-
-                $data['function_id'] = $assessment->function_id;
-                $data['function_name_bn'] = $assessment->function_name_bn;
-                $data['function_name_en'] = $assessment->function_name_en;
-
-                $data['cost_center_id'] = $assessment->cost_center_id;
-                $data['cost_center_name_en'] = $assessment->cost_center_name_en;
-                $data['cost_center_name_bn'] = $assessment->cost_center_name_bn;
-
+                $data['item_id'] = $assessment->item_id;
+                $data['item_name_en'] = $assessment->item_name_en;
+                $data['item_name_bn'] = $assessment->item_name_bn;
+                $data['item_type'] = $assessment->item_type;
                 $data['total_risk_score'] = $assessment->total_risk_score;
                 $data['risk_score_key'] = $assessment->risk_score_key;
                 $data['risk_factor_items'] = $assessment->risk_factor_items->pluck('factor_rating','x_risk_factor_id');
@@ -73,20 +65,14 @@ class RiskAssessmentFactorService
 
             $risk_factor_info = $request->risk_factor_info;
 
-            $query = RiskAssessmentFactor::query();
+            $updateLatestOne = RiskAssessmentFactor::where('item_id', $risk_factor_info['item_id'])
+            ->where('item_type', $risk_factor_info['item_type'])
+            ->update(['is_latest'=> 0]);
 
-            if($risk_factor_info['project_id']){
-                $query->where('project_id',$risk_factor_info['project_id']);
-            }elseif($risk_factor_info['function_id']){
-                $query->where('function_id',$risk_factor_info['function_id']);
-            }elseif($risk_factor_info['cost_center_id']){
-                $query->where('cost_center_id',$risk_factor_info['cost_center_id']);
-            }
+            $score = $this->calculateRiskScore($request->risk_factor_items);
 
-            $query->update(['is_latest'=> 0]);
-
-            $risk_factor_info['total_risk_score'] = $this->calculateRiskScore($request->risk_factor_items);
-            $risk_factor_info['risk_score_key'] = $this->getRiskLevel($this->calculateRiskScore($request->risk_factor_items));
+            $risk_factor_info['total_risk_score'] = $score;
+            $risk_factor_info['risk_score_key'] = $this->getRiskLevel($score);
             $risk_factor_info['is_latest'] = 1;
             $risk_factor_info['created_by'] = $cdesk->officer_id;
 
@@ -100,7 +86,7 @@ class RiskAssessmentFactorService
 
             DB::commit();
 
-            $data = ['id' => $risk_factor_info['project_id'], 'total_risk_score' => $risk_factor_info['total_risk_score'], 'risk_score_key' => $risk_factor_info['risk_score_key']];
+            $data = ['id' => $risk_factor_info['item_id'], 'total_risk_score' => $risk_factor_info['total_risk_score'], 'risk_score_key' => $risk_factor_info['risk_score_key']];
 
             return ['status' => 'success', 'data' => $data];
 
