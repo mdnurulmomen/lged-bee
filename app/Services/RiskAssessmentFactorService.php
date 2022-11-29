@@ -43,7 +43,7 @@ class RiskAssessmentFactorService
                 $data['item_type'] = $assessment->item_type;
                 $data['total_risk_score'] = $assessment->total_risk_score;
                 $data['risk_score_key'] = $assessment->risk_score_key;
-                $data['risk_factor_items'] = $assessment->risk_factor_items->pluck('factor_rating','x_risk_factor_id');
+                $data['risk_factor_items'] = $assessment->risk_factor_items;
 
                 $risk_assessment[] = $data;
             }
@@ -58,6 +58,8 @@ class RiskAssessmentFactorService
 
     public function store(Request $request): array
     {
+        // return ['status' => 'success', 'data' => is_file($request->risk_factor_items[0]['attachment'])];
+
         DB::beginTransaction();
 
         try {
@@ -78,9 +80,32 @@ class RiskAssessmentFactorService
 
             $risk_assessment_id =  RiskAssessmentFactor::insertGetId($risk_factor_info);
 
-            foreach($request->risk_factor_items as $factor){
+            foreach($request->risk_factor_items as $factorIndex => $factor){
+
+                if(is_file($factor['attachment'])) {
+
+                    // File Object
+                    $file = $factor['attachment'];
+
+                    // File extension
+                    $extension = $file->getClientOriginalExtension();
+
+                    $filename = $risk_assessment_id.'-'.$factorIndex.".".$extension;
+
+                    // File upload location
+                    $location = 'public/factor-risk-assessment';
+
+                    // Upload file
+                    $file->storeAs($location, $filename);
+
+                    // File path
+                    $filepath = asset('storage/factor-risk-assessment/'.$filename);
+                }
+
                 $factor['risk_assessment_factor_id'] = $risk_assessment_id;
+                $factor['attachment'] = $filepath ?? NULL;
                 $factor['created_by'] = $cdesk->officer_id;
+
                 RiskAssessmentFactorItem::insert($factor);
             }
 

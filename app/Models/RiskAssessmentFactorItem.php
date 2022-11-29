@@ -18,11 +18,8 @@ class RiskAssessmentFactorItem extends Model
         'risk_factor_title_en',
         'factor_weight',
         'factor_rating',
-        'project_id',
-        'function_id',
-        'unit_master_id',
-        'parent_office_id',
-        'cost_center_id',
+        'comment',
+        'attachment',
         'created_by',
         'update_by',
     ];

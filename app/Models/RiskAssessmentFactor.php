@@ -8,23 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class RiskAssessmentFactor extends Model
 {
     use HasFactory;
+
     protected $connection = 'OfficeDB';
+
     protected $fillable = [
-        'project_id',
-        'project_name_en',
-        'project_name_bn',
-        'function_id',
-        'function_name_en',
-        'function_name_bn',
-        'unit_master_id',
-        'unit_master_name_bn',
-        'unit_master_name_en',
+        'item_id',
+        'item_name_en',
+        'item_name_bn',
+        'item_type',
         'parent_office_id',
         'parent_office_name_en',
         'parent_office_name_bn',
-        'cost_center_id',
-        'cost_center_name_en',
-        'cost_center_name_bn',
         'total_risk_score',
         'risk_score_key',
         'is_latest',
