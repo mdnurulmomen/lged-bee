@@ -12,10 +12,12 @@ class AuditAssessmentArea extends Model
     protected $guarded = ['id'];
     protected $connection = 'OfficeDB';
 
+    /*
     public function auditArea()
     {
-        return $this->belongsTo(XAuditArea::class, 'x_audit_area_id', 'id');
+        return $this->belongsTo(XAuditArea::class, 'audit_area_id', 'id');
     }
+    */
 
     public function auditAssessmentAreaRisks()
     {

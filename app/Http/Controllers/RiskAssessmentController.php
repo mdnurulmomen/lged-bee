@@ -11,9 +11,9 @@ class RiskAssessmentController extends Controller
     public function index(Request $request)
     {
         try {
-            $list =  AuditAssessmentArea::with(['auditArea', 'auditAssessmentAreaRisks.xRiskAssessmentImpact', 'auditAssessmentAreaRisks.xRiskAssessmentLikelihood'])
-            ->where('assessment_item_id', $request->get('id'))
-            ->where('assessment_item_type', $request->get('type'))
+            $list =  AuditAssessmentArea::with(['auditAssessmentAreaRisks.xRiskAssessmentImpact', 'auditAssessmentAreaRisks.xRiskAssessmentLikelihood'])
+            ->where('assessment_sector_id', $request->get('id'))
+            ->where('assessment_sector_type', $request->get('type'))
             ->where('is_latest', 1)
             ->get();
 
@@ -30,18 +30,18 @@ class RiskAssessmentController extends Controller
     {
         DB::beginTransaction();
 
-        AuditAssessmentArea::where('x_audit_area_id', $request->x_audit_area_id)
-        ->where('assessment_item_id', $request->assessment_item_id)
-        ->where('assessment_item_type', $request->assessment_item_type)
+        AuditAssessmentArea::where('audit_area_id', $request->audit_area_id)
+        ->where('assessment_sector_id', $request->assessment_sector_id)
+        ->where('assessment_sector_type', $request->assessment_sector_type)
         ->update([
             'is_latest' => 0
         ]);
 
         try {
             $auditAssessmentArea = new AuditAssessmentArea();
-            $auditAssessmentArea->x_audit_area_id = $request->x_audit_area_id;
-            $auditAssessmentArea->assessment_item_id = $request->assessment_item_id;
-            $auditAssessmentArea->assessment_item_type = $request->assessment_item_type;
+            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
+            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
+            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
             $auditAssessmentArea->is_latest = 1;
             $auditAssessmentArea->creator_id = $request->creator_id;
             $auditAssessmentArea->updater_id = $request->updater_id;
@@ -100,9 +100,9 @@ class RiskAssessmentController extends Controller
 
         try {
             $auditAssessmentArea = AuditAssessmentArea::find($id);;
-            $auditAssessmentArea->x_audit_area_id = $request->x_audit_area_id;
-            $auditAssessmentArea->assessment_item_id = $request->assessment_item_id;
-            $auditAssessmentArea->assessment_item_type = $request->assessment_item_type;
+            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
+            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
+            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
             $auditAssessmentArea->updater_id = $request->updater_id;
             $auditAssessmentArea->save();
 
@@ -145,9 +145,9 @@ class RiskAssessmentController extends Controller
 
             $auditAssessmentArea = AuditAssessmentArea::find($id);
 
-            $updatePreviousAssessment = AuditAssessmentArea::where('x_audit_area_id', $auditAssessmentArea->x_audit_area_id)
-            ->where('assessment_item_id', $auditAssessmentArea->assessment_item_id)
-            ->where('assessment_item_type', $auditAssessmentArea->assessment_item_type)
+            $updatePreviousAssessment = AuditAssessmentArea::where('audit_area_id', $auditAssessmentArea->audit_area_id)
+            ->where('assessment_sector_id', $auditAssessmentArea->assessment_sector_id)
+            ->where('assessment_sector_type', $auditAssessmentArea->assessment_sector_type)
             ->latest()
             ->first()
             ->update([

@@ -105,13 +105,6 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('store', [RiskAssessmentFactorController::class, 'store']);
     });
 
-    Route::group(['prefix' => 'x-audit-areas'], function () {
-        Route::get('/', [XAuditAreaController::class, 'index']);
-        Route::post('/', [XAuditAreaController::class, 'store']);
-        Route::put('/{id}', [XAuditAreaController::class, 'update']);
-        Route::delete('/{id}', [XAuditAreaController::class, 'delete']);
-    });
-
     Route::group(['prefix' => 'risk-matrixes'], function () {
         Route::get('/', [RiskMatrixController::class, 'index']);
         Route::post('/', [RiskMatrixController::class, 'store']);
@@ -119,11 +112,18 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [RiskMatrixController::class, 'delete']);
     });
 
-    Route::group(['prefix' => 'item-risk-assessments'], function () {
+    Route::group(['prefix' => 'sector-risk-assessments'], function () {
         Route::get('/', [RiskAssessmentController::class, 'index']);
         Route::post('/', [RiskAssessmentController::class, 'store']);
         Route::put('/{id}', [RiskAssessmentController::class, 'update']);
         Route::delete('/{id}', [RiskAssessmentController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => 'audit-programs'], function () {
+        Route::get('/', [AuditProgramController::class, 'index']);
+        Route::post('/', [AuditProgramController::class, 'store']);
+        Route::put('/{id}', [AuditProgramController::class, 'update']);
+        Route::delete('/{id}', [AuditProgramController::class, 'delete']);
     });
 
     Route::group(['prefix' => 'strategic-plan'], function () {
