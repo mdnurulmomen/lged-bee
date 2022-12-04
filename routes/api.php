@@ -119,7 +119,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [RiskAssessmentController::class, 'delete']);
     });
 
-    Route::group(['prefix' => 'audit-programs'], function () {
+    Route::group(['prefix' => 'sector-area-programs'], function () {
         Route::get('/', [AuditProgramController::class, 'index']);
         Route::post('/', [AuditProgramController::class, 'store']);
         Route::put('/{id}', [AuditProgramController::class, 'update']);
