@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AuditProgram;
+use App\Exports\AuditProgramsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AuditProgramController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $list =  AuditProgram::with('procedures')->get();
+            $list =  AuditProgram::with('procedures')
+            ->where('audit_area_id', $request->audit_area_id)
+            ->get();
 
             $response = responseFormat('success', $list);
 
@@ -32,13 +36,13 @@ class AuditProgramController extends Controller
             $auditProgram->audit_area_id = $request->audit_area_id;
             $auditProgram->save();
 
-            foreach ($request->audit_area_procedures as $audit_area_procedure) {
+            foreach ($request->procedures as $audit_area_procedure) {
 
                 $auditProgram->procedures()->create([
                     'test_procedure' => $audit_area_procedure['test_procedure'],
-                    'note' => $audit_area_procedure['note'],
-                    'done_by' => $audit_area_procedure['done_by'],
-                    'reference' => $audit_area_procedure['reference'],
+                    // 'note' => $audit_area_procedure['note'],
+                    // 'done_by' => $audit_area_procedure['done_by'],
+                    // 'reference' => $audit_area_procedure['reference'],
                 ]);
 
             }
@@ -81,13 +85,13 @@ class AuditProgramController extends Controller
 
             $auditProgram->procedures()->delete();
 
-            foreach ($request->audit_area_procedures as $audit_area_procedure) {
+            foreach ($request->procedures as $audit_area_procedure) {
 
                 $auditProgram->procedures()->create([
                     'test_procedure' => $audit_area_procedure['test_procedure'],
-                    'note' => $audit_area_procedure['note'],
-                    'done_by' => $audit_area_procedure['done_by'],
-                    'reference' => $audit_area_procedure['reference'],
+                    // 'note' => $audit_area_procedure['note'],
+                    // 'done_by' => $audit_area_procedure['done_by'],
+                    // 'reference' => $audit_area_procedure['reference'],
                 ]);
 
             }
@@ -117,5 +121,25 @@ class AuditProgramController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $list =  AuditProgram::with('procedures')
+            ->where('audit_area_id', $request->audit_area_id)
+            ->get();
+
+            Excel::store(new AuditProgramsExport($list), 'audit-program/programs.xlsx', 'public');
+
+            $response = responseFormat('success', '/storage/audit-program/programs.xlsx');
+
+
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+
     }
 }

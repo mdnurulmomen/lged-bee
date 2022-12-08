@@ -121,6 +121,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'sector-area-programs'], function () {
         Route::get('/', [AuditProgramController::class, 'index']);
+        Route::get('/export', [AuditProgramController::class, 'export']);
         Route::post('/', [AuditProgramController::class, 'store']);
         Route::put('/{id}', [AuditProgramController::class, 'update']);
         Route::delete('/{id}', [AuditProgramController::class, 'delete']);
@@ -136,6 +137,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'yearly-plan'], function () {
         Route::post('list', [YearlyPlanController::class, 'list']);
         Route::post('store', [YearlyPlanController::class, 'store']);
+        Route::post('get-individual-yearly-plan', [YearlyPlanController::class, 'getIndividualYearlyPlan']);
+        Route::post('get-individual-yearly-plan-year', [YearlyPlanController::class, 'getIndividualYearlyPlanYear']);
     });
 
     Route::group(['prefix' => 'planning/'], function () {
