@@ -31,4 +31,28 @@ class YearlyPlanController extends Controller
 
         return response()->json($response);
     }
+
+    public function getIndividualYearlyPlan(Request $request, YearlyPlanService $yearlyPlanService)
+    {
+        $store = $yearlyPlanService->getIndividualYearlyPlan($request);
+        if (isSuccessResponse($store)) {
+            $response = responseFormat('success', $store['data']);
+        } else {
+            $response = responseFormat('error', $store['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function getIndividualYearlyPlanYear(Request $request, YearlyPlanService $yearlyPlanService)
+    {
+        $store = $yearlyPlanService->getIndividualYearlyPlanYear($request);
+        if (isSuccessResponse($store)) {
+            $response = responseFormat('success', $store['data']);
+        } else {
+            $response = responseFormat('error', $store['data']);
+        }
+
+        return response()->json($response);
+    }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use PDF;
 use App\Models\ApEntityAuditPlan;
+use App\Models\YearlyPlanLocation;
 use App\Services\ApEntityAuditPlanRevisedService;
 use App\Services\ApEntityTeamService;
 use Illuminate\Http\Request;
@@ -130,9 +132,9 @@ class ApEntityAuditPlanRevisedController extends Controller
     {
         Validator::make($request->all(), [
             'activity_id' => 'required|integer',
-            'annual_plan_id' => 'required|integer',
-            'fiscal_year_id' => 'required|integer',
-            'audit_plan_id' => 'required|integer',
+            // 'annual_plan_id' => 'required|integer',
+            // 'fiscal_year_id' => 'required|integer',
+            // 'audit_plan_id' => 'required|integer',
         ])->validate();
         $team_list = $apEntityAuditPlanRevisedService->getAuditPlanWiseTeam($request);
 
@@ -211,17 +213,17 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function storeAuditTeam(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'fiscal_year_id' => 'required|integer',
-            'activity_id' => 'required|integer',
-            'annual_plan_id' => 'required|integer',
-            'audit_plan_id' => 'integer',
+            // 'fiscal_year_id' => 'required|integer',
+            // 'activity_id' => 'required|integer',
+            // 'annual_plan_id' => 'required|integer',
+            // 'audit_plan_id' => 'integer',
             'teams' => 'required',
         ])->validate();
 
         $add_audit_team = $apEntityTeamService->storeAuditTeam($request);
 
         if (isSuccessResponse($add_audit_team)) {
-            $response = responseFormat('success', 'Successfully Saved Team');
+            $response = responseFormat('success', $add_audit_team);
         } else {
             $response = responseFormat('error', $add_audit_team['data']);
         }
@@ -251,8 +253,8 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function storeTeamSchedule(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'audit_plan_id' => 'integer',
-            'annual_plan_id' => 'integer',
+            // 'audit_plan_id' => 'integer',
+            // 'annual_plan_id' => 'integer',
             'team_schedules' => 'required|json',
         ])->validate();
 
@@ -317,4 +319,50 @@ class ApEntityAuditPlanRevisedController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getAnnouncementMemo($yearly_plan_location_id)
+    {
+        $yearlyPlanLocation = YearlyPlanLocation::with(['teams.members'])->find($yearly_plan_location_id);
+
+        if ($yearlyPlanLocation) {
+
+            return response()->json([
+                'status' => 'success', 'data' => $yearlyPlanLocation
+            ]);
+
+        } else {
+
+            return response()->json([
+                'status' => 'error', 'data' => 'No Model Found'
+            ]);
+
+        }
+    }
+
+    /*
+    public function downloadAnnouncementMemo($yearly_plan_location_id)
+    {
+        $announcementMemo = YearlyPlanLocation::with(['teams.members'])->find($yearly_plan_location_id);
+
+        if ($announcementMemo) {
+
+            $pdf = PDF::loadView('audit-operations.download-announcement-memo', ['announcementMemo' => $announcementMemo])
+            ->save('storage/audit-operation/announcement-memo.pdf');
+
+            // $downloadResponse = $pdf->download('announcement-memo.pdf');
+
+            return response()->json([
+                'status' => 'success', 'data' => '/storage/audit-operation/announcement-memo.pdf'
+            ]);
+
+        } else {
+
+            return response()->json([
+                'status' => 'error', 'data' => 'Model Not Found'
+            ]);
+
+        }
+    }
+    */
+
 }

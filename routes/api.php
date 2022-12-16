@@ -141,6 +141,10 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('get-individual-yearly-plan-year', [YearlyPlanController::class, 'getIndividualYearlyPlanYear']);
     });
 
+    Route::group(['prefix' => 'individual-plans'], function () {
+        Route::get('/{yearly_plan_id}', [IndividualPlanController::class, 'index']);
+    });
+
     Route::group(['prefix' => 'planning/'], function () {
         Route::group(['prefix' => 'operational-plan/'], function () {
 
@@ -292,6 +296,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('get-sub-tam', [AuditVisitCalenderPlanController::class, 'getSubTeam']);
             Route::post('team-calender-schedule-list', [AuditVisitCalenderPlanController::class, 'teamCalenderScheduleList']);
         });
+
+        Route::get('announcement-memos/{yearly_plan_location_id}', [ApEntityAuditPlanRevisedController::class, 'getAnnouncementMemo']);
+        // Route::get('download-announcement-memos/{yearly_plan_location_id}', [ApEntityAuditPlanRevisedController::class, 'downloadAnnouncementMemo']);
     });
 
     //follow up

@@ -29,4 +29,9 @@ class YearlyPlanLocation extends Model
         'created_by',
         'updated_by',
     ];
+
+    public function teams()
+    {
+        return $this->hasMany(AuditVisitCalendarPlanTeam::class, 'yearly_plan_location_id', 'id');
+    }
 }

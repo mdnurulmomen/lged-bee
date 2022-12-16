@@ -130,7 +130,7 @@ class AuditProgramController extends Controller
             ->where('audit_area_id', $request->audit_area_id)
             ->get();
 
-            Excel::store(new AuditProgramsExport($list), 'audit-program/programs.xlsx', 'public');
+            Excel::store(new AuditProgramsExport($list, $request->sectorName, $request->auditAreaName), 'audit-program/programs.xlsx', 'public');
 
             $response = responseFormat('success', '/storage/audit-program/programs.xlsx');
 

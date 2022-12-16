@@ -46,4 +46,47 @@ class YearlyPlanService
 
     }
 
+    public function getIndividualYearlyPlan(Request $request): array
+    {
+        try {
+
+            $year_wise_location_project = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            ->whereNotNull('project_id')
+            ->get();
+
+            $year_wise_location_function = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            ->whereNotNull('function_id')
+            ->get();
+
+            $year_wise_location_cost_centers = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            ->whereNotNull('cost_center_id')
+            ->get();
+
+            $data['project_list'] = $year_wise_location_project;
+            $data['function_list'] = $year_wise_location_function;
+            $data['cost_centers'] = $year_wise_location_cost_centers;
+
+            return ['status' => 'success', 'data' => $data];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
+    public function getIndividualYearlyPlanYear(Request $request): array
+    {
+        try {
+
+            $year_list = YearlyPlanLocation::select('strategic_plan_id','strategic_plan_year')
+            ->distinct('strategic_plan_year')
+            ->get();
+
+            return ['status' => 'success', 'data' => $year_list];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+
 }

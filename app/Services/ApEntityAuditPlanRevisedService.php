@@ -248,10 +248,10 @@ class ApEntityAuditPlanRevisedService
 
             $query = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::query() : AuditVisitCalendarPlanTeam::query();
 
-            $query->where('fiscal_year_id', $request->fiscal_year_id);
-            $query->where('activity_id', $request->activity_id);
-            $query->where('audit_plan_id', $request->audit_plan_id);
-            $query->where('annual_plan_id', $request->annual_plan_id);
+            // $query->where('fiscal_year_id', $request->fiscal_year_id);
+            // $query->where('activity_id', $request->activity_id);
+            // $query->where('audit_plan_id', $request->audit_plan_id);
+            $query->where('yearly_plan_location_id', $request->yearly_plan_location_id);
             $teams = $query->get()->toArray();
 
             $data = ['status' => 'success', 'data' => $teams];

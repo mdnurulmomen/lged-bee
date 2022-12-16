@@ -58,8 +58,13 @@ class StrategicPlanService
                 ->whereNotNull('function_id')
                 ->get();
 
+            $year_wise_location_cost_centers = StrategicPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+                ->whereNotNull('cost_center_id')
+                ->get();
+
             $data['project_list'] = $year_wise_location_project;
             $data['function_list'] = $year_wise_location_function;
+            $data['cost_centers'] = $year_wise_location_cost_centers;
 
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
