@@ -146,6 +146,15 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::get('store', [IndividualPlanController::class, 'store']);
     });
 
+    Route::group(['prefix' => 'audit-plans'], function () {
+        Route::get('/', [IndividualPlanController::class, 'getAllAuditPlans']);
+    });
+
+    Route::group(['prefix' => 'audit-plan-work-papers'], function () {
+        Route::get('/', [IndividualPlanController::class, 'getAllWorkPapers']);
+        Route::post('/store', [IndividualPlanController::class, 'uploadWorkPapers']);
+    });
+
     Route::group(['prefix' => 'planning/'], function () {
         Route::group(['prefix' => 'operational-plan/'], function () {
 

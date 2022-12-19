@@ -8,6 +8,90 @@ use DB;
 
 class IndividualPlanService
 {
+    public function getAllAuditPlans()
+    {
+        try {
+
+            $auditPlans = ApEntityIndividualAuditPlan::with(['yearlyPlanLocation'])->get();
+            return ['status' => 'success', 'data' => $auditPlans];
+
+        }
+        catch (\Exception $e) {
+
+            return ['status' => 'error', 'data' => $e->getMessage()];
+
+        }
+    }
+
+    public function getAllWorkPapers(Request $request)
+    {
+        // return ['status' => 'success', 'data' => $request->audit_plan_id];
+
+        try {
+
+            $auditPlan = ApEntityIndividualAuditPlan::with(['workPapers', 'yearlyPlanLocation'])
+            ->find($request->audit_plan_id);
+
+            return ['status' => 'success', 'data' => $auditPlan];
+
+        }
+        catch (\Exception $e) {
+
+            return ['status' => 'error', 'data' => $e->getMessage()];
+
+        }
+    }
+
+    public function uploadWorkPapers(Request $request)
+    {
+        // return ['status' => 'success', 'data' => $request->audit_plan_id];
+
+        DB::beginTransaction();
+
+        try {
+
+            $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+
+            if(is_file($request['attachment'])) {
+
+                // File Object
+                $file = $request['attachment'];
+
+                // File extension
+                $extension = $file->getClientOriginalExtension();
+
+                $filename = ($auditPlan->yearlyPlanLocation->id.'-'.$auditPlan->workPapers->count()).".".$extension;
+
+                // File upload location
+                $location = 'public/audit-plan/work-papers';
+
+                // Upload file
+                $file->storeAs($location, $filename);
+
+                // File path
+                $filepath = ('storage/audit-plan/work-papers/'.$filename);
+            }
+
+            $auditPlan->workPapers()->create([
+                'title_en' => $request->title_en,
+                'title_bn' => $request->title_bn,
+                'attachment' => $filepath,
+                'created_by' => $request->created_by,
+                'updated_by' => $request->updated_by,
+            ]);
+
+            DB::commit();
+
+            return ['status' => 'success', 'data' => 'Successfully uploaded'];
+
+        }
+        catch (\Exception $e) {
+
+            return ['status' => 'error', 'data' => $e->getMessage()];
+
+        }
+    }
+
     public function auditPlanInfo(Request $request): array
     {
         try {

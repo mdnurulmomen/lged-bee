@@ -106,4 +106,14 @@ class ApEntityIndividualAuditPlan extends Model
     {
         return $this->hasMany(ApMilestone::class, 'audit_plan_id', 'id');
     }
+
+    public function yearlyPlanLocation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(YearlyPlanLocation::class, 'yearly_plan_location_id', 'id');
+    }
+
+    public function workPapers()
+    {
+        return $this->hasMany(PlanWorkPaper::class, 'audit_plan_id', 'id');
+    }
 }
