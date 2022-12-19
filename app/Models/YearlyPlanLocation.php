@@ -34,4 +34,9 @@ class YearlyPlanLocation extends Model
     {
         return $this->hasMany(AuditVisitCalendarPlanTeam::class, 'yearly_plan_location_id', 'id');
     }
+
+    public function audit_plan()
+    {
+        return $this->hasOne(ApEntityIndividualAuditPlan::class, 'yearly_plan_location_id', 'id');
+    }
 }

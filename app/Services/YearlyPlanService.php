@@ -50,21 +50,19 @@ class YearlyPlanService
     {
         try {
 
-            $year_wise_location_project = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_project = YearlyPlanLocation::with('audit_plan.milestones')->where('strategic_plan_year',$request->strategic_plan_year)
             ->whereNotNull('project_id')
             ->get();
 
-            $year_wise_location_function = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_function = YearlyPlanLocation::with('audit_plan.milestones')->where('strategic_plan_year',$request->strategic_plan_year)
             ->whereNotNull('function_id')
             ->get();
 
-            $year_wise_location_cost_centers = YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
-            ->whereNotNull('cost_center_id')
-            ->get();
+
 
             $data['project_list'] = $year_wise_location_project;
             $data['function_list'] = $year_wise_location_function;
-            $data['cost_centers'] = $year_wise_location_cost_centers;
+            $data['cost_centers'] = [];
 
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {

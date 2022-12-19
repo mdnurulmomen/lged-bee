@@ -13,6 +13,10 @@ class ApEntityIndividualAuditPlan extends Model
 
     protected $fillable = [
         'plan_no',
+        'scope',
+        'objective',
+        'yearly_plan_id',
+        'yearly_plan_location_id',
         'annual_plan_id',
         'schedule_id',
         'activity_id',
@@ -96,5 +100,10 @@ class ApEntityIndividualAuditPlan extends Model
     public function apottis(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Apotti::class, 'audit_plan_id', 'id');
+    }
+
+    public function milestones()
+    {
+        return $this->hasMany(ApMilestone::class, 'audit_plan_id', 'id');
     }
 }

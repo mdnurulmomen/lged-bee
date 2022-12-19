@@ -141,8 +141,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('get-individual-yearly-plan-year', [YearlyPlanController::class, 'getIndividualYearlyPlanYear']);
     });
 
-    Route::group(['prefix' => 'individual-plans'], function () {
-        Route::get('/{yearly_plan_id}', [IndividualPlanController::class, 'index']);
+    Route::group(['prefix' => 'individual-plan'], function () {
+        Route::post('audit-plan-info', [IndividualPlanController::class, 'auditPlanInfo']);
+        Route::get('store', [IndividualPlanController::class, 'store']);
     });
 
     Route::group(['prefix' => 'planning/'], function () {
