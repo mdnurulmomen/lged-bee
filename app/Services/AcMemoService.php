@@ -36,7 +36,7 @@ class AcMemoService
         try {
             $folder_name = $cdesk->office_id;
 
-            $path = public_path('/memo/' . $folder_name);
+            $path = public_path('/findings/' . $folder_name);
 
             /*if (!Storage::exists($path)) {
                 $create_directorate_folder = Storage::makeDirectory($path, 0777, true, true);
@@ -61,11 +61,12 @@ class AcMemoService
             $audit_memo->criteria = $request->criteria;
             $audit_memo->condition = $request->condition;
             $audit_memo->cause = $request->cause;
-            $audit_memo->instances = $request->instances;
 
             $audit_memo->cost_center_id = $request->cost_center_id;
             $audit_memo->cost_center_name_bn = $request->cost_center_name_bn;
             $audit_memo->cost_center_name_en = $request->cost_center_name_en;
+
+            $audit_memo->residual_risk_rating = $request->residual_risk_rating;
 
             $audit_memo->audit_plan_id = $request->audit_plan_id;
             $audit_memo->audit_year_start = $request->audit_year_start;
@@ -73,8 +74,6 @@ class AcMemoService
 
             $audit_memo->memo_type = 1;
             $audit_memo->memo_status = 1;
-            $audit_memo->action_type = $request->action_type;
-            $audit_memo->challenges = $request->challenges;
             $audit_memo->date_to_be_implemented = date('Y-m-d H:i:s', strtotime($request->date_to_be_implemented));
             $audit_memo->save();
 
@@ -95,7 +94,7 @@ class AcMemoService
             // }
 
             //for attachments
-            // $finalAttachments = [];
+            $finalAttachments = [];
 
             //for porisishtos
             /*if ($request->hasfile('porisishtos')) {
@@ -123,22 +122,22 @@ class AcMemoService
             }*/
 
             //for memos
-            if ($request->hasfile('memos')) {
-                foreach ($request->memos as $key => $file) {
+            if ($request->hasfile('findings')) {
+                foreach ($request->findings as $key => $file) {
                     $userDefineFile = $file->getClientOriginalName();
                     $userDefineFileName = explode('.',$userDefineFile)[0];
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = '_memo_' . uniqid() . '.' . $fileExtension;
+                    $fileName = 'findings_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
+                    Storage::disk('public')->put('findings/' . $folder_name . '/' . $fileName, File::get($file));
 
                     $finalAttachments[] = array(
                         'ac_memo_id' => $audit_memo->id,
-                        'file_type' => 'memo',
+                        'file_type' => 'findings',
                         'file_user_define_name' => $userDefineFileName,
                         'file_custom_name' => $fileName,
-                        'file_path' => '/storage/memo/' . $folder_name . '/',
+                        'file_path' => 'storage/findings/' . $folder_name . '/',
                         'file_size' => $fileSize,
                         'file_extension' => $fileExtension,
                         'sequence' => $key + 1,
@@ -213,11 +212,10 @@ class AcMemoService
         }
 
         try {
-            $data['memo'] = AcMemo::with(['ac_memo_porisishtos'])->where('id', $request->memo_id)->first();
-            $data['porisishto_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
-                ->where('file_type', 'porisishto')->get();
-            $data['pramanok_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
-                ->where('file_type', 'pramanok')->get();
+            $data['findings'] = AcMemo::with(['ac_memo_attachments'])->where('id', $request->memo_id)->first();
+            $data['attachment_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
+                ->where('file_type', 'findings')->get();
+            
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -235,68 +233,34 @@ class AcMemoService
         \DB::beginTransaction();
         try {
             $folder_name = $cdesk->office_id;
-            $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
+            // $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
 
             $audit_memo = AcMemo::find($request->memo_id);
-            $audit_memo->memo_title_bn = $request->memo_title_bn;
-            $audit_memo->memo_description_bn = $request->memo_description_bn;
-            $audit_memo->irregularity_cause = $request->irregularity_cause;
-            $audit_memo->response_of_rpu = $request->response_of_rpu;
-            $audit_memo->jorito_ortho_poriman = $request->jorito_ortho_poriman;
-            $audit_memo->audit_year_start = $request->audit_year_start;
-            $audit_memo->audit_year_end = $request->audit_year_end;
-            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
-            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audit_memo->memo_type = $request->memo_type;
-            $audit_memo->memo_status = $request->memo_status;
-            $audit_memo->finder_officer_id = $request->finder_officer_id;
-            $audit_memo->finder_office_id = $request->finder_office_id;
-            $audit_memo->finder_details = $request->finder_details;
-            $audit_memo->team_leader_name = $request->team_leader_name;
-            $audit_memo->team_leader_designation = $request->team_leader_designation;
-            $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
-            $audit_memo->sub_team_leader_designation = $request->sub_team_leader_designation;
-            $audit_memo->issued_by = $request->issued_by;
+            $audit_memo->recommendation = $request->recommendation;
+            $audit_memo->agree_type = $request->agree_type;
+            $audit_memo->agree_in_part = $request->agree_in_part;
+            $audit_memo->instances = $request->instances;
+            $audit_memo->action_type = $request->action_type;
+            $audit_memo->recommended_control = $request->recommended_control;
+            $audit_memo->agreed_action_plan = $request->agreed_action_plan;
+            $audit_memo->challenges = $request->challenges;
+            $audit_memo->responsible_person = $request->responsible_person;
             $audit_memo->updated_by = $cdesk->officer_id;
-
-            $changes = array();
-            foreach ($audit_memo->getDirty() as $key => $value) {
-                $original = $audit_memo->getOriginal($key);
-                $changes[$key] = [
-                    'old' => $original,
-                    'new' => $value,
-                ];
-            }
-
-            $memo_log = new AcMemoLog();
-            $memo_log->memo_content_change = json_encode($changes);
-            $memo_log->memo_id = $request->memo_id;
-            $memo_log->modified_by_id = $cdesk->officer_id;
-            $memo_log->modified_by_name_bn = $cdesk->officer_bn;
-            $memo_log->modified_by_name_en = $cdesk->officer_en;
-            $memo_log->save();
-
             $audit_memo->save();
 
-            $porisistos = [];
-            if (isset($request->porisisto_details)){
-                foreach ($request->porisisto_details as $key=>$porisisto){
-                    $porisistos[] = array(
-                        'ac_memo_id' => $request->memo_id,
-                        'details' => $porisisto,
-                        'sequence' => $key + 1,
-                        'created_by' => $cdesk->officer_id
-                    );
-                }
-                if (!empty($porisistos)) {
-                    AcMemoPorisishto::where('ac_memo_id',$request->memo_id)->delete();
-                    AcMemoPorisishto::insert($porisistos);
-                }
-            }
+
+
+            // $memo_log = new AcMemoLog();
+            // $memo_log->memo_content_change = json_encode($changes);
+            // $memo_log->memo_id = $request->memo_id;
+            // $memo_log->modified_by_id = $cdesk->officer_id;
+            // $memo_log->modified_by_name_bn = $cdesk->officer_bn;
+            // $memo_log->modified_by_name_en = $cdesk->officer_en;
+            // $memo_log->save();
 
 
             //for attachments
-            $finalAttachments = [];
+            // $finalAttachments = [];
 
             //for porisishtos
             /*if ($request->hasfile('porisishtos')) {
@@ -322,46 +286,50 @@ class AcMemoService
                 }
             }*/
 
-            //for pramanoks
-            if ($request->hasfile('pramanoks')) {
-                foreach ($request->pramanoks as $key => $file) {
-                    $userDefineFileName = $file->getClientOriginalName();
-                    $fileExtension = $file->extension();
-                    $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix . '_pramanok_' . uniqid() . '.' . $file->extension();
+            //for memos
+            // if ($request->hasfile('memos')) {
+            //     foreach ($request->memos as $key => $file) {
+            //         $userDefineFile = $file->getClientOriginalName();
+            //         $userDefineFileName = explode('.',$userDefineFile)[0];
+            //         $fileExtension = $file->extension();
+            //         $fileSize = $file->getSize();
+            //         $fileName = '_memo_' . uniqid() . '.' . $fileExtension;
 
-                    Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
+            //         Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
-                    $finalAttachments[] = array(
-                        'ac_memo_id' => $audit_memo->id,
-                        'file_type' => 'pramanok',
-                        'file_user_define_name' => $userDefineFileName,
-                        'file_custom_name' => $fileName,
-                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
-                        'file_size' => $fileSize,
-                        'file_extension' => $fileExtension,
-                        'sequence' => $key + 1,
-                        'created_by' => $cdesk->officer_id,
-                        'modified_by' => $cdesk->officer_id,
-                    );
-                }
-            }
-            AcMemoAttachment::insert($finalAttachments);
+            //         $finalAttachments[] = array(
+            //             'ac_memo_id' => $audit_memo->id,
+            //             'file_type' => 'memo',
+            //             'file_user_define_name' => $userDefineFileName,
+            //             'file_custom_name' => $fileName,
+            //             'file_path' => '/storage/memo/' . $folder_name . '/',
+            //             'file_size' => $fileSize,
+            //             'file_extension' => $fileExtension,
+            //             'sequence' => $key + 1,
+            //             'created_by' => $cdesk->officer_id,
+            //             'modified_by' => $cdesk->officer_id,
+            //         );
+            //     }
+            // }
 
-            $memo_info = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,sequence')->where('id', $request->memo_id)->first();
-//            return ['status' => 'success', 'data' => $memo_info];
-            if ($memo_info->has_sent_to_rpu) {
-                $data['memo_info'] = $memo_info;
-                $update_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_memo_to_rpu'), $data)->json();
-                if ($update_audit_memo_to_rpu['status'] == 'success') {
-                    return ['status' => 'success', 'data' => 'Memo Update Successfully'];
-                } else {
-                    throw new \Exception(json_encode($update_audit_memo_to_rpu));
-                }
-            } else {
-                return ['status' => 'success', 'data' => 'Memo Update Successfully'];
-            }
+            // if (!empty($finalAttachments)) {
+            //     AcMemoAttachment::insert($finalAttachments);
+            // }
 
+            // $memo_info = AcMemo::with('ac_memo_attachments:id,ac_memo_id,file_type,file_user_define_name,file_path,sequence')->where('id', $request->memo_id)->first();
+            //  return ['status' => 'success', 'data' => $memo_info];
+            // if ($memo_info->has_sent_to_rpu) {
+            //     $data['memo_info'] = $memo_info;
+            //     $update_audit_memo_to_rpu = $this->initRPUHttp()->post(config('cag_rpu_api.update_memo_to_rpu'), $data)->json();
+            //     if ($update_audit_memo_to_rpu['status'] == 'success') {
+            //         return ['status' => 'success', 'data' => 'Memo Update Successfully'];
+            //     } else {
+            //         throw new \Exception(json_encode($update_audit_memo_to_rpu));
+            //     }
+            // } else {
+            //     return ['status' => 'success', 'data' => 'Memo Update Successfully'];
+            // }
+            return ['status' => 'success', 'data' => 'Memo Updated Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
