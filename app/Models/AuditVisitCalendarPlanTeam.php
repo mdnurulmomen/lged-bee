@@ -81,4 +81,9 @@ class AuditVisitCalendarPlanTeam extends Model
     {
         return $this->belongsTo(AnnualPlan::class, 'annual_plan_id', 'id');
     }
+
+    public function yearly_plan_location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(YearlyPlanLocation::class, 'yearly_plan_location_id', 'id');
+    }
 }

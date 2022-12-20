@@ -27,7 +27,6 @@ class AcMemoService
 
     public function auditMemoStore(Request $request): array
     {
-
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -46,81 +45,57 @@ class AcMemoService
                 }
             }*/
 
-            $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
+            // $office_domain_prefix = $office_db_con_response['office_domain']['domain_prefix'];
 
-            $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
-                'office_order'])->where('id', $request->team_member_schedule_id)->first();
+            // $plan_member_schedule = AuditVisitCalenderPlanMember::with(['plan_team', 'annual_plan', 'activity',
+            //     'office_order'])->where('id', $request->team_member_schedule_id)->first();
 
-            $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)
-                ->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->count();
+            // $onucched = AcMemo::where('cost_center_id', $plan_member_schedule->cost_center_id)
+            //     ->where('fiscal_year_id', $plan_member_schedule->fiscal_year_id)->count();
 
-            $fiscal_year_info = XFiscalYear::select('start', 'end')->where('id', $plan_member_schedule->fiscal_year_id)->first();
+            // $fiscal_year_info = XFiscalYear::select('start', 'end')->where('id', $plan_member_schedule->fiscal_year_id)->first();
 
             $audit_memo = new AcMemo();
-            $audit_memo->onucched_no = $onucched + 1;
-            $audit_memo->memo_date = date('Y-m-d');
-            $audit_memo->memo_irregularity_type = $request->memo_irregularity_type;
-            $audit_memo->memo_irregularity_sub_type = $request->memo_irregularity_sub_type;
-            $audit_memo->ministry_id = $plan_member_schedule->ministry_id;
-            $audit_memo->ministry_name_en = $plan_member_schedule->ministry_name_en;
-            $audit_memo->ministry_name_bn = $plan_member_schedule->ministry_name_bn;
-            $audit_memo->parent_office_id = $plan_member_schedule->entity_id;
-            $audit_memo->parent_office_name_en = $plan_member_schedule->entity_name_en;
-            $audit_memo->parent_office_name_bn = $plan_member_schedule->entity_name_bn;
-            $audit_memo->cost_center_id = $plan_member_schedule->cost_center_id;
-            $audit_memo->cost_center_name_en = $plan_member_schedule->cost_center_name_bn;
-            $audit_memo->cost_center_name_bn = $plan_member_schedule->cost_center_name_bn;
-            $audit_memo->fiscal_year_id = $plan_member_schedule->fiscal_year_id;
-            $audit_memo->fiscal_year = $fiscal_year_info->start . '-' . $fiscal_year_info->end;
-            $audit_memo->ap_office_order_id = $plan_member_schedule->office_order->id;
-            $audit_memo->audit_plan_id = $plan_member_schedule->audit_plan_id;
-            $audit_memo->audit_year_start = bnToen($request->audit_year_start);
-            $audit_memo->audit_year_end = bnToen($request->audit_year_end);
-            $audit_memo->ac_query_potro_no = 1; //todo
-            $audit_memo->audit_type = $plan_member_schedule->activity->activity_type;
-            $audit_memo->team_id = $plan_member_schedule->team_id;
-            $audit_memo->memo_title_bn = $request->memo_title_bn;
-            $audit_memo->memo_description_bn = $request->memo_description_bn;
-            $audit_memo->irregularity_cause = $request->irregularity_cause;
-            $audit_memo->memo_type = $request->memo_type;
-            $audit_memo->memo_status = $request->memo_status;
-            $audit_memo->jorito_ortho_poriman = str_replace(",","",$request->jorito_ortho_poriman);
-            $audit_memo->response_of_rpu = $request->response_of_rpu;
-            $audit_memo->created_by = $cdesk->officer_id;
-            $audit_memo->approve_status = 'draft';
-            $audit_memo->status = 'draft';
-            $audit_memo->finder_officer_id = $request->finder_officer_id;
-            $audit_memo->finder_office_id = $request->finder_office_id;
-            $audit_memo->finder_details = $request->finder_details;
-            $audit_memo->team_leader_name = $request->team_leader_name;
-            $audit_memo->team_leader_designation = $request->team_leader_designation;
-            $audit_memo->sub_team_leader_name = $request->sub_team_leader_name;
-            $audit_memo->sub_team_leader_designation = $request->sub_team_leader_designation;
-            $audit_memo->issued_by = $request->issued_by;
-            $audit_memo->rpu_acceptor_officer_name_bn = $request->rpu_acceptor_officer_name_bn;
-            $audit_memo->rpu_acceptor_officer_name_en = $request->rpu_acceptor_officer_name_bn;
-            $audit_memo->rpu_acceptor_designation_name_bn = $request->rpu_acceptor_designation_name_bn;
-            $audit_memo->rpu_acceptor_designation_name_en = $request->rpu_acceptor_designation_name_bn;
+            $audit_memo->audit_observation = $request->audit_observation;
+            $audit_memo->heading = $request->heading;
+            $audit_memo->criteria = $request->criteria;
+            $audit_memo->condition = $request->condition;
+            $audit_memo->cause = $request->cause;
+            $audit_memo->instances = $request->instances;
+
+            $audit_memo->cost_center_id = $request->cost_center_id;
+            $audit_memo->cost_center_name_bn = $request->cost_center_name_bn;
+            $audit_memo->cost_center_name_en = $request->cost_center_name_en;
+
+            $audit_memo->audit_plan_id = $request->audit_plan_id;
+            $audit_memo->audit_year_start = $request->audit_year_start;
+            $audit_memo->audit_year_end = $request->audit_year_end;
+
+            $audit_memo->memo_type = 1;
+            $audit_memo->memo_status = 1;
+            $audit_memo->action_type = $request->action_type;
+            $audit_memo->challenges = $request->challenges;
+            $audit_memo->date_to_be_implemented = date('Y-m-d H:i:s', strtotime($request->date_to_be_implemented));
             $audit_memo->save();
 
 
-            $porisistos = [];
-            foreach ($request->porisisto_details as $key => $porisisto){
-                if ($porisisto != null){
-                    $porisistos[] = array(
-                        'ac_memo_id' => $audit_memo->id,
-                        'details' => $porisisto,
-                        'sequence' => $key + 1,
-                        'created_by' => $cdesk->officer_id
-                    );
-                }
-            }
-            if (!empty($porisistos)) {
-                AcMemoPorisishto::insert($porisistos);
-            }
+            // $porisistos = [];
+            // foreach ($request->porisisto_details as $key => $porisisto){
+            //     if ($porisisto != null){
+            //         $porisistos[] = array(
+            //             'ac_memo_id' => $audit_memo->id,
+            //             'details' => $porisisto,
+            //             'sequence' => $key + 1,
+            //             'created_by' => $cdesk->officer_id
+            //         );
+            //     }
+            // }
+            // if (!empty($porisistos)) {
+            //     AcMemoPorisishto::insert($porisistos);
+            // }
 
             //for attachments
-            $finalAttachments = [];
+            // $finalAttachments = [];
 
             //for porisishtos
             /*if ($request->hasfile('porisishtos')) {
@@ -147,23 +122,23 @@ class AcMemoService
                 }
             }*/
 
-            //for pramanoks
-            if ($request->hasfile('pramanoks')) {
-                foreach ($request->pramanoks as $key => $file) {
+            //for memos
+            if ($request->hasfile('memos')) {
+                foreach ($request->memos as $key => $file) {
                     $userDefineFile = $file->getClientOriginalName();
                     $userDefineFileName = explode('.',$userDefineFile)[0];
                     $fileExtension = $file->extension();
                     $fileSize = $file->getSize();
-                    $fileName = $office_domain_prefix . '_pramanok_' . uniqid() . '.' . $fileExtension;
+                    $fileName = '_memo_' . uniqid() . '.' . $fileExtension;
 
                     Storage::disk('public')->put('memo/' . $folder_name . '/' . $fileName, File::get($file));
 
                     $finalAttachments[] = array(
                         'ac_memo_id' => $audit_memo->id,
-                        'file_type' => 'pramanok',
+                        'file_type' => 'memo',
                         'file_user_define_name' => $userDefineFileName,
                         'file_custom_name' => $fileName,
-                        'file_path' => url('storage/memo/' . $folder_name . '/' . $fileName),
+                        'file_path' => '/storage/memo/' . $folder_name . '/',
                         'file_size' => $fileSize,
                         'file_extension' => $fileExtension,
                         'sequence' => $key + 1,
@@ -195,9 +170,9 @@ class AcMemoService
         }
         try {
             $memo_list = AcMemo::with(['ac_memo_attachments'])
-                ->where('audit_plan_id', $request->audit_plan_id)
-                ->where('cost_center_id', $request->cost_center_id)
-                ->paginate(config('bee_config.per_page_pagination'));
+            ->where('audit_plan_id',$request->audit_plan_id)
+            ->where('cost_center_id',$request->cost_center_id)
+            ->get();
             return ['status' => 'success', 'data' => $memo_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
