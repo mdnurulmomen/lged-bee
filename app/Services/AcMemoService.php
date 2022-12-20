@@ -74,7 +74,6 @@ class AcMemoService
 
             $audit_memo->memo_type = 1;
             $audit_memo->memo_status = 1;
-            $audit_memo->date_to_be_implemented = date('Y-m-d H:i:s', strtotime($request->date_to_be_implemented));
             $audit_memo->save();
 
 
