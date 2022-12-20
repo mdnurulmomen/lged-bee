@@ -307,7 +307,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
             Route::post('team-calender-schedule-list', [AuditVisitCalenderPlanController::class, 'teamCalenderScheduleList']);
         });
 
-        Route::get('announcement-memos/{yearly_plan_location_id}', [ApEntityAuditPlanRevisedController::class, 'getAnnouncementMemo']);
+        Route::post('announcement-memos', [ApEntityAuditPlanRevisedController::class, 'getAnnouncementMemo']);
         // Route::get('download-announcement-memos/{yearly_plan_location_id}', [ApEntityAuditPlanRevisedController::class, 'downloadAnnouncementMemo']);
     });
 

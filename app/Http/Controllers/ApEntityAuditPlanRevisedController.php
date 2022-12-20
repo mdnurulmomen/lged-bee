@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApEntityIndividualAuditPlan;
 use PDF;
 use App\Models\ApEntityAuditPlan;
 use App\Models\YearlyPlanLocation;
@@ -320,23 +321,18 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function getAnnouncementMemo($yearly_plan_location_id)
+    public function getAnnouncementMemo(Request $request)
     {
-        $yearlyPlanLocation = YearlyPlanLocation::with(['teams.members'])->find($yearly_plan_location_id);
+        $yearlyPlanLocation = YearlyPlanLocation::with(['teams.members'])->find($request->yearly_plan_location_id);
 
-        if ($yearlyPlanLocation) {
+        $auditPlanInfo = ApEntityIndividualAuditPlan::with('milestones')->find($request->audit_plan_id);
 
-            return response()->json([
-                'status' => 'success', 'data' => $yearlyPlanLocation
-            ]);
+        $data['yearly_plan_info'] = $yearlyPlanLocation;
+        $data['audit_plan_info'] = $auditPlanInfo;
 
-        } else {
-
-            return response()->json([
-                'status' => 'error', 'data' => 'No Model Found'
-            ]);
-
-        }
+        return response()->json([
+            'status' => 'success', 'data' => $data
+        ]);
     }
 
     /*
