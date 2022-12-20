@@ -11,6 +11,15 @@ class PlanWorkPaper extends Model
 
     protected $connection = 'OfficeDB';
 
+    protected $fillable = [
+        'title_en',
+        'title_bn',
+        'attachment',
+        'audit_plan_id',
+        'created_by',
+        'updated_by',
+    ];
+
 
     public function auditPlan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
