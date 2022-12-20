@@ -11,7 +11,6 @@ class PlanWorkPaper extends Model
 
     protected $connection = 'OfficeDB';
 
-    protected $guarded = ['id'];
 
     public function auditPlan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

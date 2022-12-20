@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApMilestone;
+use App\Models\PlanWorkPaper;
 use Illuminate\Http\Request;
 use DB;
 
@@ -29,8 +30,7 @@ class IndividualPlanService
 
         try {
 
-            $auditPlan = ApEntityIndividualAuditPlan::with(['workPapers', 'yearlyPlanLocation'])
-            ->find($request->audit_plan_id);
+            $auditPlan = PlanWorkPaper::where('audit_plan_id',$request->audit_plan_id)->get();
 
             return ['status' => 'success', 'data' => $auditPlan];
 

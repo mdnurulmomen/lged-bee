@@ -35,7 +35,7 @@ class IndividualPlanController extends Controller
 
     public function uploadWorkPapers(Request $request, IndividualPlanService $individualPlanService)
     {
-        $store = $riskAssessmentFactorService->uploadWorkPapers($request);
+        $store = $individualPlanService->uploadWorkPapers($request);
         if (isSuccessResponse($store)) {
             $response = responseFormat('success', $store['data']);
         } else {
