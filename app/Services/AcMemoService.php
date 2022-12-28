@@ -56,17 +56,18 @@ class AcMemoService
             // $fiscal_year_info = XFiscalYear::select('start', 'end')->where('id', $plan_member_schedule->fiscal_year_id)->first();
 
             $audit_memo = new AcMemo();
+            $audit_memo->onucched_no = $request->onucched_no;
+            $audit_memo->memo_title_bn = $request->memo_title_bn;
             $audit_memo->audit_observation = $request->audit_observation;
-            $audit_memo->heading = $request->heading;
             $audit_memo->criteria = $request->criteria;
-            $audit_memo->condition = $request->condition;
             $audit_memo->cause = $request->cause;
 
             $audit_memo->cost_center_id = $request->cost_center_id;
             $audit_memo->cost_center_name_bn = $request->cost_center_name_bn;
             $audit_memo->cost_center_name_en = $request->cost_center_name_en;
 
-            $audit_memo->residual_risk_rating = $request->residual_risk_rating;
+            $audit_memo->impact = $request->impact;
+            $audit_memo->risk_level = $request->risk_level;
 
             $audit_memo->audit_plan_id = $request->audit_plan_id;
             $audit_memo->audit_year_start = $request->audit_year_start;
@@ -151,7 +152,7 @@ class AcMemoService
             }
 
             \DB::commit();
-            return ['status' => 'success', 'data' => 'Memo Saved Successfully'];
+            return ['status' => 'success', 'data' => 'Audit Findings Saved Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -224,6 +225,7 @@ class AcMemoService
 
     public function auditMemoUpdate(Request $request): array
     {
+        // return ['data' => $request->all()];
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -236,14 +238,11 @@ class AcMemoService
 
             $audit_memo = AcMemo::find($request->memo_id);
             $audit_memo->recommendation = $request->recommendation;
-            $audit_memo->agree_type = $request->agree_type;
-            $audit_memo->agree_in_part = $request->agree_in_part;
-            $audit_memo->instances = $request->instances;
-            $audit_memo->action_type = $request->action_type;
-            $audit_memo->recommended_control = $request->recommended_control;
-            $audit_memo->agreed_action_plan = $request->agreed_action_plan;
-            $audit_memo->challenges = $request->challenges;
+            $audit_memo->m_response = $request->m_response;
+            $audit_memo->comment = $request->auditor_comment;
+            $audit_memo->action_taken = $request->action_taken;
             $audit_memo->responsible_person = $request->responsible_person;
+            $audit_memo->date_to_be_implemented = date('Y-m-d H:i:s', strtotime($request->date_to_be_implemented));
             $audit_memo->updated_by = $cdesk->officer_id;
             $audit_memo->save();
 
@@ -328,7 +327,7 @@ class AcMemoService
             // } else {
             //     return ['status' => 'success', 'data' => 'Memo Update Successfully'];
             // }
-            return ['status' => 'success', 'data' => 'Memo Updated Successfully'];
+            return ['status' => 'success', 'data' => 'Audit Findings Updated Successfully'];
         } catch (\Exception $exception) {
             \DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
