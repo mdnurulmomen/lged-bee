@@ -143,7 +143,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'individual-plan'], function () {
         Route::post('audit-plan-info', [IndividualPlanController::class, 'auditPlanInfo']);
-        Route::get('store', [IndividualPlanController::class, 'store']);
+        Route::post('store', [IndividualPlanController::class, 'store']);
     });
 
     Route::group(['prefix' => 'audit-plans'], function () {
