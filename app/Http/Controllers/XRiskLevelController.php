@@ -7,10 +7,19 @@ use Illuminate\Http\Request;
 
 class XRiskLevelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $list =  XRiskLevel::all();
+            $type = $request->type;
+
+            $query =  XRiskLevel::query();
+
+            $query->when($type, function ($q, $type) {
+                return $q->where('type', $type);
+            });
+
+            $list = $query->get();
+
             $response = responseFormat('success', $list);
 
         } catch (\Exception $exception) {
