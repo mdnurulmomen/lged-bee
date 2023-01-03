@@ -119,6 +119,14 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::delete('/{id}', [RiskAssessmentController::class, 'delete']);
     });
 
+    Route::group(['prefix' => 'risk-identifications'], function () {
+        Route::get('/parent-areas', [RiskIdentificationController::class, 'getParentAreas']);
+        Route::get('/', [RiskIdentificationController::class, 'index']);
+        Route::post('/', [RiskIdentificationController::class, 'store']);
+        Route::put('/{id}', [RiskIdentificationController::class, 'update']);
+        Route::delete('/{id}', [RiskIdentificationController::class, 'delete']);
+    });
+
     Route::group(['prefix' => 'sector-area-programs'], function () {
         Route::get('/', [AuditProgramController::class, 'index']);
         Route::get('/export', [AuditProgramController::class, 'export']);
