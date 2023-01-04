@@ -60,6 +60,7 @@ class ApOfficeOrderController extends Controller
             'memorandum_date' => 'required',
             'heading_details' => 'required',
             'advices' => 'required',
+            'order_cc_list' => 'required',
             'cdesk' => 'required|json',
         ])->validate();
 

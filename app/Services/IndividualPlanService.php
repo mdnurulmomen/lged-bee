@@ -114,6 +114,7 @@ class IndividualPlanService
                 'plan_no' => 0,
                 'yearly_plan_id' => $request->yearly_plan_id,
                 'yearly_plan_location_id' => $request->yearly_plan_location_id,
+                'audit_type' => $request->audit_type,
                 'has_office_order' => 0,
                 'has_update_office_order' => 0,
                 'draft_unit_id' => $cdesk->office_unit_id,
@@ -143,7 +144,6 @@ class IndividualPlanService
                 $item['updated_at'] = date('Y-m-d H:i:s');
                 return $item;
             });
-
 
             if($request->id){
                 ApMilestone::where('audit_plan_id',$request->id)->delete();

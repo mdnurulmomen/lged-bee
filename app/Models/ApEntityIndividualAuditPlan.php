@@ -17,6 +17,7 @@ class ApEntityIndividualAuditPlan extends Model
         'objective',
         'yearly_plan_id',
         'yearly_plan_location_id',
+        'audit_type',
         'annual_plan_id',
         'schedule_id',
         'activity_id',

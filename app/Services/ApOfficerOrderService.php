@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ApMilestone;
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApOfficeOrder;
@@ -106,6 +107,7 @@ class ApOfficerOrderService
                 ->toArray();
 
             $auditTeamAllMembers = AuditVisitCalenderPlanMember::distinct()
+                ->with('plan_team')
                 ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
                     'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
                 ->where('audit_plan_id',$request->audit_plan_id)
@@ -117,10 +119,20 @@ class ApOfficerOrderService
                 ->get()
                 ->toArray();
 
+            $audit_type = ApEntityIndividualAuditPlan::query();
+            $audit_type = $audit_type->where('annual_plan_id',$request->annual_plan_id)
+            ->first();
+
+            $milestones = ApMilestone::where('audit_plan_id',$request->audit_plan_id)
+                ->get()
+                ->toArray();
+
             $officeOrderInfo = [
                 'office_order' => $officeOrder,
                 'audit_team_members' => $auditTeamAllMembers,
                 'audit_team_schedules' => $auditTeamWiseSchedule,
+                'audit_type' => $audit_type,
+                'milestones' => $milestones,
             ];
 
             $responseData = ['status' => 'success', 'data' => $officeOrderInfo];
