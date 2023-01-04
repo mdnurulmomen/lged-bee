@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RiskMatrix;
+use App\Models\XRiskLevel;
 use Illuminate\Http\Request;
 
 class RiskMatrixController extends Controller
@@ -51,7 +52,16 @@ class RiskMatrixController extends Controller
             ->where('x_risk_assessment_impact_id',$request->x_risk_assessment_impact_id)
             ->first();
 
-            $response = responseFormat('success', $xRiskFactorImpact);
+            if($xRiskFactorImpact){
+                $risk_level = XRiskLevel::find($xRiskFactorImpact->x_risk_level_id)->title_en;
+
+                $data['risk_level'] = $risk_level;
+                $data['priority'] = $xRiskFactorImpact->priority;
+            }else{
+                $data = [];
+            }
+
+           $response = responseFormat('success', $data);
 
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
