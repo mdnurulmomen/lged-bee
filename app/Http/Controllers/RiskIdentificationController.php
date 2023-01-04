@@ -54,13 +54,6 @@ class RiskIdentificationController extends Controller
     {
         DB::beginTransaction();
 
-        RiskIdentification::where('parent_area_id', $request->parent_area_id)
-        ->where('assessment_sector_id', $request->assessment_sector_id)
-        ->where('assessment_sector_type', $request->assessment_sector_type)
-        ->update([
-            'is_latest' => 0
-        ]);
-
         try {
             $auditAssessmentArea = new RiskIdentification();
             $auditAssessmentArea->parent_area_id = $request->parent_area_id;
@@ -83,6 +76,23 @@ class RiskIdentificationController extends Controller
 
             $response = responseFormat('error', $exception->getMessage());
 
+        }
+
+        return response()->json($response);
+    }
+
+    public function delete($id)
+    {
+        try {
+
+            $auditAssessmentArea = RiskIdentification::find($id);
+            $auditAssessmentArea->delete();
+
+            $response = responseFormat('success', 'Deleted Successfully');
+
+
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
         }
 
         return response()->json($response);
