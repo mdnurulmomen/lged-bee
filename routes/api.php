@@ -134,6 +134,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::put('/{id}', [AuditProgramController::class, 'update']);
         Route::delete('/{id}', [AuditProgramController::class, 'delete']);
     });
+    Route::post('/program-note-update', [AuditProgramController::class, 'programNoteUpdate']);
 
     Route::group(['prefix' => 'strategic-plan'], function () {
         Route::post('list', [StrategicPlanController::class, 'list']);

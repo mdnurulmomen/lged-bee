@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AuditProgram;
+use App\Models\AuditProgramProcedure;
 use App\Exports\AuditProgramsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -12,7 +13,7 @@ class AuditProgramController extends Controller
     public function index(Request $request)
     {
         try {
-            $list =  AuditProgram::with('procedures')
+            $list =  AuditProgram::with('procedures.workpapers')
             ->where('audit_area_id', $request->audit_area_id)
             ->get();
 
@@ -90,14 +91,35 @@ class AuditProgramController extends Controller
 
                 $auditProgram->procedures()->create([
                     'test_procedure' => $audit_area_procedure['test_procedure'],
-                    // 'note' => $audit_area_procedure['note'],
-                    // 'done_by' => $audit_area_procedure['done_by'],
-                    // 'reference' => $audit_area_procedure['reference'],
+                    'note' => $audit_area_procedure['note'],
+                    'done_by' => $audit_area_procedure['done_by'],
+                    'reference' => $audit_area_procedure['reference'],
                 ]);
 
             }
 
             $response = responseFormat('success', 'Updated Successfully');
+
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
+    public function programNoteUpdate(Request $request)
+    {
+        try {
+            $auditProgram = AuditProgramProcedure::find($request->id);
+            $auditProgram->note = $request->note;
+            $auditProgram->team_member_officer_id = $request->team_member_officer_id;
+            $auditProgram->team_member_name_en = $request->team_member_name_en;
+            $auditProgram->team_member_name_bn = $request->team_member_name_bn;
+            $auditProgram->team_member_details = $request->team_member_details;
+            $auditProgram->workpaper_id = $request->workpaper_id;
+            $auditProgram->save();
+
+            $response = responseFormat('success', 'Note Submitted Successfully');
 
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());

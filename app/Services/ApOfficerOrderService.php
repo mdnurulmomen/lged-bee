@@ -30,31 +30,36 @@ class ApOfficerOrderService
         }
         try {
 
-            $fiscal_year_id = $request->fiscal_year_id;
-            $activity_id = $request->activity_id;
+            // $fiscal_year_id = $request->fiscal_year_id;
+            // $activity_id = $request->activity_id;
 
             $query = ApEntityIndividualAuditPlan::query();
+            $query = $query->with('yearlyPlanLocation')->with('office_order');
 
-            $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
-                return $q->where('fiscal_year_id', $fiscal_year_id);
-            });
+            $auditPlanList =  $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            // $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
+            //     return $q->where('fiscal_year_id', $fiscal_year_id);
+            // });
 
-            $query->when($activity_id, function ($q, $activity_id) {
+            
+
+
+//             $query->when($activity_id, function ($q, $activity_id) {
 //                $q->whereHas('office_order', function ($q) use ($activity_id) {
 //                    return $q->where('activity_id', $activity_id);
 //                });
+//                 return $q->where('activity_id', $activity_id);
+//             });
 
-                return $q->where('activity_id', $activity_id);
-            });
 
-            $auditPlanList =  $query->has('audit_teams')
-                ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement','office_order_log'])
-                ->with('office_order_update.office_order_movement',function($q) use($query) {
-                    $query->where('has_update_office_order',1);
-                })
-                ->where('status','approved')
-                ->withCount('audit_team_update')
-                ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
+            // $auditPlanList =  $query->has('audit_teams')
+            //     ->with(['annual_plan.ap_entities','audit_teams','office_order.office_order_movement','office_order_log'])
+            //     ->with('office_order_update.office_order_movement',function($q) use($query) {
+            //         $query->where('has_update_office_order',1);
+            //     })
+            //     ->where('status','approved')
+            //     ->withCount('audit_team_update')
+            //     ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
 //            if ($request->per_page && $request->page && !$request->all) {
 //                $auditPlanList = ApEntityIndividualAuditPlan::has('audit_teams')
@@ -89,8 +94,13 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('id',$request->office_order_id)
-                ->where('audit_plan_id',$request->audit_plan_id)
+            // $officeOrder = ApOfficeOrder::with(['office_order_movement'])->where('id',$request->office_order_id)
+            //     ->where('audit_plan_id',$request->audit_plan_id)
+            //     ->where('annual_plan_id',$request->annual_plan_id)
+            //     ->first()
+            //     ->toArray();
+
+            $officeOrder = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)
                 ->where('annual_plan_id',$request->annual_plan_id)
                 ->first()
                 ->toArray();
@@ -99,13 +109,11 @@ class ApOfficerOrderService
                 ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
                     'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
                 ->where('audit_plan_id',$request->audit_plan_id)
-                ->where('annual_plan_id',$request->annual_plan_id)
                 ->orderBy('employee_grade','ASC')
                 ->get()
                 ->toArray();
 
             $auditTeamWiseSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
-                ->where('annual_plan_id',$request->annual_plan_id)
                 ->get()
                 ->toArray();
 

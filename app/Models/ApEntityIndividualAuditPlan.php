@@ -72,7 +72,7 @@ class ApEntityIndividualAuditPlan extends Model
 
     public function office_order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id')->where('approved_status','!=','log');
+        return $this->hasOne(ApOfficeOrder::class, 'audit_plan_id', 'id');
     }
 
     public function audit_team_update(): \Illuminate\Database\Eloquent\Relations\HasMany

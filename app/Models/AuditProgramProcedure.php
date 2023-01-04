@@ -13,4 +13,9 @@ class AuditProgramProcedure extends Model
 
     public $timestamps = false;
     protected $connection = 'OfficeDB';
+    
+    public function workpapers()
+    {
+        return $this->hasOne(PlanWorkPaper::class, 'id', 'workpaper_id');
+    }
 }
