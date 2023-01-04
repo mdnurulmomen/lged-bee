@@ -81,6 +81,35 @@ class RiskIdentificationController extends Controller
         return response()->json($response);
     }
 
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $auditAssessmentArea = RiskIdentification::find($id);;
+            $auditAssessmentArea->parent_area_id = $request->parent_area_id;
+            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
+            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
+            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
+            $auditAssessmentArea->risk_name = $request->risk_name;
+            $auditAssessmentArea->updater_id = $request->updater_id;
+            $auditAssessmentArea->save();
+
+            DB::commit();
+
+            $response = responseFormat('success', 'Updated Successfully');
+        }
+        catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            $response = responseFormat('error', $exception->getMessage());
+
+        }
+
+        return response()->json($response);
+    }
+
     public function delete($id)
     {
         try {
