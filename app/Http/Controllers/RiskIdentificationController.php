@@ -29,6 +29,28 @@ class RiskIdentificationController extends Controller
         return response()->json($response);
     }
 
+    public function getChildAreaRisks(Request $request)
+    {
+        try {
+
+            $list =  RiskIdentification::where('assessment_sector_id', $request->get('assessment_sector_id'))
+            ->where('assessment_sector_type', $request->get('assessment_sector_type'))
+            ->where('parent_area_id', $request->get('parent_area_id'))
+            ->where('audit_area_id', $request->get('audit_area_id'))
+            ->get();
+
+            $response = responseFormat('success', $list);
+
+        }
+        catch (\Exception $exception) {
+
+            $response = responseFormat('error', $exception->getMessage());
+
+        }
+
+        return response()->json($response);
+    }
+
     public function index(Request $request)
     {
         try {
@@ -69,6 +91,35 @@ class RiskIdentificationController extends Controller
             DB::commit();
 
             $response = responseFormat('success', 'Save Successfully');
+        }
+        catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            $response = responseFormat('error', $exception->getMessage());
+
+        }
+
+        return response()->json($response);
+    }
+
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $auditAssessmentArea = RiskIdentification::find($id);;
+            $auditAssessmentArea->parent_area_id = $request->parent_area_id;
+            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
+            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
+            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
+            $auditAssessmentArea->risk_name = $request->risk_name;
+            $auditAssessmentArea->updater_id = $request->updater_id;
+            $auditAssessmentArea->save();
+
+            DB::commit();
+
+            $response = responseFormat('success', 'Updated Successfully');
         }
         catch (\Exception $exception) {
 
