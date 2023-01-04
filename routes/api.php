@@ -110,6 +110,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('/', [RiskMatrixController::class, 'store']);
         Route::put('/{id}', [RiskMatrixController::class, 'update']);
         Route::delete('/{id}', [RiskMatrixController::class, 'delete']);
+        Route::post('likelihood-impact-wise-matrix', [RiskMatrixController::class, 'likelihoodAndImpactWiseMatrix']);
     });
 
     Route::group(['prefix' => 'sector-risk-assessments'], function () {

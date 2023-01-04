@@ -43,6 +43,23 @@ class RiskMatrixController extends Controller
         return response()->json($response);
     }
 
+    public function likelihoodAndImpactWiseMatrix(Request $request)
+    {
+        try {
+
+            $xRiskFactorImpact = RiskMatrix::where('x_risk_assessment_likelihood_id',$request->x_risk_assessment_likelihood_id)
+            ->where('x_risk_assessment_impact_id',$request->x_risk_assessment_impact_id)
+            ->first();
+
+            $response = responseFormat('success', $xRiskFactorImpact);
+
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
     /*
     public function show($id)
     {
