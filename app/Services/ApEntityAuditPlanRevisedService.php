@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\AcMemo;
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
+use App\Models\YearlyPlanLocation;
 use App\Models\AuditTemplate;
 use App\Models\AuditVisitCalendarPlanTeam;
 use App\Models\AuditVisitCalendarPlanTeamUpdate;
 use App\Models\AuditVisitCalenderPlanMember;
+use App\Models\EngagementLetter;
 use App\Models\OpActivity;
 use App\Models\RTemplateContent;
 use App\Traits\GenericData;
@@ -396,4 +399,34 @@ class ApEntityAuditPlanRevisedService
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
     }
+
+    public function getAnnouncementMemo(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $office_db_con_response = $this->switchOffice($cdesk->office_id);
+            if (!isSuccessResponse($office_db_con_response)) {
+                return ['status' => 'error', 'data' => $office_db_con_response];
+            }
+            $engagement_letter = EngagementLetter::where('audit_plan_id',$request->audit_plan_id)
+                ->first()
+                ->toArray();
+
+            $yearlyPlanLocation = YearlyPlanLocation::find($request->yearly_plan_location_id)->first();
+
+            $auditPlanInfo = ApEntityIndividualAuditPlan::find($request->audit_plan_id)->first();
+
+            $finding = AcMemo::where('audit_plan_id',$request->audit_plan_id)->first();
+
+            $data['engagement_letter'] = $engagement_letter;
+            $data['yearly_plan_info'] = $yearlyPlanLocation;
+            $data['audit_plan_info'] = $auditPlanInfo;
+            $data['finding'] = $finding;
+
+            return ['status' => 'success', 'data' => $data];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+    }
+
 }

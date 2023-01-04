@@ -155,6 +155,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'individual-plan'], function () {
         Route::post('audit-plan-info', [IndividualPlanController::class, 'auditPlanInfo']);
         Route::post('store', [IndividualPlanController::class, 'store']);
+        Route::post('engagement-letter-store', [IndividualPlanController::class, 'engagementLetterStore']);
     });
 
     Route::group(['prefix' => 'audit-plans'], function () {
