@@ -29,6 +29,28 @@ class RiskIdentificationController extends Controller
         return response()->json($response);
     }
 
+    public function getChildAreaRisks(Request $request)
+    {
+        try {
+
+            $list =  RiskIdentification::where('assessment_sector_id', $request->get('assessment_sector_id'))
+            ->where('assessment_sector_type', $request->get('assessment_sector_type'))
+            ->where('parent_area_id', $request->get('parent_area_id'))
+            ->where('audit_area_id', $request->get('audit_area_id'))
+            ->get();
+
+            $response = responseFormat('success', $list);
+
+        }
+        catch (\Exception $exception) {
+
+            $response = responseFormat('error', $exception->getMessage());
+
+        }
+
+        return response()->json($response);
+    }
+
     public function index(Request $request)
     {
         try {

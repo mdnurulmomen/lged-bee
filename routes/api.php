@@ -121,6 +121,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
 
     Route::group(['prefix' => 'risk-identifications'], function () {
         Route::get('/parent-areas', [RiskIdentificationController::class, 'getParentAreas']);
+        Route::get('/child-area-risks', [RiskIdentificationController::class, 'getChildAreaRisks']);
         Route::get('/', [RiskIdentificationController::class, 'index']);
         Route::post('/', [RiskIdentificationController::class, 'store']);
         Route::put('/{id}', [RiskIdentificationController::class, 'update']);
