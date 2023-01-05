@@ -17,6 +17,7 @@ class AuditExecutionQueryService
 
     public function auditQueryScheduleList(Request $request): array
     {
+        
         $cdesk = json_decode($request->cdesk, false);
         $office_db_con_response = $this->switchOffice($cdesk->office_id);
         if (!isSuccessResponse($office_db_con_response)) {
@@ -52,6 +53,7 @@ class AuditExecutionQueryService
             //     ->orderBy('team_member_start_date', 'ASC')
             //     ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             $schedule_list = $query->with('plan_team.yearly_plan_location')
+                ->where('team_member_officer_id', $cdesk->officer_id)
                 ->where('schedule_type','!=','visit')
                 ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
 
