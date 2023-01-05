@@ -321,18 +321,21 @@ class ApEntityAuditPlanRevisedController extends Controller
         return response()->json($response);
     }
 
-    public function getAnnouncementMemo(Request $request)
+    public function getAnnouncementMemo(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
-        $yearlyPlanLocation = YearlyPlanLocation::with(['teams.members'])->find($request->yearly_plan_location_id);
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required|integer',
+            'cdesk' => 'required|json',
+        ])->validate();
 
-        $auditPlanInfo = ApEntityIndividualAuditPlan::with('milestones')->find($request->audit_plan_id);
+        $engagement_letter = $apEntityAuditPlanRevisedService->getAnnouncementMemo($request);
 
-        $data['yearly_plan_info'] = $yearlyPlanLocation;
-        $data['audit_plan_info'] = $auditPlanInfo;
-
-        return response()->json([
-            'status' => 'success', 'data' => $data
-        ]);
+        if (isSuccessResponse($engagement_letter)) {
+            $response = responseFormat('success', $engagement_letter['data']);
+        } else {
+            $response = responseFormat('error', $engagement_letter['data']);
+        }
+        return response()->json($response);
     }
 
     /*

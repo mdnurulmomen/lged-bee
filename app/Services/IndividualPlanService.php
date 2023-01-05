@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\ApMilestone;
 use App\Models\PlanWorkPaper;
+use App\Models\EngagementLetter;
 use Illuminate\Http\Request;
 use DB;
 
@@ -137,7 +138,6 @@ class IndividualPlanService
 
            $milestone_list = collect($request->milestone_list);
 
-
             $milestone_list = $milestone_list->map(function ($item) use ($audit_plan_id){
                 $item['audit_plan_id'] = $audit_plan_id;
                 $item['created_at'] = date('Y-m-d H:i:s');
@@ -156,6 +156,30 @@ class IndividualPlanService
            return ['status' => 'error', 'data' => $e->getMessage()];
         }
 
+    }
+
+    public function engagementLetterStore(Request $request): array
+    {
+        try {
+            $cdesk = json_decode($request->cdesk, false);
+            $letter_data = [
+                'audit_plan_id' => $request->audit_plan_id,
+                'letter_to' => $request->letter_to,
+                'letter_from' => $cdesk->officer_en,
+                'subject' => $request->subject,
+                'body' => $request->body,
+                'others' => $request->others,
+                'created_by' => $cdesk->officer_id,
+                'modified_by' => $cdesk->officer_id,
+            ];
+
+           $engagement_letter =  EngagementLetter::insert($letter_data);
+
+            return ['status' => 'success', 'data' => 'Engagement Letter Created successfully'];
+
+        } catch (\Exception $e) {
+           return ['status' => 'error', 'data' => $e->getMessage()];
+        }
 
     }
 }

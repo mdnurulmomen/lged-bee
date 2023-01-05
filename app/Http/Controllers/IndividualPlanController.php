@@ -68,4 +68,16 @@ class IndividualPlanController extends Controller
         }
         return response()->json($response);
     }
+
+    public function engagementLetterStore(Request $request, IndividualPlanService $individualPlanService): \Illuminate\Http\JsonResponse
+    {
+        $add_letter = $individualPlanService->engagementLetterStore($request);
+
+        if (isSuccessResponse($add_letter)) {
+            $response = responseFormat('success', $add_letter['data']);
+        } else {
+            $response = responseFormat('error', $add_letter['data']);
+        }
+        return response()->json($response);
+    }
 }

@@ -120,7 +120,7 @@ class ApOfficerOrderService
                 ->toArray();
 
             $audit_type = ApEntityIndividualAuditPlan::query();
-            $audit_type = $audit_type->where('annual_plan_id',$request->annual_plan_id)
+            $audit_type = $audit_type->where('id',$request->audit_plan_id)
             ->first();
 
             $milestones = ApMilestone::where('audit_plan_id',$request->audit_plan_id)
@@ -231,7 +231,6 @@ class ApOfficerOrderService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
         try {
-            $annualPlan = AnnualPlan::find($request->annual_plan_id);
 
             //audit plan
             $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
@@ -247,9 +246,6 @@ class ApOfficerOrderService
             $apOfficeOrder->milestone_id = $auditPlan->milestone_id;
             $apOfficeOrder->fiscal_year_id = $auditPlan->fiscal_year_id;
             $apOfficeOrder->audit_plan_id = $request->audit_plan_id;
-            $apOfficeOrder->duration_id = $annualPlan->activity->duration_id;
-            $apOfficeOrder->outcome_id = $annualPlan->activity->outcome_id;
-            $apOfficeOrder->output_id = $annualPlan->activity->output_id;
             $apOfficeOrder->memorandum_no = $request->memorandum_no;
             $apOfficeOrder->memorandum_no_2 = $request->memorandum_no_2;
             $apOfficeOrder->memorandum_date = $request->memorandum_date;

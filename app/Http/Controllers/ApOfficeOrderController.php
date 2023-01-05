@@ -55,7 +55,6 @@ class ApOfficeOrderController extends Controller
     {
         Validator::make($request->all(), [
             'audit_plan_id' => 'required',
-            'annual_plan_id' => 'required',
             'memorandum_no' => 'required',
             'memorandum_date' => 'required',
             'heading_details' => 'required',
