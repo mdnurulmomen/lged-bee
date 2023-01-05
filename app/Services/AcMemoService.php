@@ -66,6 +66,10 @@ class AcMemoService
             $audit_memo->cost_center_name_bn = $request->cost_center_name_bn;
             $audit_memo->cost_center_name_en = $request->cost_center_name_en;
 
+            $audit_memo->project_id = $request->project_id;
+            $audit_memo->project_name_bn = $request->project_name_bn;
+            $audit_memo->project_name_en = $request->project_name_en;
+
             $audit_memo->impact = $request->impact;
             $audit_memo->risk_level = $request->risk_level;
 

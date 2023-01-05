@@ -108,8 +108,6 @@ class ApOfficerOrderService
 
             $auditTeamAllMembers = AuditVisitCalenderPlanMember::distinct()
                 ->with('plan_team')
-                ->select('team_member_name_bn','team_member_name_en','team_member_designation_bn',
-                    'team_member_designation_en','team_member_role_bn','team_member_role_en','mobile_no','employee_grade')
                 ->where('audit_plan_id',$request->audit_plan_id)
                 ->orderBy('employee_grade','ASC')
                 ->get()
@@ -117,6 +115,12 @@ class ApOfficerOrderService
 
             $auditTeamWiseSchedule = AuditVisitCalendarPlanTeam::where('audit_plan_id',$request->audit_plan_id)
                 ->get()
+                ->toArray();
+
+            $auditable_units = AuditVisitCalenderPlanMember::where('audit_plan_id',$request->audit_plan_id)
+                ->where('schedule_type','schedule')
+                ->get()
+                ->unique('cost_center_id')
                 ->toArray();
 
             $audit_type = ApEntityIndividualAuditPlan::query();
@@ -133,6 +137,7 @@ class ApOfficerOrderService
                 'audit_team_schedules' => $auditTeamWiseSchedule,
                 'audit_type' => $audit_type,
                 'milestones' => $milestones,
+                'auditable_units' => $auditable_units,
             ];
 
             $responseData = ['status' => 'success', 'data' => $officeOrderInfo];
