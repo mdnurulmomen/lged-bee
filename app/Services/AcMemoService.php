@@ -172,9 +172,21 @@ class AcMemoService
         //     return ['status' => 'error', 'data' => $office_db_con_response];
         // }
         try {
-            $memo_list = AcMemo::where('audit_plan_id',$request->audit_plan_id)
-            // ->where('cost_center_id',$request->cost_center_id)
-            ->get();
+            $audit_plan_id = $request->audit_plan_id;
+            $project_id = $request->project_id;
+
+            $query = AcMemo::query();
+
+            $query->when($audit_plan_id, function ($q, $audit_plan_id) {
+                return $q->where('audit_plan_id', $audit_plan_id);
+            });
+
+            $query->when($project_id, function ($q, $project_id) {
+                return $q->where('project_id', $project_id);
+            });
+
+            $memo_list =  $query->get();
+
             return ['status' => 'success', 'data' => $memo_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -218,7 +230,7 @@ class AcMemoService
             $data['findings'] = AcMemo::with(['ac_memo_attachments'])->where('id', $request->memo_id)->first();
             $data['attachment_list'] = AcMemoAttachment::where('ac_memo_id', $request->memo_id)
                 ->where('file_type', 'findings')->get();
-            
+
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];

@@ -61,6 +61,7 @@ class RiskAssessmentController extends Controller
                     'x_risk_assessment_impact_id' => $auditAssessmentAreaRisk['x_risk_assessment_impact_id'],
                     'x_risk_assessment_likelihood_id' => $auditAssessmentAreaRisk['x_risk_assessment_likelihood_id'],
                     'control_system' => $auditAssessmentAreaRisk['control_system'],
+                    'issue_no' => $auditAssessmentAreaRisk['issue_no'],
                     'risk_owner_id' => $auditAssessmentAreaRisk['risk_owner_id'],
                     'risk_owner_name' => $auditAssessmentAreaRisk['risk_owner_name'],
                     'process_owner_id' => $auditAssessmentAreaRisk['process_owner_id'],
