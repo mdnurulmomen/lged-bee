@@ -163,14 +163,13 @@ class AcMemoService
     public function auditMemoList(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
-        $office_db_con_response = $this->switchOffice($cdesk->office_id);
-        if (!isSuccessResponse($office_db_con_response)) {
-            return ['status' => 'error', 'data' => $office_db_con_response];
-        }
+        // $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        // if (!isSuccessResponse($office_db_con_response)) {
+        //     return ['status' => 'error', 'data' => $office_db_con_response];
+        // }
         try {
-            $memo_list = AcMemo::with(['ac_memo_attachments'])
-            ->where('audit_plan_id',$request->audit_plan_id)
-            ->where('cost_center_id',$request->cost_center_id)
+            $memo_list = AcMemo::where('audit_plan_id',$request->audit_plan_id)
+            // ->where('cost_center_id',$request->cost_center_id)
             ->get();
             return ['status' => 'success', 'data' => $memo_list];
         } catch (\Exception $exception) {
