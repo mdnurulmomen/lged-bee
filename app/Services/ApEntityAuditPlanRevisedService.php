@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\AcMemo;
+use App\Models\ApOfficeOrder;
 use App\Models\AnnualPlan;
 use App\Models\ApEntityIndividualAuditPlan;
 use App\Models\YearlyPlanLocation;
@@ -416,12 +416,12 @@ class ApEntityAuditPlanRevisedService
 
             $auditPlanInfo = ApEntityIndividualAuditPlan::find($request->audit_plan_id)->first();
 
-            $finding = AcMemo::where('audit_plan_id',$request->audit_plan_id)->first();
+            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->first();
 
             $data['engagement_letter'] = $engagement_letter;
             $data['yearly_plan_info'] = $yearlyPlanLocation;
             $data['audit_plan_info'] = $auditPlanInfo;
-            $data['finding'] = $finding;
+            $data['office_order'] = $office_order;
 
             return ['status' => 'success', 'data' => $data];
         } catch (\Exception $exception) {
