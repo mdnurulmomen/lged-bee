@@ -43,6 +43,7 @@ class RiskAssessmentController extends Controller
             $auditAssessmentArea = AuditAssessmentArea::where('audit_area_id', $request->audit_area_id)
                 ->where('assessment_sector_id', $request->assessment_sector_id)
                 ->where('assessment_sector_type', $request->assessment_sector_type)
+                ->where('assessment_type', $request->assessment_type)
                 ->first();
 
             if(!$auditAssessmentArea){
@@ -60,8 +61,9 @@ class RiskAssessmentController extends Controller
             foreach ($request->audit_assessment_area_risks as $auditAssessmentAreaRisk) {
 
                 $auditAssessmentArea->auditAssessmentAreaRisks()->updateOrCreate(
-                    ['inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id']],
+                    ['inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id'],'assessment_type' => $request->assessment_type],
                     [
+                    'assessment_type' => $request->assessment_type,
                     'sub_area_id' => $auditAssessmentAreaRisk['sub_area_id'],
                     'sub_area_name' => $auditAssessmentAreaRisk['sub_area_name'],
                     'inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id'],
