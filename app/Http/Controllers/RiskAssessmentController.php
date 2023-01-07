@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\AuditAssessmentArea;
@@ -31,27 +32,36 @@ class RiskAssessmentController extends Controller
     {
         DB::beginTransaction();
 
-        AuditAssessmentArea::where('audit_area_id', $request->audit_area_id)
-        ->where('assessment_sector_id', $request->assessment_sector_id)
-        ->where('assessment_sector_type', $request->assessment_sector_type)
-        ->update([
-            'is_latest' => 0
-        ]);
+//        AuditAssessmentArea::where('audit_area_id', $request->audit_area_id)
+//        ->where('assessment_sector_id', $request->assessment_sector_id)
+//        ->where('assessment_sector_type', $request->assessment_sector_type)
+//        ->update([
+//            'is_latest' => 0
+//        ]);
 
         try {
-            $auditAssessmentArea = new AuditAssessmentArea();
-            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
-            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
-            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
-            $auditAssessmentArea->assessment_type = $request->assessment_type;
-            $auditAssessmentArea->is_latest = 1;
-            $auditAssessmentArea->creator_id = $request->creator_id;
-            $auditAssessmentArea->updater_id = $request->updater_id;
-            $auditAssessmentArea->save();
+            $auditAssessmentArea = AuditAssessmentArea::where('audit_area_id', $request->audit_area_id)
+                ->where('assessment_sector_id', $request->assessment_sector_id)
+                ->where('assessment_sector_type', $request->assessment_sector_type)
+                ->first();
+
+            if(!$auditAssessmentArea){
+                $auditAssessmentArea = new AuditAssessmentArea();
+                $auditAssessmentArea->audit_area_id = $request->audit_area_id;
+                $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
+                $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
+                $auditAssessmentArea->assessment_type = $request->assessment_type;
+                $auditAssessmentArea->is_latest = 1;
+                $auditAssessmentArea->creator_id = $request->creator_id;
+                $auditAssessmentArea->updater_id = $request->updater_id;
+                $auditAssessmentArea->save();
+            }
 
             foreach ($request->audit_assessment_area_risks as $auditAssessmentAreaRisk) {
 
-                $auditAssessmentArea->auditAssessmentAreaRisks()->create([
+                $auditAssessmentArea->auditAssessmentAreaRisks()->updateOrCreate(
+                    ['inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id']],
+                    [
                     'sub_area_id' => $auditAssessmentAreaRisk['sub_area_id'],
                     'sub_area_name' => $auditAssessmentAreaRisk['sub_area_name'],
                     'inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id'],
