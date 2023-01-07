@@ -33,8 +33,8 @@ class AuditProgramController extends Controller
             $auditProgram = new AuditProgram();
             $auditProgram->audit_plan_id = $request->audit_plan_id;
             $auditProgram->area_index = $request->area_index;
-            $auditProgram->category = strtolower($request->category);
-            $auditProgram->control_objective = strtolower($request->control_objective);
+            $auditProgram->category = $request->category;
+            $auditProgram->control_objective = $request->control_objective;
             $auditProgram->audit_area_id = $request->audit_area_id;
             $auditProgram->save();
 
@@ -80,8 +80,8 @@ class AuditProgramController extends Controller
 
             $auditProgram = AuditProgram::find($id);
             $auditProgram->area_index = $request->area_index;
-            $auditProgram->category = strtolower($request->category);
-            $auditProgram->control_objective = strtolower($request->control_objective);
+            $auditProgram->category = $request->category;
+            $auditProgram->control_objective = $request->control_objective;
             $auditProgram->audit_area_id = $request->audit_area_id;
             $auditProgram->save();
 

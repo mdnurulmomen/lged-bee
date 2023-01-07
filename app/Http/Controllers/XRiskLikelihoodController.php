@@ -26,12 +26,12 @@ class XRiskLikelihoodController extends Controller
         try {
 
             $xRiskFactorImpact = new XRiskAssessmentLikelihood();
-            $xRiskFactorImpact->title_bn = strtolower($request->title_bn);
-            $xRiskFactorImpact->title_en = strtolower($request->title_en);
-            $xRiskFactorImpact->description_bn = strtolower($request->description_bn);
-            $xRiskFactorImpact->description_en = strtolower($request->description_en);
-            $xRiskFactorImpact->comment_en = strtolower($request->comment_en);
-            $xRiskFactorImpact->commnet_bn = strtolower($request->commnet_bn);
+            $xRiskFactorImpact->title_bn = $request->title_bn;
+            $xRiskFactorImpact->title_en = $request->title_en;
+            $xRiskFactorImpact->description_bn = $request->description_bn;
+            $xRiskFactorImpact->description_en = $request->description_en;
+            $xRiskFactorImpact->comment_en = $request->comment_en;
+            $xRiskFactorImpact->commnet_bn = $request->commnet_bn;
             $xRiskFactorImpact->likelihood_value = $request->likelihood_value;
             $xRiskFactorImpact->created_by = $request->created_by;
             $xRiskFactorImpact->updated_by = $request->updated_by;
@@ -67,12 +67,12 @@ class XRiskLikelihoodController extends Controller
         try {
 
             $xRiskFactorImpact = XRiskAssessmentLikelihood::find($id);
-            $xRiskFactorImpact->title_bn = strtolower($request->title_bn);
-            $xRiskFactorImpact->title_en = strtolower($request->title_en);
-            $xRiskFactorImpact->description_bn = strtolower($request->description_bn);
-            $xRiskFactorImpact->description_en = strtolower($request->description_en);
-            $xRiskFactorImpact->comment_en = strtolower($request->comment_en);
-            $xRiskFactorImpact->commnet_bn = strtolower($request->commnet_bn);
+            $xRiskFactorImpact->title_bn = $request->title_bn;
+            $xRiskFactorImpact->title_en = $request->title_en;
+            $xRiskFactorImpact->description_bn = $request->description_bn;
+            $xRiskFactorImpact->description_en = $request->description_en;
+            $xRiskFactorImpact->comment_en = $request->comment_en;
+            $xRiskFactorImpact->commnet_bn = $request->commnet_bn;
             $xRiskFactorImpact->likelihood_value = $request->likelihood_value;
             $xRiskFactorImpact->updated_by = $request->updated_by;
             $xRiskFactorImpact->save();

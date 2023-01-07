@@ -36,9 +36,9 @@ class XRiskLevelController extends Controller
             $xRiskFactor = new XRiskLevel();
             $xRiskFactor->level_from = $request->level_from;
             $xRiskFactor->level_to = $request->level_to;
-            $xRiskFactor->type = strtolower($request->type);
-            $xRiskFactor->title_bn = strtolower($request->title_bn);
-            $xRiskFactor->title_en = strtolower($request->title_en);
+            $xRiskFactor->type = $request->type;
+            $xRiskFactor->title_bn = $request->title_bn;
+            $xRiskFactor->title_en = $request->title_en;
             $xRiskFactor->created_by = $request->created_by;
             $xRiskFactor->updated_by = $request->updated_by;
             $xRiskFactor->save();
@@ -59,9 +59,9 @@ class XRiskLevelController extends Controller
             $xRiskFactor = XRiskLevel::find($id);
             $xRiskFactor->level_from = $request->level_from;
             $xRiskFactor->level_to = $request->level_to;
-            $xRiskFactor->type = strtolower($request->type);
-            $xRiskFactor->title_bn = strtolower($request->title_bn);
-            $xRiskFactor->title_en = strtolower($request->title_en);
+            $xRiskFactor->type = $request->type;
+            $xRiskFactor->title_bn = $request->title_bn;
+            $xRiskFactor->title_en = $request->title_en;
             $xRiskFactor->updated_by = $request->updated_by;
             $xRiskFactor->save();
 

@@ -26,8 +26,8 @@ class XRiskImpactController extends Controller
         try {
 
             $xRiskFactorImpact = new XRiskAssessmentImpact();
-            $xRiskFactorImpact->title_bn = strtolower($request->title_bn);
-            $xRiskFactorImpact->title_en = strtolower($request->title_en);
+            $xRiskFactorImpact->title_bn = $request->title_bn;
+            $xRiskFactorImpact->title_en = $request->title_en;
             $xRiskFactorImpact->impact_value = $request->impact_value;
             $xRiskFactorImpact->created_by = $request->created_by;
             $xRiskFactorImpact->updated_by = $request->updated_by;
@@ -63,8 +63,8 @@ class XRiskImpactController extends Controller
         try {
 
             $xRiskFactorImpact = XRiskAssessmentImpact::find($id);
-            $xRiskFactorImpact->title_bn = strtolower($request->title_bn);
-            $xRiskFactorImpact->title_en = strtolower($request->title_en);
+            $xRiskFactorImpact->title_bn = $request->title_bn;
+            $xRiskFactorImpact->title_en = $request->title_en;
             $xRiskFactorImpact->impact_value = $request->impact_value;
             $xRiskFactorImpact->updated_by = $request->updated_by;
             $xRiskFactorImpact->save();
