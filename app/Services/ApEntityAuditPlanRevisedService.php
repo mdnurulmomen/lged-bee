@@ -408,22 +408,12 @@ class ApEntityAuditPlanRevisedService
             if (!isSuccessResponse($office_db_con_response)) {
                 return ['status' => 'error', 'data' => $office_db_con_response];
             }
-            $engagement_letter = EngagementLetter::where('audit_plan_id',$request->audit_plan_id)
+            $engagement_letter = EngagementLetter::with('audit_plan.office_order','audit_plan.yearlyPlanLocation')
+                ->where('audit_plan_id',$request->audit_plan_id)
                 ->first()
                 ->toArray();
 
-            $yearlyPlanLocation = YearlyPlanLocation::find($request->yearly_plan_location_id)->first();
-
-            $auditPlanInfo = ApEntityIndividualAuditPlan::find($request->audit_plan_id)->first();
-
-            $office_order = ApOfficeOrder::where('audit_plan_id',$request->audit_plan_id)->first();
-
-            $data['engagement_letter'] = $engagement_letter;
-            $data['yearly_plan_info'] = $yearlyPlanLocation;
-            $data['audit_plan_info'] = $auditPlanInfo;
-            $data['office_order'] = $office_order;
-
-            return ['status' => 'success', 'data' => $data];
+            return ['status' => 'success', 'data' => $engagement_letter];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

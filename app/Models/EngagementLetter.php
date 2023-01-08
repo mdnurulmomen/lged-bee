@@ -22,4 +22,9 @@ class EngagementLetter extends Model
         'created_by',
         'modified_by'
     ];
+
+    public function audit_plan(): \Illuminate\Database\Eloquent\Relations\belongsTo
+    {
+        return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
+    }
 }
