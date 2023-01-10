@@ -91,9 +91,6 @@ class AuditProgramController extends Controller
 
                 $auditProgram->procedures()->create([
                     'test_procedure' => $audit_area_procedure['test_procedure'],
-                    'note' => $audit_area_procedure['note'],
-                    'done_by' => $audit_area_procedure['done_by'],
-                    'reference' => $audit_area_procedure['reference'],
                 ]);
 
             }
