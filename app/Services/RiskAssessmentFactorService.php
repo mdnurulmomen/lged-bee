@@ -33,7 +33,7 @@ class RiskAssessmentFactorService
                 $query->where('item_type', 'cost_center');
             }
 
-            $risk_assessment_factor = $query->where('is_latest',1)->get();
+            $risk_assessment_factor = $query->where('is_latest',1)->orderBy('total_risk_score', 'DESC')->get();
             $risk_assessment = [];
 
             foreach($risk_assessment_factor as $assessment){
