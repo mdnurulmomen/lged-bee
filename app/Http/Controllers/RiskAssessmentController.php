@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\AuditAssessmentArea;
+use Illuminate\Support\Arr;
 
 class RiskAssessmentController extends Controller
 {
@@ -60,8 +61,8 @@ class RiskAssessmentController extends Controller
 
             foreach ($request->audit_assessment_area_risks as $auditAssessmentAreaRisk) {
 
-                $auditAssessmentArea->auditAssessmentAreaRisks()->updateOrCreate(
-                    ['inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id'],'assessment_type' => $request->assessment_type],
+                $auditAssessmentArea->auditAssessmentAreaRisks()->updateOrCreate([
+                        'inherent_risk_id' => $auditAssessmentAreaRisk['inherent_risk_id'],'assessment_type' => $request->assessment_type],
                     [
                     'assessment_type' => $request->assessment_type,
                     'sub_area_id' => $auditAssessmentAreaRisk['sub_area_id'],
@@ -74,12 +75,14 @@ class RiskAssessmentController extends Controller
                     'x_risk_assessment_likelihood_id' => $auditAssessmentAreaRisk['x_risk_assessment_likelihood_id'],
                     'control_system' => $auditAssessmentAreaRisk['control_system'],
                     'issue_no' => $auditAssessmentAreaRisk['issue_no'],
-                    'risk_owner_id' => $auditAssessmentAreaRisk['risk_owner_id'],
+                    'risk_owner_id' => Arr::exists($auditAssessmentAreaRisk, 'risk_owner_id') ? $auditAssessmentAreaRisk['risk_owner_id'] : 0,
                     'risk_owner_name' => $auditAssessmentAreaRisk['risk_owner_name'],
-                    'process_owner_id' => $auditAssessmentAreaRisk['process_owner_id'],
+                    'process_owner_id' => Arr::exists($auditAssessmentAreaRisk, 'process_owner_id') ? $auditAssessmentAreaRisk['process_owner_id'] : 0,
                     'process_owner_name' => $auditAssessmentAreaRisk['process_owner_name'],
-                    'control_owner_id' => $auditAssessmentAreaRisk['control_owner_id'],
+                    'control_owner_id' => Arr::exists($auditAssessmentAreaRisk, 'control_owner_id') ? $auditAssessmentAreaRisk['control_owner_id'] : 0,
                     'control_owner_name' => $auditAssessmentAreaRisk['control_owner_name'],
+                    'recommendation' => Arr::exists($auditAssessmentAreaRisk, 'comments') ? $auditAssessmentAreaRisk['comments'] : '',
+                    
                 ]);
 
             }
