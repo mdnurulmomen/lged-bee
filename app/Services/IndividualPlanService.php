@@ -62,6 +62,7 @@ class IndividualPlanService
                 $extension = $file->getClientOriginalExtension();
 
                 $filename = ($auditPlan->yearlyPlanLocation->id.'-'.$auditPlan->workPapers->count()).".".$extension;
+                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).".".$extension;
 
                 // File upload location
                 $location = 'public/audit-plan/work-papers';
