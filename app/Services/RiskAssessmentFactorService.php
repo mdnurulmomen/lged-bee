@@ -21,6 +21,10 @@ class RiskAssessmentFactorService
 
             $query = RiskAssessmentFactor::query();
 
+            if($type == 'field_offices'){
+                $query = $query;
+            }
+
             if($type == 'project'){
                 $query->where('item_type', 'project');
             }
@@ -29,8 +33,8 @@ class RiskAssessmentFactorService
                 $query->where('item_type', 'function');
             }
 
-            if($type == 'cost_center'){
-                $query->where('item_type', 'cost_center');
+            if($type == 'unit'){
+                $query->where('item_type', 'unit');
             }
 
             $risk_assessment_factor = $query->where('is_latest',1)->orderBy('total_risk_score', 'DESC')->get();
