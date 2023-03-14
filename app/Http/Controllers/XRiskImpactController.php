@@ -10,7 +10,7 @@ class XRiskImpactController extends Controller
     public function index()
     {
         try {
-            $list =  XRiskAssessmentImpact::all();
+            $list =  XRiskAssessmentImpact::orderBy('impact_value','DESC')->get();
 
             $response = responseFormat('success', $list);
 
