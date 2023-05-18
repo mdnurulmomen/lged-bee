@@ -59,7 +59,6 @@ class YearlyPlanService
             ->get();
 
 
-
             $data['project_list'] = $year_wise_location_project;
             $data['function_list'] = $year_wise_location_function;
             $data['cost_centers'] = [];

@@ -50,23 +50,47 @@ class StrategicPlanService
     {
         try {
 
-            $year_wise_location_project = StrategicPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_project = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
                 ->whereNotNull('project_id')
-                ->get();
+                ->get()
+                ->toArray();
 
-            $year_wise_location_function = StrategicPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_function = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
                 ->whereNotNull('function_id')
-                ->get();
+                ->get()
+                ->toArray();
 
-            $year_wise_location_cost_centers = StrategicPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_cost_centers = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
                 ->whereNotNull('cost_center_id')
-                ->get();
+                ->get()
+                ->toArray();
 
-            $data['project_list'] = $year_wise_location_project;
-            $data['function_list'] = $year_wise_location_function;
-            $data['cost_centers'] = $year_wise_location_cost_centers;
+            if ($request->scope == 'download') {    
+                $data = array_merge($year_wise_location_project, $year_wise_location_function, $year_wise_location_cost_centers);
+                $groupedData = collect($data)->groupBy('strategic_plan_year');
+                $strategic_plan_list = [];
+                foreach ($groupedData as $key => $strategic_plan) {
+                    $projects = [];
+                    $functions = [];
+                    foreach ($strategic_plan as $plan) {
+                        if ($plan['project_id']) {
+                            $projects[] = $plan;
+                        } elseif ($plan['function_id']) {
+                            $functions[] = $plan;
+                        }
+                    }
+                    $strategic_plan_list[$key]['projects'] = $projects;
+                    $strategic_plan_list[$key]['functions'] = $functions;
+                }
+                
+                return ['status' => 'success', 'data' => $strategic_plan_list];
+            } else {
+                $data['project_list'] = $year_wise_location_project;
+                $data['function_list'] = $year_wise_location_function;
+                $data['cost_centers'] = $year_wise_location_cost_centers;
 
-            return ['status' => 'success', 'data' => $data];
+                return ['status' => 'success', 'data' => $data];
+            }
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }

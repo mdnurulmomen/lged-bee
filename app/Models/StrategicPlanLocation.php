@@ -29,4 +29,9 @@ class StrategicPlanLocation extends Model
         'created_by',
         'updated_by',
     ];
+
+    public function strategic_plans(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(StrategicPlan::class, 'x_sp_duration_id' , 'strategic_plan_id');
+    }
 }
