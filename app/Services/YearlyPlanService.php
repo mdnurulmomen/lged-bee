@@ -45,7 +45,61 @@ class YearlyPlanService
         }
 
     }
+    public function update(Request $request): array
+    {
+                // return ['status' => 'success', 'data' => $request->strategic_info];
+        DB::beginTransaction();
 
+        try {
+
+            $strategic_plan = YearlyPlan::find($request->yearly_plan_id);
+            $strategic_plan->strategic_plan_id = $request->strategic_plan_id;
+            $strategic_plan->strategic_plan_year = $request->strategic_plan_year;
+            $strategic_plan->created_by = 1;
+            $strategic_plan->save();
+
+            foreach($request->strategic_info as $strategic){
+                $location_id = (int) $strategic['location_id'];
+                YearlyPlanLocation::updateOrCreate(
+                    ['id' => $location_id],$strategic);
+            }
+
+            DB::commit();
+            return ['status' => 'success', 'data' => 'Update Successfully'];
+
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+    public function deleteYearlyPlan(Request $request): array
+    {
+
+        try {
+               $year_wise_id =  YearlyPlanLocation::where('strategic_plan_year',$request->strategic_plan_year)->pluck('id');
+               YearlyPlanLocation::whereIn('id',$year_wise_id)->delete();
+
+               YearlyPlan::where('id',$request->yearly_plan_id)->delete();
+            return ['status' => 'success', 'data' => 'Delete Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+    public function yearlyPlanLocationDelete(Request $request): array
+    {
+
+        try {
+                YearlyPlanLocation::where('id',$request->yearly_plan_locations_id)->delete();
+            return ['status' => 'success', 'data' => 'Save Successfully'];
+
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
     public function getIndividualYearlyPlan(Request $request): array
     {
         try {

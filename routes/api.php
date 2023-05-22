@@ -148,6 +148,9 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'yearly-plan'], function () {
         Route::post('list', [YearlyPlanController::class, 'list']);
         Route::post('store', [YearlyPlanController::class, 'store']);
+        Route::post('update', [YearlyPlanController::class, 'update']);
+        Route::post('yearly-plan-delete', [YearlyPlanController::class, 'deleteYearlyPlan']);
+        Route::post('yearly_plan_location_delete', [YearlyPlanController::class, 'yearlyPlanLocationDelete']);
         Route::post('get-individual-yearly-plan', [YearlyPlanController::class, 'getIndividualYearlyPlan']);
         Route::post('get-individual-yearly-plan-year', [YearlyPlanController::class, 'getIndividualYearlyPlanYear']);
     });

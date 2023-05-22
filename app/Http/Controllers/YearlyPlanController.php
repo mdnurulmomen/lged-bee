@@ -31,6 +31,40 @@ class YearlyPlanController extends Controller
 
         return response()->json($response);
     }
+    public function update(Request $request, YearlyPlanService $yearlyPlanService)
+    {
+        $update = $yearlyPlanService->update($request);
+        if (isSuccessResponse($update)) {
+            $response = responseFormat('success', $update['data']);
+        } else {
+            $response = responseFormat('error', $update['data']);
+        }
+
+        return response()->json($response);
+    }
+    public function deleteYearlyPlan(Request $request, YearlyPlanService $yearlyPlanService)
+    {
+        $deleteYearlyPlan = $yearlyPlanService->deleteYearlyPlan($request);
+        if (isSuccessResponse($deleteYearlyPlan)) {
+            $response = responseFormat('success', $deleteYearlyPlan['data']);
+        } else {
+            $response = responseFormat('error', $deleteYearlyPlan['data']);
+        }
+
+        return response()->json($response);
+    }
+
+    public function yearlyPlanLocationDelete(Request $request, YearlyPlanService $yearlyPlanService)
+    {
+        $yearlyPlanLocationDelete = $yearlyPlanService->yearlyPlanLocationDelete($request);
+        if (isSuccessResponse($yearlyPlanLocationDelete)) {
+            $response = responseFormat('success', $yearlyPlanLocationDelete['data']);
+        } else {
+            $response = responseFormat('error', $yearlyPlanLocationDelete['data']);
+        }
+
+        return response()->json($response);
+    }
 
     public function getIndividualYearlyPlan(Request $request, YearlyPlanService $yearlyPlanService)
     {
