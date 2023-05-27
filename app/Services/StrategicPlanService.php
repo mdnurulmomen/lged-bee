@@ -49,8 +49,9 @@ class StrategicPlanService
     public function getIndividualStrategicPlan(Request $request): array
     {
         try {
-
+            // return ['status' => 'success', 'data' => $request->all()];
             $year_wise_location_project = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
+                ->where('strategic_plan_year',$request->strategic_plan_year)
                 ->whereNotNull('project_id')
                 ->get()
                 ->toArray();
@@ -65,7 +66,7 @@ class StrategicPlanService
                 ->get()
                 ->toArray();
 
-            if ($request->scope == 'download') {    
+            if ($request->scope == 'download') {
                 $data = array_merge($year_wise_location_project, $year_wise_location_function, $year_wise_location_cost_centers);
                 $groupedData = collect($data)->groupBy('strategic_plan_year');
                 $strategic_plan_list = [];
@@ -82,7 +83,7 @@ class StrategicPlanService
                     $strategic_plan_list[$key]['projects'] = $projects;
                     $strategic_plan_list[$key]['functions'] = $functions;
                 }
-                
+
                 return ['status' => 'success', 'data' => $strategic_plan_list];
             } else {
                 $data['project_list'] = $year_wise_location_project;
