@@ -132,10 +132,10 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function getAuditPlanWiseTeam(Request $request, ApEntityAuditPlanRevisedService $apEntityAuditPlanRevisedService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'activity_id' => 'required|integer',
+            'activity_id' => 'nullable|integer',
             // 'annual_plan_id' => 'required|integer',
             // 'fiscal_year_id' => 'required|integer',
-            // 'audit_plan_id' => 'required|integer',
+             'audit_plan_id' => 'required|integer',
         ])->validate();
         $team_list = $apEntityAuditPlanRevisedService->getAuditPlanWiseTeam($request);
 
@@ -217,7 +217,7 @@ class ApEntityAuditPlanRevisedController extends Controller
             // 'fiscal_year_id' => 'required|integer',
             // 'activity_id' => 'required|integer',
             // 'annual_plan_id' => 'required|integer',
-            // 'audit_plan_id' => 'integer',
+             'audit_plan_id' => 'integer',
             'teams' => 'required',
         ])->validate();
 
@@ -234,9 +234,10 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function updateAuditTeam(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            'fiscal_year_id' => 'required|integer',
-            'activity_id' => 'required|integer',
-            'annual_plan_id' => 'required|integer',
+            'yearly_plan_location_id' => 'required|integer',
+            'fiscal_year_id' => 'nullable|integer',
+            'activity_id' => 'nullable|integer',
+            'annual_plan_id' => 'nullable|integer',
             'audit_plan_id' => 'required|integer',
             'teams' => 'required',
         ])->validate();
@@ -254,7 +255,7 @@ class ApEntityAuditPlanRevisedController extends Controller
     public function storeTeamSchedule(Request $request, ApEntityTeamService $apEntityTeamService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [
-            // 'audit_plan_id' => 'integer',
+             'audit_plan_id' => 'integer',
             // 'annual_plan_id' => 'integer',
             'team_schedules' => 'required|json',
         ])->validate();
@@ -273,7 +274,7 @@ class ApEntityAuditPlanRevisedController extends Controller
     {
 
         Validator::make($request->all(), [
-            'annual_plan_id' => 'required|integer',
+            'annual_plan_id' => 'nullable|integer',
             'audit_plan_id' => 'required|integer',
             'team_schedules' => 'required|json',
         ])->validate();

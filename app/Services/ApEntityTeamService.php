@@ -67,7 +67,7 @@ class ApEntityTeamService
                 // $auditVisitCalendarPlanTeam->annual_plan_id = $request->annual_plan_id;
                 $auditVisitCalendarPlanTeam->audit_year_start = $request->audit_year_start;
                 $auditVisitCalendarPlanTeam->audit_year_end = $request->audit_year_end;
-                // $auditVisitCalendarPlanTeam->audit_plan_id = $request->audit_plan_id;
+                 $auditVisitCalendarPlanTeam->audit_plan_id = $request->audit_plan_id;
                 $auditVisitCalendarPlanTeam->team_name = $team['team_name'];
                 $auditVisitCalendarPlanTeam->team_start_date = $teams['team_start_date'];
                 $auditVisitCalendarPlanTeam->team_end_date = $teams['team_end_date'];
@@ -110,7 +110,7 @@ class ApEntityTeamService
             return ['status' => 'error', 'data' => $office_db_con_response];
         }
 
-        $annualPlan = AnnualPlan::find($request->annual_plan_id);
+        $annualPlan = AnnualPlan::find($request->audit_plan_id);
         if ($request->modal_type == 'data-collection') {
             $annualPlan->has_dc_schedule = 1;
             $annualPlan->save();
@@ -130,14 +130,15 @@ class ApEntityTeamService
                 $id = isset($team['id']) &&  $team['id'] ? $team['id'] : null;
                 $data = [
                     'team_parent_id' => isset($team['team_parent_id']) && $team['team_parent_id'] == 0 ?  0 : $teams['all_teams'][1]['id'],
-                    'fiscal_year_id' => $annualPlan->fiscal_year_id,
-                    'duration_id' => $annualPlan->activity->duration_id,
-                    'outcome_id' => $annualPlan->activity->outcome_id,
-                    'output_id' => $annualPlan->activity->output_id,
-                    'activity_id' => $annualPlan->activity_id,
-                    'milestone_id' => $annualPlan->milestone_id,
-                    'annual_plan_id' => $request->annual_plan_id,
+//                    'fiscal_year_id' => $annualPlan->fiscal_year_id,
+//                    'duration_id' => $annualPlan->activity->duration_id,
+//                    'outcome_id' => $annualPlan->activity->outcome_id,
+//                    'output_id' => $annualPlan->activity->output_id,
+//                    'activity_id' => $annualPlan->activity_id,
+//                    'milestone_id' => $annualPlan->milestone_id,
+//                    'annual_plan_id' => $request->annual_plan_id,
                     'audit_plan_id' => $request->audit_plan_id,
+                    'yearly_plan_location_id' => $request->yearly_plan_location_id,
                     'audit_year_start' => $request->audit_year_start,
                     'audit_year_end' => $request->audit_year_end,
                     'team_name' => $team['team_name'],
@@ -232,9 +233,6 @@ class ApEntityTeamService
                 ->where('leader_designation_id', $designation_id)
                 ->first();
 
-              $audit_plan_id =  ApEntityIndividualAuditPlan::where('yearly_plan_location_id',$yearly_plan_location_id)->first()->id;
-
-
                 if (!$team_data) {
                     throw new \Exception('Team is not formed');
                 }
@@ -258,7 +256,7 @@ class ApEntityTeamService
                                     // 'activity_id' => $team_data->activity_id,
                                     // 'milestone_id' => $team_data->milestone_id,
                                     // 'annual_plan_id' => $team_data->annual_plan_id,
-                                     'audit_plan_id' => $audit_plan_id,
+                                     'audit_plan_id' => $team_data->audit_plan_id,
                                     // 'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
                                     // 'ministry_name_bn' => empty($schedule_datum['ministry_name_bn']) ? null : $schedule_datum['ministry_name_bn'],
                                     // 'ministry_name_en' => empty($schedule_datum['ministry_name_en']) ? null : $schedule_datum['ministry_name_en'],
@@ -331,11 +329,10 @@ class ApEntityTeamService
 
             if (!$office_order) {
                 AuditVisitCalenderPlanMember::where('audit_plan_id', $request->audit_plan_id)
-                    ->where('annual_plan_id',$request->annual_plan_id)
                     ->delete();
             }
 
-            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->audit_plan_id, $request->annual_plan_id);
+            $saveSchedule = $this->saveTeamSchedule($team_schedules, $request->yearly_plan_location_id);
             if (isSuccessResponse($saveSchedule)) {
                 $data = ['status' => 'success', 'data' => 'successfully saved'];
             } else {

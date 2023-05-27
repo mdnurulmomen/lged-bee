@@ -244,9 +244,9 @@ class ApEntityAuditPlanRevisedService
             }
 
             $team_log =  AuditVisitCalendarPlanTeamUpdate::where('fiscal_year_id', $request->fiscal_year_id)
-                ->where('activity_id', $request->activity_id)
+//                ->where('activity_id', $request->activity_id)
                 ->where('audit_plan_id', $request->audit_plan_id)
-                ->where('annual_plan_id', $request->annual_plan_id)
+//                ->where('annual_plan_id', $request->annual_plan_id)
                 ->count();
 
             $query = $team_log > 0 ? AuditVisitCalendarPlanTeamUpdate::query() : AuditVisitCalendarPlanTeam::query();
