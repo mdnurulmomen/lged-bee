@@ -53,11 +53,9 @@ class AuditExecutionQueryService
             //     ->whereNotNull('cost_center_id')
             //     ->orderBy('team_member_start_date', 'ASC')
             //     ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
-            $schedule_list = $query->with('plan_team', function($q1) use($strategic_plan_year){
-                $q1->with('yearly_plan_location', function($q2) use($strategic_plan_year){
-                    $q2->where('strategic_plan_year', $strategic_plan_year);
-                });
-            })
+            $schedule_list = $query->whereHas('yearly_plan_location', function($q) use($strategic_plan_year){
+                $q->where('strategic_plan_year', $strategic_plan_year);
+            })->with('yearly_plan_location')->with('plan_team')
                 ->where('team_member_officer_id', $cdesk->officer_id)
                 ->where('schedule_type','!=','visit')
                 ->paginate($request->per_page ?: config('bee_config.per_page_pagination'));

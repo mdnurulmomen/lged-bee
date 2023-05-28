@@ -95,4 +95,9 @@ class AuditVisitCalenderPlanMember extends Model
     {
         return $this->belongsTo(AcMemo::class, ['audit_plan_id', 'cost_center_id'], ['audit_plan_id', 'cost_center_id']);
     }
+
+    public function yearly_plan_location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(YearlyPlanLocation::class, 'yearly_plan_location_id', 'id');
+    }
 }
