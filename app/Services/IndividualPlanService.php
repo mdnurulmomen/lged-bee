@@ -28,10 +28,14 @@ class IndividualPlanService
     public function getAllWorkPapers(Request $request)
     {
         // return ['status' => 'success', 'data' => $request->audit_plan_id];
-
+        $strategic_plan_year = $request->strategic_plan_year;
         try {
 
-            $auditPlan = PlanWorkPaper::where('audit_plan_id',$request->audit_plan_id)->get();
+            $auditPlan = PlanWorkPaper::where('audit_plan_id',$request->audit_plan_id)
+            ->whereHas('yearly_plan_location', function($q) use($strategic_plan_year){
+                $q->where('strategic_plan_year' , $strategic_plan_year);
+            })
+            ->get();
 
             return ['status' => 'success', 'data' => $auditPlan];
 

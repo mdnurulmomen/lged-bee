@@ -25,4 +25,9 @@ class PlanWorkPaper extends Model
     {
         return $this->belongsTo(ApEntityIndividualAuditPlan::class, 'audit_plan_id', 'id');
     }
+
+     public function yearly_plan_location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(YearlyPlanLocation::class, 'yearly_plan_location_id', 'id');
+    }
 }
