@@ -138,30 +138,26 @@ class RiskAssessmentController extends Controller
         DB::beginTransaction();
 
         try {
-            $auditAssessmentArea = AuditAssessmentArea::find($id);;
-            $auditAssessmentArea->audit_area_id = $request->audit_area_id;
-            $auditAssessmentArea->assessment_sector_id = $request->assessment_sector_id;
-            $auditAssessmentArea->assessment_sector_type = $request->assessment_sector_type;
-            $auditAssessmentArea->updater_id = $request->updater_id;
+
+            $auditAssessmentArea = AuditAssessmentAreaRisk::find($id);
+
+            $auditAssessmentArea->sub_area_id = $request->sub_area_id ? $request->sub_area_id : $auditAssessmentArea->sub_area_id;
+            $auditAssessmentArea->sub_area_name = $request->sub_area_name ? $request->sub_area_name : $auditAssessmentArea->sub_area_name;
+            $auditAssessmentArea->inherent_risk_id = $request->inherent_risk_id ? $request->inherent_risk_id : $auditAssessmentArea->inherent_risk_id;
+            $auditAssessmentArea->inherent_risk = $request->inherent_risk ? $request->inherent_risk : $auditAssessmentArea->inherent_risk;
+            $auditAssessmentArea->x_risk_assessment_impact_id = $request->x_risk_assessment_impact_id ? $request->x_risk_assessment_impact_id : $auditAssessmentArea->x_risk_assessment_impact_id;
+            $auditAssessmentArea->x_risk_assessment_likelihood_id = $request->x_risk_assessment_likelihood_id ? $request->x_risk_assessment_likelihood_id : $auditAssessmentArea->x_risk_assessment_likelihood_id;
+            $auditAssessmentArea->risk_level = $request->risk_level ? $request->risk_level : $auditAssessmentArea->risk_level;
+            $auditAssessmentArea->priority = $request->priority ? $request->priority : $auditAssessmentArea->priority;
+            $auditAssessmentArea->issue_no = $request->issue_no ? $request->issue_no : $auditAssessmentArea->issue_no;
+            $auditAssessmentArea->risk_owner_id = $request->risk_owner_id ? $request->risk_owner_id : $auditAssessmentArea->risk_owner_id;
+            $auditAssessmentArea->risk_owner_name = $request->risk_owner_name ? $request->risk_owner_name : $auditAssessmentArea->risk_owner_name;
+            $auditAssessmentArea->process_owner_id = $request->process_owner_id ? $request->process_owner_id : $auditAssessmentArea->process_owner_id;
+            $auditAssessmentArea->process_owner_name = $request->process_owner_name ? $request->process_owner_name : $auditAssessmentArea->process_owner_name;
+            $auditAssessmentArea->control_owner_id = $request->control_owner_id ? $request->control_owner_id : $auditAssessmentArea->control_owner_id;
+            $auditAssessmentArea->control_owner_name = $request->control_owner_name ? $request->control_owner_name : $auditAssessmentArea->control_owner_name;
+            $auditAssessmentArea->control_system = $request->control_system ? $request->control_system : $auditAssessmentArea->control_system;
             $auditAssessmentArea->save();
-
-            $auditAssessmentArea->auditAssessmentAreaRisks()->delete();
-
-            foreach ($request->audit_assessment_area_risks as $auditAssessmentAreaRisk) {
-
-                $auditAssessmentArea->auditAssessmentAreaRisks()->create([
-                    'inherent_risk' => $auditAssessmentAreaRisk['inherent_risk'],
-                    'x_risk_assessment_impact_id' => $auditAssessmentAreaRisk['x_risk_assessment_impact_id'],
-                    'x_risk_assessment_likelihood_id' => $auditAssessmentAreaRisk['x_risk_assessment_likelihood_id'],
-                    'control_system' => $auditAssessmentAreaRisk['control_system'],
-                    'control_effectiveness' => $auditAssessmentAreaRisk['control_effectiveness'],
-                    'residual_risk' => $auditAssessmentAreaRisk['residual_risk'],
-                    'recommendation' => $auditAssessmentAreaRisk['recommendation'],
-                    'implemented_by' => $auditAssessmentAreaRisk['implemented_by'],
-                    'implementation_period' => $auditAssessmentAreaRisk['implementation_period'],
-                ]);
-
-            }
 
             DB::commit();
 
