@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditAssessmentAreaRisk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,20 @@ class RiskAssessmentController extends Controller
             ->get();
 
             $response = responseFormat('success', $list);
+
+        } catch (\Exception $exception) {
+            $response = responseFormat('error', $exception->getMessage());
+        }
+
+        return response()->json($response);
+    }
+
+    public function auditSubAreaRiskInfo(Request $request)
+    {
+        try {
+
+            $sub_area_risk_info = AuditAssessmentAreaRisk::with('xRiskAssessmentImpact','xRiskAssessmentLikelihood')->find($request->id);
+            $response = responseFormat('success', $sub_area_risk_info);
 
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
@@ -82,7 +97,7 @@ class RiskAssessmentController extends Controller
                     'control_owner_id' => Arr::exists($auditAssessmentAreaRisk, 'control_owner_id') ? $auditAssessmentAreaRisk['control_owner_id'] : 0,
                     'control_owner_name' => $auditAssessmentAreaRisk['control_owner_name'],
                     'recommendation' => Arr::exists($auditAssessmentAreaRisk, 'comments') ? $auditAssessmentAreaRisk['comments'] : '',
-                    
+
                 ]);
 
             }

@@ -118,6 +118,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('/', [RiskAssessmentController::class, 'store']);
         Route::put('/{id}', [RiskAssessmentController::class, 'update']);
         Route::delete('/{id}', [RiskAssessmentController::class, 'delete']);
+        Route::post('/audit-subarea-risk-info', [RiskAssessmentController::class, 'auditSubAreaRiskInfo']);
     });
 
     Route::group(['prefix' => 'risk-identifications'], function () {
