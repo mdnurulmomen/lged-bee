@@ -45,6 +45,32 @@ class StrategicPlanService
         }
 
     }
+    public function update(Request $request): array
+    {
+
+        try {
+            foreach($request->strategic_info as $strategic){
+                StrategicPlanLocation::upsert($strategic,['id']);
+            }
+            return ['status' => 'success', 'data' => 'Update Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
+    public function deleteLocation(Request $request): array
+    {
+
+        try {
+            StrategicPlanLocation::where('id',$request->location_id)->delete();
+            return ['status' => 'success', 'data' => 'Delete Successfully'];
+
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
 
     public function getIndividualStrategicPlan(Request $request): array
     {
@@ -58,10 +84,12 @@ class StrategicPlanService
 
             $year_wise_location_function = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
                 ->whereNotNull('function_id')
+                ->where('strategic_plan_year',$request->strategic_plan_year)
                 ->get()
                 ->toArray();
 
             $year_wise_location_cost_centers = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
+                ->where('strategic_plan_year',$request->strategic_plan_year)
                 ->whereNotNull('cost_center_id')
                 ->get()
                 ->toArray();

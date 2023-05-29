@@ -141,6 +141,8 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
     Route::group(['prefix' => 'strategic-plan'], function () {
         Route::post('list', [StrategicPlanController::class, 'list']);
         Route::post('store', [StrategicPlanController::class, 'store']);
+        Route::post('update', [StrategicPlanController::class, 'update']);
+        Route::post('delete-location', [StrategicPlanController::class, 'deleteLocation']);
         Route::post('get-individual-strategic-plan', [StrategicPlanController::class, 'getIndividualStrategicPlan']);
         Route::post('get-individual-strategic-plan-year', [StrategicPlanController::class, 'getIndividualStrategicPlanYear']);
     });

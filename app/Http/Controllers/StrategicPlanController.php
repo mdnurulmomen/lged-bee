@@ -31,6 +31,28 @@ class StrategicPlanController extends Controller
 
         return response()->json($response);
     }
+    public function update(Request $request, StrategicPlanService $strategicPlanService)
+    {
+        $update = $strategicPlanService->update($request);
+        if (isSuccessResponse($update)) {
+            $response = responseFormat('success', $update['data']);
+        } else {
+            $response = responseFormat('error', $update['data']);
+        }
+
+        return response()->json($response);
+    }
+    public function deleteLocation(Request $request, StrategicPlanService $strategicPlanService)
+    {
+        $deleteLocation = $strategicPlanService->deleteLocation($request);
+        if (isSuccessResponse($deleteLocation)) {
+            $response = responseFormat('success', $deleteLocation['data']);
+        } else {
+            $response = responseFormat('error', $update['data']);
+        }
+
+        return response()->json($response);
+    }
 
     public function getIndividualStrategicPlan(Request $request, StrategicPlanService $strategicPlanService)
     {
