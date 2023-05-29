@@ -19,6 +19,18 @@ class StrategicPlanController extends Controller
 
         return response()->json($response);
     }
+    public function delete(Request $request, StrategicPlanService $strategicPlanService)
+    {
+        $delete = $strategicPlanService->delete($request);
+
+        if (isSuccessResponse($delete)) {
+            $response = responseFormat('success', $delete['data']);
+        } else {
+            $response = responseFormat('error', $delete['data']);
+        }
+
+        return response()->json($response);
+    }
 
     public function store(Request $request, StrategicPlanService $strategicPlanService)
     {

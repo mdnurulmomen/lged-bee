@@ -15,7 +15,7 @@ class XStrategicPlanDurationController extends Controller
         if ($request->per_page && $request->page && !$request->all) {
             $planDurations = XStrategicPlanDuration::paginate($request->per_page);
         } else {
-            $planDurations = XStrategicPlanDuration::all();
+            $planDurations = XStrategicPlanDuration::withCount('strategic_plan')->get();
         }
 
         if ($planDurations) {

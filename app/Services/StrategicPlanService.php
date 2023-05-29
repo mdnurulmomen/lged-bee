@@ -19,6 +19,18 @@ class StrategicPlanService
         }
 
     }
+    public function delete(Request $request): array
+    {
+        try {
+            StrategicPlan::where('x_sp_duration_id',$request->strategic_plan_id)->delete();
+            StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)->delete();
+
+            return ['status' => 'success', 'data' => 'Strategic Plan Delete Successfully'];
+        } catch (\Exception $exception) {
+            return ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+
+    }
 
     public function store(Request $request): array
     {
