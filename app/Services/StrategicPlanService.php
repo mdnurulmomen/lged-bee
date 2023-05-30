@@ -88,21 +88,28 @@ class StrategicPlanService
     {
         try {
             // return ['status' => 'success', 'data' => $request->all()];
-            $year_wise_location_project = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
-                ->where('strategic_plan_year',$request->strategic_plan_year)
-                ->whereNotNull('project_id')
+            
+            $project_query = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id);
+                if ($request->strategic_plan_year) {
+                    $project_query->where('strategic_plan_year',$request->strategic_plan_year);
+                }
+            $year_wise_location_project = $project_query->whereNotNull('project_id')
                 ->get()
                 ->toArray();
 
-            $year_wise_location_function = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
-                ->whereNotNull('function_id')
-                ->where('strategic_plan_year',$request->strategic_plan_year)
+            $function_query = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id);
+                if ($request->strategic_plan_year) {
+                    $function_query->where('strategic_plan_year',$request->strategic_plan_year);
+                }
+            $year_wise_location_function = $function_query->whereNotNull('function_id')
                 ->get()
                 ->toArray();
 
-            $year_wise_location_cost_centers = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id)
-                ->where('strategic_plan_year',$request->strategic_plan_year)
-                ->whereNotNull('cost_center_id')
+            $cost_centers_query = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id);
+                if ($request->strategic_plan_year) {
+                    $function_query->where('strategic_plan_year',$request->strategic_plan_year);
+                }
+            $year_wise_location_cost_centers = $cost_centers_query->whereNotNull('cost_center_id')
                 ->get()
                 ->toArray();
 
