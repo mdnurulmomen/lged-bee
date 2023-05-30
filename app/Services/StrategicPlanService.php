@@ -44,8 +44,12 @@ class StrategicPlanService
             $strategic_plan->created_by = 1;
             $strategic_plan->save();
 
-            foreach($request->strategic_info as $strategic){
-                StrategicPlanLocation::insert($strategic);
+            $data = array_merge($request->strategic_info);
+
+            foreach($data as $strategic){
+                foreach($strategic as $plan_data){
+                    StrategicPlanLocation::insert($plan_data);
+                }
             }
 
             DB::commit();
@@ -150,6 +154,7 @@ class StrategicPlanService
         try {
 
             $year_list = StrategicPlanLocation::select('strategic_plan_id','strategic_plan_year')->distinct('strategic_plan_year')
+                ->withCount('get_individual_plan')
                 ->get();
             return ['status' => 'success', 'data' => $year_list];
 

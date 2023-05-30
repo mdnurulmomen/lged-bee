@@ -34,4 +34,8 @@ class StrategicPlanLocation extends Model
     {
         return $this->belongsTo(StrategicPlan::class, 'x_sp_duration_id' , 'strategic_plan_id');
     }
+    public function get_individual_plan()
+    {
+        return $this->hasMany(YearlyPlan::class, 'strategic_plan_year', 'strategic_plan_year');
+    }
 }
