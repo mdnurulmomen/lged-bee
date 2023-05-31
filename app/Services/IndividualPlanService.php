@@ -14,12 +14,11 @@ class IndividualPlanService
     {
         try {
 
-            $auditPlans = ApEntityIndividualAuditPlan::with(['yearlyPlanLocation'])->get();
+            $auditPlans = ApEntityIndividualAuditPlan::with(['yearlyPlanLocation'])->whereHas('yearlyPlanLocation')->get();
             return ['status' => 'success', 'data' => $auditPlans];
 
         }
         catch (\Exception $e) {
-
             return ['status' => 'error', 'data' => $e->getMessage()];
 
         }
@@ -27,15 +26,20 @@ class IndividualPlanService
 
     public function getAllWorkPapers(Request $request)
     {
-        // return ['status' => 'success', 'data' => $request->audit_plan_id];
+        // return ['status' => 'success', 'data' => $request->all()];
         $strategic_plan_year = $request->strategic_plan_year;
         try {
+            $query  = PlanWorkPaper::query();
 
-            $auditPlan = PlanWorkPaper::where('audit_plan_id',$request->audit_plan_id)
-            ->whereHas('yearly_plan_location', function($q) use($strategic_plan_year){
-                $q->where('strategic_plan_year' , $strategic_plan_year);
-            })
-            ->get();
+            $query = $query->where('audit_plan_id',$request->audit_plan_id)->whereHas('yearly_plan_location');
+
+            if($strategic_plan_year){
+                $query = $query->whereHas('yearly_plan_location', function($q) use($strategic_plan_year){
+                    $q->where('strategic_plan_year' , $strategic_plan_year);
+                });
+            }
+
+            $auditPlan =  $query->get();
 
             return ['status' => 'success', 'data' => $auditPlan];
 
