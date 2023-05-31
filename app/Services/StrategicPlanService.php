@@ -13,7 +13,7 @@ class StrategicPlanService
     public function list(Request $request): array
     {
         try {
-            $strategic_plan_list = StrategicPlan::get();
+            $strategic_plan_list = StrategicPlan::withcount('get_individual_plan')->get();
             return ['status' => 'success', 'data' => $strategic_plan_list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
