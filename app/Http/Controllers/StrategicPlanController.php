@@ -60,7 +60,7 @@ class StrategicPlanController extends Controller
         if (isSuccessResponse($deleteLocation)) {
             $response = responseFormat('success', $deleteLocation['data']);
         } else {
-            $response = responseFormat('error', $update['data']);
+            $response = responseFormat('error', $deleteLocation['data']);
         }
 
         return response()->json($response);

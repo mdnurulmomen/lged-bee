@@ -47,8 +47,6 @@ class YearlyPlanService
     }
     public function update(Request $request): array
     {
-                // return ['status' => 'success', 'data' => $request->strategic_info];
-        DB::beginTransaction();
 
         try {
 
@@ -63,12 +61,9 @@ class YearlyPlanService
                 YearlyPlanLocation::updateOrCreate(
                     ['id' => $location_id],$strategic);
             }
-
-            DB::commit();
             return ['status' => 'success', 'data' => 'Update Successfully'];
 
         } catch (\Exception $exception) {
-            DB::rollback();
             return ['status' => 'error', 'data' => $exception->getMessage()];
         }
 

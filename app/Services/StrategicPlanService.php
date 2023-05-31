@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Models\StrategicPlan;
 use App\Models\StrategicPlanLocation;
+use App\Models\YearlyPlanLocation;
 use Illuminate\Http\Request;
 use DB;
 
@@ -77,9 +78,12 @@ class StrategicPlanService
     }
     public function deleteLocation(Request $request): array
     {
-
         try {
-            StrategicPlanLocation::where('id',$request->location_id)->delete();
+            if($request->type == 'yearly'){
+                YearlyPlanLocation::where('id',$request->location_id)->delete();
+            }else{
+                StrategicPlanLocation::where('id',$request->location_id)->delete();
+            }
             return ['status' => 'success', 'data' => 'Delete Successfully'];
 
         } catch (\Exception $exception) {
@@ -92,7 +96,7 @@ class StrategicPlanService
     {
         try {
             // return ['status' => 'success', 'data' => $request->all()];
-            
+
             $project_query = StrategicPlanLocation::where('strategic_plan_id',$request->strategic_plan_id);
                 if ($request->strategic_plan_year) {
                     $project_query->where('strategic_plan_year',$request->strategic_plan_year);
