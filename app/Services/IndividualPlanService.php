@@ -61,6 +61,8 @@ class IndividualPlanService
 
             $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
 
+            $yearly_plan_location_id = $auditPlan->yearly_plan_location_id;
+
             if(is_file($request['attachment'])) {
 
                 // File Object
@@ -86,6 +88,7 @@ class IndividualPlanService
                 'title_en' => $request->title_en,
                 'title_bn' => $request->title_bn,
                 'attachment' => $filepath,
+                'yearly_plan_location_id' => $yearly_plan_location_id,
                 'created_by' => $request->created_by,
                 'updated_by' => $request->updated_by,
             ]);

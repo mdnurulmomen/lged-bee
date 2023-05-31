@@ -257,6 +257,7 @@ class ApEntityTeamService
                                     // 'milestone_id' => $team_data->milestone_id,
                                     // 'annual_plan_id' => $team_data->annual_plan_id,
                                      'audit_plan_id' => $team_data->audit_plan_id,
+                                     'yearly_plan_location_id' => $yearly_plan_location_id,
                                     // 'ministry_id' => empty($schedule_datum['ministry_id']) ? null : $schedule_datum['ministry_id'],
                                     // 'ministry_name_bn' => empty($schedule_datum['ministry_name_bn']) ? null : $schedule_datum['ministry_name_bn'],
                                     // 'ministry_name_en' => empty($schedule_datum['ministry_name_en']) ? null : $schedule_datum['ministry_name_en'],

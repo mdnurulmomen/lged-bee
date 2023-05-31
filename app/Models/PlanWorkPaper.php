@@ -16,6 +16,7 @@ class PlanWorkPaper extends Model
         'title_bn',
         'attachment',
         'audit_plan_id',
+        'yearly_plan_location_id',
         'created_by',
         'updated_by',
     ];
