@@ -102,7 +102,7 @@ class PermissionService
                     ->with(['menu_childrens' => function ($query) use ($menu_ids) {
                         $query->whereIn('id', $menu_ids)
                             ->where('type', 'menu');
-                    }])->where('parent_id', null)->get();
+                    }])->where('parent_id', null)->orderBy('display_order','ASC')->get();
 
             $data = [
                 'module' => $module,
