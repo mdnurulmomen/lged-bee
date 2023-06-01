@@ -61,10 +61,11 @@ class XStrategicPlanDurationController extends Controller
     {
         try {
             $duration = XStrategicPlanDuration::find($request->duration_id);
-            if ($duration->plan_outcome) {
+            if (!empty($duration->strategic_plan)) {
                 $response = responseFormat('error', 'Duration period is used');
             } else {
-                $response = responseFormat('success', 'Successfully Deleted');
+                $duration->delete();
+                $response = responseFormat('success', 'Delete Successfull');
             }
         } catch (\Exception $exception) {
             $response = responseFormat('error', $exception->getMessage());
