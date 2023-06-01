@@ -9,4 +9,9 @@ class YearlyPlan extends Model
 {
     use HasFactory;
     protected $connection = 'OfficeDB';
+
+    public function has_yearly_plan()
+    {
+        return $this->hasOne(ApEntityIndividualAuditPlan::class, 'yearly_plan_id', 'id');
+    }
 }

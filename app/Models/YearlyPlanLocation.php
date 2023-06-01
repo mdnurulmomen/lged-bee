@@ -39,4 +39,8 @@ class YearlyPlanLocation extends Model
     {
         return $this->hasOne(ApEntityIndividualAuditPlan::class, 'yearly_plan_location_id', 'id');
     }
+    public function yearly_plan()
+    {
+        return $this->hasOne(YearlyPlan::class, 'strategic_plan_id', 'strategic_plan_id');
+    }
 }

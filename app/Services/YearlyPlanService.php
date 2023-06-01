@@ -12,7 +12,7 @@ class YearlyPlanService
     public function list(Request $request): array
     {
         try {
-            $list = YearlyPlan::get();
+            $list = YearlyPlan::withCount('has_yearly_plan')->get();
             return ['status' => 'success', 'data' => $list];
         } catch (\Exception $exception) {
             return ['status' => 'error', 'data' => $exception->getMessage()];
@@ -99,11 +99,15 @@ class YearlyPlanService
     {
         try {
 
-            $year_wise_location_project = YearlyPlanLocation::with('audit_plan.milestones')->where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_project = YearlyPlanLocation::with('audit_plan.milestones')
+            ->with('yearly_plan:id,strategic_plan_id')
+            ->where('strategic_plan_year',$request->strategic_plan_year)
             ->whereNotNull('project_id')
             ->get();
 
-            $year_wise_location_function = YearlyPlanLocation::with('audit_plan.milestones')->where('strategic_plan_year',$request->strategic_plan_year)
+            $year_wise_location_function = YearlyPlanLocation::with('audit_plan.milestones')
+            ->with('yearly_plan:id,strategic_plan_id')
+            ->where('strategic_plan_year',$request->strategic_plan_year)
             ->whereNotNull('function_id')
             ->get();
 
@@ -124,6 +128,7 @@ class YearlyPlanService
         try {
 
             $year_list = YearlyPlanLocation::select('strategic_plan_id','strategic_plan_year')
+            ->with('yearly_plan:id,strategic_plan_id')
             ->distinct('strategic_plan_year')
             ->get();
 
