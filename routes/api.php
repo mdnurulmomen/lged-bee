@@ -173,6 +173,7 @@ Route::group(['middleware' => ['header.api.version', 'auth.jwt']], function () {
         Route::post('/', [IndividualPlanController::class, 'getAllWorkPapers']);
         Route::post('/store', [IndividualPlanController::class, 'uploadWorkPapers']);
         Route::post('/update', [IndividualPlanController::class, 'updateWorkPapers']);
+        Route::post('/delete', [IndividualPlanController::class, 'deleteWorkPapers']);
     });
 
     Route::group(['prefix' => 'planning/'], function () {

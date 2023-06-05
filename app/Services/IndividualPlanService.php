@@ -163,6 +163,17 @@ class IndividualPlanService
         }
     }
 
+    public function deleteWorkPapers(Request $request)
+    {
+        try {
+            $workPaper = PlanWorkPaper::find($request->work_paper_id)->delete();           
+            return ['status' => 'success', 'data' => 'Successfully Deleted'];
+        }
+        catch (\Exception $e) {
+            return ['status' => 'error', 'data' => $e->getMessage()];
+        }
+    }
+
     public function auditPlanInfo(Request $request): array
     {
         try {

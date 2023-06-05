@@ -57,6 +57,18 @@ class IndividualPlanController extends Controller
         return response()->json($response);
     }
 
+    public function deleteWorkPapers(Request $request, IndividualPlanService $individualPlanService)
+    {
+        $store = $individualPlanService->deleteWorkPapers($request);
+        if (isSuccessResponse($store)) {
+            $response = responseFormat('success', $store['data']);
+        } else {
+            $response = responseFormat('error', $store['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function auditPlanInfo(Request $request, IndividualPlanService $individualPlanService): \Illuminate\Http\JsonResponse
     {
         $plan_info = $individualPlanService->auditPlanInfo($request);
