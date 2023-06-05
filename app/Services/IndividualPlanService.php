@@ -26,12 +26,18 @@ class IndividualPlanService
 
     public function getAllWorkPapers(Request $request)
     {
-        // return ['status' => 'success', 'data' => $request->all()];
         $strategic_plan_year = $request->strategic_plan_year;
+        $work_paper_id = $request->work_paper_id;
         try {
             $query  = PlanWorkPaper::query();
 
-            $query = $query->where('audit_plan_id',$request->audit_plan_id)->whereHas('yearly_plan_location');
+            if($work_paper_id) {
+                $auditPlan = $query->where('id',$request->work_paper_id)->with('yearly_plan_location')->first();
+                return ['status' => 'success', 'data' => $auditPlan];
+            } else {
+                $query = $query->where('audit_plan_id',$request->audit_plan_id)
+                ->whereHas('yearly_plan_location');
+            }
 
             if($strategic_plan_year){
                 $query = $query->whereHas('yearly_plan_location', function($q) use($strategic_plan_year){
@@ -53,7 +59,6 @@ class IndividualPlanService
 
     public function uploadWorkPapers(Request $request)
     {
-        // return ['status' => 'success', 'data' => $request->audit_plan_id];
 
         DB::beginTransaction();
 
@@ -96,6 +101,59 @@ class IndividualPlanService
             DB::commit();
 
             return ['status' => 'success', 'data' => 'Successfully uploaded'];
+
+        }
+        catch (\Exception $e) {
+
+            return ['status' => 'error', 'data' => $e->getMessage()];
+
+        }
+    }
+
+    public function updateWorkPapers(Request $request)
+    {
+
+        DB::beginTransaction();
+
+        try {
+
+            $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+            $yearly_plan_location_id = $auditPlan->yearly_plan_location_id;
+
+            $workPaper = PlanWorkPaper::find($request->work_paper_id);           
+            if(is_file($request['attachment'])) {
+                $file = $request['attachment'];
+                $extension = $file->getClientOriginalExtension();
+                $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).".".$extension;
+                $location = 'public/audit-plan/work-papers';
+                $file->storeAs($location, $filename);
+                $filepath = ('storage/audit-plan/work-papers/'.$filename);
+
+                $workPaper->update([
+                    'title_en' => $request->title_en,
+                    'title_bn' => $request->title_bn,
+                    'attachment' => $filepath,
+                    'audit_plan_id' => $request->audit_plan_id,
+                    'yearly_plan_location_id' => $yearly_plan_location_id,
+                    'created_by' => $request->created_by,
+                    'updated_by' => $request->updated_by,
+                ]);
+
+            } else {
+
+                $workPaper->update([
+                    'title_en' => $request->title_en,
+                    'title_bn' => $request->title_bn,
+                    'audit_plan_id' => $request->audit_plan_id,
+                    'yearly_plan_location_id' => $yearly_plan_location_id,
+                    'created_by' => $request->created_by,
+                    'updated_by' => $request->updated_by,
+                ]);
+            }
+
+            DB::commit();
+
+            return ['status' => 'success', 'data' => 'Successfully Uploaded'];
 
         }
         catch (\Exception $e) {
