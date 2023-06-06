@@ -120,7 +120,7 @@ class IndividualPlanService
             $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
             $yearly_plan_location_id = $auditPlan->yearly_plan_location_id;
 
-            $workPaper = PlanWorkPaper::find($request->work_paper_id);           
+            $workPaper = PlanWorkPaper::find($request->work_paper_id);
             if(is_file($request['attachment'])) {
                 $file = $request['attachment'];
                 $extension = $file->getClientOriginalExtension();
@@ -190,6 +190,11 @@ class IndividualPlanService
     {
         try {
             $cdesk = json_decode($request->cdesk, false);
+            if($request->id){
+               $has_office_order =  ApEntityIndividualAuditPlan::select('has_office_order')->where('id',$request->id)->first()->has_office_order;
+            }else{
+                $has_office_order = 0;
+            }
             $plan_data = [
                 'scope' => $request->scope,
                 'objective' => $request->objective,
@@ -197,7 +202,7 @@ class IndividualPlanService
                 'yearly_plan_id' => $request->yearly_plan_id,
                 'yearly_plan_location_id' => $request->yearly_plan_location_id,
                 'audit_type' => $request->audit_type,
-                'has_office_order' => 0,
+                'has_office_order' => $has_office_order,
                 'has_update_office_order' => 0,
                 'draft_unit_id' => $cdesk->office_unit_id,
                 'draft_unit_name_en' => $cdesk->office_unit_en,

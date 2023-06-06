@@ -35,14 +35,14 @@ class ApOfficerOrderService
             // $activity_id = $request->activity_id;
 
             $query = ApEntityIndividualAuditPlan::query();
-            $query = $query->with('yearlyPlanLocation')->with('office_order');
+            $query = $query->with('yearlyPlanLocation')->with('office_order')->has('audit_teams');
 
             $auditPlanList =  $query->paginate($request->per_page ?: config('bee_config.per_page_pagination'));
             // $query->when($fiscal_year_id, function ($q, $fiscal_year_id) {
             //     return $q->where('fiscal_year_id', $fiscal_year_id);
             // });
 
-            
+
 
 
 //             $query->when($activity_id, function ($q, $activity_id) {
