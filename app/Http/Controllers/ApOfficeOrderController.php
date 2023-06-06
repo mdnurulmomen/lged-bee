@@ -74,6 +74,30 @@ class ApOfficeOrderController extends Controller
         return response()->json($response);
     }
 
+    public function updateOfficeOrder(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
+    {
+        Validator::make($request->all(), [
+            'audit_plan_id' => 'required',
+            'office_order_id' => 'required',
+            'memorandum_no' => 'required',
+            'memorandum_date' => 'required',
+            'heading_details' => 'required',
+            'advices' => 'required',
+            'order_cc_list' => 'required',
+            'cdesk' => 'required|json',
+        ])->validate();
+
+        $responseData = $apOfficerOrderService->updateOfficeOrder($request);
+
+        if (isSuccessResponse($responseData)) {
+            $response = responseFormat('success', $responseData['data']);
+        } else {
+            $response = responseFormat('error', $responseData['data']);
+        }
+
+        return response()->json($response);
+    }
+
     public function storeOfficeOrderApprovalAuthority(Request $request, ApOfficerOrderService $apOfficerOrderService): \Illuminate\Http\JsonResponse
     {
         Validator::make($request->all(), [

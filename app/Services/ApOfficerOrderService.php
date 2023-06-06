@@ -284,6 +284,40 @@ class ApOfficerOrderService
         return $responseData;
     }
 
+    public function updateOfficeOrder(Request $request): array
+    {
+        $cdesk = json_decode($request->cdesk, false);
+        $office_db_con_response = $this->switchOffice($cdesk->office_id);
+        if (!isSuccessResponse($office_db_con_response)) {
+            return ['status' => 'error', 'data' => $office_db_con_response];
+        }
+        try {
+
+            //audit plan
+            // $auditPlan = ApEntityIndividualAuditPlan::find($request->audit_plan_id);
+            // $auditPlan->has_office_order = 1;
+            // $auditPlan->has_update_office_order = $auditPlan->has_update_office_order == 2 ? 1 : $auditPlan->has_update_office_order;
+            // $auditPlan->save();
+
+            //ap office order
+            $memorandum_date = Carbon::createFromFormat('d/m/Y', $request->memorandum_date);
+            ApOfficeOrder::where('id', $request->office_order_id)->update([
+                'memorandum_no' => $request->memorandum_no,
+                'memorandum_date' => $memorandum_date->format('Y-m-d'),
+                'heading_details' => $request->heading_details,
+                'advices' => $request->advices,
+                'order_cc_list' => $request->order_cc_list,
+                'modified_by' => $cdesk->officer_id,
+            ]);
+
+            $responseData = ['status' => 'success', 'data' => 'Successfully Office Order Updated'];
+        } catch (\Exception $exception) {
+            $responseData = ['status' => 'error', 'data' => $exception->getMessage()];
+        }
+        $this->emptyOfficeDBConnection();
+        return $responseData;
+    }
+
     public function storeOfficeOrderApprovalAuthority(Request $request): array
     {
         $cdesk = json_decode($request->cdesk, false);
